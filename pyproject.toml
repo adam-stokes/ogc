@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "ogc"
+version = "0.1.0"
+description = ""
+authors = ["Adam Stokes <battlemidget@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+click = "^7.0"
+sh = "^1.12"
+melddict = "^1.0"
+toml = "^0.10.0"
+launchpadlib = "=1.10.6"
+kv = "^0.3.0"
+juju-wait = "=2.7.0"
+juju = "^0.11.7"
+pyyaml = "=3.13"
+jinja2 = "^2.10"
+semver = "^2.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+
+[tool.poetry.scripts]
+ogc = 'ogc:app.start'
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
