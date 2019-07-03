@@ -24,7 +24,11 @@ def sync_upstream(snap_list, starting_ver):
 
 
 @click.command()
-@click.option("--repo-list", help="List of git repositories to create a new branches on", required=True)
+@click.option(
+    "--repo-list",
+    help="List of git repositories to create a new branches on",
+    required=True,
+)
 @click.option(
     "--from-branch",
     help="Current git branch to checkout",
@@ -153,7 +157,7 @@ def release(name, channel, version, dry_run):
 
 cli.add_command(snap)
 snap.add_command(create_snap_recipe)
-snap.add_command(branch)
+snap.add_command(create_branch)
 snap.add_command(sync_upstream)
 snap.add_command(build)
 snap.add_command(push)

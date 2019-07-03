@@ -17,9 +17,15 @@ juju = "^0.11.7"
 pyyaml = "=3.13"
 jinja2 = "^2.10"
 semver = "^2.8"
+staticjinja = "^0.3.5"
+python-box = "^3.4"
+boto3 = "^1.9"
+awscli = "^1.16"
+pyyaml-include = "^1.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
+ipdb = "^0.12.0"
 
 [tool.poetry.scripts]
 ogc = 'ogc:app.start'

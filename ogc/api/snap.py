@@ -83,7 +83,7 @@ def create_branches(repo_list, from_branch, to_branch, dry_run):
       --to-branch 1.16.0-alpha.0
     """
     for repo in repo_list:
-       create_branch(repo, from_branch, to_branch, dry_run)
+        create_branch(repo, from_branch, to_branch, dry_run)
 
 
 def create_branch(repo, from_branch, to_branch, dry_run):
