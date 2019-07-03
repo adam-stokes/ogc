@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "ogc"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 authors = ["Adam Stokes <battlemidget@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6"
 click = "^7.0"
 sh = "^1.12"
 melddict = "^1.0"

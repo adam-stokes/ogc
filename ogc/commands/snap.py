@@ -24,6 +24,24 @@ def sync_upstream(snap_list, starting_ver):
 
 
 @click.command()
+@click.option("--repo-list", help="List of git repositories to create a new branches on", required=True)
+@click.option(
+    "--from-branch",
+    help="Current git branch to checkout",
+    required=True,
+    default="master",
+)
+@click.option(
+    "--to-branch",
+    help="Git branch to create, this is typically upstream k8s version",
+    required=True,
+)
+@click.option("--dry-run", is_flag=True)
+def create_branches(repo_list, from_branch, to_branch, dry_run):
+    return api.snap.create_branches(repo_list, from_branch, to_branch, dry_run)
+
+
+@click.command()
 @click.option("--repo", help="Git repository to create a new branch on", required=True)
 @click.option(
     "--from-branch",
@@ -37,7 +55,7 @@ def sync_upstream(snap_list, starting_ver):
     required=True,
 )
 @click.option("--dry-run", is_flag=True)
-def branch(repo, from_branch, to_branch, dry_run):
+def create_branch(repo, from_branch, to_branch, dry_run):
     return api.snap.create_branch(repo, from_branch, to_branch, dry_run)
 
 

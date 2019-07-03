@@ -26,7 +26,7 @@ def _render(tmpl_file, context):
     return template.render(context)
 
 
-def sync_upstream(snap_list, starting_ver):
+def sync_upstream(snap_list, starting_ver="1.13.7"):
     """ Syncs the upstream k8s release tags with our snap branches
 
     Usage:
@@ -70,6 +70,22 @@ def sync_upstream(snap_list, starting_ver):
                 )
 
 
+def create_branches(repo_list, from_branch, to_branch, dry_run):
+    """ Creates a git branch based on the list of  upstream snap repo and a version to branch as. This will also update
+    the snapcraft.yaml with the correct version to build the snap from in that particular branch.
+
+    These branches must already exist in https://github.com/kubernetes/kubernetes.
+
+    Usage:
+
+    ogc snap create-branches --repo git+ssh://lp_git_user@git.launchpad.net/snap-kubectl \
+      --from-branch master \
+      --to-branch 1.16.0-alpha.0
+    """
+    for repo in repo_list:
+       create_branch(repo, from_branch, to_branch, dry_run)
+
+
 def create_branch(repo, from_branch, to_branch, dry_run):
     """ Creates a git branch based on the upstream snap repo and a version to branch as. This will also update
     the snapcraft.yaml with the correct version to build the snap from in that particular branch.
@@ -78,9 +94,9 @@ def create_branch(repo, from_branch, to_branch, dry_run):
 
     Usage:
 
-    snaps-source.py branch --repo git+ssh://lp_git_user@git.launchpad.net/snap-kubectl \
+    ogc snap create-branch --repo git+ssh://lp_git_user@git.launchpad.net/snap-kubectl \
       --from-branch master \
-      --to-branch 1.13.2
+      --to-branch 1.16.0-alpha.0
     """
     env = os.environ.copy()
 
@@ -143,7 +159,7 @@ def create_snap_recipe(
 
     Usage:
 
-    snaps-source.py builder --snap kubectl --version 1.13 --tag v1.13.2 \
+    ogc snap create-snap-recipe --snap kubectl --version 1.13 --tag v1.13.2 \
       --track 1.13/edge/hotfix-LP123456 \
       --repo git+ssh://$LPCREDS@git.launchpad.net/snap-kubectl \
       --owner k8s-jenkaas-admins \
@@ -207,7 +223,7 @@ def build(snap, build_path, version, arch, match_re, rename_re, dry_run):
 
     Usage:
 
-    snaps.py build --snap kubectl --snap kube-proxy --version 1.10.3 --arch amd64 --match-re '(?=\S*[-]*)([a-zA-Z-]+)(.*)' --rename-re '\1-eks'
+    ogc snap build --snap kubectl --snap kube-proxy --version 1.10.3 --arch amd64 --match-re '(?=\S*[-]*)([a-zA-Z-]+)(.*)' --rename-re '\1-eks'
 
     Passing --rename-re and --match-re allows you to manipulate the resulting
     snap file, for example, the above renames kube-proxy_1.10.3_amd64.snap to
@@ -257,7 +273,7 @@ def push(result_dir, dry_run):
 
     Usage:
 
-       tox -e py36 -- python3 snaps.py push --result-dir ./release/snap/build
+       ogc snap push --result-dir ./release/snap/build
     """
     # TODO: Verify channel is a ver/chan string
     #   re: [\d+\.]+\/(?:edge|stable|candidate|beta)
