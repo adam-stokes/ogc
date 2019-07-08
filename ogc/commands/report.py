@@ -16,6 +16,12 @@ def report():
 
 
 @click.command()
+@click.option(
+    "--report-plan",
+    required=True,
+    help="YAML describing what the report should process",
+    default="report-plan.yaml",
+)
 @click.option("--template-path", required=True, help="Path to templates directory")
 @click.option("--out-path", required=True, help="Path to build output directory")
 @click.option(
@@ -24,24 +30,17 @@ def report():
     help="Remote S3 path, include 's3://' protocol",
     default="s3://jenkaas",
 )
-@click.option(
-    "--report-plan",
-    required=True,
-    help="YAML describing what the report should process",
-    default="report-plan.yaml",
-)
-def build_validation_report(template_path, out_path, remote_path, report_plan):
+def build_report(report_plan, template_path, out_path, remote_path):
     """ Generate a validation report
     """
     plan = Path(report_plan)
-    plan = yaml.safe_load(plan.read_text(encoding="utf8"), Loader=yaml.Loader)
+    plan = yaml.load(plan.read_text(encoding="utf8"), Loader=yaml.Loader)
     template_path = Path(template_path).absolute()
     out_path = Path(out_path).absolute()
-    report = api.report.generate_validation_report(report_plan)
-    return api.report.gen_page(
-        "index.html", report, str(template_path), str(out_path), remote_path
-    )
+    validation_report = api.report.generate_validation_report(plan)
+    contexts = [('index.html', validation_report)]
+    return api.report.gen_pages(contexts,  str(template_path), str(out_path), remote_path)
 
 
 cli.add_command(report)
-report.add_command(build_validation_report)
+report.add_command(build_report)

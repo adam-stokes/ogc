@@ -100,8 +100,18 @@ def generate_validation_report(plan):
     """
 
     def tester(line):
-        prefixes = [f"validate-{version}" for version in supported_versions]
-        return any(line.startswith(prefix) for prefix in prefixes)
+        matrix = plan['validation-report']['matrix']
+        supported_versions = [
+            version
+            for mapping in matrix
+            for version, _ in mapping.items()
+        ]
+        jobs = [
+            f"validate-{version}-canonical-kubernetes"
+            for version in supported_versions
+            for job in plan['validation-report']['jobs']
+        ]
+        return any(line == job for job in jobs)
 
     days = generate_days()
     metadata = generate_data(tester)
@@ -130,12 +140,12 @@ def generate_validation_report(plan):
     }
 
 
-def gen_page(
-    template, context, template_path, out_path, remote_path="s3://jenkaas", static=None
+def gen_pages(
+    contexts, template_path, out_path, remote_path="s3://jenkaas", static=None
 ):
     os.makedirs(out_path, exist_ok=True)
     site = Site.make_site(
-        contexts=[(template, context)], searchpath=template_path, outpath=out_path
+        contexts=contexts, searchpath=template_path, outpath=out_path
     )
     site.render()
     upload = aws.S3()
