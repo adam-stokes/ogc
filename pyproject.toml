@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ogc"
-version = "0.1.2"
+version = "0.1.3"
 description = ""
 authors = ["Adam Stokes <battlemidget@users.noreply.github.com>"]
 

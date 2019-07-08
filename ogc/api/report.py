@@ -13,6 +13,7 @@ import sh
 import yaml
 from .. import snap, aws
 from staticjinja import Site
+from string import Template
 
 
 def generate_days(numdays=30):
@@ -25,17 +26,28 @@ def generate_days(numdays=30):
     return date_list
 
 
-def scan_table(name="CIBuilds"):
-    """ Scans a table returning all results
+def query(name="CIBuilds"):
+    """ Scans a table returning results based on our date filters (always 30 days)
     """
     items = []
     dynamodb = aws.DB()
     table = dynamodb.table(name)
 
+    days = generate_days()
     # Required because only 1MB are returned
     # See: https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GettingStarted.Python.04.html
     response = table.scan()
     for item in response["Items"]:
+        try:
+            day = datetime.strptime(
+                item["build_datetime"], "%Y-%m-%dT%H:%M:%S.%f"
+            ).strftime("%Y-%m-%d")
+        except:
+            day = datetime.strptime(
+                item["build_datetime"], "%Y-%m-%d %H:%M:%S.%f"
+            ).strftime("%Y-%m-%d")
+        if day not in days:
+            continue
         items.append(item)
     while "LastEvaluatedKey" in response:
         response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
@@ -51,24 +63,36 @@ def generate_charm_data():
     db = OrderedDict()
 
 
-def generate_data(tester):
-    """ Generates a validation report
+def generate_data(results, plan):
+    """ Generates a report
 
-    tester: tester function
+    plan: report plan
     """
-    results = scan_table()
+
+    def _tester(plan, line):
+        supported_versions = plan["versions"]
+        prefix = plan["prefix"]
+        parser = plan["parser"]
+        jobs = plan["jobs"]
+        parsed_jobs = []
+        for version in supported_versions:
+            for job in jobs:
+                s = Template(parser)
+                output = s.substitute(version=version, job=job, prefix=prefix)
+                parsed_jobs.append(output)
+        return any(line == job for job in parsed_jobs)
+
     db = OrderedDict()
     metadata = OrderedDict()
-
     for obj in results:
         obj = box.Box(obj)
-        if not tester(obj.job_name):
+        if not _tester(plan, obj.job_name):
             continue
         click.echo(f"Processing {obj.job_name}")
         if obj.job_name not in db:
             db[obj.job_name] = {}
 
-        if "build_endtime" not in obj:
+        if "build_datetime" not in obj:
             continue
 
         if "test_result" not in obj:
@@ -82,11 +106,11 @@ def generate_data(tester):
 
         try:
             day = datetime.strptime(
-                obj["build_endtime"], "%Y-%m-%dT%H:%M:%S.%f"
+                obj["build_datetime"], "%Y-%m-%dT%H:%M:%S.%f"
             ).strftime("%Y-%m-%d")
         except:
             day = datetime.strptime(
-                obj["build_endtime"], "%Y-%m-%d %H:%M:%S.%f"
+                obj["build_datetime"], "%Y-%m-%d %H:%M:%S.%f"
             ).strftime("%Y-%m-%d")
 
         if day not in db[obj.job_name]:
@@ -95,28 +119,10 @@ def generate_data(tester):
     return db
 
 
-def generate_validation_report(plan):
-    """ Generate validation report
-    """
-
-    def tester(line):
-        matrix = plan['validation-report']['matrix']
-        supported_versions = [
-            version
-            for mapping in matrix
-            for version, _ in mapping.items()
-        ]
-        jobs = [
-            f"validate-{version}-canonical-kubernetes"
-            for version in supported_versions
-            for job in plan['validation-report']['jobs']
-        ]
-        return any(line == job for job in jobs)
-
+def rows(data):
     days = generate_days()
-    metadata = generate_data(tester)
     rows = []
-    for jobname, jobdays in sorted(metadata.items()):
+    for jobname, jobdays in sorted(data.items()):
         sub_item = [jobname]
         for day in days:
             if day in jobdays:
@@ -129,14 +135,32 @@ def generate_validation_report(plan):
             else:
                 sub_item.append({"job_name": jobname, "bg_class": ""})
         rows.append(sub_item)
+    return rows
 
+
+def generate_validation_report(results, plan):
+    """ Generate validation report
+    """
+    metadata = generate_data(results, plan["validation-report"])
     return {
-        "rows": rows,
+        "rows": rows(metadata),
         "headers": [
             datetime.strptime(day, "%Y-%m-%d").strftime("%m-%d")
             for day in generate_days()
         ],
-        "modified": datetime.now(),
+    }
+
+
+def generate_validation_addon_report(results, plan):
+    """ Generate validation report
+    """
+    metadata = generate_data(results, plan["validation-addon-report"])
+    return {
+        "rows": rows(metadata),
+        "headers": [
+            datetime.strptime(day, "%Y-%m-%d").strftime("%m-%d")
+            for day in generate_days()
+        ],
     }
 
 
@@ -144,9 +168,7 @@ def gen_pages(
     contexts, template_path, out_path, remote_path="s3://jenkaas", static=None
 ):
     os.makedirs(out_path, exist_ok=True)
-    site = Site.make_site(
-        contexts=contexts, searchpath=template_path, outpath=out_path
-    )
+    site = Site.make_site(contexts=contexts, searchpath=template_path, outpath=out_path)
     site.render()
     upload = aws.S3()
     upload.sync_remote(out_path, remote_path)

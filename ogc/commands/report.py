@@ -3,12 +3,14 @@
 
 import click
 import yaml
+from datetime import datetime
 from yamlinclude import YamlIncludeConstructor
 from pathlib import Path
 from .base import cli
 from .. import api
 
 YamlIncludeConstructor.add_to_loader_class(loader_class=yaml.Loader)
+
 
 @click.group()
 def report():
@@ -37,9 +39,22 @@ def build_report(report_plan, template_path, out_path, remote_path):
     plan = yaml.load(plan.read_text(encoding="utf8"), Loader=yaml.Loader)
     template_path = Path(template_path).absolute()
     out_path = Path(out_path).absolute()
-    validation_report = api.report.generate_validation_report(plan)
-    contexts = [('index.html', validation_report)]
-    return api.report.gen_pages(contexts,  str(template_path), str(out_path), remote_path)
+    data = api.report.query()
+    validation_report = api.report.generate_validation_report(data, plan)
+    validation_addon_report = api.report.generate_validation_addon_report(data, plan)
+    contexts = [
+        (
+            "index.html",
+            {
+                "validate_report": validation_report,
+                "validate_addon_report": validation_addon_report,
+                "modified": datetime.now(),
+            },
+        )
+    ]
+    return api.report.gen_pages(
+        contexts, str(template_path), str(out_path), remote_path
+    )
 
 
 cli.add_command(report)
