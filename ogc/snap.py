@@ -6,14 +6,18 @@ import re
 import operator
 
 
-def revisions(snap, version_filter=None):
+def revisions(snap, version_filter=None, arch=None):
     """ Get revisions of snap
 
     snap: name of snap
     version_filter: snap version to filter on
     """
     re_comp = re.compile("[ \t+]{2,}")
-    revision_list = sh.snapcraft.revisions(snap, _err_to_out=True)
+    revision_list = sh.snapcraft.revisions(
+        snap,
+        "--arch" if arch else "",
+        arch if arch else "",
+        _err_to_out=True)
     revision_list = revision_list.stdout.decode().splitlines()[1:]
     revision_parsed = {}
     for line in revision_list:
@@ -31,7 +35,7 @@ def revisions(snap, version_filter=None):
     return revision_parsed
 
 
-def latest(snap, version=None):
+def latest(snap, version=None, arch=None):
     """ Get latest snap revision
     """
-    return max(revisions(snap, version).items(), key=operator.itemgetter(0))[1]
+    return max(revisions(snap, version, arch).items(), key=operator.itemgetter(0))[1]
