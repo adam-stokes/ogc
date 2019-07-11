@@ -11,7 +11,7 @@ import click
 import os
 import sh
 import yaml
-from .. import snap, aws
+from .. import snap, aws, charm
 from staticjinja import Site
 from string import Template
 
@@ -161,6 +161,30 @@ def generate_validation_addon_report(results, plan):
             datetime.strptime(day, "%Y-%m-%d").strftime("%m-%d")
             for day in generate_days()
         ],
+    }
+
+def generate_charm_report(plan):
+    """ Generate reports on charm manifests
+    """
+    mapping = {}
+    channels = ['stable', 'candidate', 'beta', 'edge']
+
+    for bundle in plan['charm-report']['bundles']:
+        bundle_name, data = next(iter(bundle.items()))
+        mapping[bundle_name] = {}
+        for channel in channels:
+            applications = charm.get_bundle_applications(data['namespace'], bundle_name, channel)
+            mapping[bundle_name][channel] = {}
+            for application, charm_info in applications.items():
+                manifest = charm.get_manifest(charm_info['Charm'])
+                layers = manifest['layers']
+                mapping[bundle_name][channel][application] = [
+                     (layer['url'], layer['rev'])
+                      for layer in layers
+                ]
+            click.echo(f"Processing: {bundle_name} - {channel}")
+    return {
+        "rows": mapping
     }
 
 

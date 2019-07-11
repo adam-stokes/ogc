@@ -22,6 +22,7 @@ python-box = "^3.4"
 boto3 = "^1.9"
 awscli = "^1.16"
 pyyaml-include = "^1.1"
+requests = "^2.22"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

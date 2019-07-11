@@ -42,6 +42,7 @@ def build_report(report_plan, template_path, out_path, remote_path):
     data = api.report.query()
     validation_report = api.report.generate_validation_report(data, plan)
     validation_addon_report = api.report.generate_validation_addon_report(data, plan)
+    # charm_report = api.report.generate_charm_report(plan)
     contexts = [
         (
             "index.html",
@@ -50,7 +51,14 @@ def build_report(report_plan, template_path, out_path, remote_path):
                 "validate_addon_report": validation_addon_report,
                 "modified": datetime.now(),
             },
-        )
+        ),
+        # (
+        #     "charm_info.html",
+        #     {
+        #         "charm_report": charm_report,
+        #         "modified": datetime.now(),
+        #     },
+        # )
     ]
     return api.report.gen_pages(
         contexts, str(template_path), str(out_path), remote_path
