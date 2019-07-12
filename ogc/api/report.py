@@ -11,7 +11,8 @@ import click
 import os
 import sh
 import yaml
-from .. import snap, aws, charm
+from .. import snap, aws
+from ..models import bundle as bundle_model
 from staticjinja import Site
 from string import Template
 
@@ -163,29 +164,18 @@ def generate_validation_addon_report(results, plan):
         ],
     }
 
+
 def generate_charm_report(plan):
     """ Generate reports on charm manifests
     """
-    mapping = {}
-    channels = ['stable', 'candidate', 'beta', 'edge']
-
-    for bundle in plan['charm-report']['bundles']:
-        bundle_name, data = next(iter(bundle.items()))
-        mapping[bundle_name] = {}
-        for channel in channels:
-            applications = charm.get_bundle_applications(data['namespace'], bundle_name, channel)
-            mapping[bundle_name][channel] = {}
-            for application, charm_info in applications.items():
-                manifest = charm.get_manifest(charm_info['Charm'])
-                layers = manifest['layers']
-                mapping[bundle_name][channel][application] = [
-                     (layer['url'], layer['rev'])
-                      for layer in layers
-                ]
-            click.echo(f"Processing: {bundle_name} - {channel}")
-    return {
-        "rows": mapping
-    }
+    channels = ["stable", "candidate", "beta", "edge"]
+    bundles = [next(iter(bundle.items())) for bundle in plan["charm-report"]["bundles"]]
+    rows = []
+    for channel in channels:
+        for bundle, data in bundles:
+            click.echo(f"Processing ({channel}) {bundle}")
+            rows.append(bundle_model.BundleData(bundle, channel, data["namespace"]))
+    return {"rows": rows}
 
 
 def gen_pages(

@@ -14,10 +14,8 @@ def revisions(snap, version_filter=None, arch=None):
     """
     re_comp = re.compile("[ \t+]{2,}")
     revision_list = sh.snapcraft.revisions(
-        snap,
-        "--arch" if arch else "",
-        arch if arch else "",
-        _err_to_out=True)
+        snap, "--arch" if arch else "", arch if arch else "", _err_to_out=True
+    )
     revision_list = revision_list.stdout.decode().splitlines()[1:]
     revision_parsed = {}
     for line in revision_list:
