@@ -27,4 +27,11 @@ def cli(config):
         in pkg_resources.iter_entry_points('ogc.plugins')
     }
     for plugin in app.config.keys():
-        click.echo(f"Loading {plugin}")
+        check_plugin = plugins.get(plugin, None)
+        if not check_plugin:
+            click.echo(f"Skipping {plugin}")
+            continue
+
+        click.echo(f"Processing {plugin}")
+        # Process the plugin
+        check_plugin.process(app.config.get(plugin))
