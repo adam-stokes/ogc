@@ -1,3 +1,4 @@
+[General]
 name = "A typical conformance run"
 description = """
   A base line validation test
@@ -11,7 +12,7 @@ identifier = "a-typical-conformance-run-ab3jfe"
 # proceeding.
 requires = ["CHARMCREDS", "JUJUCREDS"]
 
-# Optionally, define a location of KEY=VALUE line items to use as this tests
+# Optionally, define a location of KEY=VALUE line items to use as this specs
 # environment variables
 properties-file = "/home/user/env.properties"
 
