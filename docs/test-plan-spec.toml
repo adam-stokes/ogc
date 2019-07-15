@@ -1,0 +1,117 @@
+name = "A typical conformance run"
+description = """
+  A base line validation test
+"""
+# Optionally override the auto generated identifier
+identifier = "a-typical-conformance-run-ab3jfe"
+
+[Env]
+# Test plans require certain environment variables to be set prior to running.
+# This module allows us to make sure those requirements are met before
+# proceeding.
+requires = ["CHARMCREDS", "JUJUCREDS"]
+
+# Optionally, define a location of KEY=VALUE line items to use as this tests
+# environment variables
+properties-file = "/home/user/env.properties"
+
+[Juju]
+# Juju module for bootstrapping and deploying a bundle
+cloud = "aws"
+
+# controller to create
+controller = "validator"
+
+# model to create
+model = "validator-model"
+
+[Juju.bootstrap]
+# turn on debugging
+debug = false
+
+# disable adding the specified model, usually when some configuration on the
+# models have to be done
+disable-add-model = true
+
+[Juju.deploy]
+# bundle to deploy
+# bundle = "cs:~owner/custom-bundle"
+bundle = "bundles/my-custom-bundle.yaml"
+
+# Optional overlay to pass into juju
+overlay = "overlays/1.15-edge.yaml"
+
+# Optional bundle channel to deploy from
+bundle_channel = "edge"
+
+# Optional charm channel to deploy from
+charm_channel = "edge"
+
+# Wait for a deployment to settle?
+wait = true
+
+[Juju.config]
+# Config options to pass to a deployed application
+# ie, juju config -m controller:model kubernetes-master allow-privileged=true
+kubernetes-master = "allow-privileged=true"
+kubernetes-worker = "allow-privileged=true"
+
+[Runner]
+# Run serial or concurrent. For serial steps, they are run in the order defined
+# here.
+serial = true
+
+    [[Runner.Shell]]
+    # Most options defined in the test plan are exposed via environment variables
+    # ie, a Juju controller is exposed as $CONTROLLER="validator"
+    name = "Running sonobuoy"
+    run = """
+    #!/bin/bash
+    set -eux
+
+    mkdir -p $HOME/.kube
+    juju scp -m $CONTROLLER:$MODEL kubernetes-master/0:config $HOME/.kube/
+    export RBAC_ENABLED=$(kubectl api-versions | grep \"rbac.authorization.k8s.io/v1beta1\" -c)
+    /var/lib/jenkins/go/bin/sonobuoy version || true
+    /var/lib/jenkins/go/bin/sonobuoy run
+    """
+
+    [[Runner.Shell]]
+    name = "Validate conformance"
+    # Loop until success
+    until = "success"
+    # Timeout after 3 hours (set in minutes)
+    timeout = 180
+    run = """
+    /var/lib/jenkins/go/bin/sonobuoy status|grep -q 'Sonobuoy has completed'
+    """
+
+    [[Runner.Shell]]
+    name = "Archive results"
+    until = "success"
+    timeout = 180
+    run = """
+    /var/lib/jenkins/go/bin/sonobuoy retrieve results/.
+    """
+
+    [[Runner.Shell]]
+    name = "A script cleanup"
+    until = "success"
+    timeout = 20
+    run-script = "scripts/env-cleanup.sh"
+
+[Archive.S3]
+# Archive module lets us store the results to some location (ie s3)
+bucket = "jenkaas"
+
+[[Archive.S3.files]]
+id = "conformance-results"
+friendly-name = "Conformance Results"
+source = "results/results*.tar.gz"
+destination = "jobs/builds/1/conformance-results.tar.gz"
+
+[[Archive.S3.files]]
+id = "junit"
+friendly-name = "jUnit result output"
+source = "results/junit.xml"
+destination = "jobs/builds/1/junit.xml"
