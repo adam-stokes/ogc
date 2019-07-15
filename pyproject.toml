@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ogc"
-version = "0.1.4"
-description = ""
+version = "0.1.5"
+description = "gangstarr"
 authors = ["Adam Stokes <battlemidget@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]

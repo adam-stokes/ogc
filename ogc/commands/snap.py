@@ -4,6 +4,7 @@ snaps-source.py - Building snaps from source and promoting them to snapstore
 """
 import click
 from .base import cli
+from .. import api
 
 
 @click.group()
