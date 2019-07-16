@@ -8,9 +8,11 @@ import pkg_resources
 
 @click.group()
 @click.version_option(__version__)
-@click.option("--spec", metavar="spec", required=False, multiple=True, help="OGC Spec")
+@click.option("--spec", metavar="<spec>", required=False, multiple=True, help="OGC Spec")
 @click.option("--debug", is_flag=True)
 def cli(spec, debug):
+    """ Processes a OGC Spec which defines how a build/test/task is performed
+    """
     specs = []
     for sp in spec:
         _path = Path(sp)
