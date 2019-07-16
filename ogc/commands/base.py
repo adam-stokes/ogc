@@ -1,14 +1,17 @@
 from ..spec import SpecLoader, SpecLoaderException
 from ..state import app
-from .. import log, __version__
+from .. import log
 from pathlib import Path
+import sys
 import click
 import pkg_resources
+from pprint import pformat
 
 
 @click.group()
-@click.version_option(__version__)
-@click.option("--spec", metavar="<spec>", required=False, multiple=True, help="OGC Spec")
+@click.option(
+    "--spec", metavar="<spec>", required=False, multiple=True, help="OGC Spec"
+)
 @click.option("--debug", is_flag=True)
 def cli(spec, debug):
     """ Processes a OGC Spec which defines how a build/test/task is performed
@@ -24,9 +27,8 @@ def cli(spec, debug):
 
     # Handle the plugin loader, initializing the plugin class
     plugins = {
-        entry_point.name: entry_point.load()()
-        for entry_point
-        in pkg_resources.iter_entry_points('ogc.plugins')
+        entry_point.name: entry_point.load()
+        for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
     for plugin in app.spec.keys():
         check_plugin = plugins.get(plugin, None)
@@ -34,5 +36,11 @@ def cli(spec, debug):
             log.debug(f"Skipping plugin {plugin}")
             continue
 
-        # Process the plugin
-        check_plugin.process(app.spec.get(plugin))
+        runner = check_plugin(app.spec[plugin])
+
+        # Validate spec is compatible with plugin
+        if not runner.check():
+            # log.error(f"{runner.NAME} has unknown options defined:\n{pformat(runner.spec)}\n{pformat(runner.spec_options)}")
+            sys.exit(1)
+
+        app.plugins.append(runner)

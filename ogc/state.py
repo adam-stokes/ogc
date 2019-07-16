@@ -3,15 +3,11 @@
 from types import SimpleNamespace
 
 
-class StateConfig:
-    """ Application state
-    """
-
-    # Config object
-    config = None
-
+app = SimpleNamespace(
+    # spec object
+    spec=None,
     # debug
-    debug = None
-
-
-app = StateConfig()
+    debug=None,
+    # plugins
+    plugins=[],
+)

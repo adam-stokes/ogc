@@ -7,4 +7,12 @@ import click
 
 def debug(ctx):
     if app.debug:
-        click.echo(click.style(f"OGC :: debug :: {ctx}", fg='yellow'))
+        click.secho(f"OGC :: {ctx}", fg="yellow", bold=True)
+
+
+def error(ctx):
+    click.secho(f"OGC :: {ctx}", fg="red", bold=True)
+
+
+def info(ctx):
+    click.secho(f"OGC :: {ctx}", fg="green", bold=True)

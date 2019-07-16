@@ -10,21 +10,22 @@ identifier = "a-typical-conformance-run-ab3jfe"
 # Test plans require certain environment variables to be set prior to running.
 # This module allows us to make sure those requirements are met before
 # proceeding.
-requires = ["CHARMCREDS", "JUJUCREDS"]
+# requires = ["CHARMCREDS", "JUJUCREDS"]
+requires = ["USER"]
 
 # Optionally, define a location of KEY=VALUE line items to use as this specs
 # environment variables
-# properties-file = "/home/user/env.properties"
+# properties_file = "docs/env.properties"
 
 [Juju]
 # Juju module for bootstrapping and deploying a bundle
 cloud = "aws"
 
 # controller to create
-controller = "validator"
+controller = "ogc-spec"
 
 # model to create
-model = "validator-model"
+model = "ogc-spec-model"
 
 [Juju.bootstrap]
 # turn on debugging
@@ -32,15 +33,17 @@ debug = false
 
 # disable adding the specified model, usually when some configuration on the
 # models have to be done
-disable-add-model = true
+disable_add_model = true
 
 [Juju.deploy]
+reuse = true
+
 # bundle to deploy
 # bundle = "cs:~owner/custom-bundle"
-bundle = "bundles/my-custom-bundle.yaml"
+bundle = "charmed-kubernetes"
 
 # Optional overlay to pass into juju
-overlay = "overlays/1.15-edge.yaml"
+# overlay = "overlays/1.15-edge.yaml"
 
 # Optional bundle channel to deploy from
 bundle_channel = "edge"
@@ -54,8 +57,8 @@ wait = true
 [Juju.config]
 # Config options to pass to a deployed application
 # ie, juju config -m controller:model kubernetes-master allow-privileged=true
-kubernetes-master = "allow-privileged=true"
-kubernetes-worker = "allow-privileged=true"
+set = ["kubernetes-master 'allow-privileged=true'",
+       "kubernetes-worker 'allow-privileged=true'"]
 
 [Runner]
 # Run serial or concurrent. For serial steps, they are run in the order defined
