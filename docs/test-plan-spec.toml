@@ -14,7 +14,7 @@ requires = ["CHARMCREDS", "JUJUCREDS"]
 
 # Optionally, define a location of KEY=VALUE line items to use as this specs
 # environment variables
-properties-file = "/home/user/env.properties"
+# properties-file = "/home/user/env.properties"
 
 [Juju]
 # Juju module for bootstrapping and deploying a bundle

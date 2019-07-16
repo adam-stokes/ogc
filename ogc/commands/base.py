@@ -1,7 +1,6 @@
-from ..config import ConfigLoader, ConfigLoaderException
+from ..spec import SpecLoader, SpecLoaderException
 from ..state import app
-from ..debug import debug
-from .. import __version__
+from .. import log, __version__
 from pathlib import Path
 import click
 import pkg_resources
@@ -9,15 +8,16 @@ import pkg_resources
 
 @click.group()
 @click.version_option(__version__)
-@click.option("--config", required=False, multiple=True, help="OGC Spec")
-def cli(config):
-    configs = []
-    for conf in config:
-        _path = Path(conf)
+@click.option("--spec", metavar="spec", required=False, multiple=True, help="OGC Spec")
+@click.option("--debug", is_flag=True)
+def cli(spec, debug):
+    specs = []
+    for sp in spec:
+        _path = Path(sp)
         if not _path.exists():
-            raise ConfigLoaderException(f"Unable to find spec: {conf}")
-        configs.append(_path)
-    app.config = ConfigLoader.load(configs)
+            raise SpecLoaderException(f"Unable to find spec: {sp}")
+        specs.append(_path)
+    app.spec = SpecLoader.load(specs)
     app.debug = debug
 
     # Handle the plugin loader, initializing the plugin class
@@ -26,12 +26,11 @@ def cli(config):
         for entry_point
         in pkg_resources.iter_entry_points('ogc.plugins')
     }
-    for plugin in app.config.keys():
+    for plugin in app.spec.keys():
         check_plugin = plugins.get(plugin, None)
         if not check_plugin:
-            click.echo(f"Skipping {plugin}")
+            log.debug(f"Skipping plugin {plugin}")
             continue
 
-        click.echo(f"Processing {plugin}")
         # Process the plugin
-        check_plugin.process(app.config.get(plugin))
+        check_plugin.process(app.spec.get(plugin))
