@@ -1,12 +1,17 @@
 import setuptools
+from pathlib import Path
+
+README = Path(__file__).parent.absolute() / 'readme.md'
+README = README.read_text(encoding='utf8')
 
 setuptools.setup(
     name="ogc",
-    version="0.1.6",
+    version="0.1.7",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
-    long_description="ogc is a task runner with plugins",
+    long_description=README,
+    long_description_content_type='text/markdown',
     url="https://github.com/battlemidget/ogc",
     packages=["ogc", "ogc.api", "ogc.commands", "ogc.models"],
     package_data={"": ["*"]},
