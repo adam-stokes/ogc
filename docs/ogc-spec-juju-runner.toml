@@ -1,0 +1,69 @@
+# An example of a fuller spec showing off various plugins
+
+[Info]
+name = "A typical conformance run"
+description = """
+  A base line validation test
+"""
+[Juju]
+# Juju module for bootstrapping and deploying a bundle
+cloud = "aws"
+
+# controller to create
+controller = "ogc-spec"
+
+# model to create
+model = "ogc-spec-model"
+
+[Juju.bootstrap]
+# turn on debugging
+debug = false
+
+# disable adding the specified model, usually when some configuration on the
+# models have to be done
+disable_add_model = true
+
+[Juju.deploy]
+reuse = false
+
+# bundle to deploy
+# bundle = "cs:~owner/custom-bundle"
+bundle = "charmed-kubernetes"
+
+# Optional overlay to pass into juju
+# overlay = "overlays/1.15-edge.yaml"
+
+# Optional bundle channel to deploy from
+bundle_channel = "edge"
+
+# Optional charm channel to deploy from
+charm_channel = "edge"
+
+# Wait for a deployment to settle?
+wait = true
+
+[Juju.config]
+# Config options to pass to a deployed application
+# ie, juju config -m controller:model kubernetes-master allow-privileged=true
+set = ["kubernetes-master allow-privileged=true",
+       "kubernetes-worker allow-privileged=true"]
+
+[[Runner]]
+# Most options defined in the test plan are exposed via environment variables
+# ie, a Juju controller is exposed as $CONTROLLER="validator"
+name = "Running sonobuoy"
+run = """
+#!/bin/bash
+set -eux
+
+mkdir -p $HOME/.kube
+juju scp -m $CONTROLLER:$MODEL kubernetes-master/0:config $HOME/.kube/
+"""
+
+[[Runner]]
+name = "Verify config exists"
+run = """
+#!/bin/bash
+set -eux
+test -f $HOME/.kube/config
+"""
