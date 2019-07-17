@@ -4,9 +4,6 @@ description = """
 An ogc spec showing out the runner and runner-shell plugin works
 """
 
-[Env]
-requires = ["HOME"]
-
 [[Runner]]
 name = "Showing env.properties"
 run = """
