@@ -1,4 +1,4 @@
-from ..spec import SpecLoader, SpecLoaderException
+from ..spec import SpecLoader, SpecLoaderException, SpecConfigException
 from ..state import app
 from .. import log
 from pathlib import Path
@@ -16,31 +16,43 @@ from pprint import pformat
 def cli(spec, debug):
     """ Processes a OGC Spec which defines how a build/test/task is performed
     """
+    app.debug = debug
+    app.log = log
+
     specs = []
     for sp in spec:
         _path = Path(sp)
         if not _path.exists():
-            raise SpecLoaderException(f"Unable to find spec: {sp}")
+            app.log.error(f"Unable to find spec: {sp}")
+            sys.exit(1)
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
-    app.debug = debug
 
     # Handle the plugin loader, initializing the plugin class
     plugins = {
         entry_point.name: entry_point.load()
         for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
+
     for plugin in app.spec.keys():
         check_plugin = plugins.get(plugin, None)
         if not check_plugin:
-            log.debug(f"Skipping plugin {plugin}")
+            app.log.debug(f"Skipping plugin {plugin}")
             continue
+        app.log.debug(f"Found plugin: {plugin}")
 
-        runner = check_plugin(app.spec[plugin])
+        _specs = app.spec[plugin]
+        if not isinstance(_specs, list):
+            _specs = [_specs]
 
-        # Validate spec is compatible with plugin
-        if not runner.check():
-            # log.error(f"{runner.NAME} has unknown options defined:\n{pformat(runner.spec)}\n{pformat(runner.spec_options)}")
-            sys.exit(1)
+        for _spec in _specs:
+            runner = check_plugin(_spec)
 
-        app.plugins.append(runner)
+            # Validate spec is compatible with plugin
+            try:
+                runner.check()
+            except SpecConfigException as error:
+                app.log.error(error)
+                sys.exit(1)
+
+            app.plugins.append(runner)

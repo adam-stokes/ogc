@@ -12,6 +12,16 @@ from . import log
 class SpecLoaderException(Exception):
     pass
 
+class SpecConfigException(Exception):
+    """ Raise when a config conflict arises
+    """
+    pass
+
+class SpecProcessException(Exception):
+    """ Raise when process fails
+    """
+    pass
+
 
 class SpecLoader(MeldDict):
     def __init__(self):
@@ -76,6 +86,11 @@ class SpecPlugin:
                         f"Attempting to access unknown plugin option for {self.NAME}: {key}"
                     )
         return True
+
+    def conflicts(self):
+        """ Handle conflicts between options
+        """
+        pass
 
     def process(self):
         """ Process function

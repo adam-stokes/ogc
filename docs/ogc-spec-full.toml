@@ -1,4 +1,6 @@
-[General]
+# An example of a fuller spec showing off various plugins
+
+[Info]
 name = "A typical conformance run"
 description = """
   A base line validation test
@@ -57,52 +59,49 @@ wait = true
 [Juju.config]
 # Config options to pass to a deployed application
 # ie, juju config -m controller:model kubernetes-master allow-privileged=true
-set = ["kubernetes-master 'allow-privileged=true'",
-       "kubernetes-worker 'allow-privileged=true'"]
+set = ["kubernetes-master allow-privileged=true",
+       "kubernetes-worker allow-privileged=true"]
 
-[Runner]
-# Run serial or concurrent. For serial steps, they are run in the order defined
-# here.
-serial = true
+[[Runner]]
+# Most options defined in the test plan are exposed via environment variables
+# ie, a Juju controller is exposed as $CONTROLLER="validator"
+name = "Running sonobuoy"
+run = """
+#!/bin/bash
+set -eux
 
-    [[Runner.Shell]]
-    # Most options defined in the test plan are exposed via environment variables
-    # ie, a Juju controller is exposed as $CONTROLLER="validator"
-    name = "Running sonobuoy"
-    run = """
-    #!/bin/bash
-    set -eux
+mkdir -p $HOME/.kube
+juju scp -m $CONTROLLER:$MODEL kubernetes-master/0:config $HOME/.kube/
+export RBAC_ENABLED=$(kubectl api-versions | grep \"rbac.authorization.k8s.io/v1beta1\" -c)
+/var/lib/jenkins/go/bin/sonobuoy version || true
+/var/lib/jenkins/go/bin/sonobuoy run
+"""
 
-    mkdir -p $HOME/.kube
-    juju scp -m $CONTROLLER:$MODEL kubernetes-master/0:config $HOME/.kube/
-    export RBAC_ENABLED=$(kubectl api-versions | grep \"rbac.authorization.k8s.io/v1beta1\" -c)
-    /var/lib/jenkins/go/bin/sonobuoy version || true
-    /var/lib/jenkins/go/bin/sonobuoy run
-    """
+[[Runner]]
+name = "Validate conformance"
+# Loop until success
+until = "success"
+# Timeout after 3 hours (set in minutes)
+timeout = 180
+run = """
+#!/bin/bash
+/var/lib/jenkins/go/bin/sonobuoy status|grep -q 'Sonobuoy has completed'
+"""
 
-    [[Runner.Shell]]
-    name = "Validate conformance"
-    # Loop until success
-    until = "success"
-    # Timeout after 3 hours (set in minutes)
-    timeout = 180
-    run = """
-    /var/lib/jenkins/go/bin/sonobuoy status|grep -q 'Sonobuoy has completed'
-    """
+[[Runner]]
+name = "Archive results"
+until = "success"
+timeout = 180
+run = """
+#!/bin/bash
+/var/lib/jenkins/go/bin/sonobuoy retrieve results/.
+"""
 
-    [[Runner.Shell]]
-    name = "Archive results"
-    until = "success"
-    timeout = 180
-    run = """
-    /var/lib/jenkins/go/bin/sonobuoy retrieve results/.
-    """
-
-    [[Runner.Shell]]
-    name = "A script cleanup"
-    until = "success"
-    timeout = 20
-    run-script = "scripts/env-cleanup.sh"
+[[Runner]]
+name = "A script cleanup"
+until = "success"
+timeout = 20
+run_script = "scripts/env-cleanup.sh"
 
 [Archive.S3]
 # Archive module lets us store the results to some location (ie s3)
@@ -110,12 +109,12 @@ bucket = "jenkaas"
 
 [[Archive.S3.files]]
 id = "conformance-results"
-friendly-name = "Conformance Results"
+friendly_name = "Conformance Results"
 source = "results/results*.tar.gz"
 destination = "jobs/builds/1/conformance-results.tar.gz"
 
 [[Archive.S3.files]]
 id = "junit"
-friendly-name = "jUnit result output"
+friendly_name = "jUnit result output"
 source = "results/junit.xml"
 destination = "jobs/builds/1/junit.xml"
