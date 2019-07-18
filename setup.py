@@ -24,7 +24,6 @@ setuptools.setup(
         "jinja2>=2.10,<3.0",
         "juju-wait==2.7.0",
         "dict-deep==2.0.2",
-        "flatten-dict==0.1.0",
         "juju>=0.11.7,<0.12.0",
         "kv>=0.3.0,<0.4.0",
         "launchpadlib==1.10.6",
