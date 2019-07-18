@@ -1,0 +1,11 @@
+[Info]
+name = "ogc spec"
+description = "OGC tests itself :)"
+
+[[Runner]]
+name = "Test ogc core"
+run = """
+#!/bin/bash
+
+pytest
+"""

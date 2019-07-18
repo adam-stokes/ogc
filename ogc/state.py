@@ -1,5 +1,6 @@
 """ application state module
 """
+from melddict import MeldDict
 from types import SimpleNamespace
 import os
 
@@ -8,10 +9,10 @@ app = SimpleNamespace(
     spec=None,
     # debug
     debug=None,
-
     # environment variables, these are accessible throughout all plugins
-    env=os.environ.copy(),
-
+    env=MeldDict(os.environ.copy()),
     # plugins
     plugins=[],
+    # logger
+    log=None,
 )

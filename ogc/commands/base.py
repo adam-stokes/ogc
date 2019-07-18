@@ -20,6 +20,10 @@ def cli(spec, debug):
     app.log = log
 
     specs = []
+    # Check for local spec
+    if Path("ogc.toml").exists():
+        specs.append(Path("ogc.toml"))
+
     for sp in spec:
         _path = Path(sp)
         if not _path.exists():
@@ -46,7 +50,7 @@ def cli(spec, debug):
             _specs = [_specs]
 
         for _spec in _specs:
-            runner = check_plugin(_spec)
+            runner = check_plugin(_spec, app.spec)
 
             # Validate spec is compatible with plugin
             try:

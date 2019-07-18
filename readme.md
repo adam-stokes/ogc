@@ -5,7 +5,19 @@ ogc - Task runner with a focus on deployment/testing/reporting.
 # usage
 
 ```
-> ogc --spec ogc-spec-runner.toml --debug execute
+> pip install ogc
+> ogc --spec ogc-spec-runner.toml execute
+
+# Or with a ogc.toml file in same directory running ogc from
+> ogc execute
+```
+
+## Show plugin dependencies
+
+OGC doesn't install package dependencies automatically, but will give you a summary that you can pass to whatever automation strategy you want.
+
+```
+> ogc --spec ogc-spec-runner.toml plugin-deps --installable --with-sudo
 ```
 
 # description

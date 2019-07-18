@@ -5,65 +5,72 @@ name = "A typical conformance run"
 description = """
   A base line validation test
 """
+
 [Juju]
 # Juju module for bootstrapping and deploying a bundle
 cloud = "aws"
 
 # controller to create
-controller = "ogc-spec"
+controller = "ogc-spec-2"
 
 # model to create
 model = "ogc-spec-model"
 
-[Juju.bootstrap]
-# turn on debugging
-debug = false
+add_to_env = ['Juju.cloud', 'Juju.controller', 'Juju.model']
 
-# disable adding the specified model, usually when some configuration on the
-# models have to be done
-disable_add_model = true
+# [Juju.bootstrap]
+# # turn on debugging
+# debug = false
 
-[Juju.deploy]
-reuse = false
+# # disable adding the specified model, usually when some configuration on the
+# # models have to be done
+# disable_add_model = false
 
-# bundle to deploy
-# bundle = "cs:~owner/custom-bundle"
-bundle = "charmed-kubernetes"
+# [Juju.deploy]
+# reuse = false
 
-# Optional overlay to pass into juju
-# overlay = "overlays/1.15-edge.yaml"
+# # bundle to deploy
+# # bundle = "cs:~owner/custom-bundle"
+# bundle = "charmed-kubernetes"
 
-# Optional bundle channel to deploy from
-bundle_channel = "edge"
+# # Optional overlay to pass into juju
+# # overlay = "overlays/1.15-edge.yaml"
 
-# Optional charm channel to deploy from
-charm_channel = "edge"
+# # Optional bundle channel to deploy from
+# bundle_channel = "edge"
 
-# Wait for a deployment to settle?
-wait = true
+# # Optional charm channel to deploy from
+# charm_channel = "edge"
 
-[Juju.config]
-# Config options to pass to a deployed application
-# ie, juju config -m controller:model kubernetes-master allow-privileged=true
-set = ["kubernetes-master allow-privileged=true",
-       "kubernetes-worker allow-privileged=true"]
+# # Wait for a deployment to settle?
+# wait = true
 
-[[Runner]]
-# Most options defined in the test plan are exposed via environment variables
-# ie, a Juju controller is exposed as $CONTROLLER="validator"
-name = "Running sonobuoy"
-run = """
-#!/bin/bash
-set -eux
+# [Juju.config]
+# # Config options to pass to a deployed application
+# # ie, juju config -m controller:model kubernetes-master allow-privileged=true
+# set = ["kubernetes-master allow-privileged=true",
+#        "kubernetes-worker allow-privileged=true"]
 
-mkdir -p $HOME/.kube
-juju scp -m $CONTROLLER:$MODEL kubernetes-master/0:config $HOME/.kube/
-"""
+# [[Runner]]
+# # Most options defined in the test plan are exposed via environment variables
+# # ie, a Juju controller is exposed as $CONTROLLER="validator"
+# name = "Running sonobuoy"
+# run = """
+# #!/bin/bash
+# set -eux
+
+# mkdir -p $HOME/.kube
+# juju scp -m $JUJU_CONTROLLER:$JUJU_MODEL kubernetes-master/0:config $HOME/.kube/
+# """
 
 [[Runner]]
 name = "Verify config exists"
 run = """
 #!/bin/bash
 set -eux
+echo "Running against cloud $JUJU_CLOUD"
+echo "juju $JUJU_CONTROLLER:$JUJU_MODEL"
+echo "Making sure our config exists"
 test -f $HOME/.kube/config
+echo $?
 """

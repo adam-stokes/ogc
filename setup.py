@@ -6,7 +6,7 @@ README = README.read_text(encoding='utf8')
 
 setuptools.setup(
     name="ogc",
-    version="0.1.7",
+    version="0.1.8",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -29,7 +29,6 @@ setuptools.setup(
         "kv>=0.3.0,<0.4.0",
         "launchpadlib==1.10.6",
         "melddict>=1.0,<2.0",
-        "python-box>=3.4,<4.0",
         "pyyaml-include>=1.1,<2.0",
         "pyyaml==3.13",
         "requests>=2.22,<3.0",
@@ -38,5 +37,7 @@ setuptools.setup(
         "staticjinja>=0.3.5,<0.4.0",
         "toml>=0.10.0,<0.11.0",
         "colorama==0.3.9",
+        "pytest==5.0.1",
+        "ogc-plugins-runner>=0.0.1"
     ],
 )

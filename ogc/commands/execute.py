@@ -12,14 +12,27 @@ def execute():
     """ Execute loaded plugins
     """
     for plugin in app.plugins:
-        app.log.debug(f"Processing > {plugin.NAME}")
+        # Setup environment
         try:
+            app.log.info(f"Setup Environment > {plugin.friendly_name}")
+            plugin.env()
+        except SpecProcessException as error:
+            app.log.error(error)
+            sys.exit(1)
+
+    for plugin in app.plugins:
+        # Check for any option conflicts
+        try:
+            app.log.info(f"Checking conflicts > {plugin.friendly_name}")
             plugin.conflicts()
         except SpecConfigException as error:
             app.log.error(error)
             sys.exit(1)
 
+    for plugin in app.plugins:
+        # Execute the spec
         try:
+            app.log.info(f"Processing > {plugin.friendly_name}")
             plugin.process()
         except SpecProcessException as error:
             app.log.error(error)

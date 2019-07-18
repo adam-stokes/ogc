@@ -1,5 +1,11 @@
-from ogc import __version__
+import toml
+from ogc.spec import SpecPlugin
 
 
-def test_version():
-    assert __version__ == "0.1.2"
+def test_load_spec():
+    spec_toml = toml.loads("""
+[Info]
+name = 'A test spec'
+""")
+    spec = SpecPlugin(spec_toml['Info'], spec_toml)
+    assert "name" in spec.spec
