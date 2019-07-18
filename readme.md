@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/battlemidget/ogc.svg?branch=master)](https://travis-ci.org/battlemidget/ogc)
+
 # ogc
 
 ogc - Task runner with a focus on deployment/testing/reporting.
