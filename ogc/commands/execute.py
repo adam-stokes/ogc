@@ -38,7 +38,7 @@ def execute(run_plugin):
         try:
             app.log.info(f"Checking conflicts > {plugin.friendly_name}")
             plugin.conflicts()
-        except SpecConfigException as error:
+        except (SpecProcessException, SpecConfigException) as error:
             app.log.error(error)
             sys.exit(1)
 
