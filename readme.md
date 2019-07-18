@@ -6,7 +6,7 @@ ogc - Task runner with a focus on deployment/testing/reporting.
 
 OGC is powered by plugins that can be discovered on https://pypi.org with the
 prefix of `ogc-plugins`. With plugins installed different aspects of a run can
-be defined through a spec file, which is a toml configuration setting up plugin
+be defined through a spec file, which is a toml file setting up plugin
 configuration for the particular goal.
 
 # usage
@@ -21,7 +21,8 @@ configuration for the particular goal.
 
 ## Show plugin dependencies
 
-OGC doesn't install package dependencies automatically, but will give you a summary that you can pass to whatever automation strategy you want.
+OGC doesn't install package dependencies automatically, but will give you a
+summary that you can pass to whatever automation strategy you want.
 
 ```
 > ogc --spec ogc-spec-runner.toml plugin-deps

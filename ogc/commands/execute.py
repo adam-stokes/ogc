@@ -8,9 +8,22 @@ from ..spec import SpecProcessException, SpecConfigException
 
 
 @click.command()
-def execute():
+@click.option(
+    "--run-plugin",
+    metavar="<plugin>",
+    required=False,
+    multiple=True,
+    help="Only run a specific plugin(s) from the loaded spec",
+)
+def execute(run_plugin):
     """ Execute loaded plugins
     """
+
+    if run_plugin:
+        app.plugins = [
+            plugin for plugin in app.plugins if plugin.__class__.__name__ in run_plugin
+        ]
+
     for plugin in app.plugins:
         # Setup environment
         try:

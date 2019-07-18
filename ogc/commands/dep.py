@@ -32,7 +32,10 @@ def plugin_deps(installable):
         try:
             plugin.dep_check(show_only, installable)
         except (TypeError, SpecDepException) as error:
-            app.log.error(f"{error}: Does your spec have nested plugins more than 2 levels deep? That is currently unsupported.")
+            app.log.error(
+                f"{error}: Does your spec have nested plugins more than 2 levels deep? That is currently unsupported."
+            )
             sys.exit(1)
+
 
 cli.add_command(plugin_deps)

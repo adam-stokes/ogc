@@ -7,6 +7,7 @@ from pathlib import Path
 from dict_deep import deep_get, deep_set
 from melddict import MeldDict
 from pprint import pformat
+from dotenv.main import DotEnv
 import click
 from . import log, dep
 from .state import app
@@ -21,6 +22,7 @@ class SpecConfigException(Exception):
     """
 
     pass
+
 
 class SpecDepException(Exception):
     """ Raise when a dependency conflict arises
@@ -73,7 +75,7 @@ class SpecPlugin:
         self.spec_options = self.options
 
     def __str__(self):
-        log.info(f"{self.friendly_name} Specification:\n{pformat(self.spec)}")
+        return log.info(f"{self.friendly_name} Specification:\n{pformat(self.spec)}")
 
     def get_option(self, key):
         # TODO: deprecate
@@ -99,7 +101,9 @@ class SpecPlugin:
 
     def set_option(self, key, value):
         if key not in self.spec_options:
-            raise SpecConfigException(f"{self.friendly_name} unknown option referenced: {key}")
+            raise SpecConfigException(
+                f"{self.friendly_name} unknown option referenced: {key}"
+            )
         deep_set(self.spec, key, value)
 
     def check(self):
@@ -179,10 +183,11 @@ class SpecPlugin:
         """
 
         if show_only and install_cmds and sudo:
-            raise SpecDepException("Can not have show_only, install_cmd and sudo enabled concurrently.")
+            raise SpecDepException(
+                "Can not have show_only, install_cmd and sudo enabled concurrently."
+            )
         if show_only and install_cmds:
             raise SpecDepException("Can not have show_only and install_cmd.")
-
 
         pkgs = self.get_plugin_option("deps")
         if not pkgs:

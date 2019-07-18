@@ -3,16 +3,25 @@
 
 from .state import app
 import click
+from datetime import datetime
 
 
 def debug(ctx):
     if app.debug:
-        click.secho(f"OGC :: {ctx}", fg="yellow", bold=True)
+        click.secho(
+            f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}",
+            fg="yellow",
+            bold=True,
+        )
 
 
 def error(ctx):
-    click.secho(f"OGC :: {ctx}", fg="red", bold=True)
+    click.secho(
+        f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}", fg="red", bold=True
+    )
 
 
 def info(ctx):
-    click.secho(f"OGC :: {ctx}", fg="green", bold=True)
+    click.secho(
+        f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}", fg="green", bold=True
+    )

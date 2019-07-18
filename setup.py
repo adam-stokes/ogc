@@ -1,17 +1,17 @@
 import setuptools
 from pathlib import Path
 
-README = Path(__file__).parent.absolute() / 'readme.md'
-README = README.read_text(encoding='utf8')
+README = Path(__file__).parent.absolute() / "readme.md"
+README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.2.1",
+    version="0.2.2",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
     long_description=README,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     url="https://github.com/battlemidget/ogc",
     packages=["ogc", "ogc.api", "ogc.commands", "ogc.models"],
     package_data={"": ["*"]},
@@ -37,6 +37,6 @@ setuptools.setup(
         "toml>=0.10.0,<0.11.0",
         "colorama==0.3.9",
         "pytest==5.0.1",
-        "python-box==3.4.2"
+        "python-box==3.4.2",
     ],
 )

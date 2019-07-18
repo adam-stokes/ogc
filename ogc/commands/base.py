@@ -41,7 +41,9 @@ def cli(spec, debug):
     for plugin in app.spec.keys():
         check_plugin = plugins.get(plugin, None)
         if not check_plugin:
-            app.log.debug(f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`")
+            app.log.debug(
+                f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
+            )
             continue
         app.log.debug(f"Found plugin: {plugin}")
 

@@ -10,11 +10,11 @@ class Dep:
 
     @classmethod
     def load(cls, package):
-        if package.startswith('apt'):
+        if package.startswith("apt"):
             return AptDep(package)
-        elif package.startswith('snap'):
+        elif package.startswith("snap"):
             return SnapDep(package)
-        elif package.startswith('pip'):
+        elif package.startswith("pip"):
             return PipDep(package)
 
     def __str__(self):
@@ -35,14 +35,15 @@ class Dep:
 class AptDep(Dep):
     """ APT package dependency
     """
+
     @property
     def name(self):
         return self.package[4:]
 
     def install_cmd(self, sudo=True):
-        cmd = ['apt-get']
+        cmd = ["apt-get"]
         if sudo:
-            cmd.insert(0, 'sudo')
+            cmd.insert(0, "sudo")
         cmd_args = ["install", "-qyf", self.package[4:]]
         cmd = cmd + cmd_args
         return " ".join(cmd)
@@ -51,16 +52,17 @@ class AptDep(Dep):
 class SnapDep(Dep):
     """ Snap package dependency
     """
+
     @property
     def name(self):
-        return self.package[5:].split('/')[0]
+        return self.package[5:].split("/")[0]
 
     def install_cmd(self, sudo=True):
         pkg_line = self.package[5:]
-        cmd = ['snap']
+        cmd = ["snap"]
         if sudo:
-            cmd.insert(0, 'sudo')
-        _package = pkg_line.split('/')
+            cmd.insert(0, "sudo")
+        _package = pkg_line.split("/")
         if len(_package) != 3:
             raise DepError("Must have a <packagename>/<track>/<channel> set.")
         name, track, channel = _package
@@ -68,9 +70,11 @@ class SnapDep(Dep):
         cmd = cmd + cmd_args
         return " ".join(cmd)
 
+
 class PipDep(Dep):
     """ Python PIP package dependency
     """
+
     @property
     def name(self):
         pattern = re.compile("^(\w+-?\w+)")
@@ -78,9 +82,9 @@ class PipDep(Dep):
         return match.group(0)
 
     def install_cmd(self, sudo=False):
-        cmd = ['pip']
+        cmd = ["pip"]
         if sudo:
-            cmd.insert(0, 'sudo')
+            cmd.insert(0, "sudo")
         cmd_args = ["install", self.package[4:]]
         cmd = cmd + cmd_args
         return " ".join(cmd)
