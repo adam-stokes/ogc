@@ -6,7 +6,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.2.2",
+    version="0.2.3",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -38,5 +38,6 @@ setuptools.setup(
         "colorama==0.3.9",
         "pytest==5.0.1",
         "python-box==3.4.2",
+        "python-dotenv==0.10.3"
     ],
 )
