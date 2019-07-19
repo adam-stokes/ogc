@@ -77,6 +77,12 @@ class SpecPlugin:
     def __str__(self):
         return log.info(f"{self.friendly_name} Specification:\n{pformat(self.spec)}")
 
+    def _load_dotenv(self, path):
+        if not path.exists():
+            return
+        _merge_env = DotEnv(dotenv_path=path, encoding="utf8").dict()
+        app.env += _merge_env
+
     def get_option(self, key):
         # TODO: deprecate
         return self.get_plugin_option(key)
@@ -120,12 +126,6 @@ class SpecPlugin:
                     )
         return True
 
-    def _load_dotenv(self, path):
-        if not path.exists():
-            return
-        _merge_env = DotEnv(dotenv_path=path, encoding="utf8").dict()
-        app.env += _merge_env
-
     def dep_check(self, show_only=True, install_cmds=False, sudo=False):
         """ Dependency checker
 
@@ -161,16 +161,16 @@ class SpecPlugin:
 
         To show the dependencies in a way that can be easily installed for automated runs:
         > ogc --spec my-run-spec.toml plugin-deps --installable
-        apt-get install -qyf python3-pytest
-        apt-get install -qyf wget
-        pip install pytest-asyncio==5.0.1
+        sudo apt-get install -qyf python3-pytest
+        sudo apt-get install -qyf wget
+        pip install --user pytest-asyncio==5.0.1
         snap install kubectl --channel=1.15/edge
 
         You can optionally pass sudo with it:
-        > ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo
+        > ogc --spec my-run-spec.toml plugin-deps --installable
         sudo apt-get install -qyf python3-pytest
         sudo apt-get install -qyf wget
-        sudo pip install pytest-asyncio==5.0.1
+        pip install --user pytest-asyncio==5.0.1
         sudo snap install kubectl --channel=1.15/edge
 
         You can install them automatically with:

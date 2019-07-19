@@ -38,6 +38,6 @@ setuptools.setup(
         "colorama==0.3.9",
         "pytest==5.0.1",
         "python-box==3.4.2",
-        "python-dotenv==0.10.3"
+        "python-dotenv==0.10.3",
     ],
 )

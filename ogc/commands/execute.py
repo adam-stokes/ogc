@@ -9,19 +9,23 @@ from ..spec import SpecProcessException, SpecConfigException
 
 @click.command()
 @click.option(
-    "--run-plugin",
-    metavar="<plugin>",
+    "-t",
+    "--tag",
+    metavar="<tag>",
     required=False,
     multiple=True,
-    help="Only run a specific plugin(s) from the loaded spec",
+    help="Only run specific plugin(s) which matches a tag",
 )
-def execute(run_plugin):
-    """ Execute loaded plugins
+def execute(tag):
+    """ Execute OGC Specification
     """
 
-    if run_plugin:
+    if tag:
         app.plugins = [
-            plugin for plugin in app.plugins if plugin.__class__.__name__ in run_plugin
+            plugin
+            for plugin in app.plugins
+            if plugin.get_option("tags")
+            and set(plugin.get_option("tags")).intersection(tag)
         ]
 
     for plugin in app.plugins:

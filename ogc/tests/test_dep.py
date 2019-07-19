@@ -28,13 +28,13 @@ def test_install_cmd():
         _dep = Dep.load(pkg)
         if isinstance(_dep, AptDep):
             _install_str = _dep.install_cmd()
-            assert _install_str == "sudo apt-get install -qyf python3-pytest"
+            assert _install_str == "sudo apt install -qyf python3-pytest"
         if isinstance(_dep, SnapDep):
             _install_str = _dep.install_cmd()
             assert _install_str == "sudo snap install conjure-up --channel=latest/edge"
         if isinstance(_dep, PipDep):
             _install_str = _dep.install_cmd()
-            assert _install_str == "pip install black>=1.2.3"
+            assert _install_str == "pip install --user black>=1.2.3"
 
 
 def test_package_name():
