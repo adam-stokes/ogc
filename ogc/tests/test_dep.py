@@ -3,11 +3,13 @@
 from ogc.dep import Dep, AptDep, SnapDep, PipDep
 
 pkgs = [
-    ("apt:python3-pytest", AptDep),
-    ("snap:conjure-up/latest/edge", SnapDep),
-    ("snap:kubectl/1.15/candidate:classic", SnapDep),
-    ("pip:black>=1.2.3", PipDep),
-    ("pip:django", PipDep),
+    ("apt:python3-pytest", AptDep, "sudo apt install -qyf python3-pytest"),
+    ("apt:curl", AptDep, "sudo apt install -qyf curl"),
+    ("snap:conjure-up/latest/edge", SnapDep, "sudo snap install conjure-up --channel=latest/edge"),
+    ("snap:kubectl/1.15/candidate:classic", SnapDep, "sudo snap install kubectl --channel=1.15/candidate --classic"),
+    ("pip:black>=1.2.3", PipDep, "pip install --user black>=1.2.3"),
+    ("pip:django", PipDep, "pip install --user django"),
+    ("pip:pytest-mock", PipDep, "pip install --user pytest-mock"),
 ]
 
 
@@ -16,7 +18,7 @@ def test_load_dep_class():
 
     Make sure correct dep class loaded for specified package
     """
-    for pkg, dep_type in pkgs:
+    for pkg, dep_type, _ in pkgs:
         _dep = Dep.load(pkg)
         assert isinstance(_dep, dep_type)
 
@@ -26,22 +28,9 @@ def test_install_cmd():
 
     Make sure we show correct install command, with and without sudo
     """
-    for pkg, dep_type in pkgs:
+    for pkg, dep_type, install_str in pkgs:
         _dep = Dep.load(pkg)
-        _install_str = _dep.install_cmd()
-        if isinstance(_dep, AptDep):
-            assert _install_str == "sudo apt install -qyf python3-pytest"
-        if isinstance(_dep, SnapDep) and _dep.name == "conjure-up":
-            assert _install_str == "sudo snap install conjure-up --channel=latest/edge"
-        elif isinstance(_dep, SnapDep) and _dep.name == "kubectl":
-            assert (
-                _install_str
-                == "sudo snap install kubectl --channel=1.15/candidate --classic"
-            )
-        if isinstance(_dep, PipDep) and _dep.name == "black":
-            assert _install_str == "pip install --user black>=1.2.3"
-        elif isinstance(_dep, PipDep) and _dep.name == "django":
-            assert _install_str == "pip install --user django"
+        assert _dep.install_cmd() == install_str
 
 
 def test_package_name():
@@ -49,7 +38,7 @@ def test_package_name():
 
     Make sure we have the correct package name
     """
-    for pkg, dep_type in pkgs:
+    for pkg, dep_type, _ in pkgs:
         _dep = Dep.load(pkg)
         assert _dep.name in pkg
 
