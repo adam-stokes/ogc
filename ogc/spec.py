@@ -83,27 +83,17 @@ class SpecPlugin:
         _merge_env = DotEnv(dotenv_path=path, encoding="utf8").dict()
         app.env += _merge_env
 
-    def get_option(self, key):
-        # TODO: deprecate
-        return self.get_plugin_option(key)
-
     def get_plugin_option(self, key):
         """ Return option defined within a spec plugin
         """
-        try:
-            return deep_get(self.spec, key)
-        except (KeyError) as error:
-            log.debug(f"{self.friendly_name} option unset {key}: skipped.")
+        if key not in self.spec:
             return None
+        return deep_get(self.spec, key)
 
     def get_spec_option(self, key):
         """ Will return an option found in the global spec
         """
-        try:
-            return deep_get(self.specs, key)
-        except (KeyError) as error:
-            log.debug(f"Spec option unset {key}: skipped.")
-            None
+        return deep_get(self.specs, key)
 
     def set_option(self, key, value):
         if key not in self.spec_options:
@@ -116,15 +106,13 @@ class SpecPlugin:
         """ Verify options exists
         """
         for key, is_required in self.spec_options:
-            log.debug(f"Verifying (required: {is_required}) option {key}")
+            log.debug(f"-- verifying {key} :: required: {is_required}")
             try:
-                return self.get_option(key)
-            except (AttributeError, TypeError, KeyError):
+                deep_get(self.spec, key)
+            except KeyError as error:
                 if is_required:
-                    raise SpecConfigException(
-                        f"Attempting to access unknown plugin option for {self.friendly_name}: {key}"
-                    )
-        return True
+                    raise SpecConfigException(f"A required {key} not found, stopping.")
+        return
 
     def dep_check(self, show_only=True, install_cmds=False, sudo=False):
         """ Dependency checker
@@ -210,20 +198,26 @@ class SpecPlugin:
         # Check for a relative .env and load thoes
         relative_env_path = Path(".") / ".env"
         self._load_dotenv(relative_env_path)
-        properties_file = self.get_option("properties_file")
+        properties_file = (
+            self.get_plugin_option("properties_file")
+            if "properties_file" in self.spec
+            else None
+        )
 
         if properties_file:
             self._load_dotenv(Path(properties_file))
 
         # Process any plugin specfic
-        extra_env_vars = self.get_plugin_option("add_to_env")
-        app.log.debug(f"{self.friendly_name} extra_env_vars - {extra_env_vars}")
+        extra_env_vars = (
+            self.get_plugin_option("add_to_env") if "add_to_env" in self.spec else None
+        )
         env_vars = {}
         if extra_env_vars:
-            app.log.debug(f"{self.friendly_name} add_to_env set, adding variables.")
+            app.log.debug(f"-- add_to_env set, adding variables.")
             for _var in extra_env_vars:
-                item_option = self.get_spec_option(_var)
-                if not item_option:
+                try:
+                    item_option = self.get_spec_option(_var)
+                except KeyError as error:
                     raise SpecProcessException(
                         f"Failed to set an unknown environment variable: {_var}"
                     )

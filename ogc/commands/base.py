@@ -45,11 +45,12 @@ def cli(spec, debug):
                 f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
             )
             continue
-        app.log.debug(f"Found plugin: {plugin}")
 
         _specs = app.spec[plugin]
         if not isinstance(_specs, list):
             _specs = [_specs]
+
+        app.log.info(f"Found {len(_specs)} {plugin} plugin(s)")
 
         for _spec in _specs:
             runner = check_plugin(_spec, app.spec)

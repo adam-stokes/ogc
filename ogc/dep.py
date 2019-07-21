@@ -23,7 +23,7 @@ class Dep:
     def name(self):
         """ Return package name stripped of any dep type information
         """
-        return self.parsed.group('name')
+        return self.parsed.group("name")
 
     @property
     def parsed(self):
@@ -42,15 +42,16 @@ class Dep:
 class AptDep(Dep):
     """ APT package dependency
     """
+
     pattern_match = r"""^(?P<type>apt):
                          (?P<name>[a-zA-Z0-9_.-]+)"""
 
     @property
     def name(self):
-        return self.parsed.group('name')
+        return self.parsed.group("name")
 
     def install_cmd(self, sudo=True):
-        cmd = [self.parsed.group('type')]
+        cmd = [self.parsed.group("type")]
         if sudo:
             cmd.insert(0, "sudo")
         cmd_args = ["install", "-qyf", self.name]
@@ -65,22 +66,24 @@ class SnapDep(Dep):
     pattern_match = r"""^(?P<type>snap):
                          (?P<name>[a-zA-Z0-9_.-]+)\/
                          (?P<track>[a-zA-Z0-9_.-]+)\/
-                         (?P<channel>stable|candidate|beta|edge):
-                         (?P<classic>classic)"""
+                         (?P<channel>stable|candidate|beta|edge)
+                         (?P<classic>:classic)?"""
 
     @property
     def name(self):
-        return self.parsed.group('name')
+        return self.parsed.group("name")
 
     def install_cmd(self, sudo=True):
-        import pdb;pdb.set_trace()
         cmd = [self.parsed.group("type")]
         if sudo:
             cmd.insert(0, "sudo")
-        cmd_args = ["install", self.name,
-                    f"--channel={self.parsed.group('track')}/{self.parsed.group('channel')}"]
-        if self.parsed.group('classic'):
-            cmd_args.append('--classic')
+        cmd_args = [
+            "install",
+            self.name,
+            f"--channel={self.parsed.group('track')}/{self.parsed.group('channel')}",
+        ]
+        if self.parsed.group("classic"):
+            cmd_args.append("--classic")
         cmd = cmd + cmd_args
         return " ".join(cmd)
 
@@ -88,16 +91,24 @@ class SnapDep(Dep):
 class PipDep(Dep):
     """ Python PIP package dependency
     """
-    pattern_match = r"^([\w+?-]+)"
+
+    pattern_match = r"""^(?P<type>pip):
+                         (?P<name>[a-zA-Z0-9_.-]+)
+                         (?P<version>[a-zA-Z0-9_.,<=>!-]+)?$"""
 
     @property
     def name(self):
-        return self.parsed.group('name')
+        return self.parsed.group("name")
 
     def install_cmd(self, sudo=False):
         cmd = [self.parsed.group("type")]
         if sudo:
             cmd.insert(0, "sudo")
-        cmd_args = ["install", "--user", self.name]
+        version = self.parsed.group("version")
+        if version:
+            _name = f"{self.name}{version}"
+        else:
+            _name = self.name
+        cmd_args = ["install", "--user", _name]
         cmd = cmd + cmd_args
         return " ".join(cmd)

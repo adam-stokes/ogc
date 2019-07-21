@@ -24,8 +24,8 @@ def execute(tag):
         app.plugins = [
             plugin
             for plugin in app.plugins
-            if plugin.get_option("tags")
-            and set(plugin.get_option("tags")).intersection(tag)
+            if "tags" in plugin.spec
+            and set(plugin.get_plugin_option("tags")).intersection(tag)
         ]
 
     for plugin in app.plugins:

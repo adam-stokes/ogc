@@ -5,7 +5,9 @@ from ogc.dep import Dep, AptDep, SnapDep, PipDep
 pkgs = [
     ("apt:python3-pytest", AptDep),
     ("snap:conjure-up/latest/edge", SnapDep),
+    ("snap:kubectl/1.15/candidate:classic", SnapDep),
     ("pip:black>=1.2.3", PipDep),
+    ("pip:django", PipDep),
 ]
 
 
@@ -26,15 +28,20 @@ def test_install_cmd():
     """
     for pkg, dep_type in pkgs:
         _dep = Dep.load(pkg)
+        _install_str = _dep.install_cmd()
         if isinstance(_dep, AptDep):
-            _install_str = _dep.install_cmd()
             assert _install_str == "sudo apt install -qyf python3-pytest"
-        if isinstance(_dep, SnapDep):
-            _install_str = _dep.install_cmd()
+        if isinstance(_dep, SnapDep) and _dep.name == "conjure-up":
             assert _install_str == "sudo snap install conjure-up --channel=latest/edge"
-        if isinstance(_dep, PipDep):
-            _install_str = _dep.install_cmd()
+        elif isinstance(_dep, SnapDep) and _dep.name == "kubectl":
+            assert (
+                _install_str
+                == "sudo snap install kubectl --channel=1.15/candidate --classic"
+            )
+        if isinstance(_dep, PipDep) and _dep.name == "black":
             assert _install_str == "pip install --user black>=1.2.3"
+        elif isinstance(_dep, PipDep) and _dep.name == "django":
+            assert _install_str == "pip install --user django"
 
 
 def test_package_name():
@@ -44,12 +51,7 @@ def test_package_name():
     """
     for pkg, dep_type in pkgs:
         _dep = Dep.load(pkg)
-        if isinstance(_dep, AptDep):
-            assert _dep.name == "python3-pytest"
-        if isinstance(_dep, SnapDep):
-            assert _dep.name == "conjure-up"
-        if isinstance(_dep, PipDep):
-            assert _dep.name == f"black"
+        assert _dep.name in pkg
 
     # Some other package testing with pip for regex
     pip_packages = [
