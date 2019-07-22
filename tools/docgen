@@ -42,7 +42,8 @@ if __name__ == "__main__":
     plugins = [
         '../ogc-plugins-runner',
         '../ogc-plugins-env',
-        '../ogc-plugins-juju'
+        '../ogc-plugins-juju',
+        '../ogc-plugins-charm'
     ]
     modules = [
         f"{modname.replace('-', '_')}"

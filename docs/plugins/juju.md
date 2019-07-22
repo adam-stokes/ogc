@@ -1,4 +1,4 @@
-#OGC Juju Plugin
+# OGC Juju Plugin
 ## Description
 Juju plugin for bootstrap and deployment of applications
 

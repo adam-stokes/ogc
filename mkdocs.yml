@@ -40,3 +40,4 @@ nav:
       - Env: plugins/env.md
       - Runner: plugins/runner.md
       - Juju: plugins/juju.md
+      - Charm: plugins/charm.md
