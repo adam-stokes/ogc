@@ -1,41 +1,44 @@
 """
 ---
-title: Plugin Specification
 targets: ['docs/plugins/spec.md']
 ---
 
-# {title}
+# Plugin specification
+
+## Methods
 
 This allows each plugin to define dependencies required to run. Take note that
 this won't actually install the plugin deps for you, however, it does make it easy to
 install those deps for all loaded plugins:
 
-## Usage
+**check** - Runs a preliminary making sure options specified in a spec file exist in the plugin.
 
-Functions supported.
+**dep_check** - Parse and print out install commands for plugin dependencies such as apt, snap, and pip.
 
-## Defining plugin dependencies
+Current Supported formats:
 
-```
+| Type | Args | Description | Example |
+| :--- | :--: | :---        | :---    |
+| apt  | PKG_NAME |  Will access apt-get package manager for installation | apt:python3-test
+| pip  | PKG_NAME>=PIP_VERSION | pip format | pip:black>=0.10.0,<1.0.0 |
+| snap | PKG_NAME/track/channel | snap format, track can be a version like 1.15, channel is stable, candidate, beta, edge.| snap:kubectl/1.15/edge:classic |
+
+A plugin dependency can be in the following form:
+
+```toml
 [[Runner]]
-name = 'Running a python script'
-executable = 'python3'
-run_script = 'bin/script.py'
-deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/edge']
-
-[[Runner]]
-name = 'Running a script'
-run = '''
-#!/bin/bash
-wget http://example.com/zip
-'''
-deps = ['apt:wget']
+deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/edge:classic']
 ```
 
-To show the required dependencies run:
+A user can then get that information prior to running so that all requirements are met.
+
 ```
 > ogc --spec my-run-spec.toml plugin-deps
+```
 
+**Returns**:
+
+```
 Required Dependencies:
   - apt:python3-pytest
   - apt:wget
@@ -44,29 +47,23 @@ Required Dependencies:
 ```
 
 To show the dependencies in a way that can be easily installed for automated runs:
+
 ```
 > ogc --spec my-run-spec.toml plugin-deps --installable
+```
+
+**Returns**:
+
+```
 sudo apt-get install -qyf python3-pytest
 sudo apt-get install -qyf wget
 pip install --user pytest-asyncio==5.0.1
 snap install kubectl --channel=1.15/edge
 ```
 
-You can optionally pass sudo with it:
-```
-> ogc --spec my-run-spec.toml plugin-deps --installable
-sudo apt-get install -qyf python3-pytest
-sudo apt-get install -qyf wget
-pip install --user pytest-asyncio==5.0.1
-sudo snap install kubectl --channel=1.15/edge
-```
 You can install them automatically with:
 ```
 > ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo | sh -
-Supported formats:
-apt: <package name> Will access apt-get package manager for installation
-pip: <packagename>==<optional version> pip format
-snap: <packagename>/track/channel, snap format, track can be a version like 1.15, channel is stable, candidate, beta, edge.
 ```
 
 """
@@ -127,7 +124,8 @@ class SpecPlugin:
     """ Base plugin class for OGC
     """
 
-    friendly_name = "SpecPlugin"
+    friendly_name = "Plugin Specification"
+    description = "The reference architecture of a plugin"
     slug = None
 
     # Global options applicable to all plugins
@@ -140,8 +138,16 @@ class SpecPlugin:
         {
             "key": "deps",
             "required": False,
-            "description": "A list of package dependencies needed to run a plugin. These are in the format of\n\ndeps = ['pip:black', 'snap:juju/latest/stable:classic', 'apt:python3-pytest']",
+            "description": "A list of package dependencies needed to run a plugin.",
         },
+        {
+            "key": "add_to_env",
+            "required": False,
+            "description": " ".join(["Convert certain spec options to an environment variable, these variables",
+                                     "will be set in the host environment in the form of **VAR=VAL**. Note: this",
+                                     "will convert the dot '.' notation to underscores"]),
+        },
+
     ]
 
     # Options is a list of dictionary of options, descriptions, and requirements
@@ -276,3 +282,34 @@ class SpecPlugin:
         """ Process function
         """
         pass
+
+    @classmethod
+    def doc_plugin_opts(cls):
+        """ Returns MD formatted plugin options
+        """
+        _merge_opts = cls.global_options + cls.options
+        rendered = [
+            "## Options",
+                    "",
+                    "| Option | Required | Description |",
+                    "|:---    |  :---:   |:---|"]
+        for opt in _merge_opts:
+            rendered.append(f"| {opt['key']} | {opt['required']} | {opt['description']} |")
+        return "\n".join(rendered)
+
+
+    @classmethod
+    def doc_example(cls):
+        """ Can be overridden in a plugin to provide an example of plugin syntax
+        """
+        return ""
+
+    @classmethod
+    def doc_render(cls):
+        """ Renders extra documentation about a plugin if applicable
+        """
+        return "\n".join([f'#{cls.friendly_name}', f'## Description\n{cls.description}',
+                          "",
+                          cls.doc_plugin_opts(),
+                          "",
+                          cls.doc_example()])

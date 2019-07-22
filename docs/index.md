@@ -21,17 +21,31 @@ configuration for the particular goal.
 > ogc execute
 ```
 
-## Creating specs
+## Add plugins
 
-Specs are defined in a TOML file and each section is related to a loaded plugin.
+To make *OGC* a bit more useful, install a few plugins:
 
-## Show plugin dependencies
+```
+> pip install ogc-plugins-runner
+> pip install ogc-plugins-env
+```
 
-OGC doesn't install package dependencies automatically, but will give you a
+This will allow you to add functionality such as running scripts and preparing
+environment variables. Please see the plugins section of the docs for more
+information.
+
+### Show plugin dependencies
+
+OGC doesn't install plugin dependencies automatically, but will give you a
 summary that you can pass to whatever automation strategy you want.
 
 ```
 > ogc --spec ogc-spec-runner.toml plugin-deps
+```
+
+Output:
+
+```
 Plugin dependency summary ::
 
   - apt:python3-markdown
@@ -44,6 +58,11 @@ To get the install commands for the plugin deps you can pass `--installable`:
 
 ```
 > ogc --spec ogc-spec-runner.toml plugin-deps --installable
+```
+
+Output:
+
+```
 sudo apt install -qyf python3-markdown
 sudo snap install juju --channel=latest/stable --classic
 sudo snap install juju-wait --channel=latest/stable --classic

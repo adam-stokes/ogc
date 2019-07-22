@@ -16,12 +16,17 @@ def build(modules):
         if not obj.__doc__:
             continue
 
-        obj = frontmatter.loads(obj.__doc__)
-        if "targets" not in obj.metadata:
+        _fm = frontmatter.loads(obj.__doc__)
+        if "targets" not in _fm.metadata:
             click.echo("Missing required frontmatter: `targets`, not generating doc page.")
             continue
-        for target in obj.metadata["targets"]:
-            Path(target).write_text(obj.content.format(**obj.metadata), encoding="utf8")
+
+        content = _fm.content.format(**_fm.metadata)
+        if hasattr(obj, '__class_plugin_obj__'):
+            content += obj.__class_plugin_obj__.doc_render()
+        for target in _fm.metadata["targets"]:
+            Path(target).write_text(content, encoding="utf8")
+
 
 if __name__ == "__main__":
     modules = ["ogc"]
@@ -29,6 +34,19 @@ if __name__ == "__main__":
     modules = [
         f"ogc.{modname}"
         for _, modname, _ in pkgutil.iter_modules(['ogc'])
-        if modname != "tests"
+        if modname != "tests" and modname != "setup"
+    ]
+    build(modules)
+
+    # Plugins
+    plugins = [
+        '../ogc-plugins-runner',
+        '../ogc-plugins-env',
+        '../ogc-plugins-juju'
+    ]
+    modules = [
+        f"{modname.replace('-', '_')}"
+        for _, modname, _ in pkgutil.iter_modules(plugins)
+        if modname != "tests" and modname != "setup"
     ]
     build(modules)
