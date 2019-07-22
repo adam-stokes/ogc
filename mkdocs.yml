@@ -1,0 +1,38 @@
+site_name: OGC, a runner of things
+theme: material
+markdown_extensions:
+    - toc:
+        permalink: True
+    - admonition
+    - smarty
+    - wikilinks
+    - codehilite:
+        linenums: True
+    # - urlize # requires: pip install git+https://github.com/r0wb0t/markdown-urlize.git
+    - pymdownx.arithmatex
+    - pymdownx.betterem:
+        smart_enable: all
+    - pymdownx.caret
+    - pymdownx.critic
+    - pymdownx.details
+    - pymdownx.emoji:
+        emoji_generator: !!python/name:pymdownx.emoji.to_svg
+    - pymdownx.inlinehilite
+    - pymdownx.magiclink
+    - pymdownx.mark
+    - pymdownx.smartsymbols
+    - pymdownx.superfences
+    - pymdownx.tasklist:
+        custom_checkbox: True
+    - pymdownx.tilde
+extra:
+  palette:
+      primary: '#087da1'
+      accent: '#00a889'
+  social:
+    - type: 'github'
+      link: 'https://github.com/battlemidget/ogc'
+nav:
+  - Home: index.md
+  - Plugins:
+      - Specification: plugins/spec.md

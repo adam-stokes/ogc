@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+
+import frontmatter
+import markdown
+import click
+from pathlib import Path
+
+import pkgutil
+import importlib
+
+
+def build(modules):
+    for mod in modules:
+        obj = importlib.import_module(mod)
+        click.echo(f"Generating docs - {obj.__name__}")
+        if not obj.__doc__:
+            continue
+
+        obj = frontmatter.loads(obj.__doc__)
+        if "targets" not in obj.metadata:
+            click.echo("Missing required frontmatter: `targets`, not generating doc page.")
+            continue
+        for target in obj.metadata["targets"]:
+            Path(target).write_text(obj.content.format(**obj.metadata), encoding="utf8")
+
+if __name__ == "__main__":
+    modules = ["ogc"]
+    build(modules)
+    modules = [
+        f"ogc.{modname}"
+        for _, modname, _ in pkgutil.iter_modules(['ogc'])
+        if modname != "tests"
+    ]
+    build(modules)

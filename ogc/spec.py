@@ -1,4 +1,74 @@
-""" spec module
+"""
+---
+title: Plugin Specification
+targets: ['docs/plugins/spec.md']
+---
+
+# {title}
+
+This allows each plugin to define dependencies required to run. Take note that
+this won't actually install the plugin deps for you, however, it does make it easy to
+install those deps for all loaded plugins:
+
+## Usage
+
+Functions supported.
+
+## Defining plugin dependencies
+
+```
+[[Runner]]
+name = 'Running a python script'
+executable = 'python3'
+run_script = 'bin/script.py'
+deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/edge']
+
+[[Runner]]
+name = 'Running a script'
+run = '''
+#!/bin/bash
+wget http://example.com/zip
+'''
+deps = ['apt:wget']
+```
+
+To show the required dependencies run:
+```
+> ogc --spec my-run-spec.toml plugin-deps
+
+Required Dependencies:
+  - apt:python3-pytest
+  - apt:wget
+  - pip:pytest-asyncio==5.0.1
+  - snap:kubectl/1.15/edge
+```
+
+To show the dependencies in a way that can be easily installed for automated runs:
+```
+> ogc --spec my-run-spec.toml plugin-deps --installable
+sudo apt-get install -qyf python3-pytest
+sudo apt-get install -qyf wget
+pip install --user pytest-asyncio==5.0.1
+snap install kubectl --channel=1.15/edge
+```
+
+You can optionally pass sudo with it:
+```
+> ogc --spec my-run-spec.toml plugin-deps --installable
+sudo apt-get install -qyf python3-pytest
+sudo apt-get install -qyf wget
+pip install --user pytest-asyncio==5.0.1
+sudo snap install kubectl --channel=1.15/edge
+```
+You can install them automatically with:
+```
+> ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo | sh -
+Supported formats:
+apt: <package name> Will access apt-get package manager for installation
+pip: <packagename>==<optional version> pip format
+snap: <packagename>/track/channel, snap format, track can be a version like 1.15, channel is stable, candidate, beta, edge.
+```
+
 """
 
 import toml
@@ -60,8 +130,21 @@ class SpecPlugin:
     friendly_name = "SpecPlugin"
     slug = None
 
-    # Options is a list of tuples, (dot.notation.option, True) if required,
-    # False if not.
+    # Global options applicable to all plugins
+    global_options = [
+        {
+            "key": "tags",
+            "required": False,
+            "description": "Global tags to reference during a ogc spec run",
+        },
+        {
+            "key": "deps",
+            "required": False,
+            "description": "A list of package dependencies needed to run a plugin. These are in the format of\n\ndeps = ['pip:black', 'snap:juju/latest/stable:classic', 'apt:python3-pytest']",
+        },
+    ]
+
+    # Options is a list of dictionary of options, descriptions, and requirements
     options = []
 
     def __init__(self, spec, specs):
@@ -105,11 +188,17 @@ class SpecPlugin:
     def check(self):
         """ Verify options exists
         """
-        for key, is_required in self.spec_options:
-            log.debug(f"-- verifying {key} :: required: {is_required}")
+        for opt in self.spec_options:
             try:
+                if isinstance(opt, tuple):
+                    key, is_required = opt
+                else:
+                    # Support new option format
+                    key = opt["key"]
+                    is_required = opt.get("required", False)
+                log.debug(f"-- verifying {key}, required: {is_required}")
                 deep_get(self.spec, key)
-            except KeyError as error:
+            except (KeyError, TypeError) as error:
                 if is_required:
                     raise SpecConfigException(f"A required {key} not found, stopping.")
         return
@@ -121,53 +210,6 @@ class SpecPlugin:
         show_only: Show a print friendly output of deps from all plugins
         install_cmds: Show the output of install commands for deps that can be passed to sh for automated installs
         sudo: requires install_cmds=True, will show same output just with sudo prepended.
-
-        This allows each plugin to define dependencies required to run. Take note that this won't actually install the deps for you, however, it does make it easy to install those deps for all loaded plugins:
-
-        [[Runner]]
-        name = 'Running a python script'
-        executable = 'python3'
-        run_script = 'bin/script.py'
-        deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/edge']
-
-        [[Runner]]
-        name = 'Running a script'
-        run = '''
-        #!/bin/bash
-        wget http://example.com/zip
-        '''
-        deps = ['apt:wget']
-
-        To show the required dependencies run:
-        > ogc --spec my-run-spec.toml plugin-deps
-
-        Required Dependencies:
-        - apt:python3-pytest
-        - apt:wget
-        - pip:pytest-asyncio==5.0.1
-        - snap:kubectl/1.15/edge
-
-        To show the dependencies in a way that can be easily installed for automated runs:
-        > ogc --spec my-run-spec.toml plugin-deps --installable
-        sudo apt-get install -qyf python3-pytest
-        sudo apt-get install -qyf wget
-        pip install --user pytest-asyncio==5.0.1
-        snap install kubectl --channel=1.15/edge
-
-        You can optionally pass sudo with it:
-        > ogc --spec my-run-spec.toml plugin-deps --installable
-        sudo apt-get install -qyf python3-pytest
-        sudo apt-get install -qyf wget
-        pip install --user pytest-asyncio==5.0.1
-        sudo snap install kubectl --channel=1.15/edge
-
-        You can install them automatically with:
-        > ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo | sh -
-
-        Supported formats:
-        apt: <package name> Will access apt-get package manager for installation
-        pip: <packagename>==<optional version> pip format
-        snap: <packagename>/track/channel, snap format, track can be a version like 1.15, channel is stable, candidate, beta, edge.
         """
 
         if show_only and install_cmds and sudo:

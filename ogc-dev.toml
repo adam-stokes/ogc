@@ -1,0 +1,21 @@
+[Info]
+name = "ogc spec"
+description = "OGC tests itself :)"
+
+[[Runner]]
+name = "Test ogc core"
+description = "This performs unittests for OGC"
+run = """
+#!/bin/bash
+
+pytest
+"""
+
+[[Runner]]
+name = "Docs"
+description = """
+Builds the site documentation, including a readme.
+"""
+run_script = 'tools/docgen'
+executable = 'python3'
+tags = ['docs']

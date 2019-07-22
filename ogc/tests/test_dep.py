@@ -5,8 +5,16 @@ from ogc.dep import Dep, AptDep, SnapDep, PipDep
 pkgs = [
     ("apt:python3-pytest", AptDep, "sudo apt install -qyf python3-pytest"),
     ("apt:curl", AptDep, "sudo apt install -qyf curl"),
-    ("snap:conjure-up/latest/edge", SnapDep, "sudo snap install conjure-up --channel=latest/edge"),
-    ("snap:kubectl/1.15/candidate:classic", SnapDep, "sudo snap install kubectl --channel=1.15/candidate --classic"),
+    (
+        "snap:conjure-up/latest/edge",
+        SnapDep,
+        "sudo snap install conjure-up --channel=latest/edge",
+    ),
+    (
+        "snap:kubectl/1.15/candidate:classic",
+        SnapDep,
+        "sudo snap install kubectl --channel=1.15/candidate --classic",
+    ),
     ("pip:black>=1.2.3", PipDep, "pip install --user black>=1.2.3"),
     ("pip:django", PipDep, "pip install --user django"),
     ("pip:pytest-mock", PipDep, "pip install --user pytest-mock"),
