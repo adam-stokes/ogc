@@ -143,11 +143,14 @@ class SpecPlugin:
         {
             "key": "add_to_env",
             "required": False,
-            "description": " ".join(["Convert certain spec options to an environment variable, these variables",
-                                     "will be set in the host environment in the form of **VAR=VAL**. Note: this",
-                                     "will convert the dot '.' notation to underscores"]),
+            "description": " ".join(
+                [
+                    "Convert certain spec options to an environment variable, these variables",
+                    "will be set in the host environment in the form of **VAR=VAL**. Note: this",
+                    "will convert the dot '.' notation to underscores",
+                ]
+            ),
         },
-
     ]
 
     # Options is a list of dictionary of options, descriptions, and requirements
@@ -290,13 +293,15 @@ class SpecPlugin:
         _merge_opts = cls.global_options + cls.options
         rendered = [
             "## Options",
-                    "",
-                    "| Option | Required | Description |",
-                    "|:---    |  :---:   |:---|"]
+            "",
+            "| Option | Required | Description |",
+            "|:---    |  :---:   |:---|",
+        ]
         for opt in _merge_opts:
-            rendered.append(f"| {opt['key']} | {opt['required']} | {opt['description']} |")
+            rendered.append(
+                f"| {opt['key']} | {opt['required']} | {opt['description']} |"
+            )
         return "\n".join(rendered)
-
 
     @classmethod
     def doc_example(cls):
@@ -308,8 +313,13 @@ class SpecPlugin:
     def doc_render(cls):
         """ Renders extra documentation about a plugin if applicable
         """
-        return "\n".join([f'#{cls.friendly_name}', f'## Description\n{cls.description}',
-                          "",
-                          cls.doc_plugin_opts(),
-                          "",
-                          cls.doc_example()])
+        return "\n".join(
+            [
+                f"#{cls.friendly_name}",
+                f"## Description\n{cls.description}",
+                "",
+                cls.doc_plugin_opts(),
+                "",
+                cls.doc_example(),
+            ]
+        )
