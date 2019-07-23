@@ -142,6 +142,18 @@ class SpecPlugin:
 
     # Global options applicable to all plugins
     global_options = [
+        {"key": "name", "required": True, "description": "Name of runner"},
+        {
+            "key": "description",
+            "required": True,
+            "description": "Description of what this runner does",
+        },
+        {
+            "key": "long_description",
+            "required": False,
+            "description": "An extended description of what this runner does, supports Markdown.",
+        },
+
         {
             "key": "tags",
             "required": False,
@@ -152,6 +164,12 @@ class SpecPlugin:
             "required": False,
             "description": "A list of package dependencies needed to run a plugin.",
         },
+        {
+            "key": "env_requires",
+            "required": False,
+            "description": "A list of environment variables that must be present for the spec to function.",
+        },
+
         {
             "key": "add_to_env",
             "required": False,

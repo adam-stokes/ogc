@@ -6,12 +6,16 @@ Allow running of shell scripts, and other scripts where the runner has access to
 
 | Option | Required | Description |
 |:---    |  :---:   |:---|
-| tags | False | Global tags to reference during a ogc spec run |
-| deps | False | A list of package dependencies needed to run a plugin. |
-| add_to_env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
 | name | True | Name of runner |
 | description | True | Description of what this runner does |
+| long_description | False | An extended description of what this runner does, supports Markdown. |
+| tags | False | Global tags to reference during a ogc spec run |
+| deps | False | A list of package dependencies needed to run a plugin. |
+| env_requires | False | A list of environment variables that must be present for the spec to function. |
+| add_to_env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
 | concurrent | False | Allow this runner to run concurrenty in the background |
+| args | False | A list of arguments to pass to an `entry_point` |
+| entry_point | False | A list of arguments to act as the entry point |
 | run | False | A blob of text to execute, usually starts with a shebang interpreter |
 | run_script | False | Path to a excutable script |
 | executable | False | Must be set when using `run_script`, this is the binary to run the script with, (ie. python3) |
@@ -29,9 +33,23 @@ Allow running of shell scripts, and other scripts where the runner has access to
 
 ## Example
 
-This shows 5 runners that execute sequentially and one example demonstrating how assets work.
+Variations of using entry points, script blob, and script files, with and without assets.
 
 ```toml
+[[Runner]]
+name = "Sync K8s snaps"
+description = """
+Pull down upstream release tags and make sure our launchpad git repo has those
+tags synced. Next, we push any new releases (major, minor, or patch) to the
+launchpad builders for building the snaps from source and uploading to the snap
+store.
+"""
+deps = ["pip:requirements.txt"]
+env_requires = ["SNAP_LIST"]
+entry_point = ["python3", "snap.py"]
+args = ["sync-upstream", "--snap-list", "$SNAP_LIST"]
+tags = ["sync"]
+
 [[Runner]]
 name = 'Run pytest'
 description = 'a description'

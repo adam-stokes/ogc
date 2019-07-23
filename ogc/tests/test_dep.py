@@ -18,6 +18,8 @@ pkgs = [
     ("pip:black>=1.2.3", PipDep, "pip install --user black>=1.2.3"),
     ("pip:django", PipDep, "pip install --user django"),
     ("pip:pytest-mock", PipDep, "pip install --user pytest-mock"),
+    ("pip:requirements.txt", PipDep, "pip install --user -rrequirements.txt"),
+    ("pip:/home/ubuntu/package/requirements.txt", PipDep, "pip install --user -r/home/ubuntu/package/requirements.txt"),
 ]
 
 
