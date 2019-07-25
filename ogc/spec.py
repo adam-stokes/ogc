@@ -82,6 +82,7 @@ These methods must be defined in the plugin itself as these are not implemented 
 
 import toml
 import os
+import re
 from pathlib import Path
 from dict_deep import deep_get, deep_set
 from melddict import MeldDict
@@ -153,7 +154,6 @@ class SpecPlugin:
             "required": False,
             "description": "An extended description of what this runner does, supports Markdown.",
         },
-
         {
             "key": "tags",
             "required": False,
@@ -169,7 +169,6 @@ class SpecPlugin:
             "required": False,
             "description": "A list of environment variables that must be present for the spec to function.",
         },
-
         {
             "key": "add_to_env",
             "required": False,
@@ -199,6 +198,23 @@ class SpecPlugin:
     def __str__(self):
         return log.info(f"{self.friendly_name} Specification:\n{pformat(self.spec)}")
 
+    def _convert_to_env(self, items):
+        """ Converts a list of items that may contain $VARNAME into their
+        environment variable result. This will return the items unaltered if no matches found
+        """
+
+        def replace_env(match):
+            match = match.group()
+            return app.env.get(match[1:])
+
+        updated_items = []
+        _pattern = re.compile(r"\$([_a-zA-Z]+)")
+        if items is None:
+            items = []
+        if isinstance(items, str):
+            items = [items]
+        return [re.sub(_pattern, replace_env, item) for item in items]
+
     def _load_dotenv(self, path):
         if not path.exists():
             return
@@ -209,8 +225,13 @@ class SpecPlugin:
         """ Return option defined within a spec plugin
         """
         try:
-            return deep_get(self.spec, key)
-        except KeyError:
+            val = deep_get(self.spec, key)
+            result = self._convert_to_env(val)
+            if len(result) == 1:
+                return result[0]
+            return result
+        except (KeyError, TypeError) as error:
+            app.log.debug(f"Option {key} unavailable: {error}")
             return None
 
     def get_spec_option(self, key):
@@ -228,14 +249,11 @@ class SpecPlugin:
     def check(self):
         """ Verify options exists
         """
-        for opt in self.spec_options:
+        for opt in self.global_options + self.spec_options:
             try:
-                if isinstance(opt, tuple):
-                    key, is_required = opt
-                else:
-                    # Support new option format
-                    key = opt["key"]
-                    is_required = opt.get("required", False)
+                # Support new option format
+                key = opt["key"]
+                is_required = opt.get("required", False)
                 log.debug(f"-- verifying {key}, required: {is_required}")
                 deep_get(self.spec, key)
             except (KeyError, TypeError) as error:

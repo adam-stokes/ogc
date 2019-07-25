@@ -5,17 +5,13 @@ description = "OGC tests itself :)"
 [[Runner]]
 name = "Test ogc core"
 description = "This performs unittests for OGC"
-run = """
-#!/bin/bash
-
-pytest
-"""
+entry_point = ["pytest"]
 
 [[Runner]]
 name = "Docs"
 description = """
 Builds the site documentation, including a readme.
 """
-run_script = 'tools/docgen'
-executable = 'python3'
+entry_point = ["python3"]
+args = ['tools/docgen']
 tags = ['docs']

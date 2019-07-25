@@ -39,3 +39,4 @@ nav:
   - Plugins:
       - Env: plugins/env.md
       - Runner: plugins/runner.md
+      - Juju: plugins/juju.md

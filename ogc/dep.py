@@ -98,15 +98,15 @@ class PipDep(Dep):
 
     @property
     def name(self):
-        if 'requirements.txt' in self.package:
+        if "requirements.txt" in self.package:
             return self.package[4:]
         return self.parsed.group("name")
 
     def install_cmd(self, sudo=False):
-        cmd = ['pip']
+        cmd = ["pip"]
         if sudo:
             cmd.insert(0, "sudo")
-        if 'requirements.txt' in self.name:
+        if "requirements.txt" in self.name:
             _name = f"-r{self.name}"
         else:
             version = self.parsed.group("version")

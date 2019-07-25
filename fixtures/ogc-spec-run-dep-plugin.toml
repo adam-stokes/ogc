@@ -1,0 +1,39 @@
+[Info]
+name = "A runner shell spec"
+description = """
+An ogc spec showing out the runner and runner-shell plugin works
+"""
+
+[Juju]
+name = "a juju plugin"
+description = "juju plugin test"
+cloud = 'stfu'
+controller = 'heyo'
+model = 'sup'
+
+[Juju.bootstrap]
+run = """
+#!/bin/bash
+set -eux
+
+cat fixtures/env.properties
+"""
+
+
+[Juju.deploy]
+bundle = 'bundle.yaml'
+bundle_channel = 'edge'
+charm_channel = 'edge'
+
+
+[[Runner]]
+name = "Showing env.properties #2"
+description = "booya2"
+run = """
+#!/bin/bash
+set -eux
+
+cat fixtures/env.properties
+"""
+tags = ['test-runner']
+

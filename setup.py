@@ -6,7 +6,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.2.6",
+    version="0.2.7",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -39,5 +39,6 @@ setuptools.setup(
         "pytest==5.0.1",
         "python-box==3.4.2",
         "python-dotenv==0.10.3",
+        "ogc-plugins-runner>=0.0.5",
     ],
 )

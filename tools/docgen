@@ -41,6 +41,7 @@ if __name__ == "__main__":
     # Plugins
     plugins = [
         '../ogc-plugins-runner',
+        '../ogc-plugins-juju',
         '../ogc-plugins-env'
     ]
     modules = [

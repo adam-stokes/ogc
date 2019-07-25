@@ -14,13 +14,14 @@ Allow running of shell scripts, and other scripts where the runner has access to
 | env_requires | False | A list of environment variables that must be present for the spec to function. |
 | add_to_env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
 | concurrent | False | Allow this runner to run concurrenty in the background |
-| args | False | A list of arguments to pass to an `entry_point` |
 | entry_point | False | A list of arguments to act as the entry point |
+| args | False | A list of arguments to pass to an `entry_point` |
 | run | False | A blob of text to execute, usually starts with a shebang interpreter |
 | run_script | False | Path to a excutable script |
 | executable | False | Must be set when using `run_script`, this is the binary to run the script with, (ie. python3) |
 | timeout | False | Do not exceed this timeout in seconds |
 | wait_for_success | False | Wait for this runner to be successfull, will retry. Useful if you are doing a status check on a service that will eventually become ready. |
+| fail_silently | False | Do not halt on a failed runner, this will print an errorthat can be logged for ci runs, but still allow all runners in a spec to complete. |
 | back_off | False | Time in seconds to wait between retries |
 | retries | False | Max number of retries |
 | assets | False | Assets configuration |
@@ -119,7 +120,7 @@ run = """
 #!/bin/bash
 set -eux
 
-juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER"
+juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER
 """
 timeout = 180
 tags = ["teardown"]
