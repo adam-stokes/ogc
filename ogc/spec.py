@@ -207,13 +207,14 @@ class SpecPlugin:
             match = match.group()
             return app.env.get(match[1:])
 
-        updated_items = []
         _pattern = re.compile(r"\$([_a-zA-Z]+)")
-        if items is None:
-            items = []
         if isinstance(items, str):
             items = [items]
-        return [re.sub(_pattern, replace_env, item) for item in items]
+        return [
+            re.sub(_pattern, replace_env, item)
+            for item in items
+            if isinstance(item, str)
+        ]
 
     def _load_dotenv(self, path):
         if not path.exists():
@@ -226,6 +227,12 @@ class SpecPlugin:
         """
         try:
             val = deep_get(self.spec, key)
+
+            if isinstance(val, bool):
+                return val
+            if all(isinstance(obj, dict) for obj in val):
+                # dont process nested list of dicts like Runner.assets
+                return val
             result = self._convert_to_env(val)
             if len(result) == 1:
                 return result[0]

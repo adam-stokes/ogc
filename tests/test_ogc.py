@@ -15,7 +15,34 @@ name = 'A test spec'
     assert "name" in spec.spec
 
 
-def test_args_to_env():
+def test_nested_args_to_env(mocker):
+    mocker.patch("ogc.state.app.log")
+    spec_toml = toml.loads(
+        """
+[[Runner.assets]]
+name = 'pytest config'
+description = 'pytest asset test'
+source_file = 'data/pytest.ini'
+destination = 'jobs/pytest.ini'
+is_executable = false
+
+[[Runner.assets]]
+name = 'boom config'
+description = 'pytest asset test'
+source_file = 'data/pytest.ini'
+destination = 'jobs/pytest.ini'
+is_executable = false
+
+"""
+    )
+    spec = SpecPlugin(spec_toml["Runner"], spec_toml)
+    assets = spec.get_plugin_option("assets")
+    assert assets[0]['name'] == 'pytest config'
+
+
+def test_args_to_env(mocker):
+    mocker.patch("ogc.state.app.log")
+
     spec_toml = toml.loads(
         """
 [Runner]
@@ -47,9 +74,10 @@ args = ["run",
     ]
 
 
-def test_get_option_env_key():
+def test_get_option_env_key(mocker):
     """ Tests that an environment variable set for a given option is converted into the hosts environment setting
     """
+    mocker.patch("ogc.state.app.log")
     spec_toml = toml.loads(
         """
 [Juju]
@@ -65,3 +93,24 @@ model_controller = "$JUJU_CONTROLLER:$JUJU_MODEL"
     spec = SpecPlugin(spec_toml["Juju"], spec_toml)
     assert spec.get_plugin_option("cloud") == "aws/us-east-1"
     assert spec.get_plugin_option("model_controller") == "test-controller:test-model"
+
+
+def test_get_option_env_key_bool(mocker):
+    """ Tests that get_plugin_option handles boolean values correctly
+    """
+    mocker.patch("ogc.state.app.log")
+    spec_toml = toml.loads(
+        """
+[Juju]
+reuse = true
+cloud = "$JUJU_CLOUD"
+model_controller = "$JUJU_CONTROLLER:$JUJU_MODEL"
+"""
+    )
+    _env = {}
+    _env["JUJU_CLOUD"] = "aws/us-east-1"
+    _env["JUJU_CONTROLLER"] = "test-controller"
+    _env["JUJU_MODEL"] = "test-model"
+    app.env = _env
+    spec = SpecPlugin(spec_toml["Juju"], spec_toml)
+    assert spec.get_plugin_option("reuse") is True
