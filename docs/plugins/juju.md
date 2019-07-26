@@ -25,8 +25,7 @@ Juju plugin for bootstrap and deployment of applications
 | deploy.reuse | False | Reuse an existing Juju model, please note that if applications exist and you deploy the same application it will create additional machines. |
 | deploy.bundle | True | The Juju bundle to use |
 | deploy.overlay | False | Juju bundle fragments that can be overlayed a base bundle. |
-| deploy.bundle_channel | True | Juju bundle channel to deploy from. |
-| deploy.charm_channel | True | Juju charm channel to deploy from. Typically, same as the bundle channel unless you are deploying individual charms. |
+| deploy.channel | True | Juju channel to deploy from. |
 | deploy.wait | False | Juju deploy is asynchronous. Turn this option on to wait for a deployment to settle. |
 | config | False | Juju charm config options |
 | config.set | False | Set a Juju charm config option |
@@ -65,10 +64,7 @@ bundle = "bundles/my-custom-bundle.yaml"
 overlay = "overlays/1.15-edge.yaml"
 
 # Optional bundle channel to deploy from
-bundle_channel = "edge"
-
-# Optional charm channel to deploy from
-charm_channel = "edge"
+channel = "edge"
 
 # Wait for a deployment to settle?
 wait = true
@@ -101,3 +97,4 @@ run = """
 python3 validations/tests/tigera/cleanup_vpcs.py
 CONTROLLER=$JUJU_CONTROLLER validations/tests/tigera/bootstrap_aws_single_subnet.py
 """
+```

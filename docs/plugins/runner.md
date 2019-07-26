@@ -47,7 +47,7 @@ store.
 """
 deps = ["pip:requirements.txt"]
 env_requires = ["SNAP_LIST"]
-entry_point = ["python3", "snap.py"]
+entry_point = ["python3", "-m", "snap.py"]
 args = ["sync-upstream", "--snap-list", "$SNAP_LIST"]
 tags = ["sync"]
 
