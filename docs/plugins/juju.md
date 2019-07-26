@@ -19,6 +19,7 @@ Juju plugin for bootstrap and deployment of applications
 | bootstrap | False | Juju bootstrap options. |
 | bootstrap.constraints | False | Juju bootstrap constraints |
 | bootstrap.debug | False | Turn on debugging during a bootstrap |
+| bootstrap.run | False | Pass in a script blob to run in place of the builtin juju bootstrap commands  |
 | bootstrap.disable_add_model | False | Do not immediately add a Juju model after bootstrap. Useful if juju model configuration needs to be performed. |
 | deploy | False | Juju deploy options |
 | deploy.reuse | False | Reuse an existing Juju model, please note that if applications exist and you deploy the same application it will create additional machines. |
@@ -31,7 +32,7 @@ Juju plugin for bootstrap and deployment of applications
 | config.set | False | Set a Juju charm config option |
 
 
-## Example
+## Example 1
 
 ```toml
 [Juju]
@@ -54,7 +55,7 @@ disable-add-model = true
 
 [Juju.deploy]
 # reuse existing controller/model
-reuse = True
+reuse = true
 
 # bundle to deploy
 # bundle = "cs:~owner/custom-bundle"
@@ -78,3 +79,25 @@ wait = true
 set = ["kubernetes-master = allow-privileged=true",
        "kubernetes-worker = allow-privileged=true"]
 ```
+
+## Example 2
+
+Overriding the built in bootstrap command
+
+```toml
+[Juju]
+# Juju module for bootstrapping and deploying a bundle
+cloud = "aws"
+
+# controller to create
+controller = "validator"
+
+# model to create
+model = "validator-model"
+
+[Juju.bootstrap]
+run = """
+#!/bin/bash
+python3 validations/tests/tigera/cleanup_vpcs.py
+CONTROLLER=$JUJU_CONTROLLER validations/tests/tigera/bootstrap_aws_single_subnet.py
+"""

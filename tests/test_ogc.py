@@ -37,7 +37,7 @@ is_executable = false
     )
     spec = SpecPlugin(spec_toml["Runner"], spec_toml)
     assets = spec.get_plugin_option("assets")
-    assert assets[0]['name'] == 'pytest config'
+    assert assets[0]["name"] == "pytest config"
 
 
 def test_args_to_env(mocker):

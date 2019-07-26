@@ -6,6 +6,7 @@ description = "OGC tests itself :)"
 name = "Test ogc core"
 description = "This performs unittests for OGC"
 entry_point = ["pytest"]
+tags = ['test']
 
 [[Runner]]
 name = "Docs"

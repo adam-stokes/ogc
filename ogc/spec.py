@@ -209,12 +209,21 @@ class SpecPlugin:
 
         _pattern = re.compile(r"\$([_a-zA-Z]+)")
         if isinstance(items, str):
-            items = [items]
-        return [
-            re.sub(_pattern, replace_env, item)
-            for item in items
-            if isinstance(item, str)
-        ]
+            return re.sub(_pattern, replace_env, items)
+        if isinstance(items, bool):
+            return items
+        if isinstance(items, dict):
+            return items
+        if isinstance(items, list):
+            if all(isinstance(obj, dict) for obj in items):
+                return items
+            modified = [
+                re.sub(_pattern, replace_env, item)
+                for item in items
+                if isinstance(item, str)
+            ]
+            return modified
+        return
 
     def _load_dotenv(self, path):
         if not path.exists():
@@ -227,16 +236,7 @@ class SpecPlugin:
         """
         try:
             val = deep_get(self.spec, key)
-
-            if isinstance(val, bool):
-                return val
-            if all(isinstance(obj, dict) for obj in val):
-                # dont process nested list of dicts like Runner.assets
-                return val
-            result = self._convert_to_env(val)
-            if len(result) == 1:
-                return result[0]
-            return result
+            return self._convert_to_env(val)
         except (KeyError, TypeError) as error:
             app.log.debug(f"Option {key} unavailable: {error}")
             return None
