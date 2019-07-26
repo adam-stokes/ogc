@@ -2,6 +2,11 @@
 name = "ogc spec"
 description = "OGC tests itself :)"
 
+[Env]
+name = "Dev environment"
+description = "Dev environment"
+properties_file = ".env"
+
 [[Runner]]
 name = "Test ogc core"
 description = "This performs unittests for OGC"
@@ -16,3 +21,18 @@ Builds the site documentation, including a readme.
 entry_point = ["python3"]
 args = ['tools/docgen']
 tags = ['docs']
+
+[[Runner]]
+name = "Deploy"
+description = """
+Builds and deploys to remote server
+"""
+env_requires = ['WEB_SITE', 'WEB_USER', 'WEB_DST']
+run = """
+#!/bin/bash
+
+set -eux
+mkdocs build
+rsync -avz site/* $WEB_USER@$WEB_SITE:$WEB_DST
+"""
+tags = ['deploy']
