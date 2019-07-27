@@ -74,3 +74,7 @@ Or to handle installing those packages automatically (like in a CI run):
 ```
 > ogc --spec ogc-spec-runner.toml plugin-deps --installable | sh -
 ```
+
+## More information
+
+- [Website / Documentation](https://ogc.8op.org)

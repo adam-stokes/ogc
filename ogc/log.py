@@ -1,4 +1,4 @@
-""" debug module
+""" log module
 """
 
 from .state import app

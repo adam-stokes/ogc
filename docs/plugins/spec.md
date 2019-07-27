@@ -2,9 +2,30 @@
 
 ## Built-in Methods
 
-**def:check** - Runs a preliminary check making sure options specified in a spec file exist in the plugin.
+### *get_plugin_option(key)*
 
-**def:dep_check** - Parse and print out install commands for plugin dependencies such as apt, snap, and pip.
+Queries options defined in the calling plugin
+
+### *get_spec_option(key)*
+
+Queries options defined in the entire spec (any loaded plugins)
+
+### *doc_plugin_opts(cls)*
+
+**classmethod** Returns markdown rendered table of the calling plugins available options
+
+### *doc_render(cls)*
+
+**classmethod** Renders markdown rendered output of plugin_opts, plugin friendly
+  name, description, and an example spec for the plugin.
+
+### *check*
+
+Runs a preliminary check making sure options specified in a spec file exist in the plugin.
+
+### *dep_check*
+
+Parse and print out install commands for plugin dependencies such as apt, snap, and pip.
 
 This allows each plugin to define dependencies required to run. Take note that
 this won't actually install the plugin deps for you, however, it does make it easy to
@@ -61,15 +82,26 @@ You can install them automatically with:
 > ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo | sh -
 ```
 
-**def:env** - Will read and set host environment variables, along with any DotEnv
-  specified one or if a properties_file is found (Which uses the Env plugin
-  itself for that.) Environment variables are merge left, updating any existing
-  key:val pairs found.
+### *env*
+
+Will read and set host environment variables, along with any DotEnv specified
+one or if a properties_file is found (Which uses the Env plugin itself for
+that.) Environment variables are merge left, updating any existing key:val
+pairs found.
 
 ## Not implemented methods
 
-These methods must be defined in the plugin itself as these are not implemented at the spec level.
+These methods should be defined in the plugin itself as these are not implemented at the spec level.
 
-**def:conflicts** - Useful if there are certain plugin options that can not be run together. Should be overridden in the plugin.
+### *doc_example(cls)*
 
-**def:process** - Process the plugin, this handles the majority of the plugin's execution task. Should be overridden in the plugin.
+**classmethod** Optionally return markdown supported output that shows a useful example of how
+to use the plugin in a spec file.
+
+### *conflicts*
+
+Useful if there are certain plugin options that can not be run together. Should be overridden in the plugin.
+
+### *process*
+
+Process the plugin, this handles the majority of the plugin's execution task. Should be overridden in the plugin.
