@@ -2,16 +2,37 @@
 name = "ogc spec"
 description = "OGC tests itself :)"
 
-[Env]
-name = "Dev environment"
-description = "Dev environment"
-properties_file = ".env"
-
 [[Runner]]
 name = "Test ogc core"
-description = "This performs unittests for OGC"
 entry_point = ["pytest"]
-tags = ['test']
+tags = ['bdist', 'test']
+
+[[Runner]]
+name = "Clean up"
+run = """
+#!/bin/bash
+
+rm -rf build dist ogc.egg-info
+"""
+tags = ['bdist', 'clean']
+
+[[Runner]]
+name = "Bump revision"
+entry_point = ["punch"]
+args = ["--part", "patch"]
+tags = ['bdist']
+
+[[Runner]]
+name = "Build dist"
+entry_point = ["python3"]
+args = ["setup.py", "bdist_wheel"]
+tags = ['bdist']
+
+[[Runner]]
+name = "Upload dist"
+entry_point = ["twine"]
+args = ["upload", "dist/*"]
+tags = ['bdist']
 
 [[Runner]]
 name = "Docs"

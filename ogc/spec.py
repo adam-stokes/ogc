@@ -178,8 +178,8 @@ class SpecPlugin:
         {"key": "name", "required": True, "description": "Name of runner"},
         {
             "key": "description",
-            "required": True,
-            "description": "Description of what this runner does",
+            "required": False,
+            "description": "Description of what this runner does"
         },
         {
             "key": "long_description",
