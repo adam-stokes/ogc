@@ -6,7 +6,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.3.0",
+    version="0.3.1",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -25,7 +25,7 @@ setuptools.setup(
         "juju-wait==2.7.0",
         "dict-deep==2.0.2",
         "juju>=0.11.7,<0.12.0",
-        "kv>=0.3.0,<0.4.0",
+        "kv>=0.3.1,<0.4.0",
         "launchpadlib==1.10.6",
         "melddict>=1.0,<2.0",
         "pyyaml-include>=1.1,<2.0",
