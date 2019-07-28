@@ -25,7 +25,7 @@ setuptools.setup(
         "juju-wait==2.7.0",
         "dict-deep==2.0.2",
         "juju>=0.11.7,<0.12.0",
-        "kv>=0.3.1,<0.4.0",
+        "kv>=0.3,<0.4.0",
         "launchpadlib==1.10.6",
         "melddict>=1.0,<2.0",
         "pyyaml-include>=1.1,<2.0",
@@ -39,6 +39,6 @@ setuptools.setup(
         "pytest==5.0.1",
         "python-box==3.4.2",
         "python-dotenv==0.10.3",
-        "ogc-plugins-runner>=0.0.5",
+        "ogc-plugins-runner>=1.0.0,<2.0.0",
     ],
 )
