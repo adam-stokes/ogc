@@ -409,7 +409,7 @@ class SpecPlugin:
         return "\n".join(
             [
                 f"# {cls.friendly_name}",
-                f"## Description\n{cls.description}",
+                f"## Description\n{str(cls)}",
                 "",
                 cls.doc_plugin_opts(),
                 "",

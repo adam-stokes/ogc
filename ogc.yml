@@ -25,6 +25,10 @@ plan:
       description: Upload dist
       cmd: twine upload dist/*
       tags: [bdist]
+  - runner:
+      description: Build documentation
+      cmd: python3 tools/docgen
+      tags: [build-docs]
 
 docs:
   - mkdocs

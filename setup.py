@@ -33,8 +33,6 @@ setuptools.setup(
         "requests>=2.22,<3.0",
         "semver>=2.8,<3.0",
         "sh>=1.12,<2.0",
-        "staticjinja>=0.3.6,<0.4.0",
-        "toml>=0.10.0,<0.11.0",
         "colorama==0.3.9",
         "pytest==5.0.1",
         "python-box==3.4.2",

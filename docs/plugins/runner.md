@@ -1,35 +1,33 @@
 # OGC Runner Plugin
 ## Description
-Allow running of shell scripts, and other scripts where the runner has access to the executable
+<class 'ogc_plugins_runner.Runner'>
 
 ## Options
 
 | Option | Required | Description |
 |:---    |  :---:   |:---|
-| name | True | Name of runner |
-| description | True | Description of what this runner does |
-| long_description | False | An extended description of what this runner does, supports Markdown. |
+| name | False | Name of runner |
+| description | False | Description of what this runner does |
+| long-description | False | An extended description of what this runner does, supports Markdown. |
 | tags | False | Global tags to reference during a ogc spec run |
 | deps | False | A list of package dependencies needed to run a plugin. |
-| env_requires | False | A list of environment variables that must be present for the spec to function. |
-| add_to_env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
+| env-requires | False | A list of environment variables that must be present for the spec to function. |
+| add-to-env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
+| description | True | Description of the running task |
 | concurrent | False | Allow this runner to run concurrenty in the background |
-| entry_point | False | A list of arguments to act as the entry point |
-| args | False | A list of arguments to pass to an `entry_point` |
-| run | False | A blob of text to execute, usually starts with a shebang interpreter |
-| run_script | False | Path to a excutable script |
-| executable | False | Must be set when using `run_script`, this is the binary to run the script with, (ie. python3) |
+| cmd | False | A command to run |
+| script | False | A blob of text to execute, usually starts with a shebang interpreter |
 | timeout | False | Do not exceed this timeout in seconds |
-| wait_for_success | False | Wait for this runner to be successfull, will retry. Useful if you are doing a status check on a service that will eventually become ready. |
-| fail_silently | False | Do not halt on a failed runner, this will print an errorthat can be logged for ci runs, but still allow all runners in a spec to complete. |
-| back_off | False | Time in seconds to wait between retries |
+| wait-for-success | False | Wait for this runner to be successfull, will retry. Useful if you are doing a status check on a service that will eventually become ready. |
+| fail-silently | False | Do not halt on a failed runner, this will print an errorthat can be logged for ci runs, but still allow all runners in a spec to complete. |
+| back-off | False | Time in seconds to wait between retries |
 | retries | False | Max number of retries |
 | assets | False | Assets configuration |
 | assets.name | False | Name of asset |
-| assets.source_file | False | A file to act on, (ie. a configuration file) |
-| assets.source_blob | False | A text blob of a file to use |
+| assets.source-file | False | A file to act on, (ie. a configuration file) |
+| assets.source-blob | False | A text blob of a file to use |
 | assets.destination | False | Where to output this asset, (ie. saving a pytest.ini blob to a tests directory) |
-| assets.is_executable | False | Make this asset executable |
+| assets.is-executable | False | Make this asset executable |
 
 
 ## Example

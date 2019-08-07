@@ -44,9 +44,10 @@ if __name__ == "__main__":
         '../ogc-plugins-juju',
         '../ogc-plugins-env'
     ]
+    skip_modules = ['test_runner', 'setup', 'punch_version', 'punch_config']
     modules = [
         f"{modname.replace('-', '_')}"
         for _, modname, _ in pkgutil.iter_modules(plugins)
-        if modname != "tests" and modname != "setup"
+        if modname not in skip_modules
     ]
     build(modules)

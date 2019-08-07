@@ -1,26 +1,25 @@
 # OGC Juju Plugin
 ## Description
-Juju plugin for bootstrap and deployment of applications
+<class 'ogc_plugins_juju.Juju'>
 
 ## Options
 
 | Option | Required | Description |
 |:---    |  :---:   |:---|
-| name | True | Name of runner |
-| description | True | Description of what this runner does |
-| long_description | False | An extended description of what this runner does, supports Markdown. |
+| name | False | Name of runner |
+| description | False | Description of what this runner does |
+| long-description | False | An extended description of what this runner does, supports Markdown. |
 | tags | False | Global tags to reference during a ogc spec run |
 | deps | False | A list of package dependencies needed to run a plugin. |
-| env_requires | False | A list of environment variables that must be present for the spec to function. |
-| add_to_env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
+| env-requires | False | A list of environment variables that must be present for the spec to function. |
+| add-to-env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
 | cloud | True | Name of one of the support Juju clouds to use. |
 | controller | True | Name of the controller to create with Juju. |
 | model | True | Name of the model to create with Juju. |
-| bootstrap | False | Juju bootstrap options. |
 | bootstrap.constraints | False | Juju bootstrap constraints |
 | bootstrap.debug | False | Turn on debugging during a bootstrap |
 | bootstrap.run | False | Pass in a script blob to run in place of the builtin juju bootstrap commands  |
-| bootstrap.disable_add_model | False | Do not immediately add a Juju model after bootstrap. Useful if juju model configuration needs to be performed. |
+| bootstrap.disable-add-model | False | Do not immediately add a Juju model after bootstrap. Useful if juju model configuration needs to be performed. |
 | deploy | False | Juju deploy options |
 | deploy.reuse | False | Reuse an existing Juju model, please note that if applications exist and you deploy the same application it will create additional machines. |
 | deploy.bundle | True | The Juju bundle to use |
