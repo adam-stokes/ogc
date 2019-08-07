@@ -8,16 +8,16 @@ ogc - Task runner with a focus on deployment/testing/reporting.
 
 OGC is powered by plugins that can be discovered on https://pypi.org with the
 prefix of `ogc-plugins`. With plugins installed different aspects of a run can
-be defined through a spec file, which is a toml file setting up plugin
+be defined through a spec file, which is a yaml file setting up plugin
 configuration for the particular goal.
 
 ## Usage
 
 ```
 > pip install ogc
-> ogc --spec ogc-spec-runner.toml execute
+> ogc --spec ogc-spec-runner.yml execute
 
-# Or with a ogc.toml file in same directory running ogc from
+# Or with a ogc.yml file in same directory running ogc from
 > ogc execute
 ```
 
@@ -34,13 +34,27 @@ This will allow you to add functionality such as running scripts and preparing
 environment variables. Please see the plugins section of the docs for more
 information.
 
+```yaml
+
+meta:
+  name: A test spec
+  description: A simple spec showing how to run commands
+
+# Phases
+setup:
+  - runner:    # This is the plugin from ogc-plugins-runner
+      description: Clean out build directory
+      cmd: rm -rf build
+      tags: [clean]
+```
+
 ### Show plugin dependencies
 
 OGC doesn't install plugin dependencies automatically, but will give you a
 summary that you can pass to whatever automation strategy you want.
 
 ```
-> ogc --spec ogc-spec-runner.toml plugin-deps
+> ogc --spec ogc-spec-runner.yml plugin-deps
 ```
 
 Output:
@@ -57,7 +71,7 @@ Plugin dependency summary ::
 To get the install commands for the plugin deps you can pass `--installable`:
 
 ```
-> ogc --spec ogc-spec-runner.toml plugin-deps --installable
+> ogc --spec ogc-spec-runner.yml plugin-deps --installable
 ```
 
 Output:
@@ -72,7 +86,7 @@ pip install --user pytest==5.0.1
 Or to handle installing those packages automatically (like in a CI run):
 
 ```
-> ogc --spec ogc-spec-runner.toml plugin-deps --installable | sh -
+> ogc --spec ogc-spec-runner.yml plugin-deps --installable | sh -
 ```
 
 ## More information
