@@ -1,25 +1,27 @@
-name: ogc spec
-description: tasks for ogc distribution
+meta:
+  name: ogc spec
+  description: tasks for ogc distribution
 
 plan:
   - runner:
-      summary: Test ogc core
-      cmd: pytest
-      tags: [dist, clean]
-  - runner:
-      summary: cleanup artifacts
+      description: cleanup artifacts
       cmd: rm -rf build dist ogc.egg-info
-      tags: [dist, clean]
+      tags: [dist, clean, bdist]
+      fail-silently: yes
   - runner:
-      summary: Bump revision
+      description: Test ogc core
+      cmd: pytest
+      tags: [dist, clean, bdist]
+  - runner:
+      description: Bump revision
       cmd: punch --part patch
       tags: [bdist]
   - runner:
-      summary: Build dist
+      description: Build dist
       cmd: python3 setup.py bdist_wheel
       tags: [bdist]
   - runner:
-      summary: Upload dist
+      description: Upload dist
       cmd: twine upload dist/*
       tags: [bdist]
 

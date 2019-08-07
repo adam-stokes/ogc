@@ -27,18 +27,18 @@ setup:
 
 plan:
   - runner:
-      summary: This has some env variables mixed into cmd
+      description: This has some env variables mixed into cmd
       cmd: echo $BONZAI l$ANOTHERTIME env$VAR_NICE $CONTROLLER:$MODEL $CONTROLLER $MODEL
   - runner:
-      summary: Test ogc core
+      description: Test ogc core
       cmd: pytest
       tags: [dist, clean]
   - runner:
-      summary: cleanup artifacts
+      description: cleanup artifacts
       cmd: rm -rf build dist ogc.egg-info
       tags: [dist, clean]
   - runner:
-      summary: Bump revision
+      description: Bump revision
       cmd: punch --part patch
       tags: [bdist]
       assets:
@@ -47,7 +47,7 @@ plan:
           destination: jobs/pytest.ini
           is-executable: no
   - runner:
-      summary: Build dist
+      description: Build dist
       cmd: python3 setup.py bdist_wheel
       tags: [bdist]
       assets:
@@ -56,6 +56,6 @@ plan:
           destiation: jobs/boom.ini
           is-executable: yes
   - runner:
-      summary: Upload dist
+      description: Upload dist
       cmd: twine upload dist/*
       tags: [bdist]

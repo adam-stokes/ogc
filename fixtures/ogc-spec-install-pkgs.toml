@@ -1,9 +1,0 @@
-[Info]
-name = "Showing how to install plugin deps"
-
-[Juju]
-deps = ["snap:juju/latest/stable"]
-
-[[Runner]]
-name = "test install deps"
-deps = ["apt:apt", "pip:black"]

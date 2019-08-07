@@ -170,19 +170,17 @@ class SpecPlugin:
     """
 
     friendly_name = "Plugin Specification"
-    description = "The reference architecture of a plugin"
-    slug = None
 
     # Global options applicable to all plugins
     global_options = [
-        {"key": "name", "required": True, "description": "Name of runner"},
+        {"key": "name", "required": False, "description": "Name of runner"},
         {
             "key": "description",
             "required": False,
             "description": "Description of what this runner does"
         },
         {
-            "key": "long_description",
+            "key": "long-description",
             "required": False,
             "description": "An extended description of what this runner does, supports Markdown.",
         },
@@ -197,12 +195,12 @@ class SpecPlugin:
             "description": "A list of package dependencies needed to run a plugin.",
         },
         {
-            "key": "env_requires",
+            "key": "env-requires",
             "required": False,
             "description": "A list of environment variables that must be present for the spec to function.",
         },
         {
-            "key": "add_to_env",
+            "key": "add-to-env",
             "required": False,
             "description": " ".join(
                 [
@@ -265,6 +263,9 @@ class SpecPlugin:
         _merge_env = DotEnv(dotenv_path=path, encoding="utf8").dict()
         app.env += _merge_env
 
+    def opt(self, key):
+        return self.get_plugin_option(key)
+
     def get_plugin_option(self, key):
         """ Return option defined within a spec plugin
         """
@@ -272,8 +273,11 @@ class SpecPlugin:
             val = deep_get(self.spec, key)
             return self._convert_to_env(val)
         except (KeyError, TypeError) as error:
-            app.log.debug(f"Option {key} unavailable: {error}")
+            app.log.debug(f"Option {key} unavailable, skipping")
             return None
+
+    def spec_opt(self, key):
+        return self.get_spec_option(key)
 
     def get_spec_option(self, key):
         """ Will return an option found in the global spec
@@ -299,7 +303,7 @@ class SpecPlugin:
                 deep_get(self.spec, key)
             except (KeyError, TypeError) as error:
                 if is_required:
-                    raise SpecConfigException(f"A required {key} not found, stopping.")
+                    raise SpecConfigException(f"{self.phase} :: A required {key} not found, stopping.")
         return
 
     def dep_check(self, show_only=True, install_cmds=False, sudo=False):
@@ -318,7 +322,7 @@ class SpecPlugin:
         if show_only and install_cmds:
             raise SpecDepException("Can not have show_only and install_cmd.")
 
-        pkgs = self.get_plugin_option("deps")
+        pkgs = self.opt("deps")
         if not pkgs:
             return
 
@@ -339,8 +343,8 @@ class SpecPlugin:
         relative_env_path = Path(".") / ".env"
         self._load_dotenv(relative_env_path)
         properties_file = (
-            self.get_plugin_option("properties_file")
-            if "properties_file" in self.spec
+            self.opt("properties-file")
+            if "properties-file" in self.spec
             else None
         )
 
@@ -349,7 +353,7 @@ class SpecPlugin:
 
         # Process any plugin specfic
         extra_env_vars = (
-            self.get_plugin_option("add_to_env") if "add_to_env" in self.spec else None
+            self.opt("add-to-env") if "add-to-env" in self.spec else None
         )
         env_vars = {}
         if extra_env_vars:

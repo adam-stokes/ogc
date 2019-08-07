@@ -17,11 +17,11 @@ def test_load_spec_phases():
     assert phases not in SPEC_CORE_PLUGINS
     assert phases == [SpecPhase.SETUP, SpecPhase.PLAN]
 
-def test_nested_args_to_env(mocker):
+def test_nested_assets(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / 'spec.yml'])
     plug = SpecPlugin(SpecPhase.PLAN, spec[SpecPhase.PLAN][3]["runner"], spec)
-    assets = plug.get_plugin_option("assets")
+    assets = plug.opt("assets")
     assert assets[0]["name"] == "pytest configuration"
 
 
@@ -37,7 +37,7 @@ def test_cmd_to_env(mocker):
     _env["MODEL"] = "juju-model"
     app.env = _env
     spec = SpecPlugin(SpecPhase.PLAN, spec[SpecPhase.PLAN][0]["runner"], spec)
-    cmd = spec.get_plugin_option("cmd")
+    cmd = spec.opt("cmd")
     assert cmd == ("echo bonzai-test lthis happened "
                    "late envinteresting concept "
                    "juju-controller:juju-model "
@@ -56,9 +56,9 @@ def test_get_option_env_key(mocker):
     _env["JUJU_CONTROLLER"] = "test-controller"
     _env["JUJU_MODEL"] = "test-model"
     app.env = _env
-    assert plug.get_plugin_option("deploy.cloud") == "aws/us-east-1"
-    assert plug.get_plugin_option("deploy.controller") == "test-controller"
-    assert plug.get_plugin_option("deploy.model") == "test-model"
+    assert plug.opt("deploy.cloud") == "aws/us-east-1"
+    assert plug.opt("deploy.controller") == "test-controller"
+    assert plug.opt("deploy.model") == "test-model"
 
 
 def test_get_option_env_key_bool(mocker):
@@ -73,4 +73,4 @@ def test_get_option_env_key_bool(mocker):
     _env["JUJU_CONTROLLER"] = "test-controller"
     _env["JUJU_MODEL"] = "test-model"
     app.env = _env
-    assert plug.get_plugin_option("deploy.reuse") is True
+    assert plug.opt("deploy.reuse") is True

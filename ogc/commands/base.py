@@ -26,7 +26,7 @@ def cli(spec, debug):
 
     specs = []
     # Check for local spec
-    if Path("ogc.yml").exists():
+    if Path("ogc.yml").exists() and not spec:
         specs.append(Path("ogc.yml"))
 
     for sp in spec:
@@ -39,41 +39,39 @@ def cli(spec, debug):
 
     # Handle the plugin loader, initializing the plugin class
     plugins = {
-        entry_point.name: entry_point.load()
+        entry_point.name.lower(): entry_point.load()
         for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
 
-    phase_mapping = {}
     for phase in app.spec.keys():
         if phase in SPEC_CORE_PLUGINS:
             continue
         if phase not in SPEC_PHASES:
             app.log.error(f'`{phase}` is an incorrect phase for this spec, please review the specfile.')
             sys.exit(1)
-        _plugins = []
 
         for plugin in app.spec[phase]:
-            check_plugin = plugins.get(plugin, None)
+            check_plugin = plugins.get(next(iter(plugin)), None)
             if not check_plugin:
                 app.log.debug(
                     f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
                 )
                 continue
 
-            _specs = app.spec[phase][plugin]
-            if not isinstance(_specs, list):
-                _specs = [_specs]
+            runner = check_plugin(phase, next(iter(plugin.values())), app.spec)
+            if runner.opt('description'):
+                _desc = runner.opt('description')
+            else:
+                setattr(runner.__class__, '__str__',
+                        lambda x: 'A Plugin, please add a __str__ attribute for a plugin description.')
+                _desc = str(runner)
+            app.log.debug(f"{phase} :: loaded : {_desc}")
 
-            app.log.info(f"{phase} phase: found {len(_specs)} {plugin} plugin(s)")
+            # Validate spec is compatible with plugin
+            try:
+                runner.check()
+            except SpecConfigException as error:
+                app.log.error(error)
+                sys.exit(1)
 
-            for _spec in _specs:
-                runner = check_plugin(phase, _spec, app.spec)
-
-                # Validate spec is compatible with plugin
-                try:
-                    runner.check()
-                except SpecConfigException as error:
-                    app.log.error(error)
-                    sys.exit(1)
-
-                app.phases[phase].append(runner)
+            app.phases[phase].append(runner)
