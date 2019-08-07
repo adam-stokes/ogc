@@ -27,7 +27,8 @@ plan:
 
 docs:
   - mkdocs
-  - rsync:
-      src: site/*
-      dst: $WEB_USER@$WEB_SITE:$WEB_HOST
-      tags: [deploy]
+  - deploy:
+      rsync:
+        src: site/*
+        dst: $WEB_USER@$WEB_SITE:$WEB_HOST
+        tags: [deploy]
