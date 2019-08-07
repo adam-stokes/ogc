@@ -1,0 +1,61 @@
+meta:
+  name: A test spec
+
+setup:
+  - juju:
+      bootstrap:
+        debug: no
+        model-default: test-mode=true
+      deploy:
+        reuse: yes
+        bundle: charmed-kubernetes
+        overlay: |
+          applications:
+            kubernetes-master:
+              options:
+                channel: $SNAP_VERSION
+            kubernetes-worker:
+              options:
+                channel: $SNAP_VERSION
+        cloud: $JUJU_CLOUD
+        controller: $JUJU_CONTROLLER
+        model: $JUJU_MODEL
+        wait: yes
+      config:
+        - kubernetes-master allow-privileged=true
+        - kubernetes-worker allow-privileged=true
+
+plan:
+  - runner:
+      summary: This has some env variables mixed into cmd
+      cmd: echo $BONZAI l$ANOTHERTIME env$VAR_NICE $CONTROLLER:$MODEL $CONTROLLER $MODEL
+  - runner:
+      summary: Test ogc core
+      cmd: pytest
+      tags: [dist, clean]
+  - runner:
+      summary: cleanup artifacts
+      cmd: rm -rf build dist ogc.egg-info
+      tags: [dist, clean]
+  - runner:
+      summary: Bump revision
+      cmd: punch --part patch
+      tags: [bdist]
+      assets:
+        - name: pytest configuration
+          source-file: data/pytest.ini
+          destination: jobs/pytest.ini
+          is-executable: no
+  - runner:
+      summary: Build dist
+      cmd: python3 setup.py bdist_wheel
+      tags: [bdist]
+      assets:
+        - name: boom config
+          source-file: data/boom.ini
+          destiation: jobs/boom.ini
+          is-executable: yes
+  - runner:
+      summary: Upload dist
+      cmd: twine upload dist/*
+      tags: [bdist]

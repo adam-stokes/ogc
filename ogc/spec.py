@@ -54,7 +54,7 @@ deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/ed
 A user can then get that information prior to running so that all requirements are met.
 
 ```
-> ogc --spec my-run-spec.toml plugin-deps
+> ogc --spec my-run-spec.yml plugin-deps
 ```
 
 **Returns**:
@@ -70,7 +70,7 @@ Required Dependencies:
 To show the dependencies in a way that can be easily installed for automated runs:
 
 ```
-> ogc --spec my-run-spec.toml plugin-deps --installable
+> ogc --spec my-run-spec.yml plugin-deps --installable
 ```
 
 **Returns**:
@@ -84,7 +84,7 @@ snap install kubectl --channel=1.15/edge
 
 You can install them automatically with:
 ```
-> ogc --spec my-run-spec.toml plugin-deps --installable --with-sudo | sh -
+> ogc --spec my-run-spec.yml plugin-deps --installable | sh -
 ```
 
 ### *env*
@@ -112,7 +112,7 @@ Useful if there are certain plugin options that can not be run together. Should 
 Process the plugin, this handles the majority of the plugin's execution task. Should be overridden in the plugin.
 """
 
-import toml
+import yaml
 import os
 import re
 from pathlib import Path
@@ -158,7 +158,7 @@ class SpecLoader(MeldDict):
     def load(cls, specs):
         cl = SpecLoader()
         for spec in specs:
-            cl += toml.loads(spec.read_text())
+            cl += yaml.safe_load(spec.read_text())
         return cl
 
     def to_dict(self):
@@ -217,12 +217,14 @@ class SpecPlugin:
     # Options is a list of dictionary of options, descriptions, and requirements
     options = []
 
-    def __init__(self, spec, specs):
+    def __init__(self, phase, spec, specs):
         """ Load spec
 
+        phase: Phase this plugin is in
         spec: Plugin specific spec
         specs: Original spec showing all plugins/options
         """
+        self.phase = phase
         self.specs = specs
         self.spec = spec
         self.spec_options = self.options
@@ -332,8 +334,7 @@ class SpecPlugin:
     def env(self):
         """ Setup environment such as adding additional variables to environment
 
-        This can load options from the Env plugin, not required.
-        """
+        This can load options from the Env plugin, not required. """
         # Check for a relative .env and load thoes
         relative_env_path = Path(".") / ".env"
         self._load_dotenv(relative_env_path)

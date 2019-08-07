@@ -1,6 +1,20 @@
 """ Enums
 """
 
-SNAP_ARCH_MAPPER = {"aarch64": "arm64", "x86_64": "amd64"}
+class SpecPhase:
+    SETUP = 'setup'
+    PLAN = 'plan'
+    TEARDOWN = 'teardown'
 
-SNAP_TRACKS = set(["latest", "1.12", "1.13", "1.14", "1.15"])
+# Please note this is the order in which the phases should execute
+SPEC_PHASES = [SpecPhase.SETUP,
+               SpecPhase.PLAN,
+               SpecPhase.TEARDOWN]
+
+class SpecCorePlugin:
+    DOCS = 'docs'
+    META = 'meta'
+
+SPEC_CORE_PLUGINS = [SpecCorePlugin.DOCS,
+                     SpecCorePlugin.META]
+

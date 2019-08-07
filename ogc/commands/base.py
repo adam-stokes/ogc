@@ -1,4 +1,9 @@
-from ..spec import SpecLoader, SpecLoaderException, SpecConfigException
+from ..spec import (
+    SpecLoader, SpecLoaderException, SpecConfigException)
+from ..enums import (
+    SPEC_PHASES,
+    SPEC_CORE_PLUGINS
+)
 from ..state import app
 from .. import log
 from pathlib import Path
@@ -21,8 +26,8 @@ def cli(spec, debug):
 
     specs = []
     # Check for local spec
-    if Path("ogc.toml").exists():
-        specs.append(Path("ogc.toml"))
+    if Path("ogc.yml").exists():
+        specs.append(Path("ogc.yml"))
 
     for sp in spec:
         _path = Path(sp)
@@ -38,28 +43,37 @@ def cli(spec, debug):
         for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
 
-    for plugin in app.spec.keys():
-        check_plugin = plugins.get(plugin, None)
-        if not check_plugin:
-            app.log.debug(
-                f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
-            )
+    phase_mapping = {}
+    for phase in app.spec.keys():
+        if phase in SPEC_CORE_PLUGINS:
             continue
+        if phase not in SPEC_PHASES:
+            app.log.error(f'`{phase}` is an incorrect phase for this spec, please review the specfile.')
+            sys.exit(1)
+        _plugins = []
 
-        _specs = app.spec[plugin]
-        if not isinstance(_specs, list):
-            _specs = [_specs]
+        for plugin in app.spec[phase]:
+            check_plugin = plugins.get(plugin, None)
+            if not check_plugin:
+                app.log.debug(
+                    f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
+                )
+                continue
 
-        app.log.info(f"Found {len(_specs)} {plugin} plugin(s)")
+            _specs = app.spec[phase][plugin]
+            if not isinstance(_specs, list):
+                _specs = [_specs]
 
-        for _spec in _specs:
-            runner = check_plugin(_spec, app.spec)
+            app.log.info(f"{phase} phase: found {len(_specs)} {plugin} plugin(s)")
 
-            # Validate spec is compatible with plugin
-            try:
-                runner.check()
-            except SpecConfigException as error:
-                app.log.error(error)
-                sys.exit(1)
+            for _spec in _specs:
+                runner = check_plugin(phase, _spec, app.spec)
 
-            app.plugins.append(runner)
+                # Validate spec is compatible with plugin
+                try:
+                    runner.check()
+                except SpecConfigException as error:
+                    app.log.error(error)
+                    sys.exit(1)
+
+                app.phases[phase].append(runner)
