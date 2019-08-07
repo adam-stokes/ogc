@@ -57,7 +57,16 @@ def execute(phase, tag):
             and set(plugin.get_plugin_option("tags")).intersection(tag)
         ]
 
-    app.log.info(f"Setup environment")
+    # no tags or phases specified, pull everything
+    if not plugins:
+        for phase in app.phases.keys():
+            plugins_for_phase = app.phases.get(phase, None)
+            if plugins_for_phase:
+                for plug in plugins_for_phase:
+                    plugins.append(plug)
+
+
+    app.log.info(f"Validating tasks")
     for plugin in plugins:
         # Setup environment
         try:
@@ -66,8 +75,6 @@ def execute(phase, tag):
             app.log.error(error)
             sys.exit(1)
 
-    app.log.info(f"Checking for conflicts")
-    for plugin in plugins:
         # Check for any option conflicts
         try:
             plugin.conflicts()

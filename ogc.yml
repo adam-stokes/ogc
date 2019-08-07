@@ -15,7 +15,8 @@ plan:
   - runner:
       description: Bump revision
       cmd: punch --part patch
-      tags: [bdist]
+      tags: [bdist, bump-rev]
+      deps: ["pip:requirements_dev.txt"]
   - runner:
       description: Build dist
       cmd: python3 setup.py bdist_wheel
