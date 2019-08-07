@@ -5,4 +5,3 @@ click>=7.0,<8.0
 dict-deep==2.0.2
 melddict>=1.0,<2.0
 python-dotenv>=0.10.3<1.0
-punch.py>=1.6.0<2.0.0
