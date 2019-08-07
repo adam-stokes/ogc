@@ -339,7 +339,7 @@ class SpecPlugin:
         """ Setup environment such as adding additional variables to environment
 
         This can load options from the Env plugin, not required. """
-        # Check for a relative .env and load thoes
+        # Check for a relative .env and load those
         relative_env_path = Path(".") / ".env"
         self._load_dotenv(relative_env_path)
         properties_file = (
@@ -357,7 +357,7 @@ class SpecPlugin:
         )
         env_vars = {}
         if extra_env_vars:
-            app.log.debug(f"-- add_to_env set, adding variables.")
+            app.log.debug(f"-- add-to-env set, adding variables.")
             for _var in extra_env_vars:
                 try:
                     item_option = self.get_spec_option(_var)
