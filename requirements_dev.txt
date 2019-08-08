@@ -1,4 +1,6 @@
 punch.py
+twine
+setuptools
 ogc>0.3.0,<1.0.0
 ogc-plugins-runner>1.0.0,<2.0.0
 ogc-plugins-env>1.0.0,<2.0.0
