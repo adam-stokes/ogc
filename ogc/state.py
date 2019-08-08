@@ -15,6 +15,8 @@ app = SimpleNamespace(
     env=MeldDict(os.environ.copy()),
     # phases
     phases=OrderedDict([(phase, []) for phase in SPEC_PHASES]),
+    # list of all plugins, across all phases
+    plugins=[],
     # logger
     log=None,
 )

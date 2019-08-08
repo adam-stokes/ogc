@@ -40,6 +40,9 @@ plan:
            --cloud $JUJU_CLOUD \
            --bunndle-channel $JUJU_DEPLOY_CHANNEL \
            --snap-channel $SNAP_VERSION
+      deps:
+        - "snap:juju/latest/stable:classic"
+
 teardown:
   - runner:
       description: Tear down juju deployment

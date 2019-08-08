@@ -5,6 +5,8 @@ import sys
 import sh
 import tempfile
 import os
+import inspect
+import importlib
 from pathlib import Path
 from .base import cli
 from ..state import app
@@ -82,10 +84,15 @@ def list_plugins():
 
     Example:
 
-    > ogc --spec my-spec.toml list-plugins
+    > ogc list-plugins
     """
-    for _plugin in app.plugins:
-        app.log.info(f" -- {_plugin.__class__.__name__}")
+    app.log.info("Plugins used:")
+    _plugins = [
+        _plugin.metadata.get('__plugin_name__', _plugin.__class__.__name__)
+        for _plugin in app.plugins
+    ]
+    for _plugin in set(_plugins):
+        app.log.info(f" -- {_plugin}")
     return
 
 

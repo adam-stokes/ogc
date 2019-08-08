@@ -112,17 +112,20 @@ Useful if there are certain plugin options that can not be run together. Should 
 Process the plugin, this handles the majority of the plugin's execution task. Should be overridden in the plugin.
 """
 
-import yaml
+import click
+import importlib
+import inspect
 import os
 import re
-from pathlib import Path
+import yaml
 from dict_deep import deep_get, deep_set
-from melddict import MeldDict
-from pprint import pformat
 from dotenv.main import DotEnv
-import click
+from melddict import MeldDict
+from pathlib import Path
+from pprint import pformat
 from . import log, dep
 from .state import app
+from .enums import MODULE_METADATA_MAPPING
 
 
 class SpecLoaderException(Exception):
@@ -228,7 +231,7 @@ class SpecPlugin:
         self.spec_options = self.options
 
     def __str__(self):
-        return log.info(f"{self.friendly_name} Specification:\n{pformat(self.spec)}")
+        return log.info(self.friendly_name)
 
     def _convert_to_env(self, items):
         """ Converts a list of items that may contain $VARNAME into their
@@ -395,6 +398,18 @@ class SpecPlugin:
                 f"| {opt['key']} | {opt['required']} | {opt['description']} |"
             )
         return "\n".join(rendered)
+
+    @property
+    def metadata(self):
+        """ Grab plugin metadata
+        """
+        module_name = Path(inspect.getfile(self.__class__)).stem
+        module = importlib.import_module(module_name)
+        meta = set(dir(module)).intersection(set(MODULE_METADATA_MAPPING))
+        return {
+            key: getattr(module, key)
+            for key in meta
+        }
 
     @classmethod
     def doc_example(cls):

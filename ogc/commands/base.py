@@ -54,7 +54,7 @@ def cli(spec, debug):
             check_plugin = plugins.get(next(iter(plugin)), None)
             if not check_plugin:
                 app.log.debug(
-                    f"Could not find plugin {plugin}, install with `pip install ogc-plugins-{plugin.lower()}`"
+                    f"Could not find plugin {next(iter(plugin)).lower()}, install with `pip install ogc-plugins-{next(iter(plugin)).lower()}`"
                 )
                 continue
 
@@ -75,3 +75,6 @@ def cli(spec, debug):
                 sys.exit(1)
 
             app.phases[phase].append(runner)
+
+            # This is to keep a definitive list of all plugins across all phases.
+            app.plugins.append(runner)
