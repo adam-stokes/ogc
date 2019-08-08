@@ -106,7 +106,7 @@ class PipDep(Dep):
         cmd = ["pip"]
         if sudo:
             cmd.insert(0, "sudo")
-        if "requirements.txt" in self.name:
+        if "requirements" in self.name:
             _name = f"-r{self.name}"
         else:
             version = self.parsed.group("version")
@@ -114,6 +114,6 @@ class PipDep(Dep):
                 _name = f"{self.name}{version}"
             else:
                 _name = self.name
-        cmd_args = ["install", "--user", _name]
+        cmd_args = ["install", _name]
         cmd = cmd + cmd_args
         return " ".join(cmd)

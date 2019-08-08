@@ -12,6 +12,7 @@ plan:
       description: Test ogc core
       cmd: pytest
       tags: [dist, clean, bdist]
+      deps: ["pip:requirements_test.txt"]
   - runner:
       description: Bump revision
       cmd: punch --part patch

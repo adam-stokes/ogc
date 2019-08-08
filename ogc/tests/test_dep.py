@@ -15,14 +15,15 @@ pkgs = [
         SnapDep,
         "sudo snap install kubectl --channel=1.15/candidate --classic",
     ),
-    ("pip:black>=1.2.3", PipDep, "pip install --user black>=1.2.3"),
-    ("pip:django", PipDep, "pip install --user django"),
-    ("pip:pytest-mock", PipDep, "pip install --user pytest-mock"),
-    ("pip:requirements.txt", PipDep, "pip install --user -rrequirements.txt"),
+    ("pip:black>=1.2.3", PipDep, "pip install black>=1.2.3"),
+    ("pip:django", PipDep, "pip install django"),
+    ("pip:pytest-mock", PipDep, "pip install pytest-mock"),
+    ("pip:requirements.txt", PipDep, "pip install -rrequirements.txt"),
+    ("pip:requirements_dev.txt", PipDep, "pip install -rrequirements_dev.txt"),
     (
         "pip:/home/ubuntu/package/requirements.txt",
         PipDep,
-        "pip install --user -r/home/ubuntu/package/requirements.txt",
+        "pip install -r/home/ubuntu/package/requirements.txt",
     ),
 ]
 
