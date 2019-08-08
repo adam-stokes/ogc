@@ -7,6 +7,7 @@ import tempfile
 import os
 import inspect
 import importlib
+import itertools
 from pathlib import Path
 from .base import cli
 from ..state import app
@@ -15,34 +16,49 @@ from ..spec import SpecDepException
 
 @click.command()
 @click.option("--installable", is_flag=True)
-def plugin_deps(installable):
+def list_deps(installable):
     """ Show plugins dependency summary
 
     Example:
 
-    > ogc --spec my-spec.toml plugin-deps
+    > ogc --spec my-spec.yml list-deps
 
     Which can be automated with:
 
-    > ogc --spec my-spec.toml plugin-deps --installable | sh -
+    > ogc --spec my-spec.yml list-deps --installable | sh -
 
     """
     show_only = False
     if not installable:
         show_only = True
 
-    if show_only:
-        click.echo("Plugin dependency summary ::\n")
+    dep_cmds = []
 
-    for plugin in app.plugins:
-        try:
+    try:
+        dep_cmds = [
             plugin.dep_check(show_only, installable)
-        except (TypeError, SpecDepException) as error:
-            app.log.error(
-                f"{error}: Does your spec have nested plugins more than 2 levels deep? That is currently unsupported."
-            )
-            sys.exit(1)
+            for plugin in app.plugins
+        ]
+    except (TypeError, SpecDepException) as error:
+        app.log.error(
+            f"{error}: Does your spec have nested plugins more than 2 levels deep? That is currently unsupported."
+        )
+        sys.exit(1)
 
+    dep_cmds = list(itertools.chain.from_iterable(dep_cmds))
+
+    if not dep_cmds:
+        app.log.info("No plugin dependencies listed.")
+        sys.exit(0)
+
+    if dep_cmds and show_only:
+        app.log.info("Plugin dependency summary ::")
+
+    for _dep in dep_cmds:
+        if isinstance(_dep, str):
+            app.log.info(f"- {_dep}")
+        else:
+            click.echo(_dep.install_cmd())
 
 @click.command()
 @click.argument("plugin")
@@ -96,6 +112,6 @@ def list_plugins():
     return
 
 
-cli.add_command(plugin_deps)
+cli.add_command(list_deps)
 cli.add_command(list_plugins)
 cli.add_command(spec_doc)

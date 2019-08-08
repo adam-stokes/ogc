@@ -49,7 +49,7 @@ deps = ['apt:python3-pytest', 'pip:pytest-asyncio==5.0.1', 'snap:kubectl/1.15/ed
 A user can then get that information prior to running so that all requirements are met.
 
 ```
-> ogc --spec my-run-spec.yml plugin-deps
+> ogc --spec my-run-spec.yml list-deps
 ```
 
 **Returns**:
@@ -65,7 +65,7 @@ Required Dependencies:
 To show the dependencies in a way that can be easily installed for automated runs:
 
 ```
-> ogc --spec my-run-spec.yml plugin-deps --installable
+> ogc --spec my-run-spec.yml list-deps --installable
 ```
 
 **Returns**:
@@ -79,7 +79,7 @@ snap install kubectl --channel=1.15/edge
 
 You can install them automatically with:
 ```
-> ogc --spec my-run-spec.yml plugin-deps --installable | sh -
+> ogc --spec my-run-spec.yml list-deps --installable | sh -
 ```
 
 ### *env*

@@ -54,7 +54,7 @@ OGC doesn't install plugin dependencies automatically, but will give you a
 summary that you can pass to whatever automation strategy you want.
 
 ```
-> ogc --spec ogc-spec-runner.yml plugin-deps
+> ogc --spec ogc-spec-runner.yml list-deps
 ```
 
 Output:
@@ -71,7 +71,7 @@ Plugin dependency summary ::
 To get the install commands for the plugin deps you can pass `--installable`:
 
 ```
-> ogc --spec ogc-spec-runner.yml plugin-deps --installable
+> ogc --spec ogc-spec-runner.yml list-deps --installable
 ```
 
 Output:
@@ -86,7 +86,7 @@ pip install --user pytest==5.0.1
 Or to handle installing those packages automatically (like in a CI run):
 
 ```
-> ogc --spec ogc-spec-runner.yml plugin-deps --installable | sh -
+> ogc --spec ogc-spec-runner.yml list-deps --installable | sh -
 ```
 
 ## More information
