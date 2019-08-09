@@ -9,6 +9,30 @@ from ..enums import SPEC_PHASES
 
 
 @click.command()
+def tasks():
+    """ Show tasks for a spec
+    """
+    plugins = []
+    for phase in app.phases.keys():
+            plugins_for_phase = app.phases.get(phase, None)
+            if plugins_for_phase:
+                for plug in plugins_for_phase:
+                    plugins.append(plug)
+    if not plugins:
+        app.log.info('No tasks found, please add phases and plugins to the specfile.')
+        sys.exit(0)
+
+    click.echo("Tasks::\n")
+    for plug in plugins:
+        name = plug.metadata.get('__plugin_name__', plug.__class__.__name__)
+        description = plug.opt('description') if plug.opt('description') else 'No description available.'
+        tags = plug.opt('tags') if plug.opt('tags') else []
+        if tags:
+            tags = "-t ".join(tags)
+        phase = plug.phase
+        click.echo(f" - {name} :: {description}\n   Run Example:\n      > ogc execute --phase {phase} {tags}")
+
+@click.command()
 @click.option(
     "--phase",
     metavar="<phase>",
@@ -93,3 +117,4 @@ def execute(phase, tag):
 
 
 cli.add_command(execute)
+cli.add_command(tasks)
