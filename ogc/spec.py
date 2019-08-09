@@ -66,7 +66,7 @@ class SpecPlugin:
         {
             "key": "description",
             "required": False,
-            "description": "Description of what this runner does"
+            "description": "Description of what this runner does",
         },
         {
             "key": "long-description",
@@ -192,7 +192,9 @@ class SpecPlugin:
                 deep_get(self.spec, key)
             except (KeyError, TypeError) as error:
                 if is_required:
-                    raise SpecConfigException(f"{self.phase} :: A required {key} not found, stopping.")
+                    raise SpecConfigException(
+                        f"{self.phase} :: A required {key} not found, stopping."
+                    )
         return
 
     def dep_check(self, show_only=True, install_cmds=False):
@@ -225,18 +227,14 @@ class SpecPlugin:
         relative_env_path = Path(".") / ".env"
         self._load_dotenv(relative_env_path)
         properties_file = (
-            self.opt("properties-file")
-            if "properties-file" in self.spec
-            else None
+            self.opt("properties-file") if "properties-file" in self.spec else None
         )
 
         if properties_file:
             self._load_dotenv(Path(properties_file))
 
         # Process any plugin specfic
-        extra_env_vars = (
-            self.opt("add-to-env") if "add-to-env" in self.spec else None
-        )
+        extra_env_vars = self.opt("add-to-env") if "add-to-env" in self.spec else None
         env_vars = {}
         if extra_env_vars:
             app.log.debug(f"-- add-to-env set, adding variables.")
@@ -285,10 +283,7 @@ class SpecPlugin:
         module_name = Path(inspect.getfile(self.__class__)).stem
         module = importlib.import_module(module_name)
         meta = set(dir(module)).intersection(set(MODULE_METADATA_MAPPING))
-        return {
-            key: getattr(module, key)
-            for key in meta
-        }
+        return {key: getattr(module, key) for key in meta}
 
     @classmethod
     def doc_example(cls):

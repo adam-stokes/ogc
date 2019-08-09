@@ -2,6 +2,7 @@
 """
 import click
 import sys
+from tabulate import tabulate
 from .base import cli
 from ..state import app
 from ..spec import SpecProcessException, SpecConfigException
@@ -14,30 +15,33 @@ def tasks():
     """
     plugins = []
     for phase in app.phases.keys():
-            plugins_for_phase = app.phases.get(phase, None)
-            if plugins_for_phase:
-                for plug in plugins_for_phase:
-                    plugins.append(plug)
+        plugins_for_phase = app.phases.get(phase, None)
+        if plugins_for_phase:
+            for plug in plugins_for_phase:
+                plugins.append(plug)
     if not plugins:
-        app.log.info('No tasks found, please add phases and plugins to the specfile.')
+        app.log.info("No tasks found, please add phases and plugins to the specfile.")
         sys.exit(0)
 
-    click.echo("Tasks::\n")
-    for plug in plugins:
-        name = plug.metadata.get('__plugin_name__', plug.__class__.__name__)
-        description = plug.opt('description') if plug.opt('description') else 'No description available.'
-        tags = plug.opt('tags') if plug.opt('tags') else []
-        if tags:
-            tags = "-t ".join(tags)
-        phase = plug.phase
-        click.echo(f" - {name} :: {description}\n   Run Example:\n      > ogc execute --phase {phase} {tags}")
+    rows = [
+        [
+            plug.opt("description")
+            if plug.opt("description")
+            else "No description available.",
+            plug.phase,
+            ", ".join(sorted(plug.opt("tags"))) if plug.opt("tags") else "-",
+        ]
+        for plug in plugins
+    ]
+    click.echo(tabulate(rows, headers=["Task", "Phase", "Tags"]))
+    click.echo("")
+    click.echo("  Example:\n")
+    click.echo("  > ogc execute --phase plan -t build-docs\n\n")
+
 
 @click.command()
 @click.option(
-    "--phase",
-    metavar="<phase>",
-    required=False,
-    help="Run a certain phase of the spec",
+    "--phase", metavar="<phase>", required=False, help="Run a certain phase of the spec"
 )
 @click.option(
     "-t",
@@ -55,13 +59,10 @@ def execute(phase, tag):
     if phase:
         plugins_for_phase = app.phases.get(phase, None)
         if not plugins_for_phase:
-            app.log.error(f'Cannot run {phase} phase, does not exist in this spec.')
+            app.log.error(f"Cannot run {phase} phase, does not exist in this spec.")
             sys.exit(1)
 
-        plugins = [
-            plugin
-            for plugin in plugins_for_phase
-        ]
+        plugins = [plugin for plugin in plugins_for_phase]
 
     if tag:
         if plugins:
@@ -88,7 +89,6 @@ def execute(phase, tag):
             if plugins_for_phase:
                 for plug in plugins_for_phase:
                     plugins.append(plug)
-
 
     app.log.info(f"Validating tasks")
     for plugin in plugins:

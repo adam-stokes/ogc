@@ -32,6 +32,7 @@ setuptools.setup(
         "python-dotenv==0.10.3",
         "ogc-plugins-runner>=1.0.0,<2.0.0",
         "ogc-plugins-env>=1.0.0,<2.0.0",
+        "tabulate==0.8.3",
     ],
-    zip_safe=False
+    zip_safe=False,
 )

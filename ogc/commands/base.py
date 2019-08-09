@@ -1,9 +1,5 @@
-from ..spec import (
-    SpecLoader, SpecLoaderException, SpecConfigException)
-from ..enums import (
-    SPEC_PHASES,
-    SPEC_CORE_PLUGINS
-)
+from ..spec import SpecLoader, SpecLoaderException, SpecConfigException
+from ..enums import SPEC_PHASES, SPEC_CORE_PLUGINS
 from ..state import app
 from .. import log
 from pathlib import Path
@@ -47,7 +43,9 @@ def cli(spec, debug):
         if phase in SPEC_CORE_PLUGINS:
             continue
         if phase not in SPEC_PHASES:
-            app.log.error(f'`{phase}` is an incorrect phase for this spec, please review the specfile.')
+            app.log.error(
+                f"`{phase}` is an incorrect phase for this spec, please review the specfile."
+            )
             sys.exit(1)
 
         for plugin in app.spec[phase]:
@@ -59,11 +57,14 @@ def cli(spec, debug):
                 continue
 
             runner = check_plugin(phase, next(iter(plugin.values())), app.spec)
-            if runner.opt('description'):
-                _desc = runner.opt('description')
+            if runner.opt("description"):
+                _desc = runner.opt("description")
             else:
-                setattr(runner.__class__, '__str__',
-                        lambda x: 'A Plugin, please add a __str__ attribute for a plugin description.')
+                setattr(
+                    runner.__class__,
+                    "__str__",
+                    lambda x: "A Plugin, please add a __str__ attribute for a plugin description.",
+                )
                 _desc = str(runner)
             app.log.debug(f"{phase} :: loaded : {_desc}")
 

@@ -2,16 +2,26 @@ meta:
   name: ogc spec
   description: tasks for ogc distribution
 
+setup:
+  - env:
+      description: Setup project and deps
+      deps:
+        - "pip:requirements_dev.txt"
+
 plan:
   - runner:
-      description: cleanup artifacts
-      cmd: rm -rf build dist ogc.egg-info
+      description: Clean project
+      cmd: rm -rf build dist ogc.egg-info __pycache__
       tags: [dist, clean, bdist]
       fail-silently: yes
   - runner:
-      description: Test ogc core
+      description: Syntax formatting
+      cmd: black .
+      tags: [dist, bdist]
+  - runner:
+      description: Run unittests
       cmd: pytest
-      tags: [dist, clean, bdist]
+      tags: [dist, bdist]
       deps: ["pip:requirements_test.txt"]
   - runner:
       description: Bump revision

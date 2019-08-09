@@ -35,10 +35,7 @@ def list_deps(installable):
     dep_cmds = []
 
     try:
-        dep_cmds = [
-            plugin.dep_check(show_only, installable)
-            for plugin in app.plugins
-        ]
+        dep_cmds = [plugin.dep_check(show_only, installable) for plugin in app.plugins]
     except (TypeError, SpecDepException) as error:
         app.log.error(
             f"{error}: Does your spec have nested plugins more than 2 levels deep? That is currently unsupported."
@@ -59,6 +56,7 @@ def list_deps(installable):
             app.log.info(f"- {_dep}")
         else:
             click.echo(_dep.install_cmd())
+
 
 @click.command()
 @click.argument("plugin")
@@ -104,7 +102,7 @@ def list_plugins():
     """
     app.log.info("Plugins used:")
     _plugins = [
-        _plugin.metadata.get('__plugin_name__', _plugin.__class__.__name__)
+        _plugin.metadata.get("__plugin_name__", _plugin.__class__.__name__)
         for _plugin in app.plugins
     ]
     for _plugin in set(_plugins):
