@@ -14,14 +14,5 @@
 | env-requires | False | A list of environment variables that must be present for the spec to function. |
 | add-to-env | False | Convert certain spec options to an environment variable, these variables will be set in the host environment in the form of **VAR=VAL**. Note: this will convert the dot '.' notation to underscores |
 | requires | False | Environment variables that need to exist before the spec can be run |
-| properties_file | False | A path to a DotEnv or the like for loading environment variables |
+| properties-file | False | A path to a DotEnv or the like for loading environment variables |
 
-
-## Example
-
-```toml
-[Env]
-requires = ["CHARMCREDS", "JUJUCREDS"]
-
-properties_file = "/home/user/env.properties"
-```
