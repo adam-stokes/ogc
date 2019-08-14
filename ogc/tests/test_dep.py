@@ -1,6 +1,6 @@
 """ Test dependency checker
 """
-from ogc.dep import Dep, AptDep, SnapDep, PipDep
+from ogc.dep import AptDep, Dep, PipDep, SnapDep
 
 pkgs = [
     ("apt:python3-pytest", AptDep, "sudo apt install -qyf python3-pytest"),

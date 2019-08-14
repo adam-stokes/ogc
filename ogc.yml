@@ -15,9 +15,17 @@ plan:
       tags: [dist, clean, bdist]
       fail-silently: yes
   - runner:
+      description: isort
+      cmd: isort -rc -m 3 .
+      tags: [dist, bdist]
+  - runner:
       description: Syntax formatting
       cmd: black .
       tags: [dist, bdist]
+  - runner:
+      description: lint
+      cmd: pylint ogc tests
+      tags: [dist, bdist, lint]
   - runner:
       description: Run unittests
       cmd: pytest

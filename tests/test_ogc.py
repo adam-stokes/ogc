@@ -1,9 +1,8 @@
-import yaml
-import os
 from pathlib import Path
+
+from ogc.enums import SPEC_CORE_PLUGINS, SpecPhase
 from ogc.spec import SpecLoader, SpecPlugin
 from ogc.state import app
-from ogc.enums import SpecPhase, SPEC_PHASES, SPEC_CORE_PLUGINS
 
 fixtures_dir = Path(__file__).parent / "fixtures"
 
@@ -26,7 +25,6 @@ def test_nested_assets(mocker):
 def test_cmd_to_env(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
-    plug = SpecPlugin(SpecPhase.PLAN, spec[SpecPhase.PLAN][0]["runner"], spec)
     _env = {}
     _env["BONZAI"] = "bonzai-test"
     _env["ANOTHERTIME"] = "this happened late"

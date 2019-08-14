@@ -1,9 +1,10 @@
 """ Snap utilities
 """
 
-import sh
-import re
 import operator
+import re
+
+import sh
 
 
 def revisions(snap, version_filter=None, arch=None):

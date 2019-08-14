@@ -1,6 +1,5 @@
 """ Dependency checker module
 """
-import click
 import re
 
 
@@ -14,9 +13,9 @@ class Dep:
     def load(cls, package):
         if package.startswith("apt"):
             return AptDep(package)
-        elif package.startswith("snap"):
+        if package.startswith("snap"):
             return SnapDep(package)
-        elif package.startswith("pip"):
+        if package.startswith("pip"):
             return PipDep(package)
 
     @property
@@ -33,7 +32,7 @@ class Dep:
         match = _pattern.match(self.package)
         return match
 
-    def install_cmd(self):
+    def install_cmd(self, sudo=True):
         """ Show the install command for package
         """
         raise NotImplementedError

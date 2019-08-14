@@ -1,4 +1,6 @@
 punch.py
+pylint
+isort
 black
 twine
 setuptools

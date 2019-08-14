@@ -1,17 +1,17 @@
 """ Get plugin information
 """
-import click
-import sys
-import sh
-import tempfile
-import os
-import inspect
-import importlib
 import itertools
+import os
+import sys
+import tempfile
 from pathlib import Path
-from .base import cli
-from ..state import app
+
+import click
+import sh
+
 from ..spec import SpecDepException
+from ..state import app
+from .base import cli
 
 
 @click.command()
@@ -107,7 +107,6 @@ def list_plugins():
     ]
     for _plugin in set(_plugins):
         app.log.info(f" -- {_plugin}")
-    return
 
 
 cli.add_command(list_deps)

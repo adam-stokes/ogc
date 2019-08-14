@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import frontmatter
-import markdown
-import click
+import importlib
+import pkgutil
 from pathlib import Path
 
-import pkgutil
-import importlib
+import click
+import frontmatter
+import markdown
 
 
 def build(modules):

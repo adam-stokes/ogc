@@ -1,12 +1,13 @@
-from ..spec import SpecLoader, SpecLoaderException, SpecConfigException
-from ..enums import SPEC_PHASES, SPEC_CORE_PLUGINS
-from ..state import app
-from .. import log
-from pathlib import Path
 import sys
+from pathlib import Path
+
 import click
 import pkg_resources
-from pprint import pformat
+
+from .. import log
+from ..enums import SPEC_CORE_PLUGINS, SPEC_PHASES
+from ..spec import SpecConfigException, SpecLoader
+from ..state import app
 
 
 @click.group()
@@ -79,3 +80,10 @@ def cli(spec, debug):
 
             # This is to keep a definitive list of all plugins across all phases.
             app.plugins.append(runner)
+
+
+def start():
+    """
+    Starts app
+    """
+    cli()

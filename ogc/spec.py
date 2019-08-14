@@ -1,17 +1,16 @@
-import click
 import importlib
 import inspect
-import os
 import re
+from pathlib import Path
+
 import yaml
 from dict_deep import deep_get, deep_set
 from dotenv.main import DotEnv
 from melddict import MeldDict
-from pathlib import Path
-from pprint import pformat
-from . import log, dep
-from .state import app
+
+from . import dep, log
 from .enums import MODULE_METADATA_MAPPING
+from .state import app
 
 
 class SpecLoaderException(Exception):
@@ -22,27 +21,18 @@ class SpecConfigException(Exception):
     """ Raise when a config conflict arises
     """
 
-    pass
-
 
 class SpecDepException(Exception):
     """ Raise when a dependency conflict arises
     """
-
-    pass
 
 
 class SpecProcessException(Exception):
     """ Raise when process fails
     """
 
-    pass
-
 
 class SpecLoader(MeldDict):
-    def __init__(self):
-        super().__init__()
-
     @classmethod
     def load(cls, specs):
         cl = SpecLoader()
@@ -161,8 +151,8 @@ class SpecPlugin:
         try:
             val = deep_get(self.spec, key)
             return self._convert_to_env(val)
-        except (KeyError, TypeError) as error:
-            app.log.debug(f"Option {key} unavailable, skipping")
+        except (KeyError, TypeError):
+            app.log.debug(f"Option {key} - unavailable, skipping")
             return None
 
     def spec_opt(self, key):
@@ -190,12 +180,11 @@ class SpecPlugin:
                 is_required = opt.get("required", False)
                 log.debug(f"-- verifying {key}, required: {is_required}")
                 deep_get(self.spec, key)
-            except (KeyError, TypeError) as error:
+            except (KeyError, TypeError):
                 if is_required:
                     raise SpecConfigException(
                         f"{self.phase} :: A required {key} not found, stopping."
                     )
-        return
 
     def dep_check(self, show_only=True, install_cmds=False):
         """ Dependency checker
@@ -252,12 +241,10 @@ class SpecPlugin:
     def conflicts(self):
         """ Handle conflicts between options
         """
-        pass
 
     def process(self):
         """ Process function
         """
-        pass
 
     @classmethod
     def doc_plugin_opts(cls):

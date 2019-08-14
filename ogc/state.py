@@ -1,10 +1,12 @@
 """ application state module
 """
-from .enums import SPEC_PHASES
-from melddict import MeldDict
-from types import SimpleNamespace
-from collections import OrderedDict
 import os
+from collections import OrderedDict
+from types import SimpleNamespace
+
+from melddict import MeldDict
+
+from .enums import SPEC_PHASES
 
 app = SimpleNamespace(
     # spec object

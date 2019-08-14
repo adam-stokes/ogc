@@ -1,12 +1,13 @@
 """ Command to execute a spec
 """
-import click
 import sys
+
+import click
 from tabulate import tabulate
-from .base import cli
+
+from ..spec import SpecConfigException, SpecProcessException
 from ..state import app
-from ..spec import SpecProcessException, SpecConfigException
-from ..enums import SPEC_PHASES
+from .base import cli
 
 
 @click.command()
@@ -69,8 +70,8 @@ def execute(phase, tag):
             _plugins = plugins
         else:
             _plugins = []
-            for phase in app.phases.keys():
-                plugins_for_phase = app.phases.get(phase, None)
+            for _phase in app.phases.keys():
+                plugins_for_phase = app.phases.get(_phase, None)
                 if plugins_for_phase:
                     for plug in plugins_for_phase:
                         _plugins.append(plug)
@@ -84,8 +85,8 @@ def execute(phase, tag):
 
     # no tags or phases specified, pull everything
     if not plugins:
-        for phase in app.phases.keys():
-            plugins_for_phase = app.phases.get(phase, None)
+        for _phase in app.phases.keys():
+            plugins_for_phase = app.phases.get(_phase, None)
             if plugins_for_phase:
                 for plug in plugins_for_phase:
                     plugins.append(plug)

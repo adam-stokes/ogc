@@ -1,9 +1,11 @@
 """ log module
 """
 
-from .state import app
-import click
 from datetime import datetime
+
+import click
+
+from .state import app
 
 
 def debug(ctx):
