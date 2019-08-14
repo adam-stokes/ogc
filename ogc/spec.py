@@ -89,6 +89,11 @@ class SpecPlugin:
                 ]
             ),
         },
+        {
+            "key": "fail-silently",
+            "required": False,
+            "description": "Disable exiting on failure, primarily used in conjunction with reporting..",
+        },
     ]
 
     # Options is a list of dictionary of options, descriptions, and requirements
@@ -185,6 +190,16 @@ class SpecPlugin:
                     raise SpecConfigException(
                         f"{self.phase} :: A required {key} not found, stopping."
                     )
+
+        # Check that environment variable requirements are met
+        env_requires = self.opt("env-requires")
+        if env_requires and any(envvar not in app.env for envvar in env_requires):
+            missing_envs = ", ".join(
+                sorted(list(set(env_requires).difference(set(app.env))))
+            )
+            raise SpecConfigException(
+                f"{missing_envs} are missing from the required environment variables, please make sure those are loaded prior to running."
+            )
 
     def dep_check(self, show_only=True, install_cmds=False):
         """ Dependency checker

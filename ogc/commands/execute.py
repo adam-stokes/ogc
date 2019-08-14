@@ -113,8 +113,11 @@ def execute(phase, tag):
         try:
             plugin.process()
         except SpecProcessException as error:
-            app.log.error(error)
-            sys.exit(1)
+            if plugin.opt("fail-silently"):
+                app.log.debug(f"Plugin set to not exit on failure, will continue.")
+            else:
+                app.log.error(error)
+                sys.exit(1)
 
 
 cli.add_command(execute)

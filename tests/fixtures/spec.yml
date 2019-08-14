@@ -33,6 +33,10 @@ plan:
       description: Test ogc core
       cmd: pytest
       tags: [dist, clean]
+      env-requires:
+        - TEST_ENV
+        - RUNNER_OPT
+        - ANOTHER_OPT
   - runner:
       description: cleanup artifacts
       cmd: rm -rf build dist ogc.egg-info
