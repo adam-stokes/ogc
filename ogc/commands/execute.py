@@ -5,7 +5,7 @@ import sys
 import click
 from tabulate import tabulate
 
-from ..spec import SpecConfigException, SpecProcessException
+from ..spec import SpecConfigException, SpecError, SpecProcessException
 from ..state import app
 from .base import cli
 
@@ -107,17 +107,22 @@ def execute(phase, tag):
             app.log.error(error)
             sys.exit(1)
 
+    task_errors = []
+
     app.log.info(f"Processing tasks")
     for plugin in plugins:
         # Execute the spec
         try:
             plugin.process()
         except SpecProcessException as error:
-            if plugin.opt("fail-silently"):
-                app.log.debug(f"Plugin set to not exit on failure, will continue.")
-            else:
-                app.log.error(error)
-                sys.exit(1)
+            task_errors.append(SpecError(plugin, error))
+
+    if task_errors:
+        app.log.error("Errors when running tasks:")
+        for task in task_errors:
+            app.log.error(f" - {task.description} :: exit: {task.error_code}")
+            app.log.error(f"   {task.explain}")
+        sys.exit(1)
 
 
 cli.add_command(execute)

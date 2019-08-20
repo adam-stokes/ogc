@@ -3,12 +3,16 @@ meta:
 
 setup:
   - juju:
+      cloud: $JUJU_CLOUD
+      controller: $JUJU_CONTROLLER
+      model: $JUJU_MODEL
       bootstrap:
         debug: no
         model-default: test-mode=true
       deploy:
         reuse: yes
         bundle: charmed-kubernetes
+        channel: edge
         overlay: |
           applications:
             kubernetes-master:
@@ -17,9 +21,6 @@ setup:
             kubernetes-worker:
               options:
                 channel: $SNAP_VERSION
-        cloud: $JUJU_CLOUD
-        controller: $JUJU_CONTROLLER
-        model: $JUJU_MODEL
         wait: yes
       config:
         - kubernetes-master allow-privileged=true
@@ -63,3 +64,11 @@ plan:
       description: Upload dist
       cmd: twine upload dist/*
       tags: [bdist]
+  - runner:
+      description: a failure
+      cmd: python3 /tmp/test
+      tags: [fail-run]
+  - runner:
+      description: This should run on previous failure
+      cmd: echo "HI"
+      tags: [fail-run]

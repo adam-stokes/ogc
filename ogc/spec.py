@@ -44,6 +44,17 @@ class SpecLoader(MeldDict):
         return dict(self)
 
 
+class SpecError:
+    """ The error class for a failed task
+    """
+
+    def __init__(self, plugin, explain, error_code=1):
+        self.plugin = plugin
+        self.description = self.plugin.opt("description")
+        self.explain = explain
+        self.error_code = int(error_code)
+
+
 class SpecPlugin:
     """ Base plugin class for OGC
     """
