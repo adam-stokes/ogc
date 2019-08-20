@@ -127,7 +127,8 @@ class SpecPlugin:
 
     def _convert_to_env(self, items):
         """ Converts a list of items that may contain $VARNAME into their
-        environment variable result. This will return the items unaltered if no matches found
+        environment variable result. This will return the items unaltered if no
+        matches found
         """
 
         def replace_env(match):

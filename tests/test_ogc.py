@@ -64,9 +64,9 @@ def test_get_option_env_key(mocker):
     _env["JUJU_CONTROLLER"] = "test-controller"
     _env["JUJU_MODEL"] = "test-model"
     app.env = _env
-    assert plug.opt("deploy.cloud") == "aws/us-east-1"
-    assert plug.opt("deploy.controller") == "test-controller"
-    assert plug.opt("deploy.model") == "test-model"
+    assert plug.opt("cloud") == "aws/us-east-1"
+    assert plug.opt("controller") == "test-controller"
+    assert plug.opt("model") == "test-model"
 
 
 def test_get_option_env_key_bool(mocker):
