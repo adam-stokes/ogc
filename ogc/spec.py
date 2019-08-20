@@ -150,7 +150,7 @@ class SpecPlugin:
                 if isinstance(item, str)
             ]
             return modified
-        return
+        return items
 
     def _load_dotenv(self, path):
         if not path.exists():
