@@ -49,11 +49,11 @@ def list_deps(installable):
         sys.exit(0)
 
     if dep_cmds and show_only:
-        app.log.info("Plugin dependency summary ::")
+        click.echo("Plugin dependency summary ::")
 
     for _dep in dep_cmds:
         if isinstance(_dep, str):
-            app.log.info(f"- {_dep}")
+            click.echo(f"  {_dep}")
         else:
             click.echo(_dep.install_cmd())
 

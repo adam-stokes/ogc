@@ -21,6 +21,7 @@ setuptools.setup(
         "click>=7.0,<8.0",
         "jinja2>=2.10,<3.0",
         "dict-deep==2.0.2",
+        "loguru>=0.3.2,<1.0.0",
         "kv>=0.3,<0.4.0",
         "melddict>=1.0,<2.0",
         "pyyaml-include>=1.1,<2.0",

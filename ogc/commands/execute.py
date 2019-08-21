@@ -118,10 +118,16 @@ def execute(phase, tag):
             task_errors.append(SpecError(plugin, error))
 
     if task_errors:
-        app.log.error("Errors when running tasks:")
+        click.secho("Errors when running tasks", fg="red", bold=True)
+
         for task in task_errors:
-            app.log.error(f" - {task.description} :: exit: {task.error_code}")
-            app.log.error(f"   {task.explain}")
+            click.secho(
+                f"- Task: {task.description}\n- Exit Code: {task.error_code}\n"
+                f"- Reason:\n{task.explain}",
+                fg="red",
+                bold=True,
+            )
+            click.echo("")
         sys.exit(1)
 
 

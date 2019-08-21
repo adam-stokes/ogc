@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import re
+import traceback
 from pathlib import Path
 
 import yaml
@@ -53,6 +54,11 @@ class SpecError:
         self.description = self.plugin.opt("description")
         self.explain = explain
         self.error_code = int(error_code)
+
+    def error_fmt(self, ex):
+        tb_lines = traceback.format_exception(ex.__class__, ex, ex.__traceback__)
+        tb_text = "".join(tb_lines)
+        return tb_text
 
 
 class SpecPlugin:

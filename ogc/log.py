@@ -1,29 +1,35 @@
 """ log module
 """
 
-from datetime import datetime
+import sys
 
-import click
+from loguru import logger
 
-from .state import app
+logger.remove()
+logger.add(
+    "ogc.log", rotation="500 MB", level="DEBUG"
+)  # Automatically rotate too big file
+logger.add(
+    sys.stderr,
+    colorize=True,
+    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <green><b>{message}</b></green>",
+    level="INFO",
+)
+logger.add(
+    sys.stderr,
+    colorize=True,
+    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <red><b>{message}</b></red>",
+    level="ERROR",
+)
 
 
 def debug(ctx):
-    if app.debug:
-        click.secho(
-            f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}",
-            fg="yellow",
-            bold=True,
-        )
+    logger.debug(ctx)
 
 
 def error(ctx):
-    click.secho(
-        f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}", fg="red", bold=True
-    )
+    logger.debug(ctx)
 
 
 def info(ctx):
-    click.secho(
-        f"[{datetime.now().strftime('%H:%M:%S')}] OGC :: {ctx}", fg="green", bold=True
-    )
+    logger.info(ctx)
