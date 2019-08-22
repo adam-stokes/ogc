@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 from melddict import MeldDict
 
+from .collect import Collector
 from .enums import SPEC_PHASES
 
 app = SimpleNamespace(
@@ -21,4 +22,6 @@ app = SimpleNamespace(
     plugins=[],
     # logger
     log=None,
+    # collector
+    collect=Collector(),
 )

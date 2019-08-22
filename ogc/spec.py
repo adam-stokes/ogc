@@ -45,20 +45,28 @@ class SpecLoader(MeldDict):
         return dict(self)
 
 
-class SpecError:
-    """ The error class for a failed task
+class SpecResult:
+    """ The result class for a failed task
     """
 
-    def __init__(self, plugin, explain, error_code=1):
+    def __init__(self, plugin, output=None, code=0):
         self.plugin = plugin
         self.description = self.plugin.opt("description")
-        self.explain = explain
-        self.error_code = int(error_code)
+        self.code = code
+        self.output = output
+        self.traceback = None
 
-    def error_fmt(self, ex):
+    def set_exception(self, ex):
         tb_lines = traceback.format_exception(ex.__class__, ex, ex.__traceback__)
-        tb_text = "".join(tb_lines)
-        return tb_text
+        self.output = "".join(tb_lines)
+
+    @property
+    def to_dict(self):
+        return {
+            "description": self.description,
+            "code": self.code,
+            "output": self.output,
+        }
 
 
 class SpecPlugin:

@@ -1,11 +1,12 @@
 """ Command to execute a spec
 """
+import json
 import sys
 
 import click
 from tabulate import tabulate
 
-from ..spec import SpecConfigException, SpecError, SpecProcessException
+from ..spec import SpecConfigException, SpecProcessException
 from ..state import app
 from .base import cli
 
@@ -60,7 +61,11 @@ def execute(phase, tag):
     if phase:
         plugins_for_phase = app.phases.get(phase, None)
         if not plugins_for_phase:
-            app.log.error(f"Cannot run {phase} phase, does not exist in this spec.")
+            click.secho(
+                f"Cannot run {phase} phase, does not exist in this spec.",
+                fg="red",
+                bold=True,
+            )
             sys.exit(1)
 
         plugins = [plugin for plugin in plugins_for_phase]
@@ -91,43 +96,38 @@ def execute(phase, tag):
                 for plug in plugins_for_phase:
                     plugins.append(plug)
 
-    app.log.info(f"Validating tasks")
+    app.log.info(f"Starting")
     for plugin in plugins:
         # Setup environment
         try:
             plugin.env()
         except SpecProcessException as error:
-            app.log.error(error)
+            click.secho(error, fg="red", bold=True)
             sys.exit(1)
 
         # Check for any option conflicts
         try:
             plugin.conflicts()
         except (SpecProcessException, SpecConfigException) as error:
-            app.log.error(error)
+            click.secho(error, fg="red", bold=True)
             sys.exit(1)
 
-    task_errors = []
-
-    app.log.info(f"Processing tasks")
-    for plugin in plugins:
         # Execute the spec
-        try:
-            plugin.process()
-        except SpecProcessException as error:
-            task_errors.append(SpecError(plugin, error))
+        plugin.process()
 
-    if task_errors:
+    # save results
+    app.collect.path.write_text(json.dumps(app.collect.db))
+    if any(res["code"] > 0 for res in app.collect.db["results"]):
         click.secho("Errors when running tasks", fg="red", bold=True)
-
-        for task in task_errors:
-            click.secho(
-                f"- Task: {task.description}\n- Exit Code: {task.error_code}\n"
-                f"- Reason:\n{task.explain}",
-                fg="red",
-                bold=True,
-            )
-            click.echo("")
+        app.log.debug("Errors:")
+        for res in app.collect.db["results"]:
+            if res["code"] > 0:
+                msg = (
+                    f"- Task: {res['description']}\n- Exit Code: {res['code']}\n"
+                    f"- Reason:\n{res['output']}"
+                )
+                app.log.debug(msg)
+                click.secho(msg, fg="red", bold=True)
         sys.exit(1)
 
 
