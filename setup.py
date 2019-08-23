@@ -30,7 +30,6 @@ setuptools.setup(
         "semver>=2.8,<3.0",
         "sh>=1.12,<2.0",
         "colorama>=0.4.1",
-        "pytest==5.0.1",
         "python-dotenv==0.10.3",
         "ogc-plugins-runner>=1.0.0,<2.0.0",
         "ogc-plugins-env>=1.0.0,<2.0.0",
