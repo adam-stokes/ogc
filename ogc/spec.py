@@ -52,9 +52,14 @@ class SpecResult:
     """
 
     def __init__(self, error):
-        self.cmd = error.full_cmd
-        self.code = error.exit_code
-        self.output = error.stdout.decode() + error.stderr.decode()
+        if isinstance(error, str):
+            self.cmd = "n/a"
+            self.code = int(1)
+            self.output = error
+        else:
+            self.cmd = error.full_cmd
+            self.code = error.exit_code
+            self.output = error.stdout.decode() + error.stderr.decode()
         self.traceback = None
 
     def set_exception(self, ex):
