@@ -130,10 +130,16 @@ class SpecJobPlan:
                 app.log.info(f"Running {key} plugin: {plug.friendly_name}")
                 plug.check()
                 plug.conflicts()
-                plug.process()
+                try:
+                    plug.process()
+                except SpecProcessException as error:
+                    app.collect.add_task_result(SpecResult(error))
             else:
                 app.log.info(f"Running {key}: {item}")
-                run.script(item, app.env, log)
+                try:
+                    run.script(item, app.env, log)
+                except SpecProcessException as error:
+                    app.collect.add_task_result(SpecResult(error))
 
 
 class SpecPlugin:
