@@ -31,11 +31,11 @@ def script(script_data, env, log, timeout=None, concurrent=False):
         cmd.wait()
     else:
         for line in sh.env(
-                str(tmp_script_path),
-                _env=env.copy(),
-                _timeout=timeout,
-                _iter=True,
-                _bg_exc=False,
+            str(tmp_script_path),
+            _env=env.copy(),
+            _timeout=timeout,
+            _iter=True,
+            _bg_exc=False,
         ):
             log.info(line.strip())
     sh.rm("-rf", tmp_script_path)

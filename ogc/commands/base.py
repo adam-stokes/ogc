@@ -7,7 +7,7 @@ import pkg_resources
 
 from .. import log
 from ..enums import SpecCore
-from ..spec import SpecJobPlan, SpecLoader, SpecProcessException, SpecConfigException
+from ..spec import SpecConfigException, SpecJobPlan, SpecLoader, SpecProcessException
 from ..state import app
 
 

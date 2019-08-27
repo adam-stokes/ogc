@@ -1,11 +1,11 @@
 import importlib
 import inspect
 import re
-import sh
 import shlex
 import traceback
 from pathlib import Path
 
+import sh
 import yaml
 from dict_deep import deep_get, deep_set
 from dotenv.main import DotEnv
@@ -67,11 +67,7 @@ class SpecResult:
 
     @property
     def to_dict(self):
-        return {
-            "cmd": self.cmd,
-            "code": self.code,
-            "output": self.output,
-        }
+        return {"cmd": self.cmd, "code": self.code, "output": self.output}
 
 
 class SpecJobPlan:
@@ -118,7 +114,8 @@ class SpecJobPlan:
         if plug_name not in app.plugins:
             raise SpecProcessException(
                 f"Failed to load plugin {plug_name}, make sure "
-                f"`ogc-plugins-{plug_name}` is installed.")
+                f"`ogc-plugins-{plug_name}` is installed."
+            )
         return app.plugins[plug_name](plug_values)
 
     def script(self, key):

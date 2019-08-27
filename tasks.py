@@ -1,9 +1,14 @@
+import os
+
+from dotenv import load_dotenv
 from invoke import task
+
+load_dotenv()
 
 
 @task
 def clean(c):
-    c.run("rm -rf build dist ogc.egg-info __pycache__")
+    c.run("rm -rf site build dist ogc.egg-info __pycache__")
 
 
 @task
@@ -39,5 +44,12 @@ def upload(c):
 
 
 @task
-def docs(c):
-    c.run("python3 tools/docgen")
+def upload_docs(c):
+    WEB_USER = os.getenv("WEB_USER")
+    WEB_SITE = os.getenv("WEB_SITE")
+    WEB_DST = os.getenv("WEB_DST")
+
+    c.run("pip install -rrequirements_doc.txt")
+    c.run("cp readme.md docs/index.md")
+    c.run("mkdocs build")
+    c.run(f"rsync -avz --delete site/* {WEB_USER}@{WEB_SITE}:{WEB_DST}")
