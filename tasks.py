@@ -15,11 +15,11 @@ def clean(c):
 def fix(c):
     c.run("isort -rc -m 3 .")
     c.run("black .")
-    c.run("pylint ogc")
 
 
 @task
 def test(c):
+    c.run("pylint ogc tests")
     c.run("pytest")
 
 

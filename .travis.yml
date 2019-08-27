@@ -6,4 +6,4 @@ python:
 install:
   - travis_retry pip install -rrequirements_test.txt
 script:
-  - travis_retry pytest
+  - travis_retry inv test
