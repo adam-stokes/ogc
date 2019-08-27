@@ -26,11 +26,6 @@ class Collector:
             sh.mkdir("-p", str(_cache_dir))
         return _cache_dir / f"{self.current_time}.json"
 
-    def add_task_result(self, result):
-        """ Adds a tasks results from SpecResult
-        """
-        self.db["results"].append(result.to_dict)
-
     def start(self):
         """ Sets a startime timestamp
         """

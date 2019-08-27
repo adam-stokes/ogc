@@ -3,6 +3,10 @@ import inspect
 import re
 import shlex
 import traceback
+import os
+import json
+import click
+import uuid
 from pathlib import Path
 
 import sh
@@ -81,7 +85,10 @@ class SpecJobPlan:
 
     def __init__(self, job):
         self.job = job
+        self.job_id = str(uuid.uuid4())
+        self.results = []
         self.tags = self.job.get("tags", [])
+        app.log.debug(f"This is Job #{self.job_id}")
 
     def env(self):
         """ Process env section, these variables will be made available to all
@@ -107,7 +114,7 @@ class SpecJobPlan:
             try:
                 run.script(item, app.env, log)
             except sh.ErrorReturnCode as error:
-                app.collect.add_task_result(SpecResult(error))
+                self.results.append(SpecResult(error))
 
     def _is_item_plug(self, item):
         """ Check if an item in the spec is referencing a plugin
@@ -135,13 +142,41 @@ class SpecJobPlan:
                 try:
                     plug.process()
                 except SpecProcessException as error:
-                    app.collect.add_task_result(SpecResult(error))
+                    self.results.append(SpecResult(error))
             else:
                 app.log.info(f"Running {key}: {item}")
                 try:
                     run.script(item, app.env, log)
                 except SpecProcessException as error:
-                    app.collect.add_task_result(SpecResult(error))
+                    self.results.append(SpecResult(error))
+
+    @property
+    def is_success(self):
+        """ Returns true/false depending on if job succeeded
+        """
+        return any(res.code > 0 for res in self.results)
+
+    def report(self):
+        # save results
+        if not self.is_success:
+            click.secho("Errors when running job", fg="red", bold=True)
+            app.log.debug("Errors:")
+            for res in self.results:
+                msg = (
+                    f"- Task: {res.cmd}\n- Exit Code: {res.code}\n"
+                    f"- Reason:\n{res.output}"
+                )
+                app.log.debug(msg)
+                click.secho(msg, fg="red", bold=True)
+        else:
+            click.secho(f"\nJob #{self.job_id} is a SUCCESS!\n", fg="green", bold=True)
+
+        report_path = Path(self.job_id) / '-job.json'
+        results_map = [
+            result.to_dict
+            for result in self.results
+        ]
+        report_path.write_text(json.dumps(results_map))
 
 
 class SpecPlugin:

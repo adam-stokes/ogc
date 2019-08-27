@@ -1,4 +1,3 @@
-import json
 import sys
 from pathlib import Path
 
@@ -7,7 +6,7 @@ import pkg_resources
 
 from .. import log
 from ..enums import SpecCore
-from ..spec import SpecConfigException, SpecJobPlan, SpecLoader, SpecProcessException
+from ..spec import SpecJobPlan, SpecLoader
 from ..state import app
 
 
@@ -54,29 +53,18 @@ def cli(spec, tag, debug):
     for job in app.jobs:
         if tag and not set(job.tags).intersection(tag):
             continue
-        try:
-            job.env()
-            job.install()
-            job.script("before-script")
-            job.script("script")
-            job.script("after-script")
-        except (SpecProcessException, SpecConfigException) as error:
-            click.secho(f"{error}", fg="red", bold=True)
-            sys.exit(1)
 
-    # save results
-    app.collect.path.write_text(json.dumps(app.collect.db))
-    if any(res["code"] > 0 for res in app.collect.db["results"]):
-        click.secho("Errors when running tasks", fg="red", bold=True)
-        app.log.debug("Errors:")
-        for res in app.collect.db["results"]:
-            if res["code"] > 0:
-                msg = (
-                    f"- Task: {res['cmd']}\n- Exit Code: {res['code']}\n"
-                    f"- Reason:\n{res['output']}"
-                )
-                app.log.debug(msg)
-                click.secho(msg, fg="red", bold=True)
+        job.env()
+        job.install()
+        job.script("before-script")
+        job.script("script")
+        job.script("after-script")
+
+        job.report()
+
+        if job.is_success:
+            job.script("deploy")
+            sys.exit(0)
         sys.exit(1)
 
 
