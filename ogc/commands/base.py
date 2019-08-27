@@ -1,3 +1,4 @@
+import json
 import sys
 from pathlib import Path
 
@@ -5,17 +6,25 @@ import click
 import pkg_resources
 
 from .. import log
-from ..enums import SPEC_CORE_PLUGINS, SPEC_PHASES
-from ..spec import SpecConfigException, SpecLoader
+from ..enums import SpecCore
+from ..spec import SpecJobPlan, SpecLoader, SpecProcessException, SpecConfigException
 from ..state import app
 
 
-@click.group()
 @click.option(
     "--spec", metavar="<spec>", required=False, multiple=True, help="OGC Spec"
 )
+@click.option(
+    "-t",
+    "--tag",
+    metavar="<tag>",
+    required=False,
+    multiple=True,
+    help="Only run specific plugin(s) which matches a tag",
+)
 @click.option("--debug", is_flag=True)
-def cli(spec, debug):
+@click.command()
+def cli(spec, tag, debug):
     """ Processes a OGC Spec which defines how a build/test/task is performed
     """
     app.debug = debug
@@ -39,47 +48,36 @@ def cli(spec, debug):
         entry_point.name.lower(): entry_point.load()
         for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
+    app.plugins = plugins
+    app.jobs = [SpecJobPlan(job) for job in app.spec[SpecCore.PLAN]]
 
-    for phase in app.spec.keys():
-        if phase in SPEC_CORE_PLUGINS:
+    for job in app.jobs:
+        if tag and not set(job.tags).intersection(tag):
             continue
-        if phase not in SPEC_PHASES:
-            app.log.error(
-                f"`{phase}` is an incorrect phase for this spec, please review the specfile."
-            )
+        try:
+            job.env()
+            job.install()
+            job.script("before-script")
+            job.script("script")
+            job.script("after-script")
+        except (SpecProcessException, SpecConfigException) as error:
+            click.secho(f"{error}", fg="red", bold=True)
             sys.exit(1)
 
-        for plugin in app.spec[phase]:
-            check_plugin = plugins.get(next(iter(plugin)), None)
-            if not check_plugin:
-                app.log.debug(
-                    f"Could not find plugin {next(iter(plugin)).lower()}, install with `pip install ogc-plugins-{next(iter(plugin)).lower()}`"
+    # save results
+    app.collect.path.write_text(json.dumps(app.collect.db))
+    if any(res["code"] > 0 for res in app.collect.db["results"]):
+        click.secho("Errors when running tasks", fg="red", bold=True)
+        app.log.debug("Errors:")
+        for res in app.collect.db["results"]:
+            if res["code"] > 0:
+                msg = (
+                    f"- Task: {res['cmd']}\n- Exit Code: {res['code']}\n"
+                    f"- Reason:\n{res['output']}"
                 )
-                continue
-
-            runner = check_plugin(phase, next(iter(plugin.values())), app.spec)
-            if runner.opt("description"):
-                _desc = runner.opt("description")
-            else:
-                setattr(
-                    runner.__class__,
-                    "__str__",
-                    lambda x: "A Plugin, please add a __str__ attribute for a plugin description.",
-                )
-                _desc = str(runner)
-            app.log.debug(f"{phase} :: loaded : {_desc}")
-
-            # Validate spec is compatible with plugin
-            try:
-                runner.check()
-            except SpecConfigException as error:
-                app.log.error(error)
-                sys.exit(1)
-
-            app.phases[phase].append(runner)
-
-            # This is to keep a definitive list of all plugins across all phases.
-            app.plugins.append(runner)
+                app.log.debug(msg)
+                click.secho(msg, fg="red", bold=True)
+        sys.exit(1)
 
 
 def start():

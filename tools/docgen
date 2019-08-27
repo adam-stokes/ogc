@@ -5,9 +5,8 @@ import pkgutil
 from pathlib import Path
 
 import click
-import markdown
-
 import frontmatter
+import markdown
 
 
 def build(modules):

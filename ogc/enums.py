@@ -2,22 +2,20 @@
 """
 
 
-class SpecPhase:
-    SETUP = "setup"
-    PLAN = "plan"
-    TEARDOWN = "teardown"
-
-
-# Please note this is the order in which the phases should execute
-SPEC_PHASES = [SpecPhase.SETUP, SpecPhase.PLAN, SpecPhase.TEARDOWN]
-
-
-class SpecCorePlugin:
-    DOCS = "docs"
+class SpecCore:
     META = "meta"
+    PLAN = "plan"
 
 
-SPEC_CORE_PLUGINS = [SpecCorePlugin.DOCS, SpecCorePlugin.META]
+SPEC_CORE_LIST = [SpecCore.META, SpecCore.PLAN]
+
+SPEC_CORE_PLAN_PROPERTIES = (
+    "env",
+    "install",
+    "before-script",
+    "script",
+    "after-script",
+)
 
 
 class ModuleMetadata:
