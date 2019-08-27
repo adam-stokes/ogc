@@ -27,7 +27,6 @@ To make *OGC* a bit more useful, install a few plugins:
 
 ```
 > pip install ogc-plugins-runner
-> pip install ogc-plugins-env
 ```
 
 This will allow you to add functionality such as running scripts and preparing
@@ -40,53 +39,11 @@ meta:
   name: A test spec
   description: A simple spec showing how to run commands
 
-# Phases
-setup:
+plan:
   - runner:    # This is the plugin from ogc-plugins-runner
       description: Clean out build directory
       cmd: rm -rf build
       tags: [clean]
-```
-
-### Show plugin dependencies
-
-OGC doesn't install plugin dependencies automatically, but will give you a
-summary that you can pass to whatever automation strategy you want.
-
-```
-> ogc --spec ogc-spec-runner.yml list-deps
-```
-
-Output:
-
-```
-Plugin dependency summary ::
-
-  - apt:python3-markdown
-  - snap:juju/latest/stable:classic
-  - snap:juju-wait/latest/stable:classic
-  - pip:pytest==5.0.1
-```
-
-To get the install commands for the plugin deps you can pass `--installable`:
-
-```
-> ogc --spec ogc-spec-runner.yml list-deps --installable
-```
-
-Output:
-
-```
-sudo apt install -qyf python3-markdown
-sudo snap install juju --channel=latest/stable --classic
-sudo snap install juju-wait --channel=latest/stable --classic
-pip install --user pytest==5.0.1
-```
-
-Or to handle installing those packages automatically (like in a CI run):
-
-```
-> ogc --spec ogc-spec-runner.yml list-deps --installable | sh -
 ```
 
 ## More information
