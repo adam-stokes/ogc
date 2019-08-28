@@ -17,6 +17,9 @@ def script(script_data, env, log, timeout=None, concurrent=False):
     #        --quiet \
     #        --return /tmp/ansible-output.txt \
     #        --command "my-ansible-command"
+    _run = sh.env
+    if 'sudo' in script_data:
+        _run = sh.contrib.sudo.env
     if not script_data[:2] != "#!":
         script_data = "#!/bin/bash\n" + script_data
     tmp_script = tempfile.mkstemp()
@@ -25,17 +28,17 @@ def script(script_data, env, log, timeout=None, concurrent=False):
     make_executable(tmp_script_path)
     os.close(tmp_script[0])
     if concurrent:
-        cmd = sh.env(
+        cmd = _run(
             str(tmp_script_path), _env=env.copy(), _timeout=timeout, _bg=concurrent
         )
         cmd.wait()
     else:
-        for line in sh.env(
+        for line in _run(
             str(tmp_script_path),
             _env=env.copy(),
             _timeout=timeout,
             _iter=True,
-            _bg_exc=False,
+            _bg_exc=False
         ):
             log.info(line.strip())
     sh.rm("-rf", tmp_script_path)

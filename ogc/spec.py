@@ -1,14 +1,13 @@
 import importlib
 import inspect
+import json
 import re
 import shlex
 import traceback
-import os
-import json
-import click
 import uuid
 from pathlib import Path
 
+import click
 import sh
 import yaml
 from dict_deep import deep_get, deep_set
@@ -56,10 +55,10 @@ class SpecResult:
     """
 
     def __init__(self, error):
-        if isinstance(error, str):
+        if not hasattr(error, 'full_cmd'):
             self.cmd = "n/a"
             self.code = int(1)
-            self.output = error
+            self.output = str(error)
         else:
             self.cmd = error.full_cmd
             self.code = error.exit_code
@@ -141,25 +140,25 @@ class SpecJobPlan:
                 plug.conflicts()
                 try:
                     plug.process()
-                except SpecProcessException as error:
+                except (SpecProcessException, sh.ErrorReturnCode) as error:
                     self.results.append(SpecResult(error))
             else:
                 app.log.info(f"Running {key}: {item}")
                 try:
                     run.script(item, app.env, log)
-                except SpecProcessException as error:
+                except (SpecProcessException, sh.ErrorReturnCode) as error:
                     self.results.append(SpecResult(error))
 
     @property
     def is_success(self):
         """ Returns true/false depending on if job succeeded
         """
-        return any(res.code > 0 for res in self.results)
+        return all(res.code == 0 for res in self.results)
 
     def report(self):
         # save results
         if not self.is_success:
-            click.secho("Errors when running job", fg="red", bold=True)
+            click.secho(f"\nJob {self.job_id} is a FAILURE!\n", fg="red", bold=True)
             app.log.debug("Errors:")
             for res in self.results:
                 msg = (
@@ -169,13 +168,10 @@ class SpecJobPlan:
                 app.log.debug(msg)
                 click.secho(msg, fg="red", bold=True)
         else:
-            click.secho(f"\nJob #{self.job_id} is a SUCCESS!\n", fg="green", bold=True)
+            click.secho(f"\nJob {self.job_id} is a SUCCESS!\n", fg="green", bold=True)
 
-        report_path = Path(self.job_id) / '-job.json'
-        results_map = [
-            result.to_dict
-            for result in self.results
-        ]
+        report_path = Path(f"{self.job_id}-job.json")
+        results_map = [result.to_dict for result in self.results]
         report_path.write_text(json.dumps(results_map))
 
 
