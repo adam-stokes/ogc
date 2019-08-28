@@ -54,6 +54,9 @@ def cli(spec, tag, debug):
         if tag and not set(job.tags).intersection(tag):
             continue
 
+        app.log.info(f"Starting Job: {job.job_id}")
+        app.collect.start()
+        app.collect.meta()
         job.env()
         job.install()
         job.script("before-script")
@@ -61,6 +64,10 @@ def cli(spec, tag, debug):
         job.script("after-script")
 
         job.report()
+        app.collect.end()
+        app.collect.result(job.is_success)
+        app.collect.save()
+        app.log.info(f"Completed Job: {job.job_id}")
 
         if job.is_success:
             job.script("deploy")

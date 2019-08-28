@@ -8,6 +8,7 @@ load_dotenv()
 
 @task
 def clean(c):
+    print("Cleaning project")
     c.run("rm -rf site build dist ogc.egg-info __pycache__")
 
 
@@ -33,7 +34,7 @@ def dist(c):
     c.run("python3 setup.py bdist_wheel")
 
 
-@task
+@task(pre=[clean, dist])
 def install(c):
     c.run("pip install --upgrade dist/*whl --force")
 

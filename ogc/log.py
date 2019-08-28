@@ -3,6 +3,7 @@
 
 import sys
 
+import click
 from loguru import logger
 
 logger.remove()
@@ -28,6 +29,7 @@ def debug(ctx):
 
 
 def error(ctx):
+    click.secho(ctx, fg="red", bold=True)
     logger.debug(ctx)
 
 

@@ -55,7 +55,7 @@ class SpecResult:
     """
 
     def __init__(self, error):
-        if not hasattr(error, 'full_cmd'):
+        if not hasattr(error, "full_cmd"):
             self.cmd = "n/a"
             self.code = int(1)
             self.output = str(error)
@@ -87,7 +87,6 @@ class SpecJobPlan:
         self.job_id = str(uuid.uuid4())
         self.results = []
         self.tags = self.job.get("tags", [])
-        app.log.debug(f"This is Job #{self.job_id}")
 
     def env(self):
         """ Process env section, these variables will be made available to all
@@ -157,8 +156,10 @@ class SpecJobPlan:
 
     def report(self):
         # save results
+        click.echo("")
+        click.echo("")
         if not self.is_success:
-            click.secho(f"\nJob {self.job_id} is a FAILURE!\n", fg="red", bold=True)
+            click.secho(f"This job is a FAILURE!\n", fg="red", bold=True)
             app.log.debug("Errors:")
             for res in self.results:
                 msg = (
@@ -168,8 +169,10 @@ class SpecJobPlan:
                 app.log.debug(msg)
                 click.secho(msg, fg="red", bold=True)
         else:
-            click.secho(f"\nJob {self.job_id} is a SUCCESS!\n", fg="green", bold=True)
+            click.secho(f"This job is a SUCCESS!\n", fg="green", bold=True)
 
+        click.echo("")
+        click.echo("")
         report_path = Path(f"{self.job_id}-job.json")
         results_map = [result.to_dict for result in self.results]
         report_path.write_text(json.dumps(results_map))

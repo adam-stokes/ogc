@@ -18,7 +18,7 @@ def script(script_data, env, log, timeout=None, concurrent=False):
     #        --return /tmp/ansible-output.txt \
     #        --command "my-ansible-command"
     _run = sh.env
-    if 'sudo' in script_data:
+    if "sudo" in script_data:
         _run = sh.contrib.sudo.env
     if not script_data[:2] != "#!":
         script_data = "#!/bin/bash\n" + script_data
@@ -38,7 +38,7 @@ def script(script_data, env, log, timeout=None, concurrent=False):
             _env=env.copy(),
             _timeout=timeout,
             _iter=True,
-            _bg_exc=False
+            _bg_exc=False,
         ):
             log.info(line.strip())
     sh.rm("-rf", tmp_script_path)
