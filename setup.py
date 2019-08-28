@@ -29,7 +29,7 @@ setuptools.setup(
         "requests>=2.22,<3.0",
         "semver>=2.8,<3.0",
         "sh>=1.12,<2.0",
-        "colorama>=0.4.1",
+        "colorama==0.3.9",
         "python-dotenv==0.10.3",
         "tabulate==0.8.3",
     ],

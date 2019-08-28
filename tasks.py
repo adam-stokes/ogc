@@ -39,7 +39,7 @@ def install(c):
     c.run("pip install --upgrade dist/*whl --force")
 
 
-@task
+@task(pre=[clean, fix, test, bump_rev, dist])
 def upload(c):
     c.run("twine upload dist/*")
 
