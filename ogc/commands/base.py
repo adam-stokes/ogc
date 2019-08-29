@@ -61,13 +61,14 @@ def cli(spec, tag, debug):
         job.install()
         job.script("before-script")
         job.script("script")
-        job.script("after-script")
-
         job.report()
         app.collect.end()
         app.collect.result(job.is_success)
         app.collect.save()
         app.log.info(f"Completed Job: {job.job_id}")
+
+        # This should run after other script sections and reporting is done
+        job.script("after-script")
 
         if job.is_success:
             job.script("deploy")
