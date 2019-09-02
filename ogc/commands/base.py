@@ -76,8 +76,10 @@ def cli(spec, tag, debug):
 
         if job.is_success:
             job.script("deploy")
-            sys.exit(0)
-        sys.exit(1)
+
+    if all(job.is_success for job in app.jobs):
+        sys.exit(0)
+    sys.exit(1)
 
 
 def start():
