@@ -3,6 +3,8 @@ import inspect
 import json
 import re
 import shlex
+import signal
+import sys
 import traceback
 import uuid
 from pathlib import Path
@@ -87,6 +89,15 @@ class SpecJobPlan:
         self.job_id = str(uuid.uuid4())
         self.results = []
         self.tags = self.job.get("tags", [])
+        self.force_shutdown = False
+        for sig in [2, 3, 5, 6, 15]:
+            signal.signal(sig, self._sighandler)
+            app.log.debug(f"Registering signal interupt: {sig}")
+
+    def _sighandler(self, sig, frame):
+        self.force_shutdown = True
+        app.log.debug(f"Caught signal {sig} - {frame}: running last after-script.")
+        self.script("after-script")
 
     def env(self):
         """ Process env section, these variables will be made available to all
@@ -147,6 +158,8 @@ class SpecJobPlan:
                     run.script(item, app.env, log)
                 except (SpecProcessException, sh.ErrorReturnCode) as error:
                     self.results.append(SpecResult(error))
+        if self.force_shutdown:
+            sys.exit(1)
 
     @property
     def is_success(self):
