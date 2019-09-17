@@ -1,7 +1,9 @@
+import subprocess
 from pathlib import Path
 
 import pytest
 
+from ogc import run
 from ogc.enums import SpecCore
 from ogc.spec import SpecLoader, SpecPlugin
 from ogc.state import app
@@ -75,3 +77,16 @@ def test_get_option_env_key_bool(mocker):
     _env["JUJU_MODEL"] = "test-model"
     app.env = _env
     assert plug.opt("deploy.reuse") is True
+
+
+def test_run_script_passes_check():
+    """ Tests that we can run shell scripts
+    """
+    run.script("ls -l", env=app.env.copy(), check=True)
+
+
+def test_run_script_fails_check():
+    """ Tests that we can run shell scripts
+    """
+    with pytest.raises(subprocess.CalledProcessError):
+        run.script("ls -l\necho HI\nexit 1", env=app.env.copy(), check=True)

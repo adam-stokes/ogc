@@ -4,6 +4,7 @@ import json
 import re
 import shlex
 import signal
+import subprocess
 import sys
 import traceback
 import uuid
@@ -121,7 +122,7 @@ class SpecJobPlan:
         for item in self.job.get("install", []):
             app.log.info(f"Running: {item}")
             try:
-                run.script(item, app.env, log)
+                run.script(item, app.env)
             except sh.ErrorReturnCode as error:
                 self.results.append(SpecResult(error))
 
@@ -150,13 +151,21 @@ class SpecJobPlan:
                 plug.conflicts()
                 try:
                     plug.process()
-                except (SpecProcessException, sh.ErrorReturnCode) as error:
+                except (
+                    SpecProcessException,
+                    sh.ErrorReturnCode,
+                    subprocess.SubprocessError,
+                ) as error:
                     self.results.append(SpecResult(error))
             else:
                 app.log.info(f"Running {key}: {item}")
                 try:
-                    run.script(item, app.env, log)
-                except (SpecProcessException, sh.ErrorReturnCode) as error:
+                    run.script(item, app.env)
+                except (
+                    SpecProcessException,
+                    sh.ErrorReturnCode,
+                    subprocess.SubprocessError,
+                ) as error:
                     self.results.append(SpecResult(error))
         if self.force_shutdown:
             sys.exit(1)
