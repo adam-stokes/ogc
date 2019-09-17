@@ -39,6 +39,7 @@ def script(script_data, env, log, timeout=None, concurrent=False):
             _timeout=timeout,
             _iter=True,
             _bg_exc=False,
+            _tty_in=True,
         ):
             log.info(line.strip())
     sh.rm("-rf", tmp_script_path)
