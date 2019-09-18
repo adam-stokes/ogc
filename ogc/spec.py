@@ -4,12 +4,11 @@ import json
 import re
 import shlex
 import signal
-import subprocess
 import sys
 import traceback
 import uuid
 from pathlib import Path
-
+from subprocess import SubprocessError
 import click
 import sh
 import yaml
@@ -151,21 +150,17 @@ class SpecJobPlan:
                 plug.conflicts()
                 try:
                     plug.process()
-                except (
-                    SpecProcessException,
-                    sh.ErrorReturnCode,
-                    subprocess.SubprocessError,
-                ) as error:
+                except (SpecProcessException,
+                        sh.ErrorReturnCode,
+                        SubprocessError) as error:
                     self.results.append(SpecResult(error))
             else:
                 app.log.info(f"Running {key}: {item}")
                 try:
                     run.script(item, app.env)
-                except (
-                    SpecProcessException,
-                    sh.ErrorReturnCode,
-                    subprocess.SubprocessError,
-                ) as error:
+                except (SpecProcessException,
+                        sh.ErrorReturnCode,
+                        SubprocessError) as error:
                     self.results.append(SpecResult(error))
         if self.force_shutdown:
             sys.exit(1)

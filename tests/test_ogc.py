@@ -82,7 +82,7 @@ def test_get_option_env_key_bool(mocker):
 def test_run_script_passes_check():
     """ Tests that we can run shell scripts
     """
-    run.script("ls -l", env=app.env.copy(), check=True)
+    run.script("ls -l", env=app.env.copy())
 
 
 def test_run_script_fails_check():
