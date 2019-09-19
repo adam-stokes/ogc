@@ -7,6 +7,7 @@ import signal
 import sys
 import traceback
 import uuid
+import os
 from pathlib import Path
 from subprocess import SubprocessError
 
@@ -113,7 +114,9 @@ class SpecJobPlan:
             for _envvar in envvars:
                 app.log.info(f"Adding to env: {_envvar}")
                 name, value = _envvar.split("=")
-                _map[name] = value
+                # env variables set outside of spec take precendence
+                if name not in list(os.envion.keys()):
+                    _map[name] = value
         app.env += _map
 
     def install(self):
