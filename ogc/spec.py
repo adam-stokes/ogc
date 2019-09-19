@@ -115,7 +115,7 @@ class SpecJobPlan:
                 app.log.info(f"Adding to env: {_envvar}")
                 name, value = _envvar.split("=")
                 # env variables set outside of spec take precendence
-                if name not in list(os.envion.keys()):
+                if name not in list(os.environ.keys()):
                     _map[name] = value
         app.env += _map
 
