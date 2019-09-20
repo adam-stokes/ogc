@@ -112,11 +112,12 @@ class SpecJobPlan:
         for item in self.job.get("env", []):
             envvars = shlex.split(item)
             for _envvar in envvars:
-                app.log.info(f"Adding to env: {_envvar}")
                 name, value = _envvar.split("=")
                 # env variables set outside of spec take precendence
-                if name not in list(os.environ.keys()):
-                    _map[name] = value
+                _value = os.environ.get(name, value)
+                _map[name] = _value
+                app.log.info(
+                    f"Adding to env: {name}={_value}")
         app.env += _map
 
     def install(self):
