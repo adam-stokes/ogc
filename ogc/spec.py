@@ -116,8 +116,7 @@ class SpecJobPlan:
                 # env variables set outside of spec take precendence
                 _value = os.environ.get(name, value)
                 _map[name] = _value
-                app.log.info(
-                    f"Adding to env: {name}={_value}")
+                app.log.info(f"Adding to env: {name}={_value}")
         app.env += _map
 
     def install(self):
