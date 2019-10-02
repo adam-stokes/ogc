@@ -4,8 +4,8 @@ import pytest
 
 from ogc import run
 from ogc.enums import SpecCore
-from ogc.spec import SpecLoader, SpecPlugin
 from ogc.exceptions import SpecProcessException
+from ogc.spec import SpecLoader, SpecPlugin
 from ogc.state import app
 
 fixtures_dir = Path(__file__).parent / "fixtures"

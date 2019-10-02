@@ -20,8 +20,8 @@ from melddict import MeldDict
 
 from . import log, run
 from .enums import MODULE_METADATA_MAPPING
+from .exceptions import SpecConfigException, SpecProcessException
 from .state import app
-from .exceptions import (SpecConfigException, SpecProcessException)
 
 
 class SpecLoader(MeldDict):
