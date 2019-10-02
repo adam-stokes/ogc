@@ -7,7 +7,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.3.47",
+    version="0.3.48",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
