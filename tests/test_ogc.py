@@ -1,4 +1,3 @@
-import subprocess
 from pathlib import Path
 
 import pytest
@@ -6,6 +5,7 @@ import pytest
 from ogc import run
 from ogc.enums import SpecCore
 from ogc.spec import SpecLoader, SpecPlugin
+from ogc.exceptions import SpecProcessException
 from ogc.state import app
 
 fixtures_dir = Path(__file__).parent / "fixtures"
@@ -79,14 +79,28 @@ def test_get_option_env_key_bool(mocker):
     assert plug.opt("deploy.reuse") is True
 
 
-def test_run_script_passes_check():
-    """ Tests that we can run shell scripts
+def test_run_script_passes_check(mocker):
+    """ Tests that we can run shell commands
     """
+    mocker.patch("ogc.state.app.log")
     run.script("ls -l", env=app.env.copy())
 
 
-def test_run_script_fails_check():
+def test_run_script_blob_passes_check(mocker):
     """ Tests that we can run shell scripts
     """
-    with pytest.raises(subprocess.CalledProcessError):
-        run.script("ls -l\necho HI\nexit 1", env=app.env.copy(), check=True)
+    mocker.patch("ogc.state.app.log")
+    blob = """
+#!/bin/bash
+set -x
+ls -l
+"""
+    run.script(blob, env=app.env.copy())
+
+
+def test_run_script_fails_check(mocker):
+    """ Tests that we can run shell scripts
+    """
+    mocker.patch("ogc.state.app.log")
+    with pytest.raises(SpecProcessException):
+        run.script("ls -l\necho HI\nexit 1", env=app.env.copy())

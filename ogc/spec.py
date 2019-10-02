@@ -21,25 +21,7 @@ from melddict import MeldDict
 from . import log, run
 from .enums import MODULE_METADATA_MAPPING
 from .state import app
-
-
-class SpecLoaderException(Exception):
-    pass
-
-
-class SpecConfigException(Exception):
-    """ Raise when a config conflict arises
-    """
-
-
-class SpecDepException(Exception):
-    """ Raise when a dependency conflict arises
-    """
-
-
-class SpecProcessException(Exception):
-    """ Raise when process fails
-    """
+from .exceptions import (SpecConfigException, SpecProcessException)
 
 
 class SpecLoader(MeldDict):
