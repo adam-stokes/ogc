@@ -107,8 +107,8 @@ class SpecJobPlan:
         for item in self.job.get("install", []):
             app.log.info(f"Running: {item}")
             try:
-                run.script(item, app.env, check=True)
-            except SubprocessError as error:
+                run.script(item, app.env)
+            except SpecProcessException as error:
                 self.results.append(SpecResult(error))
 
     def _is_item_plug(self, item):
@@ -145,7 +145,7 @@ class SpecJobPlan:
             else:
                 app.log.info(f"Running {key}: {item}")
                 try:
-                    run.script(item, app.env, check=True)
+                    run.script(item, app.env)
                 except (
                     SpecProcessException,
                     sh.ErrorReturnCode,
