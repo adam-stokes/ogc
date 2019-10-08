@@ -7,7 +7,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="0.3.52",
+    version="0.3.53",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -25,6 +25,7 @@ setuptools.setup(
         "kv>=0.3,<0.4.0",
         "melddict>=1.0,<2.0",
         "pyyaml>=3.0,<6.0",
+        "pyyaml-include>=1.1.1.1",
         "requests>=2.22,<3.0",
         "semver>=2.8,<3.0",
         "sh>=1.12,<2.0",
