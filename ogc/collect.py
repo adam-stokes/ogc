@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+from kv import KV
 
 
 class Collector:
@@ -11,7 +12,7 @@ class Collector:
     def __init__(self):
         self.current_date = datetime.now().strftime("%Y/%m/%d")
         self.current_time = datetime.utcnow().strftime("%H.%M.%S")
-        self.db = {}
+        self.db = KV("metadata.db")
         self.meta_path = Path("metadata.json")
 
     def meta(self):
@@ -42,4 +43,4 @@ class Collector:
     def save(self):
         """ Saves metadata to file
         """
-        self.meta_path.write_text(json.dumps(self.db))
+        self.meta_path.write_text(json.dumps(dict(self.db)))
