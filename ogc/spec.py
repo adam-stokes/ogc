@@ -17,19 +17,22 @@ import yaml
 from dict_deep import deep_get, deep_set
 from dotenv.main import DotEnv
 from melddict import MeldDict
+from yamlinclude import YamlIncludeConstructor
 
 from . import log, run
 from .enums import MODULE_METADATA_MAPPING
 from .exceptions import SpecConfigException, SpecProcessException
 from .state import app
 
+YamlIncludeConstructor.add_to_loader_class(
+    loader_class=yaml.FullLoader, base_dir=str(Path.cwd()))
 
 class SpecLoader(MeldDict):
     @classmethod
     def load(cls, specs):
         cl = SpecLoader()
         for spec in specs:
-            cl += yaml.safe_load(spec.read_text())
+            cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
         return cl
 
     def to_dict(self):

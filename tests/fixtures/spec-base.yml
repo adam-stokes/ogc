@@ -1,0 +1,6 @@
+meta:
+  name: A test spec
+
+plan:
+  before-script:
+    - !include tests/fixtures/spec-include.yml

@@ -19,6 +19,11 @@ def runners():
     return [runner for runner in spec["plan"]["script"]]
 
 
+def test_yml_include_spec(mocker):
+    mocker.patch("ogc.state.app.log")
+    spec = SpecLoader.load([fixtures_dir / "spec-base.yml"])
+    assert "juju" in spec['plan']['before-script'][0]
+
 def test_nested_assets(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
