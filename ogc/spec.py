@@ -25,7 +25,9 @@ from .exceptions import SpecConfigException, SpecProcessException
 from .state import app
 
 YamlIncludeConstructor.add_to_loader_class(
-    loader_class=yaml.FullLoader, base_dir=str(Path.cwd()))
+    loader_class=yaml.FullLoader, base_dir=str(Path.cwd())
+)
+
 
 class SpecLoader(MeldDict):
     @classmethod
