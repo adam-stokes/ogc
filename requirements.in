@@ -9,6 +9,7 @@ sh
 mkdocs==1.0.4
 mkdocs-material
 pygments
+kv
 pymdown-extensions
 python-frontmatter==0.4.5
 pytest==5.0.1
