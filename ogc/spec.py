@@ -110,11 +110,31 @@ class SpecJobPlan:
         """ Processes any install items
         """
         for item in self.job.get("install", []):
-            app.log.info(f"Running: {item}")
+            app.log.info(f"Running:\n{item}")
             try:
                 run.script(item, app.env)
             except SpecProcessException as error:
                 self.results.append(SpecResult(error))
+
+    def condition_if(self):
+        """ Processes any conditional items
+
+        # This will determine if the job should run or not based on a failed or
+        # pass state. If the condition fails (an exit code other than 0) this
+        # job will be set to execute, otherwise a passing test will skip job.
+        # All items in this section should pass or fail there is no mix of the
+        # 2.
+        """
+        if "condition-if" not in self.job:
+            return False
+
+        for item in self.job.get("condition-if", []):
+            app.log.info(f"Checking conditional:\n {item}")
+            try:
+                run.script(item, app.env)
+            except SpecProcessException as error:
+                return False
+        return True
 
     def _is_item_plug(self, item):
         """ Check if an item in the spec is referencing a plugin
@@ -148,7 +168,7 @@ class SpecJobPlan:
                 ) as error:
                     self.results.append(SpecResult(error))
             else:
-                app.log.info(f"Running {key}: {item}")
+                app.log.info(f"Running {key}:\n {item}")
                 try:
                     run.script(item, app.env)
                 except (

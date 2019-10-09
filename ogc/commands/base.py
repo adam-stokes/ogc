@@ -62,6 +62,8 @@ def cli(spec, tag, debug):
         app.collect.start()
         app.collect.meta()
         job.env()
+        if job.condition_if():
+            continue
         job.install()
         job.script("before-script")
         job.script("script")

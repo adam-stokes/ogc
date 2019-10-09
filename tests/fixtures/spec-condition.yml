@@ -1,0 +1,7 @@
+plan:
+  - condition-if:
+      - exit 0
+    script:
+      - 'this should be skipped'
+  - script:
+      - 'this should be run'

@@ -5,7 +5,7 @@ import pytest
 from ogc import run
 from ogc.enums import SpecCore
 from ogc.exceptions import SpecProcessException
-from ogc.spec import SpecLoader, SpecPlugin
+from ogc.spec import SpecJobPlan, SpecLoader, SpecPlugin
 from ogc.state import app
 
 fixtures_dir = Path(__file__).parent / "fixtures"
@@ -16,19 +16,19 @@ def runners():
     """ Fixture with the parsed runners
     """
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
-    return [runner for runner in spec["plan"]["script"]]
+    return [job for job in spec["plan"]]
 
 
 def test_yml_include_spec(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec-base.yml"])
-    assert "juju" in spec["plan"]["before-script"][0]
+    assert "juju" in spec["plan"][0]["before-script"][0]
 
 
 def test_nested_assets(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
-    plug = SpecPlugin(spec[SpecCore.PLAN]["script"][3]["runner"])
+    plug = SpecPlugin(spec[SpecCore.PLAN][0]["script"][3]["runner"])
     assets = plug.opt("assets")
     assert assets[0]["name"] == "pytest configuration"
 
@@ -43,7 +43,7 @@ def test_cmd_to_env(mocker):
     _env["CONTROLLER"] = "juju-controller"
     _env["MODEL"] = "juju-model"
     app.env = _env
-    spec = SpecPlugin(spec[SpecCore.PLAN]["script"][0]["runner"])
+    spec = SpecPlugin(spec[SpecCore.PLAN][0]["script"][0]["runner"])
     cmd = spec.opt("cmd")
     assert cmd == (
         "echo bonzai-test lthis happened "
@@ -58,7 +58,7 @@ def test_get_option_env_key(mocker):
     into the hosts environment setting """
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
-    plug = SpecPlugin(spec[SpecCore.PLAN]["before-script"][0]["juju"])
+    plug = SpecPlugin(spec[SpecCore.PLAN][0]["before-script"][0]["juju"])
 
     _env = {}
     _env["JUJU_CLOUD"] = "aws/us-east-1"
@@ -75,7 +75,7 @@ def test_get_option_env_key_bool(mocker):
     """
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
-    plug = SpecPlugin(spec[SpecCore.PLAN]["before-script"][0]["juju"])
+    plug = SpecPlugin(spec[SpecCore.PLAN][0]["before-script"][0]["juju"])
 
     _env = {}
     _env["JUJU_CLOUD"] = "aws/us-east-1"
@@ -110,3 +110,13 @@ def test_run_script_fails_check(mocker):
     mocker.patch("ogc.state.app.log")
     with pytest.raises(SpecProcessException):
         run.script("ls -l\necho HI\nexit 1", env=app.env.copy())
+
+
+def test_condition_if(mocker):
+    """ Tests that a condition will skip a job item
+    """
+    mocker.patch("ogc.state.app.log")
+    spec = SpecLoader.load([fixtures_dir / "spec-condition.yml"])
+    jobs = [SpecJobPlan(job) for job in spec[SpecCore.PLAN]]
+    assert jobs[0].condition_if()
+    assert jobs[1].condition_if() is False
