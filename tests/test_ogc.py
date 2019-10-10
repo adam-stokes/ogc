@@ -119,4 +119,5 @@ def test_condition_if(mocker):
     spec = SpecLoader.load([fixtures_dir / "spec-condition.yml"])
     jobs = [SpecJobPlan(job) for job in spec[SpecCore.PLAN]]
     assert jobs[0].condition_if()
-    assert jobs[1].condition_if() is False
+    assert jobs[1].condition_if()
+    assert jobs[2].condition_if() is False

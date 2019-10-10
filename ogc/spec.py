@@ -119,21 +119,20 @@ class SpecJobPlan:
     def condition_if(self):
         """ Processes any conditional items
 
-        # This will determine if the job should run or not based on a failed or
-        # pass state. If the condition fails (an exit code other than 0) this
-        # job will be set to execute, otherwise a passing test will skip job.
-        # All items in this section should pass or fail there is no mix of the
-        # 2.
+        This will determine if the job should run or not based on a failed or
+        pass state. If the condition fails (an exit code other than 0) this job
+        will be set to execute, otherwise a passing test will skip job. All
+        items in this section should pass or fail there is no mix of the 2.
         """
-        if "condition-if" not in self.job:
-            return False
+        if "if" not in self.job:
+            return True
 
-        for item in self.job.get("condition-if", []):
+        try:
+            item = self.job.get("if", "exit 0")
             app.log.info(f"Checking conditional:\n {item}")
-            try:
-                run.script(item, app.env)
-            except SpecProcessException as error:
-                return False
+            run.script(item, app.env)
+        except SpecProcessException as error:
+            return False
         return True
 
     def _is_item_plug(self, item):
