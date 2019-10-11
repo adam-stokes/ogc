@@ -50,7 +50,6 @@ def upload_docs(c):
     WEB_SITE = os.getenv("WEB_SITE")
     WEB_DST = os.getenv("WEB_DST")
 
-    c.run("pip install -rrequirements_doc.txt")
     c.run("cp readme.md docs/index.md")
     c.run("mkdocs build")
     c.run(f"rsync -avz --delete site/* {WEB_USER}@{WEB_SITE}:{WEB_DST}")

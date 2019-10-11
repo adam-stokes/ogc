@@ -84,11 +84,10 @@ plan:
       - |
         #!/bin/bash
         set -eux
-        pytest validations/tests/validation.py  \
-           --connection $JUJU_CONTROLLER:$JUJU_MODEL \
-           --cloud $JUJU_CLOUD \
-           --bunndle-channel $JUJU_DEPLOY_CHANNEL \
-           --snap-channel $SNAP_VERSION
+        pytest jobs/integration/validation.py \
+             --cloud $JUJU_CLOUD \
+             --controller $JUJU_CONTROLLER \
+             --model $JUJU_MODEL
     after-script:
       - juju-crashdump -a debug-layer -a config -m $JUJU_CONTROLLER:$JUJU_MODEL
       - aws s3 sync *.log s3://jenkaas/$JUJU_DEPLOY_BUNDLE/$SNAP_VERSION

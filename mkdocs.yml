@@ -34,8 +34,9 @@ extra:
       link: 'https://github.com/battlemidget/ogc'
 nav:
   - Home: index.md
-  # - Reference:
-  #     - Plugin Specification: plugins/spec.md
+  - Reference:
+      - Specification: spec.md
+      # - Plugin Specification: plugins/spec.md
   # - Plugins:
   #     - Env: plugins/env.md
   #     - Runner: plugins/runner.md
