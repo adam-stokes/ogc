@@ -79,7 +79,7 @@ class SpecJobPlan:
         self.results = []
         self.tags = self.job.get("tags", [])
         self.force_shutdown = False
-        for sig in [2, 3, 5, 6, 15]:
+        for sig in [1, 2, 3, 5, 6, 15]:
             signal.signal(sig, self._sighandler)
             app.log.debug(f"Registering signal interupt: {sig}")
 
