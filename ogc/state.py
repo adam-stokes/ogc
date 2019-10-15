@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 from melddict import MeldDict
 
+from . import log
 from .collect import Collector
 
 app = SimpleNamespace(
@@ -17,7 +18,7 @@ app = SimpleNamespace(
     # list of all plugins, across all phases
     plugins=[],
     # logger
-    log=None,
+    log=log,
     # collector
     collect=Collector(),
     # jobs

@@ -5,7 +5,6 @@ from pathlib import Path
 import click
 import pkg_resources
 
-from .. import log
 from ..enums import SpecCore
 from ..spec import SpecJobPlan, SpecLoader
 from ..state import app
@@ -28,7 +27,6 @@ def cli(spec, tag, debug):
     """ Processes a OGC Spec which defines how a build/test/task is performed
     """
     app.debug = debug
-    app.log = log
 
     specs = []
     # Check for local spec
