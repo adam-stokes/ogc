@@ -49,7 +49,7 @@ def cli(spec, tag, debug):
     app.plugins = plugins
     app.jobs = [SpecJobPlan(job) for job in app.spec[SpecCore.PLAN]]
 
-    if not app.spec.get('sequential', False):
+    if not app.spec.get("sequential", False):
         # randomize jobs for maximum effort
         random.shuffle(app.jobs)
 
