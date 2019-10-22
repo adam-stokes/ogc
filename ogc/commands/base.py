@@ -49,8 +49,9 @@ def cli(spec, tag, debug):
     app.plugins = plugins
     app.jobs = [SpecJobPlan(job) for job in app.spec[SpecCore.PLAN]]
 
-    # randomize jobs for maximum effort
-    random.shuffle(app.jobs)
+    if not app.spec.get('sequential', False):
+        # randomize jobs for maximum effort
+        random.shuffle(app.jobs)
 
     for job in app.jobs:
         if tag and not set(job.tags).intersection(tag):

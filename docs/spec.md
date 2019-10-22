@@ -4,6 +4,24 @@ The spec file composed of configuration items in yaml format. There are
 currently 2 top level properties that are accessed when the specification is
 executed, the first is **meta** and the second is **plan**.
 
+## Spec properties
+
+There are a couple top level properties that can be set that would effect the
+operation of the specification plan.
+
+### Example
+
+```yaml
+# Run jobs sequentially
+sequential: yes
+```
+
+### Properties
+
+| Name | Description |
+| -    | -           |
+| sequential | Run plan jobs sequentially (default: no) |
+
 
 ## Meta specification
 
