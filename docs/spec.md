@@ -158,6 +158,8 @@ plan:
 | before-script | **before-script** phase |
 | script | **script** phase |
 | after-script | **after-script** phase |
+| on-success | Runs on each successful job |
+| on-failure | Runs on each failed job |
 
 
 ### Conditional Variants

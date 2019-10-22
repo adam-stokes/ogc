@@ -77,6 +77,9 @@ def cli(spec, tag, debug):
 
         if job.is_success:
             job.script("deploy")
+            job.script("on-success")
+        else:
+            job.script("on-failure")
 
     if all(job.is_success for job in app.jobs):
         sys.exit(0)
