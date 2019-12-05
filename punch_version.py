@@ -1,3 +1,3 @@
-major = 0
-minor = 3
-patch = 58
+major = 1
+minor = 0
+patch = 0
