@@ -2,6 +2,8 @@ import os
 import subprocess
 import tempfile
 from pathlib import Path
+import shlex
+from types import SimpleNamespace
 
 from .exceptions import SpecProcessException
 from .state import app
@@ -58,3 +60,43 @@ def script(script_data, env, **kwargs):
     subprocess.run(["rm", "-rf", str(tmp_script_path)])
     if exitcode > 0:
         raise SpecProcessException("Failed to run script")
+
+
+def capture(script, **kwargs):
+    """ capture command output
+    """
+    env = app.env.copy()
+    if not isinstance(script, list) and "shell" not in kwargs:
+        script = shlex.split(script)
+    process = subprocess.run(
+        script, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **kwargs
+    )
+    return SimpleNamespace(
+        ok=bool(process.returncode == 0),
+        returncode=process.returncode,
+        stdout=process.stdout,
+        stderr=process.stderr,
+    )
+
+
+def cmd_ok(script, **kwargs):
+    """ Stream command, doesnt buffer and prints it all out to stdout, only
+    returns exit status
+    """
+    env = app.env.copy()
+    check = None
+    if "check" in kwargs:
+        check = kwargs["check"]
+        del kwargs["check"]
+    if not isinstance(script, list) and "shell" not in kwargs:
+        script = shlex.split(script)
+    process = subprocess.Popen(
+        script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, **kwargs
+    )
+
+    with process.stdout:
+        _log_sub_out(process.stdout)
+    exitcode = process.wait()
+    if check and exitcode > 0:
+        raise subprocess.CalledProcessError(exitcode, "", "")
+    return SimpleNamespace(ok=bool(exitcode == 0), returncode=exitcode)
