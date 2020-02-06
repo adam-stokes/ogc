@@ -1,8 +1,8 @@
 import os
+import shlex
 import subprocess
 import tempfile
 from pathlib import Path
-import shlex
 from types import SimpleNamespace
 
 from .exceptions import SpecProcessException
@@ -62,14 +62,14 @@ def script(script_data, env, **kwargs):
         raise SpecProcessException("Failed to run script")
 
 
-def capture(script, **kwargs):
+def capture(_script, **kwargs):
     """ capture command output
     """
     env = app.env.copy()
-    if not isinstance(script, list) and "shell" not in kwargs:
-        script = shlex.split(script)
+    if not isinstance(_script, list) and "shell" not in kwargs:
+        _script = shlex.split(_script)
     process = subprocess.run(
-        script, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **kwargs
+        _script, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, **kwargs
     )
     return SimpleNamespace(
         ok=bool(process.returncode == 0),
@@ -79,7 +79,7 @@ def capture(script, **kwargs):
     )
 
 
-def cmd_ok(script, **kwargs):
+def cmd_ok(_script, **kwargs):
     """ Stream command, doesnt buffer and prints it all out to stdout, only
     returns exit status
     """
@@ -88,10 +88,10 @@ def cmd_ok(script, **kwargs):
     if "check" in kwargs:
         check = kwargs["check"]
         del kwargs["check"]
-    if not isinstance(script, list) and "shell" not in kwargs:
-        script = shlex.split(script)
+    if not isinstance(_script, list) and "shell" not in kwargs:
+        _script = shlex.split(_script)
     process = subprocess.Popen(
-        script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, **kwargs
+        _script, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, **kwargs
     )
 
     with process.stdout:
