@@ -23,45 +23,56 @@ vars:
   juju_controller: validate-ck-{{series}}
   juju_model: validate-model
 
-plan:
-  script:
-    - juju:
-        cloud: {{juju_cloud}}
-        controller: {{juju_controller}}
-        model: {{juju_model}}
-        force: yes
-        bootstrap:
-          series: {{series}}
-          constraints: "arch={{arch}}"
-          debug: no
-          replace-controller: yes
-          model-default:
-            - test-mode=true
-            - resource-tags=owner=k8sci
-            {% if series == "focal" %}
-            - image-stream=daily
-            {% endif %}
-        deploy:
-          reuse: no
-          bundle: {{juju_deploy_bundle}}
-          series: {{series}}
-          overlay: |
-            applications:
-              kubernetes-master:
-                options:
-                  channel: {{snap_version}}
-              kubernetes-worker:
-                options:
-                  channel: {{snap_version}}
-          wait: yes
-          timeout: 7200
-          channel: {{juju_deploy_channel}}
-    - !include jobs/spec-helpers/pytest.yml
-    - !include jobs/spec-helpers/collect.yml
-    - juju:
-        controller: {{juju_controller}}
-        teardown:
-          graceful: yes
+backends: [juju/mem=16G,cores=16,root-disk=100G]
+
+provisioner:
+  shell: |
+    rsync -avz files/files* ubuntu@1.2.3.4:.
+    sudo apt-get remove lxd lxd-client
+    sudo snap install juju --classic
+
+plan: |
+  #!/bin/bash
+  set -x
+
+  if ! juju destroy-controller -y --destroy-all-models --destroy-storage {{juju_controller}} 2>&1; then
+    juju kill-controller -y {{juju_controller}} 2>&1
+  fi
+
+  juju bootstrap {{juju_cloud}} {{juju_controller}} \
+       -d {{juju_model}} \
+       --bootstrap-series {{series}} \
+       --force \
+       --bootstrap-constraints 'arch={{arch}}' \
+       {% if series == 'focal' %}
+       --model-default image-stream=daily \
+       {% endif %}
+       --model-default test-mode=true \
+       --model-default resource-tags=owner=k8sci
+
+  tee overlay.yaml <<EOF
+  applications:
+    kubernetes-master:
+      options:
+        channel: {{snap_version}}
+    kubernetes-worker:
+      options:
+        channel: {{snap_version}}
+  EOF
+
+  juju deploy -m {{juju_controller}}:{{juju_model}} \
+        --series {{series}} \
+        --force \
+        --overlay overlay.yaml \
+        --channel {{juju_deploy_channel}} {{juju_deploy_bundle}}
+
+  juju-wait -e {{juju_controller}}:{{juju_model}} -w
+
+  pytest -m "not slow" jobs/integration/validation.py \
+     --cloud {{juju_cloud}} \
+     --model {{juju_model}} \
+     --controller {{juju_controller}}
+
 
 meta:
   name: Verify CK
