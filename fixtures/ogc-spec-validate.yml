@@ -1,0 +1,83 @@
+matrix:
+  snap_version:
+    - 1.18/edge
+    - 1.17/edge
+    - 1.17/stable
+    - 1.16/edge
+    - 1.15/edge
+  series:
+    - focal
+    - bionic
+    - xenial
+  channel:
+    - edge
+    - stable
+  arch:
+    - amd64
+    - arm64
+
+vars:
+  juju_deploy_bundle: cs:~containers/charmed-kubernetes
+  juju_deploy_channel: {{channel}}
+  juju_cloud: aws/us-east-1
+  juju_controller: validate-ck-{{series}}
+  juju_model: validate-model
+
+plan:
+  script:
+    - juju:
+        cloud: {{juju_cloud}}
+        controller: {{juju_controller}}
+        model: {{juju_model}}
+        force: yes
+        bootstrap:
+          series: {{series}}
+          constraints: "arch={{arch}}"
+          debug: no
+          replace-controller: yes
+          model-default:
+            - test-mode=true
+            - resource-tags=owner=k8sci
+            {% if series == "focal" %}
+            - image-stream=daily
+            {% endif %}
+        deploy:
+          reuse: no
+          bundle: {{juju_deploy_bundle}}
+          series: {{series}}
+          overlay: |
+            applications:
+              kubernetes-master:
+                options:
+                  channel: {{snap_version}}
+              kubernetes-worker:
+                options:
+                  channel: {{snap_version}}
+          wait: yes
+          timeout: 7200
+          channel: {{juju_deploy_channel}}
+    - !include jobs/spec-helpers/pytest.yml
+    - !include jobs/spec-helpers/collect.yml
+    - juju:
+        controller: {{juju_controller}}
+        teardown:
+          graceful: yes
+
+meta:
+  name: Verify CK
+  synopsis:
+    - summary: Running the base validation suite against a deployed Kubernetes
+      code: |
+        ```
+        # edit spec.yml and update the appropriate vars under the `env:` section
+        > ogc --spec jobs/validate/spec.yml -t core
+        ```
+  description: |
+    Verifies that CK passes integration tests
+  mkdocs:
+    destination:
+      - "validations/ck/index.md"
+    jenkins-job-builder:
+      jobs:
+        - jobs/ci-master.yaml
+        - jobs/validate.yaml
