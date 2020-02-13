@@ -6,7 +6,7 @@ import click
 import pkg_resources
 
 from ..enums import SpecCore
-from ..spec import SpecJobPlan, SpecLoader
+from ..spec import SpecJobMatrix, SpecJobPlan, SpecLoader
 from ..state import app
 
 
@@ -47,7 +47,11 @@ def cli(spec, tag, debug):
         for entry_point in pkg_resources.iter_entry_points("ogc.plugins")
     }
     app.plugins = plugins
-    app.jobs = [SpecJobPlan(job) for job in app.spec[SpecCore.PLAN]]
+
+    matrixes = SpecJobMatrix(app.spec[SpecCore.MATRIX])
+    app.jobs = [
+        SpecJobPlan(app.spec[SpecCore.PLAN], matrix) for matrix in matrixes.generate()
+    ]
 
     if not app.spec.get("sequential", False):
         # randomize jobs for maximum effort
@@ -58,14 +62,13 @@ def cli(spec, tag, debug):
             continue
 
         app.log.info(f"Starting Job: {job.job_id}")
-        app.collect.start()
+        app.collect.start(job.job_id)
         app.collect.meta()
         job.env()
         if not job.condition_if():
             continue
-        job.install()
-        job.script("before-script")
-        job.script("script")
+        job.script("pre-execute")
+        job.script("execute")
         job.report()
         app.collect.end()
         app.collect.result(job.is_success)
@@ -73,7 +76,7 @@ def cli(spec, tag, debug):
         app.log.info(f"Completed Job: {job.job_id}")
 
         # This should run after other script sections and reporting is done
-        job.script("after-script")
+        job.script("post-execute")
 
         if job.is_success:
             job.script("deploy")

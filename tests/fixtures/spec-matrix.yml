@@ -1,0 +1,44 @@
+matrix:
+  snap_version:
+    - 1.18/edge
+    - 1.17/edge
+    - 1.17/stable
+    - 1.16/edge
+    - 1.15/edge
+  series:
+    - focal
+    - bionic
+    - xenial
+  channel:
+    - edge
+    - stable
+  arch:
+    - amd64
+    - arm64
+
+
+plan:
+  env:
+    - JUJU_DEPLOY_BUNDLE=cs:~containers/charmed-kubernetes
+    - JUJU_DEPLOY_CHANNEL=$CHANNEL
+    - JUJU_CLOUD=aws/us-east-1
+    - JUJU_CONTROLLER=validate-ck-$SERIES
+    - JUJU_MODEL=validate-model
+
+  backends: [juju/mem=16G,cores=16,root-disk=100G]
+
+  provisioner:
+    rsync:
+      src: files/files*
+      dst: /home/ubuntu/.
+    shell: |
+      sudo apt-get remove lxd lxd-client
+      sudo snap install juju --classic
+
+  execute: |
+    #!/bin/bash
+    set -x
+
+    if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
+      juju kill-controller -y $JUJU_CONTROLLER 2>&1
+    fi

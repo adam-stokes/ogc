@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import itertools
 import json
 import os
 import re
@@ -27,6 +28,35 @@ from .state import app
 YamlIncludeConstructor.add_to_loader_class(
     loader_class=yaml.FullLoader, base_dir=str(Path.cwd())
 )
+
+
+def _convert_to_env(items):
+    """ Converts a list of items that may contain $VARNAME into their
+    environment variable result. This will return the items unaltered if no
+    matches found
+    """
+
+    def replace_env(match):
+        match = match.group()
+        return app.env.get(match[1:])
+
+    _pattern = re.compile(r"\$([_a-zA-Z]+)")
+    if isinstance(items, str):
+        return re.sub(_pattern, replace_env, items)
+    if isinstance(items, bool):
+        return items
+    if isinstance(items, dict):
+        return items
+    if isinstance(items, list):
+        if all(isinstance(obj, dict) for obj in items):
+            return items
+        modified = [
+            re.sub(_pattern, replace_env, item)
+            for item in items
+            if isinstance(item, str)
+        ]
+        return modified
+    return items
 
 
 class SpecLoader(MeldDict):
@@ -69,12 +99,34 @@ class SpecResult:
         return {"cmd": self.cmd, "code": self.code, "output": self.output}
 
 
+class SpecJobMatrix:
+    """ Job matrix
+    """
+
+    def __init__(self, matrix):
+        self.matrix = matrix
+
+    def generate(self):
+        """ Generates the build combinations
+        """
+        all_names = sorted(self.matrix)
+        combos = itertools.product(*(self.matrix[item] for item in all_names))
+        combo_map = []
+        for line in combos:
+            combine = zip(all_names, line)
+            combo_map.append(
+                {a: b for a, b in combine for combine in zip(all_names, line)}
+            )
+        return combo_map
+
+
 class SpecJobPlan:
     """ A Job Plan specification
     """
 
-    def __init__(self, job):
+    def __init__(self, job, matrix):
         self.job = job
+        self.matrix = matrix
         self.job_id = str(uuid.uuid4())
         self.results = []
         self.tags = self.job.get("tags", [])
@@ -96,25 +148,21 @@ class SpecJobPlan:
           - SNAP_VERSION=1.15/edge
         """
         _map = {}
+
+        # Process our matrix items first as env so that future env setup can pull from those values if needed
+        for name, value in self.matrix.items():
+            app.env[name.upper()] = value
+
         for item in self.job.get("env", []):
             envvars = shlex.split(item)
             for _envvar in envvars:
                 name, value = _envvar.split("=")
+                value = _convert_to_env(value)
                 # env variables set outside of spec take precendence
                 _value = os.environ.get(name, value)
                 _map[name] = _value
                 app.log.info(f"Adding to env: {name}={_value}")
         app.env += _map
-
-    def install(self):
-        """ Processes any install items
-        """
-        for item in self.job.get("install", []):
-            app.log.info(f"Running:\n{item}")
-            try:
-                run.script(item, app.env)
-            except SpecProcessException as error:
-                self.results.append(SpecResult(error))
 
     def condition_if(self):
         """ Processes any conditional items
@@ -152,7 +200,8 @@ class SpecJobPlan:
     def script(self, key):
         """ Processes before-script, script, and after-script based on key
         """
-        for item in self.job.get(key, []):
+        item = self.job.get(key, None)
+        if item:
             plug = self._is_item_plug(item)
             if plug:
                 app.log.info(f"Running {key} plugin: {plug.friendly_name}")
@@ -227,34 +276,6 @@ class SpecPlugin:
     def __str__(self):
         return log.info(self.friendly_name)
 
-    def _convert_to_env(self, items):
-        """ Converts a list of items that may contain $VARNAME into their
-        environment variable result. This will return the items unaltered if no
-        matches found
-        """
-
-        def replace_env(match):
-            match = match.group()
-            return app.env.get(match[1:])
-
-        _pattern = re.compile(r"\$([_a-zA-Z]+)")
-        if isinstance(items, str):
-            return re.sub(_pattern, replace_env, items)
-        if isinstance(items, bool):
-            return items
-        if isinstance(items, dict):
-            return items
-        if isinstance(items, list):
-            if all(isinstance(obj, dict) for obj in items):
-                return items
-            modified = [
-                re.sub(_pattern, replace_env, item)
-                for item in items
-                if isinstance(item, str)
-            ]
-            return modified
-        return items
-
     def _load_dotenv(self, path):
         if not path.exists():
             return
@@ -269,7 +290,7 @@ class SpecPlugin:
         """
         try:
             val = deep_get(self.spec, key)
-            return self._convert_to_env(val)
+            return _convert_to_env(val)
         except (KeyError, TypeError):
             app.log.debug(f"Option {key} - unavailable, skipping")
             return None

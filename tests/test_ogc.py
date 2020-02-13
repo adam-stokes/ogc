@@ -5,7 +5,7 @@ import pytest
 from ogc import run
 from ogc.enums import SpecCore
 from ogc.exceptions import SpecProcessException
-from ogc.spec import SpecJobPlan, SpecLoader, SpecPlugin
+from ogc.spec import SpecJobMatrix, SpecJobPlan, SpecLoader, SpecPlugin
 from ogc.state import app
 
 fixtures_dir = Path(__file__).parent / "fixtures"
@@ -17,6 +17,47 @@ def runners():
     """
     spec = SpecLoader.load([fixtures_dir / "spec.yml"])
     return [job for job in spec["plan"]]
+
+
+def test_matrix_combos(mocker):
+    """ Test all combos are present
+    """
+    mocker.patch("ogc.state.app.log")
+    spec = SpecLoader.load([fixtures_dir / "spec-matrix.yml"])
+    matrixes = SpecJobMatrix(spec[SpecCore.MATRIX])
+    combos = matrixes.generate()
+    assert {
+        "snap_version": "1.18/edge",
+        "series": "focal",
+        "channel": "stable",
+        "arch": "arm64",
+    } in combos
+    assert {
+        "snap_version": "1.17/stable",
+        "series": "bionic",
+        "channel": "stable",
+        "arch": "arm64",
+    } in combos
+    assert {
+        "snap_version": "1.15/edge",
+        "series": "xenial",
+        "channel": "edge",
+        "arch": "amd64",
+    } in combos
+
+
+def test_matrix_replace_env_var(mocker):
+    """ Tests that a matrix variable updates an referenced environment variable
+    """
+    mocker.patch("ogc.state.app.log")
+    spec = SpecLoader.load([fixtures_dir / "spec-matrix.yml"])
+    matrixes = SpecJobMatrix(spec[SpecCore.MATRIX])
+    jobs = [SpecJobPlan(spec[SpecCore.PLAN], matrix) for matrix in matrixes.generate()]
+    jobs[0].env()
+    assert app.env["JUJU_CONTROLLER"] == "validate-ck-{}".format(
+        jobs[0].matrix["series"]
+    )
+    assert app.env["JUJU_DEPLOY_CHANNEL"] == jobs[0].matrix["channel"]
 
 
 def test_yml_include_spec(mocker):
@@ -112,12 +153,15 @@ def test_run_script_fails_check(mocker):
         run.script("ls -l\necho HI\nexit 1", env=app.env.copy())
 
 
+@pytest.mark.skip
 def test_condition_if(mocker):
     """ Tests that a condition will skip a job item
     """
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec-condition.yml"])
-    jobs = [SpecJobPlan(job) for job in spec[SpecCore.PLAN]]
+    matrixes = [SpecJobMatrix(matrix) for matrix in app.spec[SpecCore.MATRIX]]
+
+    jobs = [SpecJobPlan(app.spec[SpecCore.PLAN], matrix) for matrix in matrixes]
     assert jobs[0].condition_if()
     assert jobs[1].condition_if()
     assert jobs[2].condition_if() is False

@@ -5,13 +5,15 @@
 class SpecCore:
     META = "meta"
     PLAN = "plan"
+    MATRIX = "matrix"
 
 
-SPEC_CORE_LIST = [SpecCore.META, SpecCore.PLAN]
+SPEC_CORE_LIST = [SpecCore.META, SpecCore.PLAN, SpecCore.MATRIX]
 
 SPEC_CORE_PLAN_PROPERTIES = (
     "env",
     "install",
+    "execute",
     "before-script",
     "script",
     "after-script",

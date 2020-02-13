@@ -28,10 +28,11 @@ class Collector:
         self.db["git_url"] = env.get("GIT_URL", "n/a")
         self.db["git_branch"] = env.get("GIT_BRANCH", "master")
 
-    def start(self):
+    def start(self, job_id):
         """ Sets a startime timestamp
         """
         self.db["build_datetime"] = str(datetime.utcnow().isoformat())
+        self.db["job_id"] = job_id
 
     def end(self):
         """ Sets a endtime timestamp

@@ -1,79 +1,3 @@
-matrix:
-  snap_version:
-    - 1.18/edge
-    - 1.17/edge
-    - 1.17/stable
-    - 1.16/edge
-    - 1.15/edge
-  series:
-    - focal
-    - bionic
-    - xenial
-  channel:
-    - edge
-    - stable
-  arch:
-    - amd64
-    - arm64
-
-vars:
-  juju_deploy_bundle: cs:~containers/charmed-kubernetes
-  juju_deploy_channel: {{channel}}
-  juju_cloud: aws/us-east-1
-  juju_controller: validate-ck-{{series}}
-  juju_model: validate-model
-
-backends: [juju/mem=16G,cores=16,root-disk=100G]
-
-provisioner:
-  shell: |
-    rsync -avz files/files* ubuntu@1.2.3.4:.
-    sudo apt-get remove lxd lxd-client
-    sudo snap install juju --classic
-
-plan: |
-  #!/bin/bash
-  set -x
-
-  if ! juju destroy-controller -y --destroy-all-models --destroy-storage {{juju_controller}} 2>&1; then
-    juju kill-controller -y {{juju_controller}} 2>&1
-  fi
-
-  juju bootstrap {{juju_cloud}} {{juju_controller}} \
-       -d {{juju_model}} \
-       --bootstrap-series {{series}} \
-       --force \
-       --bootstrap-constraints 'arch={{arch}}' \
-       {% if series == 'focal' %}
-       --model-default image-stream=daily \
-       {% endif %}
-       --model-default test-mode=true \
-       --model-default resource-tags=owner=k8sci
-
-  tee overlay.yaml <<EOF
-  applications:
-    kubernetes-master:
-      options:
-        channel: {{snap_version}}
-    kubernetes-worker:
-      options:
-        channel: {{snap_version}}
-  EOF
-
-  juju deploy -m {{juju_controller}}:{{juju_model}} \
-        --series {{series}} \
-        --force \
-        --overlay overlay.yaml \
-        --channel {{juju_deploy_channel}} {{juju_deploy_bundle}}
-
-  juju-wait -e {{juju_controller}}:{{juju_model}} -w
-
-  pytest -m "not slow" jobs/integration/validation.py \
-     --cloud {{juju_cloud}} \
-     --model {{juju_model}} \
-     --controller {{juju_controller}}
-
-
 meta:
   name: Verify CK
   synopsis:
@@ -92,3 +16,81 @@ meta:
       jobs:
         - jobs/ci-master.yaml
         - jobs/validate.yaml
+
+matrix:
+  snap_version:
+    - 1.18/edge
+    - 1.17/edge
+    - 1.17/stable
+    - 1.16/edge
+    - 1.15/edge
+  series:
+    - focal
+    - bionic
+    - xenial
+  channel:
+    - edge
+    - stable
+  arch:
+    - amd64
+    - arm64
+
+plan:
+  env:
+    - JUJU_DEPLOY_BUNDLE=cs:~containers/charmed-kubernetes
+    - JUJU_DEPLOY_CHANNEL=$CHANNEL
+    - JUJU_CLOUD=aws/us-east-1
+    - JUJU_CONTROLLER=validate-ck-$SERIES
+    - JUJU_MODEL=validate-model
+
+  backends: [juju/mem=16G,cores=16,root-disk=100G]
+
+  provisioner:
+    rsync:
+      src: files/files*
+      dst: /home/ubuntu/.
+    shell: |
+      sudo apt-get remove lxd lxd-client
+      sudo snap install juju --classic
+
+  execute: |
+    #!/bin/bash
+    set -x
+
+    if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
+      juju kill-controller -y $JUJU_CONTROLLER 2>&1
+    fi
+
+    juju bootstrap $JUJU_CLOUD $JUJU_CONTROLLER \
+         -d $JUJU_MODEL \
+         --bootstrap-series $SERIES \
+         --force \
+         --bootstrap-constraints 'arch=$ARCH' \
+         {% if series == 'focal' %}
+         --model-default image-stream=daily \
+         {% endif %}
+         --model-default test-mode=true \
+         --model-default resource-tags=owner=k8sci
+
+    tee overlay.yaml <<EOF
+    applications:
+      kubernetes-master:
+        options:
+          channel: $SNAP_VERSION
+      kubernetes-worker:
+        options:
+          channel: $SNAP_VERSION
+    EOF
+
+    juju deploy -m $JUJU_CONTROLLER:$JUJU_MODEL \
+          --series $SERIES \
+          --force \
+          --overlay overlay.yaml \
+          --channel $JUJU_DEPLOY_CHANNEL $JUJU_DEPLOY_BUNDLE
+
+    juju-wait -e $JUJU_CONTROLLER:$JUJU_MODEL -w
+
+    pytest -m "not slow" jobs/integration/validation.py \
+       --cloud $JUJU_CLOUD \
+       --model $JUJU_MODEL \
+       --controller $JUJU_CONTROLLER
