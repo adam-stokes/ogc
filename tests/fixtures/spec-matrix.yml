@@ -25,7 +25,7 @@ plan:
     - JUJU_CONTROLLER=validate-ck-$SERIES
     - JUJU_MODEL=validate-model
 
-  backends: [juju/mem=16G,cores=16,root-disk=100G]
+  backend: juju/mem=16G,cores=16,root-disk=100G
 
   provisioner:
     rsync:

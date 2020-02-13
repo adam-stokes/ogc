@@ -53,20 +53,11 @@ def cli(spec, tag, debug):
         SpecJobPlan(app.spec[SpecCore.PLAN], matrix) for matrix in matrixes.generate()
     ]
 
-    if not app.spec.get("sequential", False):
-        # randomize jobs for maximum effort
-        random.shuffle(app.jobs)
-
     for job in app.jobs:
-        if tag and not set(job.tags).intersection(tag):
-            continue
-
         app.log.info(f"Starting Job: {job.job_id}")
         app.collect.start(job.job_id)
         app.collect.meta()
         job.env()
-        if not job.condition_if():
-            continue
         job.script("pre-execute")
         job.script("execute")
         job.report()

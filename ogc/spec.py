@@ -140,6 +140,11 @@ class SpecJobPlan:
         app.log.debug(f"Caught signal {sig} - {frame}: running last after-script.")
         self.script("after-script")
 
+    def backend(self):
+        """ This sets up backend to process job (ie. lxd or juju)
+        """
+        return Backend(self.job.get("backend")).create()
+
     def env(self):
         """ Process env section, these variables will be made available to all
         properties in this job.
