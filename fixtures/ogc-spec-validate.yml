@@ -47,6 +47,8 @@ plan:
     #!/bin/bash
     set -x
 
+    ogc-set-key job_custom_name "$JUJU_CONTROLLER"-$(uname -m)
+
     if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
       juju kill-controller -y $JUJU_CONTROLLER 2>&1
     fi
@@ -83,5 +85,18 @@ plan:
        --model $JUJU_MODEL \
        --controller $JUJU_CONTROLLER
 
+    wget https://raw.githubusercontent.com/juju-solutions/cdk-field-agent/master/collect.py
+    python3 collect.py -m $JUJU_CONTROLLER:$JUJU_MODEL
+
+    ogc-set-key 'snap_version' "$SNAP_VERSION"
+    ogc-set-key 'juju_deploy_channel' "$JUJU_DEPLOY_CHANNEL"
+
+    ogc-add-files --file results*.tar.gz \
+                  --file ogc.log \
+                  --file metadata.json \
+                  --file *job.json
+
+    ogc-save
+    ogc-upload-results
 
     juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER
