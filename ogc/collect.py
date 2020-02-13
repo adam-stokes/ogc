@@ -13,7 +13,7 @@ class Collector:
     def __init__(self):
         self.current_date = datetime.now().strftime("%Y/%m/%d")
         self.current_time = datetime.utcnow().strftime("%H.%M.%S")
-        self.db = KV("metadata.db")
+        self.db = {}
         self.meta_path = Path("metadata.json")
 
     def meta(self):

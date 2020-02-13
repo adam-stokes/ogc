@@ -40,14 +40,13 @@ plan:
     - JUJU_DEPLOY_BUNDLE=cs:~containers/charmed-kubernetes
     - JUJU_DEPLOY_CHANNEL=$CHANNEL
     - JUJU_CLOUD=aws/us-east-1
-    - JUJU_CONTROLLER=validate-ck-$SERIES
+    - JUJU_CONTROLLER=validate-ck-$SERIES-$SNAP_VERSION-$ARCH-$CHANNEL
     - JUJU_MODEL=validate-model
 
   execute: |
     #!/bin/bash
     set -x
 
-    ogc-set-key job_custom_name "$JUJU_CONTROLLER"-$(uname -m)
 
     if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
       juju kill-controller -y $JUJU_CONTROLLER 2>&1
@@ -58,9 +57,6 @@ plan:
          --bootstrap-series $SERIES \
          --force \
          --bootstrap-constraints arch=$ARCH \
-         if [ "$SERIES" = "focal" ]; then
-           --model-default image-stream=daily \
-         fi
          --model-default test-mode=true \
          --model-default resource-tags=owner=k8sci
 
@@ -84,19 +80,5 @@ plan:
        --cloud $JUJU_CLOUD \
        --model $JUJU_MODEL \
        --controller $JUJU_CONTROLLER
-
-    wget https://raw.githubusercontent.com/juju-solutions/cdk-field-agent/master/collect.py
-    python3 collect.py -m $JUJU_CONTROLLER:$JUJU_MODEL
-
-    ogc-set-key 'snap_version' "$SNAP_VERSION"
-    ogc-set-key 'juju_deploy_channel' "$JUJU_DEPLOY_CHANNEL"
-
-    ogc-add-files --file results*.tar.gz \
-                  --file ogc.log \
-                  --file metadata.json \
-                  --file *job.json
-
-    ogc-save
-    ogc-upload-results
 
     juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER

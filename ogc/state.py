@@ -6,7 +6,6 @@ from types import SimpleNamespace
 from melddict import MeldDict
 
 from . import log
-from .collect import Collector
 
 app = SimpleNamespace(
     # spec object
@@ -19,8 +18,6 @@ app = SimpleNamespace(
     plugins=[],
     # logger
     log=log,
-    # collector
-    collect=Collector(),
     # jobs
     jobs=[],
 )

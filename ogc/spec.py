@@ -24,6 +24,7 @@ from . import log, run
 from .enums import MODULE_METADATA_MAPPING
 from .exceptions import SpecConfigException, SpecProcessException
 from .state import app
+from .collect import Collector
 
 YamlIncludeConstructor.add_to_loader_class(
     loader_class=yaml.FullLoader, base_dir=str(Path.cwd())
@@ -131,6 +132,7 @@ class SpecJobPlan:
         self.results = []
         self.tags = self.job.get("tags", [])
         self.force_shutdown = False
+        self.collect = Collector()
         for sig in [1, 2, 3, 5, 6, 15]:
             signal.signal(sig, self._sighandler)
             app.log.debug(f"Registering signal interupt: {sig}")

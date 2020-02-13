@@ -1,4 +1,7 @@
 import sys
+import os
+import concurrent.futures
+import tempfile
 from pathlib import Path
 
 import click
@@ -44,27 +47,38 @@ def cli(spec, debug):
         SpecJobPlan(app.spec[SpecCore.PLAN], matrix) for matrix in matrixes.generate()
     ]
 
-    for job in app.jobs:
-        app.log.info(f"Starting Job: {job.job_id}")
-        app.collect.start(job.job_id)
-        app.collect.meta()
-        job.env()
-        job.script("pre-execute")
-        job.script("execute")
-        job.report()
-        app.collect.end()
-        app.collect.result(job.is_success)
-        app.collect.save()
-        app.log.info(f"Completed Job: {job.job_id}")
+    def _run_job(job):
+        with tempfile.TemporaryDirectory() as tp:
+            os.chdir(tp)
+            app.log.info(f"Starting Job: {job.job_id}")
+            job.collect.start(job.job_id)
+            job.collect.meta()
+            job.env()
+            job.script("pre-execute")
+            job.script("execute")
+            job.report()
+            job.collect.end()
+            job.collect.result(job.is_success)
+            job.collect.save()
+            app.log.info(f"Completed Job: {job.job_id}")
 
-        # This should run after other script sections and reporting is done
-        job.script("post-execute")
+            # This should run after other script sections and reporting is done
+            job.script("post-execute")
 
-        if job.is_success:
-            job.script("deploy")
-            job.script("on-success")
-        else:
-            job.script("on-failure")
+            if job.is_success:
+                job.script("deploy")
+                job.script("on-success")
+            else:
+                job.script("on-failure")
+
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
+        jobs = {tp.submit(_run_job, job): job for job in app.jobs}
+        for future in concurrent.futures.as_completed(jobs):
+            try:
+                future.result()
+            except Exception as exc:
+                click.echo(f"Failed thread: {exc}")
 
     if all(job.is_success for job in app.jobs):
         sys.exit(0)
