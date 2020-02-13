@@ -1,4 +1,3 @@
-import random
 import sys
 from pathlib import Path
 
@@ -13,17 +12,9 @@ from ..state import app
 @click.option(
     "--spec", metavar="<spec>", required=False, multiple=True, help="OGC Spec"
 )
-@click.option(
-    "-t",
-    "--tag",
-    metavar="<tag>",
-    required=False,
-    multiple=True,
-    help="Only run specific plugin(s) which matches a tag",
-)
 @click.option("--debug", is_flag=True)
 @click.command()
-def cli(spec, tag, debug):
+def cli(spec, debug):
     """ Processes a OGC Spec which defines how a build/test/task is performed
     """
     app.debug = debug

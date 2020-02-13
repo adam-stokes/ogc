@@ -43,20 +43,7 @@ plan:
     - JUJU_CONTROLLER=validate-ck-$SERIES
     - JUJU_MODEL=validate-model
 
-  backend: juju/mem=16G,cores=16,root-disk=100G
-
-  provisioner:
-    rsync:
-      src: files/files*
-      dst: /home/ubuntu/.
-    shell: |
-      sudo apt-get remove lxd lxd-client
-      sudo snap install juju --classic
-
   execute: |
-    #!/bin/bash
-    set -x
-
     if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
       juju kill-controller -y $JUJU_CONTROLLER 2>&1
     fi
