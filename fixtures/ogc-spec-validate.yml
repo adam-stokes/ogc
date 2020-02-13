@@ -44,6 +44,9 @@ plan:
     - JUJU_MODEL=validate-model
 
   execute: |
+    #!/bin/bash
+    set -x
+
     if ! juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER 2>&1; then
       juju kill-controller -y $JUJU_CONTROLLER 2>&1
     fi
@@ -52,14 +55,14 @@ plan:
          -d $JUJU_MODEL \
          --bootstrap-series $SERIES \
          --force \
-         --bootstrap-constraints 'arch=$ARCH' \
-         {% if series == 'focal' %}
-         --model-default image-stream=daily \
-         {% endif %}
+         --bootstrap-constraints arch=$ARCH \
+         if [ "$SERIES" = "focal" ]; then
+           --model-default image-stream=daily \
+         fi
          --model-default test-mode=true \
          --model-default resource-tags=owner=k8sci
 
-    tee overlay.yaml <<EOF
+    tee overlay.yaml <<EOF> /dev/null
     applications:
       kubernetes-master:
         options:
@@ -70,8 +73,6 @@ plan:
     EOF
 
     juju deploy -m $JUJU_CONTROLLER:$JUJU_MODEL \
-          --series $SERIES \
-          --force \
           --overlay overlay.yaml \
           --channel $JUJU_DEPLOY_CHANNEL $JUJU_DEPLOY_BUNDLE
 
@@ -81,3 +82,6 @@ plan:
        --cloud $JUJU_CLOUD \
        --model $JUJU_MODEL \
        --controller $JUJU_CONTROLLER
+
+
+    juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER
