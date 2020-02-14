@@ -1,3 +1,5 @@
+# pylint: disable=broad-except
+
 import sys
 import os
 import concurrent.futures

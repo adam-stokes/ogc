@@ -116,7 +116,7 @@ class SpecJobMatrix:
         for line in combos:
             combine = zip(all_names, line)
             combo_map.append(
-                {a: b for a, b in combine for combine in zip(all_names, line)}
+                {a: b for a, b in combine}
             )
         return combo_map
 

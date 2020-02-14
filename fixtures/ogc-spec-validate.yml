@@ -36,7 +36,7 @@ plan:
     - JUJU_DEPLOY_BUNDLE=cs:~containers/charmed-kubernetes
     - JUJU_DEPLOY_CHANNEL=$CHANNEL
     - JUJU_CLOUD=aws/us-east-1
-    - JUJU_CONTROLLER=validate-ck-$SERIES-$SNAP_VERSION-$ARCH-$CHANNEL
+    - JUJU_CONTROLLER=validate-ck-$SERIES-$arch-$SNAP_VERSION
     - JUJU_MODEL=validate-model
 
   execute: |
