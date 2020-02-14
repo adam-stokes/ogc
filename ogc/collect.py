@@ -3,8 +3,6 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from kv import KV
-
 
 class Collector:
     """ Provides access to storing persistent information on each run

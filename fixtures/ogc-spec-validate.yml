@@ -12,10 +12,6 @@ meta:
   mkdocs:
     destination:
       - "validations/ck/index.md"
-    jenkins-job-builder:
-      jobs:
-        - jobs/ci-master.yaml
-        - jobs/validate.yaml
 
 matrix:
   snap_version:
@@ -80,5 +76,8 @@ plan:
        --cloud $JUJU_CLOUD \
        --model $JUJU_MODEL \
        --controller $JUJU_CONTROLLER
+
+    wget https://raw.githubusercontent.com/juju-solutions/cdk-field-agent/master/collect.py
+    python3 collect.py -m $JUJU_CONTROLLER:$JUJU_MODEL
 
     juju destroy-controller -y --destroy-all-models --destroy-storage $JUJU_CONTROLLER
