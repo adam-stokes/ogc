@@ -12,6 +12,7 @@ import pkg_resources
 from ..enums import SpecCore
 from ..spec import SpecJobMatrix, SpecJobPlan, SpecLoader
 from ..state import app
+from ..collect import Collector
 
 
 @click.option(
