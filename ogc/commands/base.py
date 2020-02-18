@@ -74,7 +74,7 @@ def cli(spec, debug):
                 job.script("on-failure")
 
 
-    if not app.spec.get("concurrent", True):
+    if not app.spec.get("concurrent", False):
         with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
             jobs = {tp.submit(_run_job, job): job for job in app.jobs}
             for future in concurrent.futures.as_completed(jobs):
