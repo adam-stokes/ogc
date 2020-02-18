@@ -1,5 +1,5 @@
-import json
 import os
+import click
 from datetime import datetime
 from pathlib import Path
 from kv import KV
@@ -12,8 +12,7 @@ class Collector:
     def __init__(self):
         self.current_date = datetime.now().strftime("%Y/%m/%d")
         self.current_time = datetime.utcnow().strftime("%H.%M.%S")
-        self.db = None
-        self.meta_path = Path("metadata.json")
+        self.db = KV("metadata.db")
 
     def meta(self):
         """ Sets metadata information
@@ -30,7 +29,6 @@ class Collector:
     def start(self, job_id):
         """ Sets a startime timestamp
         """
-        self.db = KV("metadata.db")
         self.db["build_datetime"] = str(datetime.utcnow().isoformat())
         self.db["job_id"] = job_id
 
@@ -39,10 +37,16 @@ class Collector:
         """
         self.db["build_endtime"] = str(datetime.utcnow().isoformat())
 
+    def setk(self, db_key, db_val):
+        """ Sets arbitrary db key/val
+        """
+        self.db[db_key] = db_val
+
+    def getk(self, db_key):
+        """ Gets db key/val
+        """
+        val = self.db.get(db_key, "")
+        return val
+
     def result(self, result):
         self.db["test_result"] = bool(result)
-
-    def save(self):
-        """ Saves metadata to file
-        """
-        self.meta_path.write_text(json.dumps(dict(self.db)))

@@ -16,7 +16,10 @@ setuptools.setup(
     url="https://github.com/battlemidget/ogc",
     packages=["ogc", "ogc.commands"],
     package_data={"": ["*"]},
-    entry_points={"console_scripts": ["ogc = ogc.commands.base:start"]},
+    entry_points={"console_scripts": [
+        "ogc = ogc.commands.base:start",
+        "ogc-collect = ogc.commands.collect:start"
+    ]},
     install_requires=[
         "click>=7.0,<8.0",
         "jinja2>=2.10,<3.0",

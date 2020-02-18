@@ -53,15 +53,15 @@ def cli(spec, debug):
         with tempfile.TemporaryDirectory() as tp:
             os.chdir(tp)
             app.log.info(f"Starting Job: {job.job_id}")
-            job.collect.start(job.job_id)
-            job.collect.meta()
+            collect = Collector()
+            collect.start(job.job_id)
+            collect.meta()
             job.env()
             job.script("pre-execute")
             job.script("execute")
             job.report()
-            job.collect.end()
-            job.collect.result(job.is_success)
-            job.collect.save()
+            collect.end()
+            collect.result(job.is_success)
             app.log.info(f"Completed Job: {job.job_id}")
 
             # This should run after other script sections and reporting is done
