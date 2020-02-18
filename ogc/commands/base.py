@@ -74,13 +74,18 @@ def cli(spec, debug):
                 job.script("on-failure")
 
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
-        jobs = {tp.submit(_run_job, job): job for job in app.jobs}
-        for future in concurrent.futures.as_completed(jobs):
-            try:
-                future.result()
-            except Exception as exc:
-                click.echo(f"Failed thread: {exc}")
+    if not app.spec.get("concurrent", True):
+        with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
+            jobs = {tp.submit(_run_job, job): job for job in app.jobs}
+            for future in concurrent.futures.as_completed(jobs):
+                try:
+                    future.result()
+                except Exception as exc:
+                    click.echo(f"Failed thread: {exc}")
+    else:
+        app.log.info("Running jobs sequentially, concurrency has been disabled for this spec.")
+        for job in app.jobs:
+            _run_job(job)
 
     if all(job.is_success for job in app.jobs):
         sys.exit(0)
