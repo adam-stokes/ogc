@@ -12,7 +12,7 @@ class Collector:
     def __init__(self):
         self.current_date = datetime.now().strftime("%Y/%m/%d")
         self.current_time = datetime.utcnow().strftime("%H.%M.%S")
-        self.db = KV("metadata.db")
+        self.db = None
         self.meta_path = Path("metadata.json")
 
     def meta(self):
@@ -30,6 +30,7 @@ class Collector:
     def start(self, job_id):
         """ Sets a startime timestamp
         """
+        self.db = KV("metadata.db")
         self.db["build_datetime"] = str(datetime.utcnow().isoformat())
         self.db["job_id"] = job_id
 
