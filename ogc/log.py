@@ -8,7 +8,7 @@ from loguru import logger
 
 logger.remove()
 logger.add(
-    "ogc.log", rotation="500 MB", level="DEBUG"
+    "ogc.log", rotation="5 MB", level="DEBUG"
 )  # Automatically rotate too big file
 logger.add(
     sys.stderr,
