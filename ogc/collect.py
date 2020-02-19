@@ -45,8 +45,30 @@ class Collector:
     def getk(self, db_key):
         """ Gets db key/val
         """
-        val = self.db.get(db_key, "")
+        val = self.db.get(db_key, None)
         return val
+
+    def push(self, profile_name, region_name, bucket, db_key, files):
+        """ Pushes files to s3, needs AWS configured prior
+        """
+        import boto3
+        session = boto3.Session(profile_name=profile_name, region_name=region_name)
+        s3 = session.client("s3")
+        result_path_objs = []
+        for r_file in files:
+            r_file = Path(r_file)
+            if not r_file.exists():
+                continue
+            result_path_objs.append((r_file, r_file.stat().st_mtime))
+
+        newest_result_file = max(result_path_objs, key=operator.itemgetter(1))[0]
+        current_date = datetime.now().strftime("%Y/%m/%d")
+        env = os.environ.copy()
+        job_name = self.getk("job_name_custom", self.getk("job_name"))
+        s3_path = Path(job_name) / current_date / db["build_number"] / db["build_endtime"] / newest_result_file
+        s3.upload_file(str(newest_result_file), bucket, str(s3_path))
+        self.setk(db_key, str(s3_path))
+
 
     def result(self, result):
         self.db["test_result"] = bool(result)
