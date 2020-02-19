@@ -84,4 +84,4 @@ class Collector:
         session = boto3.Session(profile_name=profile_name, region_name=region_name)
         dynamodb = session.resource("dynamodb")
         table = dynamodb.Table(table)
-        table.put_item(Item=dict(db))
+        table.put_item(Item=dict(self.db))
