@@ -65,16 +65,8 @@ class Collector:
 
         newest_result_file = max(result_path_objs, key=operator.itemgetter(1))[0]
         current_date = datetime.now().strftime("%Y/%m/%d")
-        env = os.environ.copy()
-        if "job_name_custom" in self.db:
-            job_name = self.db["job_name_custom"]
-        else:
-            job_name = self.db["job_name"]
         s3_path = (
-            Path(job_name)
-            / current_date
-            / self.getk("build_number")
-            / self.getk("build_endtime")
+            Path(str(self.getk("job_id")))
             / newest_result_file
         )
         s3.upload_file(str(newest_result_file), bucket, str(s3_path))
