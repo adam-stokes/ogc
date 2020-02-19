@@ -2,7 +2,7 @@ import operator
 import os
 from datetime import datetime
 from pathlib import Path
-
+from loguru import logger
 from kv import KV
 
 
@@ -30,6 +30,7 @@ class Collector:
     def start(self, job_id):
         """ Sets a startime timestamp
         """
+        logger.add(f"job-{job_id}.log", level="DEBUG")
         self.setk("build_datetime", str(datetime.utcnow().isoformat()))
         self.setk("job_id", job_id)
 
