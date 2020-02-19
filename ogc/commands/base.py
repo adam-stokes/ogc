@@ -1,18 +1,18 @@
 # pylint: disable=broad-except
 
-import sys
-import os
 import concurrent.futures
+import os
+import sys
 import tempfile
 from pathlib import Path
 
 import click
 import pkg_resources
 
+from ..collect import Collector
 from ..enums import SpecCore
 from ..spec import SpecJobMatrix, SpecJobPlan, SpecLoader
 from ..state import app
-from ..collect import Collector
 
 
 @click.option(
@@ -74,7 +74,6 @@ def cli(spec, debug):
             else:
                 job.script("on-failure")
 
-
     if app.spec.get("concurrent", True):
         with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
             jobs = {tp.submit(_run_job, job): job for job in app.jobs}
@@ -84,7 +83,9 @@ def cli(spec, debug):
                 except Exception as exc:
                     click.echo(f"Failed thread: {exc}")
     else:
-        app.log.info("Running jobs sequentially, concurrency has been disabled for this spec.")
+        app.log.info(
+            "Running jobs sequentially, concurrency has been disabled for this spec."
+        )
         for job in app.jobs:
             _run_job(job)
 

@@ -59,6 +59,7 @@ def test_matrix_replace_env_var(mocker):
     )
     assert app.env["JUJU_DEPLOY_CHANNEL"] == jobs[0].matrix["channel"]
 
+
 def test_yml_include_spec(mocker):
     mocker.patch("ogc.state.app.log")
     spec = SpecLoader.load([fixtures_dir / "spec-base.yml"])

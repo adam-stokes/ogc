@@ -16,10 +16,12 @@ setuptools.setup(
     url="https://github.com/battlemidget/ogc",
     packages=["ogc", "ogc.commands"],
     package_data={"": ["*"]},
-    entry_points={"console_scripts": [
-        "ogc = ogc.commands.base:start",
-        "ogc-collect = ogc.commands.collect:start"
-    ]},
+    entry_points={
+        "console_scripts": [
+            "ogc = ogc.commands.base:start",
+            "ogc-collect = ogc.commands.collect:start",
+        ]
+    },
     install_requires=[
         "click>=7.0,<8.0",
         "jinja2>=2.10,<3.0",
@@ -36,7 +38,7 @@ setuptools.setup(
         "python-dotenv==0.10.3",
         "tabulate==0.8.3",
         "boto3==1.9.229",
-        "botocore==1.12.229"
+        "botocore==1.12.229",
     ],
     zip_safe=False,
 )
