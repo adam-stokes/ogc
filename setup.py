@@ -37,8 +37,7 @@ setuptools.setup(
         "colorama==0.3.9",
         "python-dotenv==0.10.3",
         "tabulate==0.8.3",
-        "boto3==1.9.229",
-        "botocore==1.12.229",
+        "boto3==1.12.2",
     ],
     zip_safe=False,
 )
