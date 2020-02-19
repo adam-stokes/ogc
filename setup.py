@@ -7,7 +7,7 @@ README = README.read_text(encoding="utf8")
 
 setuptools.setup(
     name="ogc",
-    version="1.99.13",
+    version="1.99.14",
     author="Adam Stokes",
     author_email="adam.stokes@ubuntu.com",
     description="ogc, a runner of things",
@@ -26,7 +26,7 @@ setuptools.setup(
         "click>=7.0,<8.0",
         "jinja2>=2.10,<3.0",
         "dict-deep==2.0.2",
-        "loguru>=0.3.2,<1.99.13",
+        "loguru>=0.3.2,<1.99.14",
         "kv>=0.3,<0.4.0",
         "melddict>=1.0,<2.0",
         "pyyaml>=3.0,<6.0",
