@@ -63,6 +63,7 @@ def cli(spec, debug):
             job.report()
             collect.end()
             collect.result(job.is_success)
+            collect.sync_db('default', 'us-east-1', 'CIBuilds')
             app.log.info(f"Completed Job: {job.job_id}")
 
             # This should run after other script sections and reporting is done

@@ -73,4 +73,15 @@ class Collector:
         self.setk(db_key, str(s3_path))
 
     def result(self, result):
+
         self.setk("test_result", bool(result))
+
+    def sync_db(self, profile_name, region_name, table):
+        """ syncs to dynamo
+        """
+        import boto3
+
+        session = boto3.Session(profile_name=profile_name, region_name=region_name)
+        dynamodb = session.resource("dynamodb")
+        table = dynamodb.Table(table)
+        table.put_item(Item=dict(db))
