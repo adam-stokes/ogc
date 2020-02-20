@@ -1,5 +1,6 @@
 # pylint: disable=broad-except
 
+import random
 import concurrent.futures
 import os
 import sys
@@ -50,6 +51,10 @@ def cli(spec, debug):
     app.jobs = [
         SpecJobPlan(app.spec[SpecCore.PLAN], matrix) for matrix in matrixes.generate()
     ]
+
+    if not app.spec.get("sequential", False):
+        # randomize jobs for maximum effort
+        random.shuffle(app.jobs)
 
     def _run_job(job):
         with tempfile.TemporaryDirectory() as tp:
