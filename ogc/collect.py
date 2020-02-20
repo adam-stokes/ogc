@@ -39,6 +39,7 @@ class Collector:
         """ Sets a endtime timestamp
         """
         self.setk("build_endtime", str(datetime.utcnow().isoformat()))
+        job_id = self.getk("job_id")
         Path(f"job-{job_id}.json").write_text(json.dumps(dict(self.db)))
 
     def setk(self, db_key, db_val):
