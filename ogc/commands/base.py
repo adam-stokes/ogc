@@ -64,8 +64,6 @@ def cli(spec, debug):
             job.report()
             collect.end()
             collect.result(job.is_success)
-            app.log.info(f"Completed Job: {job.job_id}")
-            app.log.info("Result:\n{}\n".format(pformat(dict(collect.db))))
 
             # This should run after other script sections and reporting is done
             job.script("post-execute")
@@ -78,6 +76,8 @@ def cli(spec, debug):
                 job.script("on-success")
             else:
                 job.script("on-failure")
+            app.log.info(f"Completed Job: {job.job_id}")
+            app.log.info("Result:\n{}\n".format(pformat(dict(collect.db))))
 
     if app.spec.get("concurrent", True):
         with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
