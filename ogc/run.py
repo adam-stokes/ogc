@@ -19,7 +19,7 @@ def _log_sub_out(pipe):
     """ Logs output from subprocess
     """
     for line in iter(pipe.readline, b""):
-        app.log.info(line.decode().strip())
+        app.log.debug(line.decode().strip())
 
 
 def script(script_data, env, **kwargs):

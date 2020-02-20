@@ -13,13 +13,13 @@ logger.add(
 logger.add(
     sys.stderr,
     colorize=True,
-    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <green><b>{message}</b></green>",
+    format="{time:HH:mm:ss} | <level>{level}</level> <green><b>{message}</b></green>",
     level="INFO",
 )
 logger.add(
     sys.stderr,
     colorize=True,
-    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <red><b>{message}</b></red>",
+    format="{time:HH:mm:ss} | <level>{level}</level> <red><b>{message}</b></red>",
     level="ERROR",
 )
 
