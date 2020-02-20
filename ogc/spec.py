@@ -136,7 +136,7 @@ class SpecJobPlan:
     def _sighandler(self, sig, frame):
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}: running last after-script.")
-        self.script("after-script")
+        self.script("post-execute")
 
     def env(self):
         """ Process env section, these variables will be made available to all
@@ -159,7 +159,7 @@ class SpecJobPlan:
                 # env variables set outside of spec take precendence
                 _value = os.environ.get(name, value)
                 _map[name] = _value
-                app.log.info(f"Adding to env: {name}={_value}")
+                app.log.info(f"ENV: {name}={_value}")
         app.env += _map
 
     def condition_if(self):

@@ -19,8 +19,7 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "ogc = ogc.commands.base:start",
-            "ogc-collect = ogc.commands.collect:start",
-            "ogc-log = ogc.commands.log:start",
+            "ogc-collect = ogc.commands.collect:start"
         ]
     },
     install_requires=[
