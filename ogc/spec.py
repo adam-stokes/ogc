@@ -214,7 +214,7 @@ class SpecJobPlan:
                 ) as error:
                     self.results.append(SpecResult(error))
             else:
-                app.log.info(f"Running {key}:\n {item}")
+                app.log.info(f"Running {key}:\n{item}")
                 try:
                     run.script(item, app.env)
                 except (
