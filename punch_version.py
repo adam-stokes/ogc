@@ -1,3 +1,3 @@
 major = 1
 minor = 99
-patch = 23
+patch = 24
