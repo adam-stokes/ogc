@@ -82,7 +82,7 @@ def cli(spec, debug):
             # Collect artifacts
             collect.artifacts()
             collect.push(
-                "default", "us-east-1", "jenkaas", "artifacts", "artifacts.tar.gz"
+                "default", "us-east-1", "jenkaas", "artifacts", ["artifacts.tar.gz"]
             )
 
             app.log.info("Syncing to database")
