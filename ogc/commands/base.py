@@ -1,8 +1,8 @@
 # pylint: disable=broad-except
 
-import random
 import concurrent.futures
 import os
+import random
 import sys
 import tempfile
 from pathlib import Path
@@ -73,14 +73,20 @@ def cli(spec, debug):
             # This should run after other script sections and reporting is done
             job.script("post-execute")
 
-            app.log.info("Syncing to database")
-            collect.sync_db('default', 'us-east-1', 'CIBuilds')
-
             if job.is_success:
                 job.script("deploy")
                 job.script("on-success")
             else:
                 job.script("on-failure")
+
+            # Collect artifacts
+            collect.artifacts()
+            collect.push(
+                "default", "us-east-1", "jenkaas", "artifacts", "artifacts.tar.gz"
+            )
+
+            app.log.info("Syncing to database")
+            collect.sync_db("default", "us-east-1", "CIBuilds")
             app.log.info(f"Completed Job: {job.job_id}")
             app.log.info("Result:\n{}\n".format(pformat(dict(collect.db))))
 

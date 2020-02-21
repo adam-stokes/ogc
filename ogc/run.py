@@ -56,7 +56,7 @@ def script(script_data, env, **kwargs):
     )
     with process.stdout:
         _log_sub_out(process.stdout)
-    exitcode = process.wait()
+    exitcode = process.wait(10800)  # 3 hours
     subprocess.run(["rm", "-rf", str(tmp_script_path)])
     if exitcode > 0:
         raise SpecProcessException("Failed to run script")

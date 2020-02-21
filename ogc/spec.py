@@ -251,7 +251,7 @@ class SpecJobPlan:
 
         click.echo("")
         click.echo("")
-        report_path = Path(f"{self.job_id}-job.json")
+        report_path = Path(f"results-{self.job_id}.json")
         results_map = [result.to_dict for result in self.results]
         report_path.write_text(json.dumps(results_map))
 

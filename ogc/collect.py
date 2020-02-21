@@ -1,10 +1,13 @@
+import json
 import operator
 import os
-import json
 from datetime import datetime
 from pathlib import Path
-from loguru import logger
+
 from kv import KV
+from loguru import logger
+
+from .run import cmd_ok
 
 
 class Collector:
@@ -39,8 +42,6 @@ class Collector:
         """ Sets a endtime timestamp
         """
         self.setk("build_endtime", str(datetime.utcnow().isoformat()))
-        job_id = self.getk("job_id")
-        Path(f"job-{job_id}.json").write_text(json.dumps(dict(self.db)))
 
     def setk(self, db_key, db_val):
         """ Sets arbitrary db key/val
@@ -52,6 +53,11 @@ class Collector:
         """
         val = self.db.get(db_key, None)
         return val
+
+    def artifacts(self):
+        """ Tars up any artifacts in the job directory
+        """
+        cmd_ok("tar cvjf artifacts.tar.gz *")
 
     def push(self, profile_name, region_name, bucket, db_key, files):
         """ Pushes files to s3, needs AWS configured prior
@@ -69,15 +75,11 @@ class Collector:
 
         newest_result_file = max(result_path_objs, key=operator.itemgetter(1))[0]
         current_date = datetime.now().strftime("%Y/%m/%d")
-        s3_path = (
-            Path(str(self.getk("job_id")))
-            / newest_result_file
-        )
+        s3_path = Path(str(self.getk("job_id"))) / newest_result_file
         s3.upload_file(str(newest_result_file), bucket, str(s3_path))
         self.setk(db_key, str(s3_path))
 
     def result(self, result):
-
         self.setk("test_result", bool(result))
 
     def sync_db(self, profile_name, region_name, table):
@@ -89,3 +91,9 @@ class Collector:
         dynamodb = session.resource("dynamodb")
         table = dynamodb.Table(table)
         table.put_item(Item=dict(self.db))
+
+    def to_json(self):
+        """ Write metadata to json
+        """
+        job_id = self.getk("job_id")
+        Path(f"metadata-{job_id}.json").write_text(json.dumps(dict(self.db)))
