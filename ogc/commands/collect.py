@@ -1,8 +1,10 @@
 # pylint: disable=broad-except
 
 import click
+import os
 
 from ..collect import Collector
+from ..state import app
 
 
 @click.group()
@@ -16,7 +18,10 @@ def cli():
 def set_key(db_key, db_val):
     """ sets db key/val
     """
-    Collector().setk(db_key, db_val)
+    JOBID = os.environ['OGC_JOB_ID']
+    WORKDIR = os.environ['OGC_JOB_WORKDIR']
+
+    return Collector(JOBID, WORKDIR).setk(db_key, db_val)
 
 
 @cli.command()
@@ -24,23 +29,11 @@ def set_key(db_key, db_val):
 def get_key(db_key):
     """ gets db key/val
     """
-    db_val = Collector().getk(db_key)
+    JOBID = os.environ['OGC_JOB_ID']
+    WORKDIR = os.environ['OGC_JOB_WORKDIR']
+
+    db_val = Collector(JOBID, WORKDIR).getk(db_key)
     click.echo(db_val)
-
-
-@cli.command()
-@click.option(
-    "--profile-name", required=True, help="AWS profile to use", default="default"
-)
-@click.option(
-    "--region-name", required=True, help="AWS region to use", default="us-east-1"
-)
-@click.option("--bucket", required=True, help="s3 bucket to use", default="jenkaas")
-@click.argument("db_key")
-@click.argument("results-file", nargs=-1)
-def push(profile_name, region_name, bucket, db_key, results_file):
-    collect = Collector()
-    collect.push(profile_name, region_name, bucket, db_key, results_file)
 
 
 def start():

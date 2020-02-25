@@ -24,7 +24,6 @@ plan:
     #!/bin/bash
     . $FIXTURES/lib.sh
 
-    pwd
     setup_env
 
   # post-execute: |

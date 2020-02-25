@@ -1,12 +1,11 @@
 # pylint: disable=broad-except
 
-import concurrent.futures
 import os
 import random
 import sys
-import tempfile
 from pathlib import Path
 from pprint import pformat
+from pathos.multiprocessing import ProcessPool
 
 import click
 import pkg_resources
@@ -57,47 +56,43 @@ def cli(spec, debug):
         random.shuffle(app.jobs)
 
     def _run_job(job):
-        with tempfile.TemporaryDirectory() as tp:
-            os.chdir(tp)
-            app.log.info(f"Starting Job: {job.job_id}")
-            collect = Collector()
-            collect.start(job.job_id)
-            collect.meta()
-            job.env()
-            job.script("pre-execute")
-            job.script("execute")
-            job.report()
-            collect.end()
-            collect.result(job.is_success)
+        app.log.info(f"Starting Job: {job.job_id} in dir: {job.workdir}")
+        app.log.info(f"Matrix: {job.matrix}")
+        job.env()
+        collect = Collector(job.job_id, job.workdir)
+        collect.start()
+        collect.meta()
+        job.script("pre-execute")
+        job.script("execute")
+        job.report()
+        collect.end()
+        collect.result(job.is_success)
 
-            # This should run after other script sections and reporting is done
-            job.script("post-execute")
+        # This should run after other script sections and reporting is done
+        job.script("post-execute")
 
-            if job.is_success:
-                job.script("deploy")
-                job.script("on-success")
-            else:
-                job.script("on-failure")
+        if job.is_success:
+            job.script("deploy")
+            job.script("on-success")
+        else:
+            job.script("on-failure")
 
-            # Collect artifacts
-            collect.artifacts()
-            collect.push(
-                "default", "us-east-1", "jenkaas", "artifacts", ["artifacts.tar.gz"]
-            )
+        # Collect artifacts
+        collect.artifacts()
+        collect.push(
+            "default", "us-east-1", "jenkaas", "artifacts", [f"{job.workdir}/artifacts.tar.gz"]
+        )
 
-            app.log.info("Syncing to database")
-            collect.sync_db("default", "us-east-1", "CIBuilds")
-            app.log.info(f"Completed Job: {job.job_id}")
-            app.log.info("Result:\n{}\n".format(pformat(dict(collect.db))))
+        app.log.info("Syncing to database")
+        collect.sync_db("default", "us-east-1", "CIBuilds")
+        app.log.info(f"Completed Job: {job.job_id}")
+        app.log.info("Result:\n{}\n".format(pformat(dict(app.redis.hgetall(job.job_id)))))
+        job.cleanup()
+        return job
 
     if app.spec.get("concurrent", True):
-        with concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count()) as tp:
-            jobs = {tp.submit(_run_job, job): job for job in app.jobs}
-            for future in concurrent.futures.as_completed(jobs):
-                try:
-                    future.result()
-                except Exception as exc:
-                    click.echo(f"Failed thread: {exc}")
+        pool = ProcessPool()
+        pool.map(_run_job, app.jobs)
     else:
         app.log.info(
             "Running jobs sequentially, concurrency has been disabled for this spec."

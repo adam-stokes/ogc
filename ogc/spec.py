@@ -9,6 +9,7 @@ import signal
 import sys
 import traceback
 import uuid
+import tempfile
 from pathlib import Path
 from subprocess import SubprocessError
 
@@ -124,6 +125,7 @@ class SpecJobPlan:
 
     def __init__(self, job, matrix):
         self.job = job
+        self.workdir = tempfile.mkdtemp()
         self.matrix = matrix
         self.job_id = str(uuid.uuid4())
         self.results = []
@@ -137,6 +139,9 @@ class SpecJobPlan:
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}: running last after-script.")
         self.script("post-execute")
+
+    def cleanup(self):
+        run.cmd_ok(f"rm -rf {self.workdir}", shell=True)
 
     def env(self):
         """ Process env section, these variables will be made available to all
@@ -161,6 +166,8 @@ class SpecJobPlan:
                 _map[name] = _value
                 app.log.info(f"ENV: {name}={_value}")
         app.env += _map
+        app.env["OGC_JOB_ID"] = self.job_id
+        app.env["OGC_JOB_WORKDIR"] = self.workdir
 
     def condition_if(self):
         """ Processes any conditional items
@@ -230,14 +237,16 @@ class SpecJobPlan:
     def is_success(self):
         """ Returns true/false depending on if job succeeded
         """
-        return all(res.code == 0 for res in self.results)
+        if all(res.code == 0 for res in self.results):
+            return 1
+        return 0
 
     def report(self):
         # save results
         click.echo("")
         click.echo("")
         if not self.is_success:
-            click.secho(f"This job is a FAILURE!\n", fg="red", bold=True)
+            click.secho(f"This job is a FAILURE ({self.is_success})!\n", fg="red", bold=True)
             app.log.debug("Errors:")
             for res in self.results:
                 msg = (
@@ -251,7 +260,7 @@ class SpecJobPlan:
 
         click.echo("")
         click.echo("")
-        report_path = Path(f"results-{self.job_id}.json")
+        report_path = Path(f"{self.workdir}/results-{self.job_id}.json")
         results_map = [result.to_dict for result in self.results]
         report_path.write_text(json.dumps(results_map))
 

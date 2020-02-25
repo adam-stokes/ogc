@@ -1,6 +1,7 @@
 """ application state module
 """
 import os
+import redis
 from types import SimpleNamespace
 
 from melddict import MeldDict
@@ -20,4 +21,6 @@ app = SimpleNamespace(
     log=log,
     # jobs
     jobs=[],
+    # redis
+    redis=redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 )

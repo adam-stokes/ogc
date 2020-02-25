@@ -8,16 +8,18 @@ from kv import KV
 from loguru import logger
 
 from .run import cmd_ok
+from .state import app
 
 
 class Collector:
     """ Provides access to storing persistent information on each run
     """
 
-    def __init__(self):
+    def __init__(self, job_id, workdir):
         self.current_date = datetime.now().strftime("%Y/%m/%d")
         self.current_time = datetime.utcnow().strftime("%H.%M.%S")
-        self.db = KV("metadata.db")
+        self.workdir = workdir
+        self.job_id = job_id
 
     def meta(self):
         """ Sets metadata information
@@ -31,12 +33,12 @@ class Collector:
         self.setk("git_url", env.get("GIT_URL", "n/a"))
         self.setk("git_branch", env.get("GIT_BRANCH", "master"))
 
-    def start(self, job_id):
+    def start(self):
         """ Sets a startime timestamp
         """
-        logger.add(f"job-{job_id}.log", rotation="5 MB", level="DEBUG")
+        logger.add(f"{self.workdir}/job-{self.job_id}.log", rotation="5 MB", level="DEBUG")
         self.setk("build_datetime", str(datetime.utcnow().isoformat()))
-        self.setk("job_id", job_id)
+        self.setk("job_id", self.job_id)
 
     def end(self):
         """ Sets a endtime timestamp
@@ -46,18 +48,18 @@ class Collector:
     def setk(self, db_key, db_val):
         """ Sets arbitrary db key/val
         """
-        self.db[db_key] = db_val
+        app.redis.hset(self.job_id, db_key, db_val)
 
     def getk(self, db_key):
         """ Gets db key/val
         """
-        val = self.db.get(db_key, None)
+        val = app.redis.hget(self.job_id, db_key)
         return val
 
     def artifacts(self):
         """ Tars up any artifacts in the job directory
         """
-        cmd_ok("tar cvjf artifacts.tar.gz *", shell=True)
+        cmd_ok(f"tar cvjf {self.workdir}/artifacts.tar.gz {self.workdir}/*", shell=True)
 
     def push(self, profile_name, region_name, bucket, db_key, files):
         """ Pushes files to s3, needs AWS configured prior
@@ -75,12 +77,12 @@ class Collector:
 
         newest_result_file = max(result_path_objs, key=operator.itemgetter(1))[0]
         current_date = datetime.now().strftime("%Y/%m/%d")
-        s3_path = Path(str(self.getk("job_id"))) / newest_result_file
+        s3_path = Path(str(self.job_id)) / newest_result_file.parts[-1]
         s3.upload_file(str(newest_result_file), bucket, str(s3_path))
         self.setk(db_key, str(s3_path))
 
     def result(self, result):
-        self.setk("test_result", bool(result))
+        self.setk("test_result", result)
 
     def sync_db(self, profile_name, region_name, table):
         """ syncs to dynamo
@@ -90,10 +92,9 @@ class Collector:
         session = boto3.Session(profile_name=profile_name, region_name=region_name)
         dynamodb = session.resource("dynamodb")
         table = dynamodb.Table(table)
-        table.put_item(Item=dict(self.db))
+        table.put_item(Item=dict(app.redis.hgetall(self.job_id)))
 
     def to_json(self):
         """ Write metadata to json
         """
-        job_id = self.getk("job_id")
-        Path(f"metadata-{job_id}.json").write_text(json.dumps(dict(self.db)))
+        Path(f"{self.workdir}/metadata-{self.job_id}.json").write_text(json.dumps(dict(app.redis.hgetall(self.job_id))))

@@ -27,7 +27,6 @@ setuptools.setup(
         "jinja2>=2.10,<3.0",
         "dict-deep==2.0.2",
         "loguru>=0.3.2,<1.99.25",
-        "kv>=0.3,<0.4.0",
         "melddict>=1.0,<2.0",
         "pyyaml>=3.0,<6.0",
         "pyyaml-include>=1.1.1.1",
@@ -38,6 +37,8 @@ setuptools.setup(
         "python-dotenv==0.10.3",
         "tabulate==0.8.3",
         "boto3==1.12.2",
+        "redis==3.4.1",
+        "pathos==0.2.5"
     ],
     zip_safe=False,
 )
