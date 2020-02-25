@@ -7,6 +7,7 @@ ogc - task runner with a focus on deployment/testing/reporting.
 ## Usage
 
 ```
+> sudo apt install redis-server
 > pip install ogc
 > ogc --spec jobs/validate/spec.yml
 
