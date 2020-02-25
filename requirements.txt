@@ -8,7 +8,7 @@ appdirs==1.4.3            # via black
 astroid==2.2.5            # via pylint
 atomicwrites==1.3.0       # via pytest
 attrs==19.1.0             # via black, packaging, pytest
-black==19.3b0
+black==19.10b0
 bleach==3.1.0             # via readme-renderer
 certifi==2019.6.16        # via requests
 chardet==3.0.4            # via requests
@@ -35,6 +35,7 @@ mkdocs-minify-plugin==0.2.1  # via mkdocs-material
 mkdocs==1.0.4
 more-itertools==7.2.0     # via pytest, zipp
 packaging==19.1           # via pytest, pytest-sugar
+pathspec==0.7.0           # via black
 pkginfo==1.5.0.1          # via twine
 pluggy==0.12.0            # via pytest
 punch.py==1.6.2
@@ -51,6 +52,7 @@ python-frontmatter==0.4.5
 pyyaml-include==1.1.1.1
 pyyaml==5.1.2
 readme-renderer==24.0     # via twine
+regex==2020.2.20          # via black
 requests-toolbelt==0.9.1  # via twine
 requests==2.22.0          # via requests-toolbelt, twine
 sh==1.12.14
@@ -60,7 +62,7 @@ toml==0.10.0              # via black
 tornado==6.0.3            # via livereload, mkdocs
 tqdm==4.35.0              # via twine
 twine==1.13.0
-typed-ast==1.4.0          # via astroid
+typed-ast==1.4.0          # via astroid, black
 urllib3==1.25.3           # via requests
 wcwidth==0.1.7            # via pytest
 webencodings==0.5.1       # via bleach
@@ -68,4 +70,4 @@ wrapt==1.11.2             # via astroid
 zipp==0.6.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools==41.4.0
+# setuptools
