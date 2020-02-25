@@ -1,0 +1,55 @@
+meta:
+  name: Concurrent plan
+  description: |
+    Conncurrent plan
+
+matrix:
+  snap_version:
+    - 1.18/edge
+    - 1.17/edge
+  series:
+    - bionic
+  channel:
+    - edge
+  arch:
+    - amd64
+
+concurrent: yes
+
+
+plan:
+  env:
+    - JUJU_CONTROLLER=validate-ck-nfs
+  pre-execute: |
+    #!/bin/bash
+    . $FIXTURES/lib.sh
+
+    pwd
+    setup_env
+
+  # post-execute: |
+  #   #!/bin/bash
+  #   . $FIXTURES/lib.sh
+
+  #   inject_env
+
+  #   collect_env
+
+  #   teardown_env
+
+  # execute: |
+  #   #!/bin/bash
+  #   set -eu
+
+  #   . $FIXTURES/lib.sh
+
+  #   inject_env
+
+  #   echo "juju bootstrap $JUJU_CLOUD $JUJU_CONTROLLER \
+  #        -d $JUJU_MODEL \
+  #        --bootstrap-series $SERIES \
+  #        --force \
+  #        --bootstrap-constraints arch=$ARCH \
+  #        --model-default test-mode=true \
+  #        --model-default resource-tags=owner=k8sci \
+  #        --model-default image-stream=daily"
