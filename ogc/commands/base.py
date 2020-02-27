@@ -56,12 +56,13 @@ def cli(spec, debug):
         random.shuffle(app.jobs)
 
     def _run_job(job):
-        app.log.info(f"Starting Job: {job.job_id} in dir: {job.workdir}")
-        app.log.info(f"Matrix: {job.matrix}")
-        job.env()
         collect = Collector(job.job_id, job.workdir)
         collect.start()
         collect.meta()
+
+        app.log.info(f"Starting Job: {job.job_id} in dir: {job.workdir}")
+        app.log.info(f"Matrix: {job.matrix}")
+        job.env()
         job.script("pre-execute")
         job.script("execute")
         job.report()
