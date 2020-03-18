@@ -23,3 +23,4 @@ melddict>=1.0,<2.0
 python-dotenv>=0.10.3<1.0
 loguru==0.3.2
 pylint==2.3.1
+bleach>=3.1.1

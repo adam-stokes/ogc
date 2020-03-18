@@ -38,7 +38,7 @@ setuptools.setup(
         "tabulate==0.8.3",
         "boto3==1.12.2",
         "redis==3.4.1",
-        "pathos==0.2.5"
+        "pathos==0.2.5",
     ],
     zip_safe=False,
 )

@@ -5,10 +5,11 @@ import random
 import sys
 from pathlib import Path
 from pprint import pformat
-from pathos.multiprocessing import ProcessPool
 
 import click
 import pkg_resources
+
+from pathos.multiprocessing import ProcessPool
 
 from ..collect import Collector
 from ..enums import SpecCore
@@ -81,13 +82,19 @@ def cli(spec, debug):
         # Collect artifacts
         collect.artifacts()
         collect.push(
-            "default", "us-east-1", "jenkaas", "artifacts", [f"{job.workdir}/artifacts.tar.gz"]
+            "default",
+            "us-east-1",
+            "jenkaas",
+            "artifacts",
+            [f"{job.workdir}/artifacts.tar.gz"],
         )
 
         app.log.info("Syncing to database")
         collect.sync_db("default", "us-east-1", "CIBuilds")
         app.log.info(f"Completed Job: {job.job_id}")
-        app.log.info("Result:\n{}\n".format(pformat(dict(app.redis.hgetall(job.job_id)))))
+        app.log.info(
+            "Result:\n{}\n".format(pformat(dict(app.redis.hgetall(job.job_id))))
+        )
         job.cleanup()
         return job
 

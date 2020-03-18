@@ -35,7 +35,9 @@ class Collector:
     def start(self):
         """ Sets a startime timestamp
         """
-        logger.add(f"{self.workdir}/job-{self.job_id}.log", rotation="5 MB", level="DEBUG")
+        logger.add(
+            f"{self.workdir}/job-{self.job_id}.log", rotation="5 MB", level="DEBUG"
+        )
         self.setk("build_datetime", str(datetime.utcnow().isoformat()))
         self.setk("job_id", self.job_id)
 
@@ -96,4 +98,6 @@ class Collector:
     def to_json(self):
         """ Write metadata to json
         """
-        Path(f"{self.workdir}/metadata-{self.job_id}.json").write_text(json.dumps(dict(app.redis.hgetall(self.job_id))))
+        Path(f"{self.workdir}/metadata-{self.job_id}.json").write_text(
+            json.dumps(dict(app.redis.hgetall(self.job_id)))
+        )

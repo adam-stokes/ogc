@@ -1,7 +1,8 @@
 # pylint: disable=broad-except
 
-import click
 import os
+
+import click
 
 from ..collect import Collector
 from ..state import app
@@ -18,8 +19,8 @@ def cli():
 def set_key(db_key, db_val):
     """ sets db key/val
     """
-    JOBID = os.environ['OGC_JOB_ID']
-    WORKDIR = os.environ['OGC_JOB_WORKDIR']
+    JOBID = os.environ["OGC_JOB_ID"]
+    WORKDIR = os.environ["OGC_JOB_WORKDIR"]
 
     return Collector(JOBID, WORKDIR).setk(db_key, db_val)
 
@@ -29,8 +30,8 @@ def set_key(db_key, db_val):
 def get_key(db_key):
     """ gets db key/val
     """
-    JOBID = os.environ['OGC_JOB_ID']
-    WORKDIR = os.environ['OGC_JOB_WORKDIR']
+    JOBID = os.environ["OGC_JOB_ID"]
+    WORKDIR = os.environ["OGC_JOB_WORKDIR"]
 
     db_val = Collector(JOBID, WORKDIR).getk(db_key)
     click.echo(db_val)

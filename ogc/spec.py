@@ -7,9 +7,9 @@ import re
 import shlex
 import signal
 import sys
+import tempfile
 import traceback
 import uuid
-import tempfile
 from pathlib import Path
 from subprocess import SubprocessError
 
@@ -246,7 +246,9 @@ class SpecJobPlan:
         click.echo("")
         click.echo("")
         if not self.is_success:
-            click.secho(f"This job is a FAILURE ({self.is_success})!\n", fg="red", bold=True)
+            click.secho(
+                f"This job is a FAILURE ({self.is_success})!\n", fg="red", bold=True
+            )
             app.log.debug("Errors:")
             for res in self.results:
                 msg = (
