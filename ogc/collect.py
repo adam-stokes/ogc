@@ -4,7 +4,6 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from kv import KV
 from loguru import logger
 
 from .run import cmd_ok
@@ -59,7 +58,7 @@ class Collector:
     def artifacts(self):
         """ Tars up any artifacts in the job directory
         """
-        cmd_ok(f"tar cvjf {self.workdir}/artifacts.tar.gz {self.workdir}/*", shell=True)
+        cmd_ok(f"tar cvzf {self.workdir}/artifacts.tar.gz {self.workdir}/*", shell=True)
 
     def push(self, profile_name, region_name, bucket, db_key, files):
         """ Pushes files to s3, needs AWS configured prior
