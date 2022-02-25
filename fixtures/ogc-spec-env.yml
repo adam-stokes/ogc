@@ -1,8 +1,0 @@
-meta:
-  name: Phases with Env plugin
-  description: |
-    Creates a setup phase with an env plugin
-
-setup:
-  - env:
-      requires: [OGC_SPECIAL_DIR]

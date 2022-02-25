@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "ogc"
+version = "2.0.0"
+description = "Provisioner"
+authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+sh = "^1.14.2"
+kv = "^0.3"
+click = "^8.0.4"
+dict-deep = "^4.1.2"
+python-dotenv = "^0.19.2"
+loguru = "^0.6.0"
+apache-libcloud = "^3.4.1"
+PyYAML = "^6.0"
+melddict = "^1.0.1"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+isort = "^5.10.1"
+invoke = "^1.6.0"
+mkdocs = "^1.2.3"
+mkdocs-material = "^8.2.1"
+pymdown-extensions = "^9.2"
+python-frontmatter = "^1.0.0"
+pylint = "^2.12.2"
+"punch.py" = "^2.0.0"
+Pygments = "^2.11.2"
+pytest = "^7.0.1"
+
+[tool.poetry.scripts]
+ogc = "ogc.commands.base:start"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

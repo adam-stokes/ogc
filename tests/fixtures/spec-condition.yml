@@ -1,9 +1,0 @@
-plan:
-  - if: '[[ $(date +"%A") = $(date +"%A") ]]'
-    script:
-      - 'this should be run'
-  - script:
-      - 'this should be run'
-  - if: exit 1
-    script:
-      - 'this should be skipped'
