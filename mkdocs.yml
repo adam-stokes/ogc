@@ -31,11 +31,6 @@ extra:
       accent: '#00a889'
   social:
     - type: 'github'
-      link: 'https://github.com/battlemidget/ogc'
+      link: 'https://github.com/adam-stokes/ogc'
 nav:
   - Home: index.md
-  - Reference:
-      - Specification: spec.md
-  - Plugins:
-      - Runner: plugins/runner.md
-      - Juju: plugins/juju.md
