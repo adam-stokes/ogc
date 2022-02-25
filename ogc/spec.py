@@ -1,7 +1,9 @@
 import signal
 
 import yaml
+from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from melddict import MeldDict
+
 from .state import app
 
 
@@ -37,9 +39,16 @@ class SpecProvisionLayout:
     def arches(self):
         return self.layout.get("arches", ["amd64"])
 
-    @property
-    def providers(self):
-        return self.layout.get("providers", [])
+    def provision(self, engine):
+        step = ScriptDeployment("echo whoami ; date ; ls -la")
+        msd = MultiStepDeployment([step])
+        image = engine.provisioner.get_image("ami-0d90bed76900e679a")
+        sizes = engine.sizes()
+        size = [size for size in sizes if size.id == "c5.4xlarge"]
+        app.log.info(f"Deploying node with [{image}] [{size[0]}]")
+        return engine.provisioner.create_node(
+            name="test-adam", image=image, size=size[0]
+        )
 
 
 class SpecProvisionPlan:
@@ -73,4 +82,3 @@ class SpecProvisionPlan:
     def _sighandler(self, sig, frame):
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}")
-

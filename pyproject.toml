@@ -16,6 +16,7 @@ loguru = "^0.6.0"
 apache-libcloud = "^3.4.1"
 PyYAML = "^6.0"
 melddict = "^1.0.1"
+paramiko = "^2.9.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

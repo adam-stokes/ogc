@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 
+from ..provision import choose_provisioner
 from ..spec import SpecLoader
 from ..state import app
 
@@ -26,8 +27,17 @@ def cli(spec):
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
 
-    for layout in app.layouts:
-        layout.provision()
+    app.log.debug(app.env)
+
+    if not app.spec.providers:
+        app.log.error("No providers defined, please define at least 1 to proceed.")
+        sys.exit(1)
+
+    for provider, options in app.spec.providers.items():
+        engine = choose_provisioner(provider, options, app.env)
+        app.log.info(f"Using provisioner: {engine}")
+        for layout in app.spec.layouts:
+            layout.provision(engine)
 
 
 def start():

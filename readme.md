@@ -21,7 +21,7 @@ providers:
   aws:
     region: us-east-1
   google:
-    region: us-east-1
+    datacenter: us-east-1
     project: my-google-project
 
 layout:

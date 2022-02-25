@@ -2,10 +2,7 @@ name: ci
 
 providers:
   aws:
-    region: us-east-1
-  google:
-    region: us-east-1
-    project: my-google-project
+    region: us-east-2
 
 layouts:
   cluster: 
