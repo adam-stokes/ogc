@@ -1,4 +1,5 @@
 import signal
+import sys
 
 import yaml
 from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
@@ -38,6 +39,10 @@ class SpecProvisionLayout:
     @property
     def arches(self):
         return self.layout.get("arches", ["amd64"])
+
+    @property
+    def providers(self):
+        return self.layout.get("providers", [])
 
     def provision(self, engine):
         step = ScriptDeployment("echo whoami ; date ; ls -la")
@@ -82,3 +87,4 @@ class SpecProvisionPlan:
     def _sighandler(self, sig, frame):
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}")
+        sys.exit(1)

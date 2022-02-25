@@ -49,7 +49,7 @@ class AWSProvisioner(BaseProvisioner):
         ami_images = [
             image for image in self.provisioner.list_images() if "ami-" in image.id
         ]
-        return [image for image in ami_images]
+        return ami_images
 
     def __repr__(self):
         return f"<AWSProvisioner [{self.options['region']}]>"
