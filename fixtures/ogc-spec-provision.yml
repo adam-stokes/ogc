@@ -1,5 +1,11 @@
 name: ci
 
+# SSH Keys must be generated in PEM format
+# ssh-keygen -m PEM
+ssh-keys:
+  public: ~/.ssh/id_rsa_libcloud.pub
+  private: ~/.ssh/id_rsa_libcloud
+
 providers:
   aws:
     region: us-east-2
@@ -7,28 +13,26 @@ providers:
 layouts:
   cluster: 
     runs-on: ubuntu-latest
-    username: ubuntu
-    scripts:
-      - contrib/setup-deb-system
-      - contrib/setup-docker
-      - contrib/setup-cluster
-    providers: [aws, google]
+    steps:
+      - script: contrib/setup-deb-system
+      - script: contrib/setup-docker
+      - script: contrib/setup-cluster
+    providers: [google]
   elastic-agent-ubuntu:
     runs-on: ubuntu-latest
-    username: ubuntu
-    scripts:
-      - contrib/setup-deb-system
+    steps:
+      - run: "sudo apt update"
+      - run: "sudo apt-get -qyf dist-upgrade"
     arches: [amd64, arm64]
   elastic-agent-centos:
     runs-on: centos-latest
-    username: admin
-    scripts:
-      - contrib/setup-rpm-system
+    steps:
+      - script: contrib/setup-rpm-system
     arches: [amd64, arm64]
-    providers: [aws]
+    providers: [google]
   elastic-agent-win:
     runs-on: windows-latest
-    scripts:
-      - contrib/setup-powershell-system
+    steps:
+      - script: contrib/setup-powershell-system
     arches: [amd64]
-    providers: [aws]
+    providers: [google]

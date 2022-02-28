@@ -17,38 +17,39 @@ ogc - provisioning, that's it.
 ```yaml
 name: ci
 
+# SSH Keys must be generated in PEM format
+# ssh-keygen -m PEM
+ssh-keys:
+  public: ~/.ssh/id_rsa_libcloud.pub
+  private: ~/.ssh/id_rsa_libcloud
+
 providers:
   aws:
-    region: us-east-1
-  google:
-    datacenter: us-east-1
-    project: my-google-project
+    region: us-east-2
 
-layout:
+layouts:
   cluster: 
     runs-on: ubuntu-latest
-    username: ubuntu
     scripts:
       - contrib/setup-deb-system
       - contrib/setup-docker
       - contrib/setup-cluster
+    providers: [google]
   elastic-agent-ubuntu:
     runs-on: ubuntu-latest
-    username: ubuntu
     scripts:
       - contrib/setup-deb-system
     arches: [amd64, arm64]
   elastic-agent-centos:
     runs-on: centos-latest
-    username: admin
     scripts:
       - contrib/setup-rpm-system
     arches: [amd64, arm64]
-    clouds: [aws]
+    providers: [google]
   elastic-agent-win:
     runs-on: windows-latest
     scripts:
       - contrib/setup-powershell-system
     arches: [amd64]
-    clouds: [aws]
+    providers: [google]
 ```

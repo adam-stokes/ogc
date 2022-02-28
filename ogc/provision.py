@@ -1,3 +1,5 @@
+from libcloud.compute.base import NodeAuthSSHKey
+from libcloud.compute.deployment import MultiStepDeployment
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 
@@ -15,11 +17,18 @@ class BaseProvisioner:
     def connect(self):
         raise NotImplementedError()
 
-    def sizes(self):
+    def sizes(self, **kwargs):
         return self.provisioner.list_sizes()
 
-    def images(self):
+    def image(self, id):
+        """Gets a single image from registry of provider"""
+        return self.provisioner.get_image(id)
+
+    def images(self, **kwargs):
         return self.provisioner.list_images()
+
+    def deploy(self, **kwargs):
+        return self.provisioner.deploy_node(**kwargs)
 
     def __repr__(self):
         raise NotImplementedError()
@@ -45,11 +54,29 @@ class AWSProvisioner(BaseProvisioner):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def images(self):
+    def images(self, **kwargs):
         ami_images = [
             image for image in self.provisioner.list_images() if "ami-" in image.id
         ]
         return ami_images
+
+    def deploy(self, layout, ssh, **kwargs):
+        _ssh = NodeAuthSSHKey(ssh.public.read_text())
+        msd = MultiStepDeployment([step.render() for step in layout.steps])
+        image = self.image("ami-0d90bed76900e679a")
+        sizes = self.sizes()
+        size = [size for size in sizes if size.id == "c5.4xlarge"]
+        opts = dict(
+            name="test-adam",
+            image=image,
+            size=size[0],
+            ssh_key=ssh.private,
+            ssh_username="admin",
+            deploy=msd,
+            auth=_ssh,
+            ex_securitygroup="e2e",
+        )
+        return (super().deploy(**opts), msd)
 
     def __repr__(self):
         return f"<AWSProvisioner [{self.options['region']}]>"

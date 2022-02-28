@@ -1,8 +1,13 @@
 import signal
 import sys
+from pathlib import Path
 
 import yaml
-from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
+from libcloud.compute.deployment import (
+    MultiStepDeployment,
+    ScriptDeployment,
+    ScriptFileDeployment,
+)
 from melddict import MeldDict
 
 from .state import app
@@ -15,6 +20,18 @@ class SpecLoader(MeldDict):
         for spec in specs:
             cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
         return SpecProvisionPlan(cl)
+
+
+class SpecProvisionLayoutStep:
+    def __init__(self, step):
+        self.step = step
+
+    def render(self):
+        """Returns the correct deployment based on type of step"""
+        if "script" in self.step:
+            return ScriptFileDeployment(str(Path(self.step["script"].absolute())))
+        elif "run" in self.step:
+            return ScriptDeployment(self.step["run"])
 
 
 class SpecProvisionLayout:
@@ -33,8 +50,13 @@ class SpecProvisionLayout:
         return self.layout.get("username", "admin")
 
     @property
-    def scripts(self):
-        return self.layout.get("scripts", [])
+    def steps(self):
+        _steps = self.layout.get("steps", [])
+        _processed_steps = []
+        if _steps:
+            for _step in _steps:
+                _processed_steps.append(SpecProvisionLayoutStep(_step))
+        return _processed_steps
 
     @property
     def arches(self):
@@ -44,16 +66,18 @@ class SpecProvisionLayout:
     def providers(self):
         return self.layout.get("providers", [])
 
-    def provision(self, engine):
-        step = ScriptDeployment("echo whoami ; date ; ls -la")
-        msd = MultiStepDeployment([step])
-        image = engine.provisioner.get_image("ami-0d90bed76900e679a")
-        sizes = engine.sizes()
-        size = [size for size in sizes if size.id == "c5.4xlarge"]
-        app.log.info(f"Deploying node with [{image}] [{size[0]}]")
-        return engine.provisioner.create_node(
-            name="test-adam", image=image, size=size[0]
-        )
+
+class SpecProvisionSSHKey:
+    def __init__(self, sshkeys):
+        self.sshkeys = sshkeys
+
+    @property
+    def public(self) -> Path:
+        return Path(self.sshkeys.get("public")).expanduser()
+
+    @property
+    def private(self) -> Path:
+        return Path(self.sshkeys.get("private")).expanduser()
 
 
 class SpecProvisionPlan:
@@ -76,6 +100,10 @@ class SpecProvisionPlan:
     @property
     def providers(self):
         return self.plan.get("providers", {})
+
+    @property
+    def ssh(self):
+        return SpecProvisionSSHKey(self.plan.get("ssh-keys", {}))
 
     def get_layout(self, name):
         """Returns a layout for a given name/key"""

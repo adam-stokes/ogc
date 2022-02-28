@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from pprint import pprint
 
 import click
 
@@ -37,7 +38,15 @@ def cli(spec):
         engine = choose_provisioner(provider, options, app.env)
         app.log.info(f"Using provisioner: {engine}")
         for layout in app.spec.layouts:
-            layout.provision(engine)
+            if layout.providers and provider not in layout.providers:
+                app.log.debug(f"Skipping excluded layout: {layout}")
+                continue
+            app.log.info(f"Deploying {layout}")
+            node, steps = engine.deploy(layout, app.spec.ssh)
+            app.log.info(f"Launched {node.name} [{node.state}]")
+            app.log.info(f"  Provision Result:")
+            for step in steps.steps:
+                app.log.info(f"  - [{step.exit_status}]: {step}")
 
 
 def start():
