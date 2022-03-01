@@ -3,11 +3,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from libcloud.compute.deployment import (
-    MultiStepDeployment,
-    ScriptDeployment,
-    ScriptFileDeployment,
-)
+from libcloud.compute.deployment import ScriptDeployment, ScriptFileDeployment
 from melddict import MeldDict
 
 from .state import app
@@ -29,7 +25,12 @@ class SpecProvisionLayoutStep:
     def render(self):
         """Returns the correct deployment based on type of step"""
         if "script" in self.step:
-            return ScriptFileDeployment(str(Path(self.step["script"].absolute())))
+            fpath = Path(self.step["script"]).absolute()
+            if fpath.exists():
+                return ScriptFileDeployment(str(fpath))
+            return ScriptDeployment(
+                f"echo \"{self.step['script']}\" >> missing_scripts"
+            )
         elif "run" in self.step:
             return ScriptDeployment(self.step["run"])
 
@@ -43,7 +44,7 @@ class SpecProvisionLayout:
 
     @property
     def runs_on(self):
-        return self.layout.get("runs-on", "ubuntu-latest")
+        return self.layout.get("runs-on", "ubuntu-20.04")
 
     @property
     def username(self):
@@ -59,8 +60,8 @@ class SpecProvisionLayout:
         return _processed_steps
 
     @property
-    def arches(self):
-        return self.layout.get("arches", ["amd64"])
+    def constraints(self):
+        return self.layout.get("constraints", "")
 
     @property
     def providers(self):

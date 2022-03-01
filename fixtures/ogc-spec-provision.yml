@@ -12,27 +12,30 @@ providers:
 
 layouts:
   cluster: 
-    runs-on: ubuntu-latest
+    runs-on: ami-0d90bed76900e679a
     steps:
       - script: contrib/setup-deb-system
       - script: contrib/setup-docker
       - script: contrib/setup-cluster
-    providers: [google]
+    providers: [aws]
   elastic-agent-ubuntu:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-focal
     steps:
       - run: "sudo apt update"
       - run: "sudo apt-get -qyf dist-upgrade"
-    arches: [amd64, arm64]
+    providers: [aws]
   elastic-agent-centos:
-    runs-on: centos-latest
+    runs-on: ami-057cacbfbbb471bb3
     steps:
       - script: contrib/setup-rpm-system
-    arches: [amd64, arm64]
+    providers: [google]
+  elastic-agent-sles:
+    runs-on: sles-15
+    steps:
+      - script: contrib/setup-rpm-system
     providers: [google]
   elastic-agent-win:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - script: contrib/setup-powershell-system
-    arches: [amd64]
     providers: [google]

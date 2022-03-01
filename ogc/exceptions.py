@@ -4,3 +4,7 @@ class SpecLoaderException(Exception):
 
 class SpecProcessException(Exception):
     """Raise when process fails"""
+
+
+class ProvisionException(Exception):
+    """Raise when process fails"""

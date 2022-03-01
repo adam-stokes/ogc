@@ -29,27 +29,31 @@ providers:
 
 layouts:
   cluster: 
-    runs-on: ubuntu-latest
-    scripts:
-      - contrib/setup-deb-system
-      - contrib/setup-docker
-      - contrib/setup-cluster
+    runs-on: debian-10
+    steps:
+      - script: contrib/setup-deb-system
+      - script: contrib/setup-docker
+      - script: contrib/setup-cluster
     providers: [google]
   elastic-agent-ubuntu:
-    runs-on: ubuntu-latest
-    scripts:
-      - contrib/setup-deb-system
-    arches: [amd64, arm64]
+    runs-on: ubuntu-focal
+    steps:
+      - run: "sudo apt update"
+      - run: "sudo apt-get -qyf dist-upgrade"
+    providers: [aws]
   elastic-agent-centos:
-    runs-on: centos-latest
-    scripts:
-      - contrib/setup-rpm-system
-    arches: [amd64, arm64]
+    runs-on: CentOS Stream 9
+    steps:
+      - script: contrib/setup-rpm-system
+    providers: [aws]
+  elastic-agent-sles:
+    runs-on: sles-15
+    steps:
+      - script: contrib/setup-rpm-system
     providers: [google]
   elastic-agent-win:
-    runs-on: windows-latest
-    scripts:
-      - contrib/setup-powershell-system
-    arches: [amd64]
+    runs-on: windows-2022
+    steps:
+      - script: contrib/setup-powershell-system
     providers: [google]
 ```

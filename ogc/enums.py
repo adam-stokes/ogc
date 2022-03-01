@@ -32,3 +32,23 @@ SPEC_CORE_LAYOUT_LIST = [
     SpecCoreLayout.ARCHES,
     SpecCoreLayout.PROVIDERS,
 ]
+
+# list of aws owner ids for official ami images
+AWS_AMI_OWNERS = {
+    "ubuntu": {
+        "owner_id": "099720109477",
+        "prefix": "ubuntu/images/hvm-ssd/",
+        "username": "ubuntu",
+    },
+    "debian": {
+        "owner_id": "136693071363",
+        "prefix": "",
+        "username": "debian",
+    },
+    "centos": {"owner_id": "125523088429", "prefix": "", "username": "centos"},
+    "sles": {
+        "owner_id": "013907871322",
+        "prefix": "suse-",
+        "username": "ec2-user",
+    },
+}
