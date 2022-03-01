@@ -2,14 +2,19 @@
 
 ogc - provisioning, that's it.
 
+## Prereqs
+
+- Python 3.8+
+- [Poetry](https://python-poetry.org/)
 ## Usage
 
 ```
-> pip install ogc
-> ogc --spec ci/provision.yml
+> export AWS_ACCESS_KEY_ID=...
+> export AWS_SECRET_ACCESS_KEY=..
+> poetry run ogc --spec ci/provision.yml
 
 # Or with a ogc.yml file in same directory running ogc from
-> ogc
+> poetry run ogc
 ```
 
 ## Example spec file
@@ -34,7 +39,7 @@ layouts:
       - script: contrib/setup-deb-system
       - script: contrib/setup-docker
       - script: contrib/setup-cluster
-    providers: [google]
+    providers: [aws]
   elastic-agent-ubuntu:
     runs-on: ubuntu-focal
     steps:
@@ -50,10 +55,10 @@ layouts:
     runs-on: sles-15
     steps:
       - script: contrib/setup-rpm-system
-    providers: [google]
+    providers: [aws]
   elastic-agent-win:
     runs-on: windows-2022
     steps:
       - script: contrib/setup-powershell-system
-    providers: [google]
+    providers: [aws]
 ```
