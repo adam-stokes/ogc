@@ -44,7 +44,11 @@ class SpecProvisionLayout:
 
     @property
     def runs_on(self):
-        return self.layout.get("runs-on", "ubuntu-20.04")
+        return self.layout.get("runs-on", "ubuntu-focal")
+
+    @property
+    def constraints(self):
+        return self.layout.get("constraints", "disk=100G mem=8G cores=16")
 
     @property
     def username(self):
@@ -60,12 +64,8 @@ class SpecProvisionLayout:
         return _processed_steps
 
     @property
-    def constraints(self):
-        return self.layout.get("constraints", "")
-
-    @property
-    def providers(self):
-        return self.layout.get("providers", [])
+    def provider(self):
+        return self.layout.get("provider", [])
 
 
 class SpecProvisionSSHKey:

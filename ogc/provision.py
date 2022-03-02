@@ -1,3 +1,7 @@
+from gevent import monkey
+
+monkey.patch_all()
+
 from datetime import datetime
 
 import click
@@ -8,27 +12,25 @@ from libcloud.compute.types import Provider
 
 from ogc.exceptions import ProvisionException
 
-from .enums import AWS_AMI_OWNERS
-
 
 class ProvisionResult:
-    def __init__(self, deploy, steps, username, ssh):
+    def __init__(self, deploy, deploy_steps_results, layout, ssh):
         self.deploy = deploy
-        self.steps = steps.steps
-        self.username = username
+        self.layout = layout
+        self.steps = deploy_steps_results.steps
+        self.username = layout.username
         self.ssh = ssh
 
-    def render(self):
-        click.secho("---")
-        click.secho("Provision Result: ")
+    def render(self, msg_cb):
+        msg_cb("Provision Result: ")
         for step in self.steps:
-            click.secho(f"  - [{step.exit_status}]: {step}")
-        click.secho("Connection Information: ")
-        click.secho(f"  - Node: {self.deploy.name} [{self.deploy.state}]")
-        click.secho(
+            msg_cb(f"  - [{step.exit_status}]: {step}")
+        msg_cb("Connection Information: ")
+        msg_cb(f"  - Node: {self.deploy.name} [{self.deploy.state}]")
+        msg_cb(
             f"  - ssh -i {self.ssh.private} {self.username}@{self.deploy.public_ips[0]}"
         )
-        click.secho("---")
+        msg_cb("")
 
 
 class BaseProvisioner:
@@ -44,8 +46,13 @@ class BaseProvisioner:
     def connect(self):
         raise NotImplementedError()
 
-    def sizes(self, **kwargs):
-        return self.provisioner.list_sizes()
+    def sizes(self, constraints):
+        _sizes = self.provisioner.list_sizes()
+
+        explicit_constraints = any(x in constraints for x in ["cores", "disk", "mem"])
+        if not explicit_constraints:
+            return [size for size in _sizes if size.id == constraints]
+        raise ProvisionException(f"Could not locate instance size for {constraints}")
 
     def image(self, id):
         """Gets a single image from registry of provider"""
@@ -81,68 +88,38 @@ class AWSProvisioner(BaseProvisioner):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def images(self, **kwargs):
-        ami_images = [
-            image
-            for image in self.provisioner.list_images(**kwargs)
-            if "ami-" in image.id and image.extra["architecture"] in ["x86_64", "amd64"]
-        ]
-        ami_images.sort(key=lambda img: img.extra["creation_date"])
-        return ami_images
-
     def images_query(self, runs_on):
         """Returns the AMI and username to login with"""
         if runs_on.startswith("ami-"):
-            return (self.image(runs_on), "admin")
+            return self.image(runs_on)
+        return None
 
-        image_property = None
-        params = {}
-        if "ubuntu" in runs_on:
-            image_property = AWS_AMI_OWNERS.get("ubuntu")
-
-        elif "centos" in runs_on:
-            image_property = AWS_AMI_OWNERS.get("centos")
-
-        elif "sles" in runs_on:
-            image_property = AWS_AMI_OWNERS.get("sles")
-
-        elif "debian" in runs_on:
-            image_property = AWS_AMI_OWNERS.get("debian")
-        else:
-            return (None, None)
-
-        params["ex_owner"] = image_property["owner_id"]
-        if image_property["prefix"]:
-            params["ex_filters"] = {"name": f"{image_property['prefix']}{runs_on}*"}
-        else:
-            params["ex_filters"] = {"name": f"{runs_on}*"}
-
-        images = self.images(**params)
-        if len(images) > 0:
-            return (images[-1], image_property["username"])
-        return (None, None)
-
-    def deploy(self, layout, ssh, **kwargs):
+    def deploy(self, layout, ssh, msg_cb, **kwargs):
+        msg_cb(f"Launching {layout}")
         _ssh = NodeAuthSSHKey(ssh.public.read_text())
         msd = MultiStepDeployment([step.render() for step in layout.steps])
 
-        image, username = self.images_query(layout.runs_on)
-        if not image and not username:
-            raise ProvisionException(f"Could not locate AMI for: {layout.runs_on}")
-        sizes = self.sizes()
-        size = [size for size in sizes if size.id == "c5.4xlarge"]
+        image = self.images_query(layout.runs_on)
+        if not image and not layout.username:
+            raise ProvisionException(
+                f"Could not locate AMI and/or username for: {layout.runs_on}"
+            )
+        size = self.sizes(layout.constraints)
+        if size and len(size) > 0:
+            size = size[0]
+
         opts = dict(
             name="test-adam",
             image=image,
-            size=size[0],
+            size=size,
             ssh_key=ssh.private,
-            ssh_username=username,
+            ssh_username=layout.username,
             deploy=msd,
             auth=_ssh,
             ex_securitygroup="e2e",
         )
         node = super().deploy(**opts)
-        return ProvisionResult(node, msd, username, ssh)
+        return ProvisionResult(node, msd, layout, ssh)
 
     def __repr__(self):
         return f"<AWSProvisioner [{self.options['region']}]>"

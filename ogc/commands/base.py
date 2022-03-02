@@ -1,8 +1,10 @@
 import sys
+from collections import deque
 from pathlib import Path
-from pprint import pprint
 
 import click
+import gevent
+from gevent.pool import Pool
 
 from ..provision import choose_provisioner
 from ..spec import SpecLoader
@@ -34,19 +36,22 @@ def cli(spec):
         app.log.error("No providers defined, please define at least 1 to proceed.")
         sys.exit(1)
 
+    pool = Pool(len(app.spec.layouts))
+    jobs = []
     for provider, options in app.spec.providers.items():
         engine = choose_provisioner(provider, options, app.env)
         app.log.info(f"Using provisioner: {engine}")
-        provision_results = []
         for layout in app.spec.layouts:
-            if layout.providers and provider not in layout.providers:
-                app.log.debug(f"Skipping excluded layout: {layout}")
-                continue
-            app.log.info(f"Launching {layout}")
-            provision_results.append(engine.deploy(layout, app.spec.ssh))
-    for result in provision_results:
-        result.render()
-        click.secho("")
+            if layout.provider and provider == layout.provider:
+                jobs.append(
+                    pool.spawn(
+                        engine.deploy, layout, ssh=app.spec.ssh, msg_cb=app.log.info
+                    )
+                )
+    gevent.joinall(jobs)
+    for job in jobs:
+        if job.value is not None:
+            job.value.render(msg_cb=app.log.info)
 
 
 def start():
