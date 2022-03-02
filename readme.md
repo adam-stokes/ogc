@@ -22,8 +22,7 @@ ogc - provisioning, that's it.
 ```yaml
 name: ci
 
-# SSH Keys must be generated in PEM format
-# ssh-keygen -m PEM
+# SSH Keys must be passwordless
 ssh-keys:
   public: ~/.ssh/id_rsa_libcloud.pub
   private: ~/.ssh/id_rsa_libcloud
