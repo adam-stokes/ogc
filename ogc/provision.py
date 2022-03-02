@@ -2,15 +2,16 @@ from gevent import monkey
 
 monkey.patch_all()
 
-from datetime import datetime
+import uuid
 
-import click
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from libcloud.compute.providers import get_driver
+from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
+from retry.api import retry_call
 
-from ogc.exceptions import ProvisionException
+from ogc.exceptions import ProvisionDeployerException, ProvisionException
 
 
 class ProvisionResult:
@@ -61,8 +62,24 @@ class BaseProvisioner:
     def images(self, **kwargs):
         return self.provisioner.list_images(**kwargs)
 
-    def deploy(self, **kwargs):
-        return self.provisioner.deploy_node(**kwargs)
+    def _create_node(self, **kwargs):
+        _opts = kwargs.copy()
+        layout = None
+        if "layout" in _opts:
+            layout = _opts["layout"]
+            del _opts["layout"]
+
+        node = self.provisioner.create_node(**_opts)
+        node = self.provisioner.wait_until_running(
+            nodes=[node], wait_period=5, timeout=300
+        )[0]
+        return {"node": node, "layout": layout, "deployer": Deployer(node, layout)}
+
+    def create_ssh_keypair(self, ssh):
+        id = str(uuid.uuid4())[:8]
+        return self.provisioner.import_key_pair_from_file(
+            name=f"ogc-{id}", key_file_path=str(ssh.public)
+        )
 
     def __repr__(self):
         raise NotImplementedError()
@@ -94,11 +111,9 @@ class AWSProvisioner(BaseProvisioner):
             return self.image(runs_on)
         return None
 
-    def deploy(self, layout, ssh, msg_cb, **kwargs):
-        msg_cb(f"Launching {layout}")
-        _ssh = NodeAuthSSHKey(ssh.public.read_text())
-        msd = MultiStepDeployment([step.render() for step in layout.steps])
-
+    def create(self, layout, ssh, msg_cb, **kwargs):
+        msg_cb(f"Launching {layout.name}")
+        auth = NodeAuthSSHKey(ssh.public.read_text())
         image = self.images_query(layout.runs_on)
         if not image and not layout.username:
             raise ProvisionException(
@@ -109,17 +124,16 @@ class AWSProvisioner(BaseProvisioner):
             size = size[0]
 
         opts = dict(
-            name="test-adam",
+            name=f"ogc-{layout.name}",
             image=image,
             size=size,
-            ssh_key=ssh.private,
-            ssh_username=layout.username,
-            deploy=msd,
-            auth=_ssh,
+            auth=auth,
             ex_securitygroup="e2e",
+            ex_spot=True,
+            ex_terminate_on_shutdown=True,
+            layout=layout,
         )
-        node = super().deploy(**opts)
-        return ProvisionResult(node, msd, layout, ssh)
+        return self._create_node(**opts)
 
     def __repr__(self):
         return f"<AWSProvisioner [{self.options['region']}]>"
@@ -154,3 +168,29 @@ def choose_provisioner(name, options, env):
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
     provisioner = choices[name]
     return provisioner(env, **options)
+
+
+class Deployer:
+    def __init__(self, node, layout):
+        self.node, self.ip_addresses = node
+        self.layout = layout
+
+    def run(self, ssh, msg_cb):
+        msg_cb(
+            f"Establishing connection [{self.ip_addresses[0]}] [{self.layout.username}] [{str(ssh.private)}]"
+        )
+        ssh_client = ParamikoSSHClient(
+            self.ip_addresses[0],
+            username=self.layout.username,
+            key=str(ssh.private),
+            timeout=300,
+        )
+        retry_call(ssh_client.connect, tries=15, delay=5)
+        steps = [step.render() for step in self.layout.steps]
+        if steps:
+            msg_cb(f"Executing deployment actions for {self.layout.name}")
+            msd = MultiStepDeployment(steps)
+            msd.run(self.node, ssh_client)
+            return ProvisionResult(self.node, msd, self.layout, ssh)
+        msg_cb("No deployment actions listed, skipping.")
+        return None

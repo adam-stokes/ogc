@@ -6,7 +6,7 @@ import click
 import gevent
 from gevent.pool import Pool
 
-from ..provision import choose_provisioner
+from ..provision import ProvisionResult, choose_provisioner
 from ..spec import SpecLoader
 from ..state import app
 
@@ -37,20 +37,34 @@ def cli(spec):
         sys.exit(1)
 
     pool = Pool(len(app.spec.layouts))
-    jobs = []
+    create_jobs = []
     for provider, options in app.spec.providers.items():
         engine = choose_provisioner(provider, options, app.env)
+        app.log.info(f"Creating ssh credentials from {app.spec.ssh.public}")
+        engine.create_ssh_keypair(app.spec.ssh)
         app.log.info(f"Using provisioner: {engine}")
         for layout in app.spec.layouts:
             if layout.provider and provider == layout.provider:
-                jobs.append(
+                create_jobs.append(
                     pool.spawn(
-                        engine.deploy, layout, ssh=app.spec.ssh, msg_cb=app.log.info
+                        engine.create, layout, ssh=app.spec.ssh, msg_cb=app.log.info
                     )
                 )
-    gevent.joinall(jobs)
-    for job in jobs:
+    gevent.joinall(create_jobs)
+
+    config_jobs = []
+    for job in create_jobs:
         if job.value is not None:
+            config_jobs.append(
+                pool.spawn(
+                    job.value["deployer"].run, ssh=app.spec.ssh, msg_cb=app.log.info
+                )
+            )
+
+    gevent.joinall(config_jobs)
+
+    for job in config_jobs:
+        if job.value is not None and isinstance(job.value, ProvisionResult):
             job.value.render(msg_cb=app.log.info)
 
 

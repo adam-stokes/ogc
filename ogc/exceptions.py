@@ -8,3 +8,7 @@ class SpecProcessException(Exception):
 
 class ProvisionException(Exception):
     """Raise when process fails"""
+
+
+class ProvisionDeployerException(Exception):
+    """Raise when deployer fails"""
