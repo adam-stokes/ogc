@@ -1,7 +1,7 @@
 import signal
 import sys
 from pathlib import Path
-
+from mako.template import Template
 import yaml
 from libcloud.compute.deployment import ScriptDeployment, ScriptFileDeployment
 from melddict import MeldDict
@@ -22,12 +22,14 @@ class SpecProvisionLayoutStep:
     def __init__(self, step):
         self.step = step
 
-    def render(self):
+    def render(self, metadata):
         """Returns the correct deployment based on type of step"""
         if "script" in self.step:
             fpath = Path(self.step["script"]).absolute()
             if fpath.exists():
-                return ScriptFileDeployment(str(fpath))
+                template = Template(filename=str(fpath))
+                contents = template.render(**metadata)
+                return ScriptDeployment(contents)
             return ScriptDeployment(
                 f"echo \"{self.step['script']}\" >> missing_scripts"
             )

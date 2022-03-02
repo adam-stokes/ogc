@@ -1,6 +1,8 @@
 import sys
+import os
 from collections import deque
 from pathlib import Path
+import dill
 
 import click
 import gevent
@@ -17,6 +19,11 @@ from ..state import app
 @click.command()
 def cli(spec):
     """Processes a OGC Spec"""
+    # Setup cache-dir
+    cache_dir = Path(__file__).cwd() / ".ogc-cache"
+    if not cache_dir.exists():
+        os.makedirs(str(cache_dir))
+
     specs = []
     # Check for local spec
     if Path("ogc.yml").exists() and not spec:
@@ -47,17 +54,24 @@ def cli(spec):
             if layout.provider and provider == layout.provider:
                 create_jobs.append(
                     pool.spawn(
-                        engine.create, layout, ssh=app.spec.ssh, msg_cb=app.log.info
+                        engine.create, layout, cache_dir=cache_dir, ssh=app.spec.ssh, msg_cb=app.log.info
                     )
                 )
     gevent.joinall(create_jobs)
+
+    # Load up any stored metadata
+    metadata = {}
+    for layout in app.spec.layouts:
+        metadata_db = cache_dir / layout.name
+        if metadata_db.exists():
+            metadata[layout.name.replace("-", "_")] = dill.loads(metadata_db.read_bytes())
 
     config_jobs = []
     for job in create_jobs:
         if job.value is not None:
             config_jobs.append(
                 pool.spawn(
-                    job.value["deployer"].run, ssh=app.spec.ssh, msg_cb=app.log.info
+                    job.value["deployer"].run, metadata=metadata, ssh=app.spec.ssh, msg_cb=app.log.info
                 )
             )
 

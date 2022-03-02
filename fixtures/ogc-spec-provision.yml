@@ -17,6 +17,7 @@ layouts:
     constraints: c5.4xlarge
     username: admin
     steps:
+      - script: fixtures/show-metadata
       - script: contrib/setup-deb-system
       - script: contrib/setup-docker
       - script: contrib/setup-cluster
@@ -27,6 +28,7 @@ layouts:
     username: ubuntu
     steps:
       - run: "sudo apt update"
+      - script: fixtures/show-metadata
     provider: aws
   elastic-agent-centos:
     runs-on: ami-057cacbfbbb471bb3

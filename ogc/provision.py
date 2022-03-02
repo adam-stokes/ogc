@@ -3,7 +3,7 @@ from gevent import monkey
 monkey.patch_all()
 
 import uuid
-
+import dill
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from libcloud.compute.providers import get_driver
@@ -11,7 +11,7 @@ from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
 from retry.api import retry_call
 
-from ogc.exceptions import ProvisionDeployerException, ProvisionException
+from ogc.exceptions import ProvisionException
 
 
 class ProvisionResult:
@@ -46,6 +46,9 @@ class BaseProvisioner:
 
     def connect(self):
         raise NotImplementedError()
+    
+    def create(self):
+        raise NotImplementedError()
 
     def sizes(self, constraints):
         _sizes = self.provisioner.list_sizes()
@@ -65,14 +68,36 @@ class BaseProvisioner:
     def _create_node(self, **kwargs):
         _opts = kwargs.copy()
         layout = None
-        if "layout" in _opts:
-            layout = _opts["layout"]
-            del _opts["layout"]
+        if "ogc_layout" in _opts:
+            layout = _opts["ogc_layout"]
+            del _opts["ogc_layout"]
+
+        cache_dir = None
+        if "ogc_cache_dir" in _opts:
+            cache_dir = _opts["ogc_cache_dir"]
+            del _opts["ogc_cache_dir"]
+
+        ssh_creds = None
+        if "ogc_ssh" in _opts:
+            ssh_creds = _opts["ogc_ssh"]
+            del _opts["ogc_ssh"]
 
         node = self.provisioner.create_node(**_opts)
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]
+
+        # Store some useful metadata to be used in arbitrary scripts
+        metadata_db = cache_dir / layout.name
+        metadata = {
+                "host": node[1][0],
+                "username": layout.username,
+                "layout": layout,
+                "ssh_public_key": ssh_creds.public,
+                "ssh_private_key": ssh_creds.private,
+                "node": node
+        }
+        metadata_db.write_bytes(dill.dumps(metadata))
         return {"node": node, "layout": layout, "deployer": Deployer(node, layout)}
 
     def create_ssh_keypair(self, ssh):
@@ -111,7 +136,7 @@ class AWSProvisioner(BaseProvisioner):
             return self.image(runs_on)
         return None
 
-    def create(self, layout, ssh, msg_cb, **kwargs):
+    def create(self, layout, ssh, cache_dir, msg_cb, **kwargs):
         msg_cb(f"Launching {layout.name}")
         auth = NodeAuthSSHKey(ssh.public.read_text())
         image = self.images_query(layout.runs_on)
@@ -131,7 +156,9 @@ class AWSProvisioner(BaseProvisioner):
             ex_securitygroup="e2e",
             ex_spot=True,
             ex_terminate_on_shutdown=True,
-            layout=layout,
+            ogc_layout=layout,
+            ogc_cache_dir=cache_dir,
+            ogc_ssh=ssh,
         )
         return self._create_node(**opts)
 
@@ -175,7 +202,7 @@ class Deployer:
         self.node, self.ip_addresses = node
         self.layout = layout
 
-    def run(self, ssh, msg_cb):
+    def run(self, ssh, metadata, msg_cb):
         msg_cb(
             f"Establishing connection [{self.ip_addresses[0]}] [{self.layout.username}] [{str(ssh.private)}]"
         )
@@ -186,7 +213,7 @@ class Deployer:
             timeout=300,
         )
         retry_call(ssh_client.connect, tries=15, delay=5)
-        steps = [step.render() for step in self.layout.steps]
+        steps = [step.render(metadata) for step in self.layout.steps]
         if steps:
             msg_cb(f"Executing deployment actions for {self.layout.name}")
             msd = MultiStepDeployment(steps)
