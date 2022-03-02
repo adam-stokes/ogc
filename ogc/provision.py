@@ -95,7 +95,7 @@ class BaseProvisioner:
                 "layout": layout,
                 "ssh_public_key": ssh_creds.public,
                 "ssh_private_key": ssh_creds.private,
-                "node": node
+                "node": node[0]
         }
         metadata_db.write_bytes(dill.dumps(metadata))
         return {"node": node, "layout": layout, "deployer": Deployer(node, layout)}
