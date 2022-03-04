@@ -12,11 +12,11 @@ def ls():
     cache_obj = Cache()
     inventory = cache_obj.inventory
     table = Texttable()
-    table.set_cols_align(["l", "l", "l", "l"])
-    table.set_cols_valign(["m", "m", "m", "m"])
-    table.set_cols_width([20, 25, 10, 65])
+    # table.set_cols_align(["l", "l", "l", "l"])
+    # table.set_cols_valign(["m", "m", "m", "m"])
+    table.set_cols_width([25, 20, 10, 15, 65])
     table.set_deco(Texttable.HEADER | Texttable.HLINES)
-    table.add_row(["InstanceID", "Name", "Status", "Connection"])
+    table.add_row(["Name", "InstanceID", "Status", "KeyPair", "Connection"])
     for node_name, data in inventory.items():
         layout = data["layout"]
         node_id = data["node"].id
@@ -24,14 +24,16 @@ def ls():
         node = engine.node(instance_id=node_id)
         table.add_row(
             [
-                node.id,
                 node_name,
+                node.id,
                 node.state,
+                data["uuid"],
                 f"ssh -i {data['ssh_private_key']} {data['username']}@{data['host']}",
             ]
         )
 
     click.secho(table.draw())
+
 
 @click.option("--provider", default="aws", help="Provider to query")
 @click.option("--filter", required=False, help="Filter by keypair name")
@@ -45,7 +47,8 @@ def ls_key_pairs(provider, filter):
         kps = [kp for kp in engine.list_key_pairs()]
 
     for kp in kps:
-        click.secho(kp.name)
+        click.secho(kp.name, fg="green")
+
 
 cli.add_command(ls)
 cli.add_command(ls_key_pairs)

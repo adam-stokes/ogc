@@ -1,13 +1,13 @@
 import sys
 
 import click
+import gevent
+from gevent.pool import Pool
 
 from ..cache import Cache
 from ..provision import choose_provisioner
 from ..state import app
 from .base import cli
-import gevent
-from gevent.pool import Pool
 
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
@@ -30,13 +30,15 @@ def rm(name):
         if not is_destroyed:
             app.log.error(f"Unable to destroy {node.id}")
 
-        is_ssh_deleted = engine.delete_key_pair(uuid)
-        if not is_ssh_deleted:
-            app.log.error(f"Could not delete ssh keypair {engine.uuid}")
+        key_pair = engine.get_key_pair(uuid)
+        ssh_deleted_err = engine.delete_key_pair(key_pair)
+        if ssh_deleted_err:
+            app.log.error(f"Could not delete ssh keypair {uuid}")
 
-        if not is_destroyed and not is_ssh_deleted:
+        if not is_destroyed and ssh_deleted_err:
             sys.exit(1)
     cache_obj.delete(name)
+
 
 @click.option("--provider", default="aws", help="Provider to query")
 @click.option("--filter", required=False, help="Filter by keypair name")
@@ -52,10 +54,11 @@ def rm_key_pairs(provider, filter):
     pool = Pool(5)
     rm_jobs = []
     for kp in kps:
-        click.secho(f"Removing keypair: {kp.name}")
+        click.secho(f"Removing keypair: {kp.name}", fg="green")
         rm_jobs.append(pool.spawn(engine.delete_key_pair, kp))
 
     gevent.joinall(rm_jobs)
+
 
 cli.add_command(rm)
 cli.add_command(rm_key_pairs)

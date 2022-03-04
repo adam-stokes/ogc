@@ -1,10 +1,12 @@
 # pylint: disable=unexpected-keyword-arg
 import sys
+from pathlib import Path
 
 import click
 import sh
 
 from ..cache import Cache
+from ..provision import Deployer
 from ..state import app
 from .base import cli
 
@@ -29,4 +31,28 @@ def ssh(name):
     sys.exit(1)
 
 
+@click.command(help="Scp files or directories to node")
+@click.argument("name")
+@click.argument("src")
+@click.argument("dst")
+def scp_to(name, src, dst):
+    deploy = Deployer(name)
+    src = Path(src)
+    dst = Path(dst)
+    deploy.put(src, dst, app.log.info)
+
+
+@click.command(help="Scp files or directories from node")
+@click.argument("name")
+@click.argument("dst")
+@click.argument("src")
+def scp_get(name, dst, src):
+    deploy = Deployer(name)
+    src = Path(src)
+    dst = Path(dst)
+    deploy.get(dst, src, app.log.info)
+
+
 cli.add_command(ssh)
+cli.add_command(scp_to)
+cli.add_command(scp_get)

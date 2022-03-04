@@ -44,6 +44,7 @@ def launch(spec):
                 layout,
                 cache=cache_obj,
                 ssh=app.spec.ssh,
+                env=app.env,
                 msg_cb=app.log.info,
             )
         )
@@ -62,7 +63,6 @@ def launch(spec):
                 pool.spawn(
                     job.value["deployer"].run,
                     metadata=metadata,
-                    ssh=app.spec.ssh,
                     msg_cb=app.log.info,
                 )
             )
