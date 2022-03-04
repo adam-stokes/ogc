@@ -6,16 +6,8 @@ ogc - provisioning, that's it.
 
 - Python 3.8+
 - [Poetry](https://python-poetry.org/)
-## Usage
 
-```
-> export AWS_ACCESS_KEY_ID=...
-> export AWS_SECRET_ACCESS_KEY=..
-> export AWS_REGION=us-east-2
-> poetry run ogc launch --spec ci/provision.yml
-```
-
-## Example spec file
+## Example provision file
 
 ```yaml
 name: ci
@@ -59,29 +51,39 @@ layouts:
       - script: contrib/setup-rpm-system
     provider: aws
 ```
+## Usage
 
-## Interfacing with deployment
+### Set environment variables
+```
+> export AWS_ACCESS_KEY_ID=...
+> export AWS_SECRET_ACCESS_KEY=..
+> export AWS_REGION=us-east-2
+```
 
+### Launch nodes
+
+```
+> poetry run ogc launch --spec ci/provision.yml
+```
 ### List nodes
 
 ```
 > poetry run ogc ls
 
-InstanceID             Name                        Status       Connection                                                       
----------------------------------------------------------------------------------------------------------------------------------
-i-0b36a26dcf08e24f6    elastic-agent-sles          running      ssh -i /Users/adam/.ssh/id_rsa_libcloud ec2-user@3.141.164.199   
----------------------------------------------------------------------------------------------------------------------------------
-i-0673f1735e86fa9b0    cluster                     running      ssh -i /Users/adam/.ssh/id_rsa_libcloud admin@3.141.85.94        
----------------------------------------------------------------------------------------------------------------------------------
-i-06bde64d9eaac37a0    elastic-agent-centos        running      ssh -i /Users/adam/.ssh/id_rsa_libcloud centos@3.19.30.242       
----------------------------------------------------------------------------------------------------------------------------------
-i-048be62656025ee8a    elastic-agent-ubuntu        running      ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@18.222.194.224    
+Name                        InstanceID             Status       KeyPair           Connection                                                       
+---------------------------------------------------------------------------------------------------------------------------------------------------
+elastic-agent-sles          i-0c6154f78d62d3189    running      ogc-ba632446      ssh -i /Users/adam/.ssh/id_rsa_libcloud ec2-user@3.15.171.223    
+---------------------------------------------------------------------------------------------------------------------------------------------------
+cluster                     i-070b90d5a09fa3f41    running      ogc-53a2d728      ssh -i /Users/adam/.ssh/id_rsa_libcloud admin@18.188.119.198     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+elastic-agent-centos        i-0687e35792343573d    running      ogc-c81f7f1f      ssh -i /Users/adam/.ssh/id_rsa_libcloud centos@13.58.247.156     
+---------------------------------------------------------------------------------------------------------------------------------------------------
+elastic-agent-ubuntu        i-052048090ad75a608    running      ogc-63e9bd2b      ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@18.217.224.189    
 ```
-
 ### Destroy node
 
 ```
-> poetry run ogc destroy elastic-agent-sles
+> poetry run ogc rm elastic-agent-sles
 ```
 
 ### Connect to node
@@ -89,3 +91,23 @@ i-048be62656025ee8a    elastic-agent-ubuntu        running      ssh -i /Users/ad
 ```
 > poetry run ogc ssh cluster
 ```
+
+### Upload Files and Directories
+
+```
+> poetry run ogc scp-to cluster `pwd` dst-dir
+> poetry run ogc scp-to cluster readme.md readme.md
+```
+
+### List keypairs
+
+```
+> poetry run ogc ls-key-pairs --filter "my-key-prefix"
+```
+
+### Remove keypairs
+
+```
+> poetry run ogc rm-key-pairs --filter "my-key-prefix"
+```
+
