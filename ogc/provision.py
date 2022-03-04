@@ -117,9 +117,11 @@ class BaseProvisioner:
     def get_key_pair(self, name):
         return self.provisioner.get_key_pair(name)
 
-    def delete_key_pair(self, name):
-        key_pair = self.get_key_pair(name)
-        return self.provisioner.delete_key_pair(key_pair)
+    def delete_key_pair(self, key_pair):
+        retry_call(self.provisioner.delete_key_pair, fargs=[key_pair], backoff=3, tries=15)
+
+    def list_key_pairs(self):
+        return self.provisioner.list_key_pairs()
 
     def __repr__(self):
         raise NotImplementedError()
@@ -146,7 +148,10 @@ class AWSProvisioner(BaseProvisioner):
         return aws(**self.options)
 
     def image(self, runs_on):
-        _runs_on = CLOUD_IMAGE_MAP["aws"].get(runs_on)
+        if runs_on.startswith("ami-"):
+            _runs_on = runs_on
+        else:
+            _runs_on = CLOUD_IMAGE_MAP["aws"].get(runs_on)
         return super().image(_runs_on)
 
     def create(self, layout, ssh, cache, msg_cb, **kwargs):

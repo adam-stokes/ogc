@@ -870,6 +870,17 @@ decorator = ">=3.4.2"
 py = ">=1.4.26,<2.0.0"
 
 [[package]]
+name = "scp"
+version = "0.14.4"
+description = "scp module for paramiko"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+paramiko = "*"
+
+[[package]]
 name = "sh"
 version = "1.14.2"
 description = "Python subprocess replacement"
@@ -1035,7 +1046,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "73e67368b90fadde108aef2863540430667859a84f9c7550c25f24c1357a3371"
+content-hash = "91fb4c241bf71ed5ffcb9f7d660cdd5bb1bbf71be44e732ad56de17e5eedba57"
 
 [metadata.files]
 apache-libcloud = []
@@ -1607,6 +1618,10 @@ requests = [
 retry = [
     {file = "retry-0.9.2-py2.py3-none-any.whl", hash = "sha256:ccddf89761fa2c726ab29391837d4327f819ea14d244c232a1d24c67a2f98606"},
     {file = "retry-0.9.2.tar.gz", hash = "sha256:f8bfa8b99b69c4506d6f5bd3b0aabf77f98cdb17f3c9fc3f5ca820033336fba4"},
+]
+scp = [
+    {file = "scp-0.14.4-py2.py3-none-any.whl", hash = "sha256:29ddaafbfba60793a8a779694c97d8c150d365668a4ef67616c515b80a69ef2f"},
+    {file = "scp-0.14.4.tar.gz", hash = "sha256:54699b92cb68ae34b5928c48a888eab9722a212502cba89aa795bd56597505bd"},
 ]
 sh = [
     {file = "sh-1.14.2-py2.py3-none-any.whl", hash = "sha256:4921ac9c1a77ec8084bdfaf152fe14138e2b3557cc740002c1a97076321fce8a"},

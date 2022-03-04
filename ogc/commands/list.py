@@ -33,5 +33,19 @@ def ls():
 
     click.secho(table.draw())
 
+@click.option("--provider", default="aws", help="Provider to query")
+@click.option("--filter", required=False, help="Filter by keypair name")
+@click.command(help="List keypairs")
+def ls_key_pairs(provider, filter):
+    engine = choose_provisioner(provider, env=app.env)
+    kps = []
+    if filter:
+        kps = [kp for kp in engine.list_key_pairs() if filter in kp.name]
+    else:
+        kps = [kp for kp in engine.list_key_pairs()]
+
+    for kp in kps:
+        click.secho(kp.name)
 
 cli.add_command(ls)
+cli.add_command(ls_key_pairs)
