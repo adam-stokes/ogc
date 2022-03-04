@@ -1,37 +1,52 @@
 name: ci
 
+# SSH Keys must be passwordless
+ssh-keys:
+  public: ~/.ssh/id_rsa_libcloud.pub
+  private: ~/.ssh/id_rsa_libcloud
+
+# Configure the provider parameters here, they will
+# be referenced by each layout during deployment.
 providers:
   aws:
-    region: us-east-1
-  google:
-    region: us-east-1
-    project: my-google-project
+    region: us-east-2
 
 layouts:
   cluster: 
-    runs-on: ubuntu-latest
-    username: ubuntu
-    scripts:
-      - contrib/setup-deb-system
-      - contrib/setup-docker
-      - contrib/setup-cluster
-    providers: [aws, google]
+    runs-on: debian-latest
+    constraints: c5.4xlarge
+    username: admin
+    steps:
+      - script: fixtures/show-metadata
+      - script: contrib/setup-deb-system
+      - script: contrib/setup-docker
+      - script: contrib/setup-cluster
+    provider: aws
   elastic-agent-ubuntu:
     runs-on: ubuntu-latest
+    constraints: c5.4xlarge
     username: ubuntu
-    scripts:
-      - contrib/setup-deb-system
-    arches: [amd64, arm64]
+    steps:
+      - run: "sudo apt update"
+      - script: fixtures/show-metadata
+    provider: aws
   elastic-agent-centos:
     runs-on: centos-latest
-    username: admin
-    scripts:
-      - contrib/setup-rpm-system
-    arches: [amd64, arm64]
-    providers: [aws]
+    constraints: c5.4xlarge
+    username: centos
+    steps:
+      - script: contrib/setup-rpm-system
+    provider: aws
+  elastic-agent-sles:
+    runs-on: sles-latest
+    constraints: c5.4xlarge
+    username: ec2-user
+    steps:
+      - script: contrib/setup-rpm-system
+    provider: aws
   elastic-agent-win:
-    runs-on: windows-latest
-    scripts:
-      - contrib/setup-powershell-system
-    arches: [amd64]
-    providers: [aws]
+    runs-on: windows-2022
+    constraints: cores=16 mem=8G disk=100G
+    steps:
+      - script: contrib/setup-powershell-system
+    provider: google

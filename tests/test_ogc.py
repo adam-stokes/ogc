@@ -1,3 +1,4 @@
+# pylint: disable=R0801
 from pathlib import Path
 
 from ogc.spec import SpecLoader
@@ -10,6 +11,5 @@ def test_parse_layouts():
     plan = SpecLoader.load([fixtures_dir / "spec.yml"])
     cluster_layout = plan.get_layout("cluster")
     assert len(cluster_layout) == 1
-    assert cluster_layout[0].runs_on == "ubuntu-latest"
-    assert cluster_layout[0].arches == ["amd64"]
-    assert cluster_layout[0].providers == ["aws", "google"]
+    assert cluster_layout[0].runs_on == "debian-latest"
+    assert cluster_layout[0].provider == "aws"

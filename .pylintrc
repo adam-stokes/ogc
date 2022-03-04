@@ -9,5 +9,8 @@ disable=invalid-name,
         too-few-public-methods,
         unused-variable,
         too-many-branches,
-        no-value-for-parameter
+        no-value-for-parameter,
+        duplicate-code,
+        arguments-differ,
+        abstract-method
 

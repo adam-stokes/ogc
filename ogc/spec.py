@@ -1,9 +1,10 @@
 import signal
 import sys
 from pathlib import Path
-from mako.template import Template
+
 import yaml
-from libcloud.compute.deployment import ScriptDeployment, ScriptFileDeployment
+from libcloud.compute.deployment import ScriptDeployment
+from mako.template import Template
 from melddict import MeldDict
 
 from .state import app
@@ -33,8 +34,7 @@ class SpecProvisionLayoutStep:
             return ScriptDeployment(
                 f"echo \"{self.step['script']}\" >> missing_scripts"
             )
-        elif "run" in self.step:
-            return ScriptDeployment(self.step["run"])
+        return ScriptDeployment(self.step["run"])
 
 
 class SpecProvisionLayout:

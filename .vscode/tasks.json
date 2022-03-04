@@ -6,12 +6,33 @@
         {
             "label": "deploy",
             "type": "shell",
-            "command": "poetry run ogc --spec fixtures/ogc-spec-provision.yml",
+            "command": "poetry run ogc launch fixtures/ogc-spec-provision.yml",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "fix",
+            "type": "shell",
+            "command": "poetry run inv fix",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "poetry run inv test",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         }
+
     ]
 }

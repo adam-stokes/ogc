@@ -14,7 +14,7 @@ def clean(c):
 
 @task
 def fix(c):
-    c.run("isort -m 3 .")
+    c.run("isort -m 3 ogc")
     c.run("black .")
 
 

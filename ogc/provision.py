@@ -1,17 +1,19 @@
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import uuid
+
 from gevent import monkey
+from retry.api import retry_call
+
+from ogc.enums import CLOUD_IMAGE_MAP
+from ogc.exceptions import ProvisionException
 
 monkey.patch_all()
-
-import uuid
-import dill
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from libcloud.compute.providers import get_driver
 from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
-from retry.api import retry_call
-
-from ogc.exceptions import ProvisionException
 
 
 class ProvisionResult:
@@ -38,6 +40,7 @@ class BaseProvisioner:
     def __init__(self, env, **kwargs):
         self._args = kwargs
         self.env = env
+        self.uuid = f"ogc-{str(uuid.uuid4())[:8]}"
         self.provisioner = self.connect()
 
     @property
@@ -46,9 +49,12 @@ class BaseProvisioner:
 
     def connect(self):
         raise NotImplementedError()
-    
-    def create(self):
+
+    def create(self, *args, **kwargs):
         raise NotImplementedError()
+
+    def destroy(self, node):
+        return self.provisioner.destroy_node(node)
 
     def sizes(self, constraints):
         _sizes = self.provisioner.list_sizes()
@@ -58,9 +64,9 @@ class BaseProvisioner:
             return [size for size in _sizes if size.id == constraints]
         raise ProvisionException(f"Could not locate instance size for {constraints}")
 
-    def image(self, id):
+    def image(self, runs_on):
         """Gets a single image from registry of provider"""
-        return self.provisioner.get_image(id)
+        return self.provisioner.get_image(runs_on)
 
     def images(self, **kwargs):
         return self.provisioner.list_images(**kwargs)
@@ -72,10 +78,10 @@ class BaseProvisioner:
             layout = _opts["ogc_layout"]
             del _opts["ogc_layout"]
 
-        cache_dir = None
-        if "ogc_cache_dir" in _opts:
-            cache_dir = _opts["ogc_cache_dir"]
-            del _opts["ogc_cache_dir"]
+        cache = None
+        if "ogc_cache" in _opts:
+            cache = _opts["ogc_cache"]
+            del _opts["ogc_cache"]
 
         ssh_creds = None
         if "ogc_ssh" in _opts:
@@ -88,23 +94,32 @@ class BaseProvisioner:
         )[0]
 
         # Store some useful metadata to be used in arbitrary scripts
-        metadata_db = cache_dir / layout.name
         metadata = {
-                "host": node[1][0],
-                "username": layout.username,
-                "layout": layout,
-                "ssh_public_key": ssh_creds.public,
-                "ssh_private_key": ssh_creds.private,
-                "node": node[0]
+            "host": node[1][0],
+            "username": layout.username,
+            "layout": layout,
+            "ssh_public_key": ssh_creds.public,
+            "ssh_private_key": ssh_creds.private,
+            "node": node[0],
+            "uuid": self.uuid,
         }
-        metadata_db.write_bytes(dill.dumps(metadata))
+        cache.save(layout.name, metadata)
         return {"node": node, "layout": layout, "deployer": Deployer(node, layout)}
 
-    def create_ssh_keypair(self, ssh):
-        id = str(uuid.uuid4())[:8]
+    def node(self, **kwargs):
+        return self.provisioner.list_nodes(**kwargs)
+
+    def create_keypair(self, ssh):
         return self.provisioner.import_key_pair_from_file(
-            name=f"ogc-{id}", key_file_path=str(ssh.public)
+            name=self.uuid, key_file_path=str(ssh.public)
         )
+
+    def get_key_pair(self, name):
+        return self.provisioner.get_key_pair(name)
+
+    def delete_key_pair(self, name):
+        key_pair = self.get_key_pair(name)
+        return self.provisioner.delete_key_pair(key_pair)
 
     def __repr__(self):
         raise NotImplementedError()
@@ -123,23 +138,20 @@ class AWSProvisioner(BaseProvisioner):
         return {
             "key": self.env.get("AWS_ACCESS_KEY_ID", None),
             "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
-            "region": self._args.get("region"),
+            "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
     def connect(self):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def images_query(self, runs_on):
-        """Returns the AMI and username to login with"""
-        if runs_on.startswith("ami-"):
-            return self.image(runs_on)
-        return None
+    def image(self, runs_on):
+        _runs_on = CLOUD_IMAGE_MAP["aws"].get(runs_on)
+        return super().image(_runs_on)
 
-    def create(self, layout, ssh, cache_dir, msg_cb, **kwargs):
-        msg_cb(f"Launching {layout.name}")
+    def create(self, layout, ssh, cache, msg_cb, **kwargs):
         auth = NodeAuthSSHKey(ssh.public.read_text())
-        image = self.images_query(layout.runs_on)
+        image = self.image(layout.runs_on)
         if not image and not layout.username:
             raise ProvisionException(
                 f"Could not locate AMI and/or username for: {layout.runs_on}"
@@ -157,10 +169,19 @@ class AWSProvisioner(BaseProvisioner):
             ex_spot=True,
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
-            ogc_cache_dir=cache_dir,
+            ogc_cache=cache,
             ogc_ssh=ssh,
         )
         return self._create_node(**opts)
+
+    def node(self, **kwargs):
+        instance_id = None
+        if "instance_id" in kwargs:
+            instance_id = kwargs["instance_id"]
+        _nodes = super().node(ex_node_ids=[instance_id])
+        if _nodes:
+            return _nodes[0]
+        raise ProvisionException("Unable to get node information")
 
     def __repr__(self):
         return f"<AWSProvisioner [{self.options['region']}]>"
@@ -179,22 +200,26 @@ class GCEProvisioner(BaseProvisioner):
         return {
             "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", None),
             "key": self.env.get("GOOGLE_APPLICATION_CREDENTIALS", None),
-            "project": self._args.get("project"),
-            "datacenter": self._args.get("datacenter"),
+            "project": self.env.get("GOOGLE_PROJECT", None),
+            "datacenter": self.env.get("GOOGLE_DATACENTER", None),
         }
 
     def connect(self):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
+    def image(self, runs_on):
+        _runs_on = CLOUD_IMAGE_MAP["google"].get(runs_on)
+        return super().image(_runs_on)
+
     def __repr__(self):
         return f"<GCEProvisioner [{self.options['datacenter']}]>"
 
 
-def choose_provisioner(name, options, env):
+def choose_provisioner(name, env, **kwargs):
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
     provisioner = choices[name]
-    return provisioner(env, **options)
+    return provisioner(env, **kwargs)
 
 
 class Deployer:
