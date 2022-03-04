@@ -27,41 +27,37 @@ ssh-keys:
 
 layouts:
   cluster: 
-    runs-on: ami-0d90bed76900e679a
+    runs-on: debian-latest
     constraints: c5.4xlarge
     username: admin
     steps:
+      - script: fixtures/show-metadata
       - script: contrib/setup-deb-system
       - script: contrib/setup-docker
       - script: contrib/setup-cluster
     provider: aws
   elastic-agent-ubuntu:
-    runs-on: ami-039af3bfc52681cd5
+    runs-on: ubuntu-latest
     constraints: c5.4xlarge
     username: ubuntu
     steps:
       - run: "sudo apt update"
+      - script: fixtures/show-metadata
     provider: aws
   elastic-agent-centos:
-    runs-on: ami-057cacbfbbb471bb3
+    runs-on: centos-latest
     constraints: c5.4xlarge
     username: centos
     steps:
       - script: contrib/setup-rpm-system
     provider: aws
   elastic-agent-sles:
-    runs-on: ami-0f7cb53c916a75006
+    runs-on: sles-latest
     constraints: c5.4xlarge
     username: ec2-user
     steps:
       - script: contrib/setup-rpm-system
     provider: aws
-  elastic-agent-win:
-    runs-on: windows-2022
-    constraints: cores=16 mem=8G disk=100G
-    steps:
-      - script: contrib/setup-powershell-system
-    provider: google
 ```
 
 ## Interfacing with deployment
