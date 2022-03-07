@@ -1,5 +1,7 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
+
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -11,7 +13,6 @@ from retry.api import retry_call
 from ogc.cache import Cache
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
-from ogc.fs import walk
 
 monkey.patch_all()
 from libcloud.compute.base import NodeAuthSSHKey
@@ -39,10 +40,45 @@ class ProvisionResult:
         cache_obj = Cache()
         cache_obj.save(self.layout.name, self)
 
+    def reload(self):
+        return ProvisionResult.load(self.layout.name)
+
     @classmethod
     def load(cls, name):
         cache_obj = Cache()
         cache_obj.load(name)
+
+
+class ProvisionConstraint:
+    """Parses the constraints to give us a proper node size for selected cloud"""
+
+    def __init__(self, constraint):
+        self.constraint = constraint
+
+    def parse(self):
+        items = self.constraint.split(" ")
+        params = {}
+        for item in items:
+            prop, val = item.split("=")
+            try:
+                params[prop] = self.bytesto(self.parse_size(val), "m")
+            except ValueError:
+                params[prop] = val
+        return params
+
+    def bytesto(bytes, to, bsize=1024):
+        a = {"k": 1, "m": 2, "g": 3, "t": 4, "p": 5, "e": 6}
+        r = float(bytes)
+        return int(bytes / (bsize ** a[to]))
+
+    def parse_size(self, size):
+        if isinstance(size, int):
+            return size
+        m = re.match(r"^(\d+(?:\.\d+)?)\s*([KMGT]?B)?$", size.upper())
+        if m:
+            number, unit = m.groups()
+            return int(float(number) * self.units[unit])
+        raise ValueError("Invalid size")
 
 
 class BaseProvisioner:
@@ -73,6 +109,9 @@ class BaseProvisioner:
         )
         if not explicit_constraints:
             return [size for size in _sizes if size.id == constraints]
+
+        parsed_constraints = ProvisionConstraint(constraints).parse()
+
         raise ProvisionException(f"Could not locate instance size for {constraints}")
 
     def image(self, runs_on):

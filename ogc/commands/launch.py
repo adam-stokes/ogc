@@ -31,7 +31,7 @@ def launch(spec):
             sys.exit(1)
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
-    pool = Pool(len(app.spec.layouts))
+    pool = Pool(len(app.spec.layouts) + 2)
     create_jobs = []
     app.log.info(
         f"Launching: [{', '.join([layout.name for layout in app.spec.layouts])}]"

@@ -14,7 +14,11 @@ from .base import cli
 @click.option("--name", multiple=True, required=True)
 def rm(name):
     _names = name
-    for name in _names:
+
+    pool = Pool(5)
+    rm_jobs = []
+
+    def destroy_node(name):
         cache_obj = Cache()
         node_data = None
         if not cache_obj.exists(name):
@@ -40,6 +44,10 @@ def rm(name):
             if not is_destroyed and ssh_deleted_err:
                 sys.exit(1)
         cache_obj.delete(name)
+
+    for name in _names:
+        rm_jobs.append(pool.spawn(destroy_node, name))
+    gevent.joinall(rm_jobs)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

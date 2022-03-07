@@ -22,6 +22,7 @@ retry = "^0.9.2"
 dill = "^0.3.4"
 texttable = "^1.6.4"
 scp = "^0.14.4"
+humanfriendly = "^10.0"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

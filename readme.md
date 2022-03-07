@@ -83,7 +83,10 @@ elastic-agent-ubuntu        i-052048090ad75a608    running      ogc-63e9bd2b    
 ### Destroy node
 
 ```
-> poetry run ogc rm elastic-agent-sles
+> poetry run ogc rm --name elastic-agent-sles \
+                    --name cluster \
+                    --name elastic-agent-centos \
+                    --name elastic-agent-ubuntu
 ```
 
 ### Connect to node
