@@ -38,19 +38,21 @@ class SpecProvisionLayoutStep:
 
 
 class SpecProvisionLayout:
-    def __init__(self, layout):
+    def __init__(self, layout, env, ssh):
         self.name, self.layout = layout
+        self.env = env
+        self.ssh = ssh
 
     def __repr__(self):
         return f"<SpecProvisionLayout [{self.name}]>"
 
     @property
     def runs_on(self):
-        return self.layout.get("runs-on", "ubuntu-focal")
+        return self.layout.get("runs-on", "ubuntu-latest")
 
     @property
     def constraints(self):
-        return self.layout.get("constraints", "disk=100G mem=8G cores=16")
+        return self.layout.get("constraints", "disk=100G mem=8G cores=16 arch=amd64")
 
     @property
     def username(self):
@@ -94,7 +96,10 @@ class SpecProvisionPlan:
 
     @property
     def layouts(self):
-        return [SpecProvisionLayout(layout) for layout in self.plan["layouts"].items()]
+        return [
+            SpecProvisionLayout(layout=layout, env=app.env, ssh=self.ssh)
+            for layout in self.plan["layouts"].items()
+        ]
 
     @property
     def name(self):

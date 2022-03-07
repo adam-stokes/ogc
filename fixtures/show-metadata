@@ -1,4 +1,7 @@
 #!/bin/bash
 
-echo "My cluster ip connection is ${cluster["username"]}@${cluster["host"]}"
-echo "My elastic-agent-ubuntu connection is ${elastic_agent_ubuntu["username"]}@${elastic_agent_ubuntu["host"]}"
+echo "My cluster ip connection is ${cluster.username}@${cluster.host}"
+echo "My elastic-agent-ubuntu connection is ${elastic_agent_ubuntu.username}@${elastic_agent_ubuntu.host}"
+
+echo "The cluster is associated with id: ${cluster.id}"
+echo "The ubuntu-agent is associated with id: ${elastic_agent_ubuntu.id}"

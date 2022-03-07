@@ -2,13 +2,16 @@
 # pylint: disable=wrong-import-order
 import sys
 import uuid
+from pathlib import Path
+from typing import List
 
 from gevent import monkey
 from retry.api import retry_call
 
 from ogc.cache import Cache
 from ogc.enums import CLOUD_IMAGE_MAP
-from ogc.exceptions import ProvisionDeployerException, ProvisionException
+from ogc.exceptions import ProvisionException
+from ogc.fs import walk
 
 monkey.patch_all()
 from libcloud.compute.base import NodeAuthSSHKey
@@ -20,23 +23,26 @@ from scp import SCPClient
 
 
 class ProvisionResult:
-    def __init__(self, deploy, deploy_steps_results, layout, ssh_private_key):
-        self.deploy = deploy
+    def __init__(self, id, node, layout, env):
+        self.node = node
         self.layout = layout
-        self.steps = deploy_steps_results.steps
-        self.username = layout.username
-        self.ssh_private_key = ssh_private_key
+        self.node = node[0]
+        self.host = node[1][0]
+        self.private_ips = self.node.private_ips[0]
+        self.env = env
+        self.id = id
+        self.username = self.layout.username
+        self.ssh_public_key = self.layout.ssh.public.resolve()
+        self.ssh_private_key = self.layout.ssh.private.resolve()
 
-    def render(self, msg_cb):
-        msg_cb("Provision Result: ")
-        for step in self.steps:
-            msg_cb(f"  - [{step.exit_status}]: {step}")
-        msg_cb("Connection Information: ")
-        msg_cb(f"  - Node: {self.deploy.name} [{self.deploy.state}]")
-        msg_cb(
-            f"  - ssh -i {self.ssh_private_key} {self.username}@{self.deploy.public_ips[0]}"
-        )
-        msg_cb("")
+    def save(self):
+        cache_obj = Cache()
+        cache_obj.save(self.layout.name, self)
+
+    @classmethod
+    def load(cls, name):
+        cache_obj = Cache()
+        cache_obj.load(name)
 
 
 class BaseProvisioner:
@@ -53,7 +59,7 @@ class BaseProvisioner:
     def connect(self):
         raise NotImplementedError()
 
-    def create(self, *args, **kwargs):
+    def create(self, layout, env, **kwargs):
         raise NotImplementedError()
 
     def destroy(self, node):
@@ -62,7 +68,9 @@ class BaseProvisioner:
     def sizes(self, constraints):
         _sizes = self.provisioner.list_sizes()
 
-        explicit_constraints = any(x in constraints for x in ["cores", "disk", "mem"])
+        explicit_constraints = any(
+            x in constraints for x in ["cores", "disk", "mem", "arch"]
+        )
         if not explicit_constraints:
             return [size for size in _sizes if size.id == constraints]
         raise ProvisionException(f"Could not locate instance size for {constraints}")
@@ -74,22 +82,12 @@ class BaseProvisioner:
     def images(self, **kwargs):
         return self.provisioner.list_images(**kwargs)
 
-    def _create_node(self, **kwargs):
+    def _create_node(self, **kwargs) -> ProvisionResult:
         _opts = kwargs.copy()
         layout = None
         if "ogc_layout" in _opts:
             layout = _opts["ogc_layout"]
             del _opts["ogc_layout"]
-
-        cache = None
-        if "ogc_cache" in _opts:
-            cache = _opts["ogc_cache"]
-            del _opts["ogc_cache"]
-
-        ssh_creds = None
-        if "ogc_ssh" in _opts:
-            ssh_creds = _opts["ogc_ssh"]
-            del _opts["ogc_ssh"]
 
         env = None
         if "ogc_env" in _opts:
@@ -100,20 +98,9 @@ class BaseProvisioner:
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]
-
-        # Store some useful metadata to be used in arbitrary scripts
-        metadata = {
-            "host": node[1][0],
-            "username": layout.username,
-            "layout": layout,
-            "ssh_public_key": ssh_creds.public,
-            "ssh_private_key": ssh_creds.private,
-            "node": node[0],
-            "uuid": self.uuid,
-            "env": env,
-        }
-        cache.save(layout.name, metadata)
-        return {"node": node, "layout": layout, "deployer": Deployer(layout.name)}
+        result = ProvisionResult(self.uuid, node, layout, env)
+        result.save()
+        return result
 
     def node(self, **kwargs):
         return self.provisioner.list_nodes(**kwargs)
@@ -162,11 +149,12 @@ class AWSProvisioner(BaseProvisioner):
         if runs_on.startswith("ami-"):
             _runs_on = runs_on
         else:
-            _runs_on = CLOUD_IMAGE_MAP["aws"].get(runs_on)
+            # FIXME: need proper architecture detection
+            _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on)
         return super().image(_runs_on)
 
-    def create(self, layout, ssh, cache, env, msg_cb, **kwargs):
-        auth = NodeAuthSSHKey(ssh.public.read_text())
+    def create(self, layout, env, **kwargs) -> ProvisionResult:
+        auth = NodeAuthSSHKey(layout.ssh.public.read_text())
         image = self.image(layout.runs_on)
         if not image and not layout.username:
             raise ProvisionException(
@@ -185,8 +173,6 @@ class AWSProvisioner(BaseProvisioner):
             ex_spot=True,
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
-            ogc_cache=cache,
-            ogc_ssh=ssh,
             ogc_env=env,
         )
         return self._create_node(**opts)
@@ -240,19 +226,17 @@ def choose_provisioner(name, env, **kwargs):
 
 
 class Deployer:
-    def __init__(self, name):
-        self.cache = Cache()
-        if self.cache.exists(name):
-            self.cache = self.cache.load(name)
-        else:
-            raise ProvisionDeployerException(f"Could not locate cache for {name}")
-        self.layout = self.cache["layout"]
-        engine = choose_provisioner(self.layout.provider, env=self.cache["env"])
-        self.node = engine.node(instance_id=self.cache["node"].id)
+    def __init__(self, deployment: ProvisionResult):
+        self.deployment = deployment
+        self.layout = self.deployment.layout
+        self.env = self.deployment.env
+
+        engine = choose_provisioner(self.layout.provider, env=self.env)
+        self.node = engine.node(instance_id=self.deployment.node.id)
         self._ssh_client = ParamikoSSHClient(
-            self.cache["host"],
-            username=self.cache["username"],
-            key=str(self.cache["ssh_private_key"]),
+            self.deployment.host,
+            username=self.deployment.username,
+            key=str(self.deployment.ssh_private_key),
             timeout=300,
         )
         retry_call(self._ssh_client.connect, tries=15, delay=5)
@@ -264,23 +248,22 @@ class Deployer:
             "[%s:%s] %s progress: %.2f%%                           \r"
             % (self.layout.name, peername[0], filename, float(sent) / float(size) * 100)
         )
+        sys.stdout.flush()
 
-    def run(self, metadata, msg_cb):
+    def run(self, context, msg_cb):
         msg_cb(
-            f"Establishing connection [{self.cache['host']}] [{self.cache['username']}] [{str(self.cache['ssh_private_key'])}]"
+            f"Establishing connection [{self.deployment.host}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
         )
-        steps = [step.render(metadata) for step in self.layout.steps]
+        steps = [step.render(context) for step in self.layout.steps]
         if steps:
             msg_cb(f"Executing deployment actions for {self.layout.name}")
             msd = MultiStepDeployment(steps)
             msd.run(self.node, self._ssh_client)
-            return ProvisionResult(
-                self.node, msd, self.layout, self.cache["ssh_private_key"]
-            )
+            return DeployerResult(self.deployment, msd)
         msg_cb("No deployment actions listed, skipping.")
         return None
 
-    def put(self, src, dst, msg_cb):
+    def put(self, src: Path, dst: Path, excludes: List[str], msg_cb):
         scp = SCPClient(self._ssh_client._get_transport(), progress4=self._progress)
         if src.is_dir():
             msg_cb(f"Uploading directory contents of [{src}] to [{dst}]")
@@ -291,7 +274,7 @@ class Deployer:
         scp.close()
         sys.stdout.write("\n")
 
-    def get(self, dst, src, msg_cb):
+    def get(self, dst: Path, src: Path, msg_cb):
         scp = SCPClient(self._ssh_client._get_transport(), progress4=self._progress)
         if str(src).endswith("/"):
             msg_cb(f"Downloading destination contents of [{dst}] to [{src}]")
@@ -301,3 +284,22 @@ class Deployer:
             scp.get(remote_path=str(dst), local_path=str(src))
         scp.close()
         sys.stdout.write("\n")
+
+
+class DeployerResult:
+    def __init__(self, deployment: Deployer, msd: MultiStepDeployment):
+        self.deployment = deployment
+        self.msd = msd
+
+    def show(self, msg_cb):
+        msg_cb("Deployment Result: ")
+        for step in self.msd.steps:
+            msg_cb(f"  - [{step.exit_status}]: {step}")
+        msg_cb("Connection Information: ")
+        msg_cb(
+            f"  - Node: {self.deployment.layout.name} [{self.deployment.node.state}]"
+        )
+        msg_cb(
+            f"  - ssh -i {self.deployment.ssh_private_key} {self.deployment.username}@{self.deployment.host}"
+        )
+        msg_cb("")

@@ -7,7 +7,7 @@ import gevent
 from gevent.pool import Pool
 
 from ..cache import Cache
-from ..provision import ProvisionResult, choose_provisioner
+from ..provision import Deployer, DeployerResult, ProvisionResult, choose_provisioner
 from ..spec import SpecLoader
 from ..state import app
 from .base import cli
@@ -31,21 +31,19 @@ def launch(spec):
             sys.exit(1)
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
-
     pool = Pool(len(app.spec.layouts))
     create_jobs = []
+    app.log.info(
+        f"Launching: [{', '.join([layout.name for layout in app.spec.layouts])}]"
+    )
     for layout in app.spec.layouts:
         engine = choose_provisioner(layout.provider, env=app.env)
-        app.log.info(f"[{engine}] Launching: {layout.name}")
-        engine.create_keypair(app.spec.ssh)
+        engine.create_keypair(layout.ssh)
         create_jobs.append(
             pool.spawn(
                 engine.create,
-                layout,
-                cache=cache_obj,
-                ssh=app.spec.ssh,
+                layout=layout,
                 env=app.env,
-                msg_cb=app.log.info,
             )
         )
     gevent.joinall(create_jobs)
@@ -57,12 +55,15 @@ def launch(spec):
             metadata[layout.name.replace("-", "_")] = cache_obj.load(layout.name)
 
     config_jobs = []
+    app.log.info(
+        f"Executing Deployment(s) on: [{', '.join([layout.name for layout in app.spec.layouts])}]"
+    )
     for job in create_jobs:
-        if job.value is not None:
+        if job.value is not None and isinstance(job.value, ProvisionResult):
             config_jobs.append(
                 pool.spawn(
-                    job.value["deployer"].run,
-                    metadata=metadata,
+                    Deployer(job.value).run,
+                    context=metadata,
                     msg_cb=app.log.info,
                 )
             )
@@ -70,8 +71,8 @@ def launch(spec):
     gevent.joinall(config_jobs)
 
     for job in config_jobs:
-        if job.value is not None and isinstance(job.value, ProvisionResult):
-            job.value.render(msg_cb=app.log.info)
+        if job.value is not None and isinstance(job.value, DeployerResult):
+            job.value.show(msg_cb=app.log.info)
 
 
 cli.add_command(launch)

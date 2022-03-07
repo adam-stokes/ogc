@@ -11,33 +11,35 @@ from .base import cli
 
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
-@click.argument("name")
+@click.option("--name", multiple=True, required=True)
 def rm(name):
-    cache_obj = Cache()
-    node_data = None
-    if not cache_obj.exists(name):
-        app.log.error(f"Unable to find {layout.name} in cache")
-        sys.exit(1)
-    node_data = cache_obj.load(name)
-    if node_data:
-        uuid = node_data["uuid"]
-        node = node_data["node"]
-        layout = node_data["layout"]
-        engine = choose_provisioner(layout.provider, env=app.env)
-        node = engine.node(instance_id=node.id)
-        app.log.info(f"Destroying {layout.name}")
-        is_destroyed = node.destroy()
-        if not is_destroyed:
-            app.log.error(f"Unable to destroy {node.id}")
-
-        key_pair = engine.get_key_pair(uuid)
-        ssh_deleted_err = engine.delete_key_pair(key_pair)
-        if ssh_deleted_err:
-            app.log.error(f"Could not delete ssh keypair {uuid}")
-
-        if not is_destroyed and ssh_deleted_err:
+    _names = name
+    for name in _names:
+        cache_obj = Cache()
+        node_data = None
+        if not cache_obj.exists(name):
+            app.log.error(f"Unable to find {layout.name} in cache")
             sys.exit(1)
-    cache_obj.delete(name)
+        node_data = cache_obj.load(name)
+        if node_data:
+            uuid = node_data.id
+            node = node_data.node
+            layout = node_data.layout
+            engine = choose_provisioner(layout.provider, env=app.env)
+            node = engine.node(instance_id=node.id)
+            app.log.info(f"Destroying {layout.name}")
+            is_destroyed = node.destroy()
+            if not is_destroyed:
+                app.log.error(f"Unable to destroy {node.id}")
+
+            key_pair = engine.get_key_pair(uuid)
+            ssh_deleted_err = engine.delete_key_pair(key_pair)
+            if ssh_deleted_err:
+                app.log.error(f"Could not delete ssh keypair {uuid}")
+
+            if not is_destroyed and ssh_deleted_err:
+                sys.exit(1)
+        cache_obj.delete(name)
 
 
 @click.option("--provider", default="aws", help="Provider to query")
