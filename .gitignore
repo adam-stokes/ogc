@@ -8,3 +8,4 @@ site
 ogc.log
 .tox
 .ogc-cache
+adam-stokes-svc.json

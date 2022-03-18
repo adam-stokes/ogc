@@ -98,23 +98,31 @@ class BaseProvisioner:
     def create(self, layout, env, **kwargs):
         raise NotImplementedError()
 
+    def setup(self):
+        """Perform some provider specific setup before launch"""
+        raise NotImplementedError()
+
+    def cleanup(self, node):
+        """Perform some provider specific cleanup after node destroy typically"""
+        raise NotImplementedError()
+
     def destroy(self, node):
         return self.provisioner.destroy_node(node)
 
     def sizes(self, constraints):
         _sizes = self.provisioner.list_sizes()
+        try:
+            return [
+                size
+                for size in _sizes
+                if size.id == constraints or size.name == constraints
+            ][0]
+        except IndexError:
+            raise ProvisionException(
+                f"Could not locate instance size for {constraints}"
+            )
 
-        explicit_constraints = any(
-            x in constraints for x in ["cores", "disk", "mem", "arch"]
-        )
-        if not explicit_constraints:
-            return [size for size in _sizes if size.id == constraints]
-
-        parsed_constraints = ProvisionConstraint(constraints).parse()
-
-        raise ProvisionException(f"Could not locate instance size for {constraints}")
-
-    def image(self, runs_on):
+    def image(self, runs_on, arch):
         """Gets a single image from registry of provider"""
         return self.provisioner.get_image(runs_on)
 
@@ -184,24 +192,29 @@ class AWSProvisioner(BaseProvisioner):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def image(self, runs_on):
+    def setup(self, layout):
+        self.create_keypair(layout.ssh)
+
+    def cleanup(self, node):
+        key_pair = self.get_key_pair(node.id)
+        return self.delete_key_pair(key_pair)
+
+    def image(self, runs_on, arch):
         if runs_on.startswith("ami-"):
             _runs_on = runs_on
         else:
             # FIXME: need proper architecture detection
-            _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on)
-        return super().image(_runs_on)
+            _runs_on = CLOUD_IMAGE_MAP["aws"][arch].get(runs_on)
+        return super().image(_runs_on, arch)
 
     def create(self, layout, env, **kwargs) -> ProvisionResult:
         auth = NodeAuthSSHKey(layout.ssh.public.read_text())
-        image = self.image(layout.runs_on)
+        image = self.image(layout.runs_on, layout.arch)
         if not image and not layout.username:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout.runs_on}"
+                f"Could not locate AMI and/or username for: {layout.runs_on}/{layout.arch}"
             )
         size = self.sizes(layout.constraints)
-        if size and len(size) > 0:
-            size = size[0]
 
         opts = dict(
             name=f"ogc-{layout.name}",
@@ -250,9 +263,55 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def image(self, runs_on):
-        _runs_on = CLOUD_IMAGE_MAP["google"].get(runs_on)
-        return super().image(_runs_on)
+    def setup(self, layout):
+        pass
+
+    def cleanup(self, node):
+        pass
+
+    def image(self, runs_on, arch):
+        _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
+        try:
+            return [i for i in self.images() if i.name == _runs_on][0]
+        except IndexError:
+            raise ProvisionException(f"Could not determine image for {_runs_on}")
+
+    def create(self, layout, env, **kwargs) -> ProvisionResult:
+        image = self.image(layout.runs_on, layout.arch)
+        if not image and not layout.username:
+            raise ProvisionException(
+                f"Could not locate AMI and/or username for: {layout.runs_on}/{layout.arch}"
+            )
+        size = self.sizes(layout.constraints)
+
+        ex_metadata = {
+            "items": [
+                {
+                    "key": "ssh-keys",
+                    "value": "root: %s" % (layout.ssh.public.read_text()),
+                }
+            ]
+        }
+
+        opts = dict(
+            name=f"ogc-{layout.name}",
+            image=image,
+            size=size,
+            ex_metadata=ex_metadata,
+            ogc_layout=layout,
+            ogc_env=env,
+        )
+        return self._create_node(**opts)
+
+    def node(self, **kwargs):
+        _nodes = super().node()
+        instance_id = None
+        if "instance_id" in kwargs:
+            instance_id = kwargs["instance_id"]
+        _node = [n for n in _nodes if n.id == instance_id]
+        if _node:
+            return _node[0]
+        raise ProvisionException("Unable to get node information")
 
     def __repr__(self):
         return f"<GCEProvisioner [{self.options['datacenter']}]>"

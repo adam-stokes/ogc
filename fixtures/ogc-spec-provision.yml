@@ -12,10 +12,14 @@ layouts:
     username: admin
     steps:
       - script: fixtures/show-metadata
-      - script: contrib/setup-deb-system
-      - script: contrib/setup-docker
-      - script: contrib/setup-cluster
     provider: aws
+  elastic-agent-ubuntu-gcp:
+    runs-on: ubuntu-1804
+    constraints: e2-standard-8
+    username: root
+    steps:
+      - script: fixtures/show-metadata-gce
+    provider: google
   elastic-agent-ubuntu:
     runs-on: ubuntu-latest
     constraints: c5.4xlarge
@@ -24,20 +28,20 @@ layouts:
       - run: "sudo apt update"
       - script: fixtures/show-metadata
     provider: aws
-  elastic-agent-centos:
-    runs-on: centos-latest
-    constraints: c5.4xlarge
-    username: centos
-    steps:
-      - script: contrib/setup-rpm-system
-    provider: aws
-  elastic-agent-sles:
-    runs-on: sles-latest
-    constraints: c5.4xlarge
-    username: ec2-user
-    steps:
-      - script: contrib/setup-rpm-system
-    provider: aws
+  # elastic-agent-centos:
+  #   runs-on: centos-latest
+  #   constraints: c5.4xlarge
+  #   username: centos
+  #   steps:
+  #     - script: contrib/setup-rpm-system
+  #   provider: aws
+  # elastic-agent-sles:
+  #   runs-on: sles-latest
+  #   constraints: c5.4xlarge
+  #   username: ec2-user
+  #   steps:
+  #     - script: contrib/setup-rpm-system
+  #   provider: aws
   # elastic-agent-win:
   #   runs-on: windows-2022
   #   constraints: cores=16 mem=8G disk=100G

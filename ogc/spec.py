@@ -51,6 +51,10 @@ class SpecProvisionLayout:
         return self.layout.get("runs-on", "ubuntu-latest")
 
     @property
+    def arch(self):
+        return self.layout.get("arch", "amd64")
+
+    @property
     def constraints(self):
         return self.layout.get("constraints", "disk=100G mem=8G cores=16 arch=amd64")
 

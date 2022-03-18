@@ -38,7 +38,7 @@ def launch(spec):
     )
     for layout in app.spec.layouts:
         engine = choose_provisioner(layout.provider, env=app.env)
-        engine.create_keypair(layout.ssh)
+        engine.setup(layout)
         create_jobs.append(
             pool.spawn(
                 engine.create,

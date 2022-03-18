@@ -22,10 +22,12 @@ class SpecCoreLayout:
     USERNAME = "username"
     SCRIPTS = "scripts"
     PROVIDER = "provider"
+    ARCH = "arch"
 
 
 SPEC_CORE_LAYOUT_LIST = [
     SpecCoreLayout.RUNS_ON,
+    SpecCoreLayout.ARCH,
     SpecCoreLayout.USERNAME,
     SpecCoreLayout.SCRIPTS,
     SpecCoreLayout.PROVIDER,
@@ -66,9 +68,6 @@ CLOUD_IMAGE_MAP = {
             "ubuntu-latest": "",
             "ubuntu-2004": "",
             "ubuntu-1804": "",
-            "centos-latest": "",
-            "centos-9": "",
-            "centos-8": "",
             "sles-latest": "",
             "sles-15": "",
             "debian-latest": "",
@@ -76,20 +75,14 @@ CLOUD_IMAGE_MAP = {
             "debian-9": "",
         },
         "amd64": {
-            "ubuntu-latest": "",
-            "ubuntu-2004": "",
-            "ubuntu-1804": "",
-            "centos-latest": "",
-            "centos-9": "",
-            "centos-8": "",
-            "sles-latest": "",
-            "sles-15": "",
-            "debian-latest": "",
-            "debian-10": "",
-            "debian-9": "",
-            "windows-latest": "",
-            "windows-2022": "",
-            "windows-10": "",
+            "ubuntu-latest": "ubuntu-2004-focal-v20220308",
+            "ubuntu-2004": "ubuntu-2004-focal-v20220308",
+            "ubuntu-1804": "ubuntu-1804-bionic-v20220308",
+            "sles-latest": "sles-15-sp3-v20220223",
+            "sles-15": "sles-15-sp3-v20220223",
+            "debian-latest": "debian-11-bullseye-v20220317",
+            "debian-10": "debian-10-buster-v20220317",
+            "debian-9": "debian-9-stretch-v20220317",
         },
     },
 }

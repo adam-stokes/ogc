@@ -36,8 +36,7 @@ def rm(name):
             if not is_destroyed:
                 app.log.error(f"Unable to destroy {node.id}")
 
-            key_pair = engine.get_key_pair(uuid)
-            ssh_deleted_err = engine.delete_key_pair(key_pair)
+            ssh_deleted_err = engine.cleanup(node_data)
             if ssh_deleted_err:
                 app.log.error(f"Could not delete ssh keypair {uuid}")
 
