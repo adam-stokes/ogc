@@ -12,7 +12,7 @@ click = "^8.0.4"
 dict-deep = "^4.1.2"
 python-dotenv = "^0.19.2"
 loguru = "^0.6.0"
-apache-libcloud = { git = "https://github.com/apache/libcloud.git", branch = "trunk" }
+apache-libcloud = "^3.5.0"
 PyYAML = "^6.0"
 melddict = "^1.0.1"
 paramiko = "^2.9.2"
@@ -23,6 +23,7 @@ dill = "^0.3.4"
 texttable = "^1.6.4"
 scp = "^0.14.4"
 humanfriendly = "^10.0"
+celery = {extras = ["redis"], version = "^5.2.3"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
@@ -39,7 +40,7 @@ pytest = "^7.0.1"
 ipdb = "^0.13.9"
 
 [tool.poetry.scripts]
-ogc = "ogc.commands.base:start"
+ogc = "ogc.commands.base:start" 
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

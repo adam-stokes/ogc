@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  redis:
+    env_file:
+      - ".env"
+    image: "redis:6.2-alpine"
+    restart: always
+    volumes:
+      - "redis:/data"
+    ports:
+      - '6379:6379'  
+
+  celery:
+    build: "."
+    command: ./wait-for-it.sh -h localhost -p 6379 --timeout=15 --strict -- celery -A ogc.celery.app worker --loglevel=debug -E 
+    restart: on-failure
+    depends_on:
+      - redis
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+
+volumes:
+  redis: {}

@@ -27,3 +27,7 @@ def test(c):
 @task
 def bump_rev(c):
     c.run("punch --part patch")
+
+@task
+def celery(c):
+    c.run("celery -A ogc.celery.app worker --loglevel=info -E")

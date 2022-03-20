@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-from statistics import multimode
 
 import click
 import gevent
