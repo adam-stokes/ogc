@@ -7,20 +7,17 @@ import uuid
 from pathlib import Path
 from typing import List
 
-from gevent import monkey
-from retry.api import retry_call
-
-from ogc.cache import Cache
-from ogc.enums import CLOUD_IMAGE_MAP
-from ogc.exceptions import ProvisionException
-
-monkey.patch_all()
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.deployment import MultiStepDeployment
 from libcloud.compute.providers import get_driver
 from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
+from retry.api import retry_call
 from scp import SCPClient
+
+from ogc.cache import Cache
+from ogc.enums import CLOUD_IMAGE_MAP
+from ogc.exceptions import ProvisionException
 
 
 class ProvisionResult:

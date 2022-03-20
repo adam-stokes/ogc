@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye as pybase
+FROM python:3.10-slim
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
@@ -12,8 +12,10 @@ WORKDIR /code
 
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    build-essential \
+    build-essential bzip2 ca-certificates git gzip \
+    libc-dev libffi-dev vim wget \
   && rm -rf /var/lib/apt/lists/*
+
 RUN pip install "poetry==$POETRY_VERSION"
 RUN python -m venv /venv
 COPY pyproject.toml poetry.lock ./

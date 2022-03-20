@@ -1,10 +1,9 @@
 import sys
 
 import click
-import gevent
-from gevent.pool import Pool
 
-from ..cache import Cache
+from ogc.tasks import do_destroy
+
 from ..provision import choose_provisioner
 from ..state import app
 from .base import cli
@@ -14,39 +13,9 @@ from .base import cli
 @click.option("--name", multiple=True, required=True)
 def rm(name):
     _names = name
-
-    pool = Pool(5)
-    rm_jobs = []
-
-    def destroy_node(name):
-        cache_obj = Cache()
-        node_data = None
-        if not cache_obj.exists(name):
-            app.log.error(f"Unable to find {layout.name} in cache")
-            sys.exit(1)
-        node_data = cache_obj.load(name)
-        if node_data:
-            uuid = node_data.id
-            node = node_data.node
-            layout = node_data.layout
-            engine = choose_provisioner(layout.provider, env=app.env)
-            node = engine.node(instance_id=node.id)
-            app.log.info(f"Destroying {layout.name}")
-            is_destroyed = node.destroy()
-            if not is_destroyed:
-                app.log.error(f"Unable to destroy {node.id}")
-
-            ssh_deleted_err = engine.cleanup(node_data)
-            if ssh_deleted_err:
-                app.log.error(f"Could not delete ssh keypair {uuid}")
-
-            if not is_destroyed and ssh_deleted_err:
-                sys.exit(1)
-        cache_obj.delete(name)
-
+    app.log.info(f"Destroying: [{', '.join(_names)}]")
     for name in _names:
-        rm_jobs.append(pool.spawn(destroy_node, name))
-    gevent.joinall(rm_jobs)
+        do_destroy.delay(name, app.env)
 
 
 @click.option("--provider", default="aws", help="Provider to query")
@@ -60,13 +29,9 @@ def rm_key_pairs(provider, filter):
     else:
         kps = [kp for kp in engine.list_key_pairs()]
 
-    pool = Pool(5)
-    rm_jobs = []
     for kp in kps:
         click.secho(f"Removing keypair: {kp.name}", fg="green")
-        rm_jobs.append(pool.spawn(engine.delete_key_pair, kp))
-
-    gevent.joinall(rm_jobs)
+        engine.delete_key_pair(kp)
 
 
 cli.add_command(rm)

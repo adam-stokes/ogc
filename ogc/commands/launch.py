@@ -2,11 +2,11 @@ import sys
 from pathlib import Path
 
 import click
-import gevent
-from gevent.pool import Pool
+from celery import chord
 
-from ..cache import Cache
-from ..provision import Deployer, DeployerResult, ProvisionResult, choose_provisioner
+from ogc.tasks import do_deploy, do_provision, end_deploy, end_provision
+
+from ..provision import DeployerResult, ProvisionResult
 from ..spec import SpecLoader
 from ..state import app
 from .base import cli
@@ -16,8 +16,6 @@ from .base import cli
 @click.option("--spec", required=True, multiple=True)
 def launch(spec):
     # Setup cache-dir
-    cache_obj = Cache()
-
     specs = []
     # Check for local spec
     if Path("ogc.yml").exists() and not spec:
@@ -30,48 +28,33 @@ def launch(spec):
             sys.exit(1)
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
-    pool = Pool(len(app.spec.layouts) + 2)
-    create_jobs = []
     app.log.info(
-        f"Launching: [{', '.join([layout.name for layout in app.spec.layouts])}]"
+        f"Provisioning: [{', '.join([layout.name for layout in app.spec.layouts])}]"
     )
-    for layout in app.spec.layouts:
-        engine = choose_provisioner(layout.provider, env=app.env)
-        engine.setup(layout)
-        create_jobs.append(
-            pool.spawn(
-                engine.create,
-                layout=layout,
-                env=app.env,
-            )
-        )
-    gevent.joinall(create_jobs)
+
+    create_jobs = [do_provision.s(layout, app.env) for layout in app.spec.layouts]
+
+    callback = end_provision.s()
+    result = chord(create_jobs)(callback)
+    results = result.get()
 
     # Load up any stored metadata
+    # TODO: move this to a database for better async
     metadata = {}
-    for layout in app.spec.layouts:
-        if cache_obj.exists(layout.name):
-            metadata[layout.name.replace("-", "_")] = cache_obj.load(layout.name)
+    for job in results:
+        metadata[job.layout.name.replace("-", "_")] = job
 
-    config_jobs = []
-    app.log.info(
-        f"Executing Deployment(s) on: [{', '.join([layout.name for layout in app.spec.layouts])}]"
-    )
-    for job in create_jobs:
-        if job.value is not None and isinstance(job.value, ProvisionResult):
-            config_jobs.append(
-                pool.spawn(
-                    Deployer(job.value).run,
-                    context=metadata,
-                    msg_cb=app.log.info,
-                )
-            )
+    config_jobs = [
+        do_deploy.s(job, metadata, app.log.info)
+        for job in results
+        if isinstance(job, ProvisionResult)
+    ]
+    callback = end_deploy.s()
+    result = chord(config_jobs)(callback)
 
-    gevent.joinall(config_jobs)
-
-    for job in config_jobs:
-        if job.value is not None and isinstance(job.value, DeployerResult):
-            job.value.show(msg_cb=app.log.info)
+    for job in result.get():
+        if isinstance(job, DeployerResult):
+            job.show(msg_cb=app.log.info)
 
 
 cli.add_command(launch)
