@@ -2,8 +2,6 @@ version: "3.9"
 
 services:
   redis:
-    env_file:
-      - ".env"
     image: "redis:6.2-alpine"
     restart: always
     volumes:
@@ -31,6 +29,7 @@ services:
     command: celery -A ogc.celery.app worker -l info -E
     depends_on:
       - redis
+      - postgres
     env_file:
       - .env
     environment:
