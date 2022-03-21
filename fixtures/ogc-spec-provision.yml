@@ -6,42 +6,21 @@ ssh-keys:
   private: ~/.ssh/id_rsa_libcloud
 
 layouts:
-  # cluster: 
-  #   runs-on: debian-latest
-  #   constraints: c5.4xlarge
-  #   username: admin
-  #   scripts: fixtures/ex_deploy_debian
-  #   provider: aws
-  elastic-agent-ubuntu-gcp:
+  elastic-agent-sles: 
+    runs-on: sles-15
+    constraints: e2-standard-8
+    username: root
+    scripts: fixtures/ex_deploy_debian
+    provider: google
+    scale: 5
+    tags:
+      - elastic-agent-7.x
+  elastic-agent-ubuntu:
     runs-on: ubuntu-1804
     constraints: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 100
-  # elastic-agent-ubuntu:
-  #   runs-on: ubuntu-latest
-  #   constraints: c5.4xlarge
-  #   username: ubuntu
-  #   scripts: fixtures/ex_deploy_ubuntu
-  #   provider: aws
-  # elastic-agent-centos:
-  #   runs-on: centos-latest
-  #   constraints: c5.4xlarge
-  #   username: centos
-  #   steps:
-  #     - script: contrib/setup-rpm-system
-  #   provider: aws
-  # elastic-agent-sles:
-  #   runs-on: sles-latest
-  #   constraints: c5.4xlarge
-  #   username: ec2-user
-  #   steps:
-  #     - script: contrib/setup-rpm-system
-  #   provider: aws
-  # elastic-agent-win:
-  #   runs-on: windows-2022
-  #   constraints: cores=16 mem=8G disk=100G
-  #   steps:
-  #     - script: contrib/setup-powershell-system
-  #   provider: google
+    scale: 5
+    tags:
+      - elastic-agent-8.x

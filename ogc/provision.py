@@ -33,8 +33,10 @@ class ProvisionResult:
         self.id = id
         self.username = self.layout["username"]
         self.scripts = self.layout["scripts"]
+        self.provider = self.layout["provider"]
         self.ssh_public_key = self.layout["ssh_public_key"]
         self.ssh_private_key = self.layout["ssh_private_key"]
+        self.tags = self.layout["tags"]
 
     def save(self) -> NodeModel:
         node_obj = NodeModel(
@@ -42,13 +44,14 @@ class ProvisionResult:
             instance_name=self.node.name,
             instance_id=self.node.id,
             instance_state=self.node.state,
-            username=self.layout["username"],
+            username=self.username,
             public_ip=self.host,
             private_ip=self.private_ip,
             ssh_public_key=self.ssh_public_key,
             ssh_private_key=self.ssh_private_key,
-            provider=self.layout["provider"],
-            scripts=self.layout["scripts"],
+            provider=self.provider,
+            scripts=self.scripts,
+            tags=self.tags,
         )
         node_obj.save()
         return node_obj
@@ -305,6 +308,7 @@ class GCEProvisioner(BaseProvisioner):
             image=image,
             size=size,
             ex_metadata=ex_metadata,
+            ex_tags=["e2e"],
             ogc_layout=layout,
             ogc_env=env,
         )
@@ -343,7 +347,7 @@ class Deployer:
             key=str(self.deployment.ssh_private_key),
             timeout=300,
         )
-        retry_call(self._ssh_client.connect, tries=15, delay=5)
+        retry_call(self._ssh_client.connect, tries=20, delay=15, backoff=2)
 
     def render(self, template: Path, context):
         """Returns the correct deployment based on type of step"""
@@ -374,7 +378,8 @@ class Deployer:
                 ssh_private_key=row.ssh_private_key,
                 provider=row.provider,
             )
-        scripts_to_run = scripts.glob("**/*")
+        scripts_to_run = list(scripts.glob("**/*"))
+        scripts_to_run.reverse()
         for s in scripts_to_run:
             if s.is_file():
                 log.info(f"[{self.deployment.instance_name}] Executing {s}")

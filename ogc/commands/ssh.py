@@ -5,12 +5,13 @@ from pathlib import Path
 import click
 import sh
 
+from ogc import db
+
 from ..cache import Cache
 from ..fs import walk
 from ..provision import Deployer
 from ..state import app
 from .base import cli
-from ogc import db
 
 
 @click.command(help="Login to a node")

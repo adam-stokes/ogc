@@ -48,11 +48,15 @@ class SpecProvisionLayout:
 
     @property
     def provider(self):
-        return self.layout.get("provider", [])
+        return self.layout.get("provider", "google")
 
     @property
     def scale(self):
         return self.layout.get("scale", 1)
+
+    @property
+    def tags(self):
+        return self.layout.get("tags", [])
 
     def as_dict(self):
         return dict(
@@ -66,6 +70,7 @@ class SpecProvisionLayout:
             provider=self.provider,
             ssh_public_key=str(self.ssh.public),
             ssh_private_key=str(self.ssh.private),
+            tags=self.tags,
         )
 
 

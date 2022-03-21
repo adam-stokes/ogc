@@ -1,8 +1,9 @@
 import datetime
 
 from peewee import *
+from playhouse.postgres_ext import *
 
-DATABASE = PostgresqlDatabase(
+DATABASE = PostgresqlExtDatabase(
     "ogc", user="postgres", password="postgres", host="localhost"
 )
 
@@ -26,6 +27,7 @@ class NodeModel(BaseModel):
     ssh_private_key = TextField()
     provider = TextField()
     scripts = TextField()
+    tags = ArrayField(CharField)
 
 
 def connect():

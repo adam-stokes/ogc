@@ -1,0 +1,7 @@
+#!/bin/bash
+
+% for id, meta in instances.items():
+    echo "Name: ${meta['instance_name']}"
+    echo "Connection: ${meta['username']}@${meta['public_ip']}"
+    echo "Provider: ${meta['provider']}"
+% endfor

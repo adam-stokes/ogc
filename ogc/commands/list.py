@@ -13,15 +13,16 @@ def ls():
     db.connect()
     rows = db.NodeModel.select()
     table = Texttable()
-    table.set_cols_width([10, 40, 10, 65])
+    table.set_cols_width([10, 40, 20, 10, 65])
     table.set_deco(Texttable.HEADER | Texttable.HLINES)
-    table.add_row([f"{len(rows)} Nodes", "Name", "Status", "Connection"])
+    table.add_row([f"{len(rows)} Nodes", "Name", "Tags", "Status", "Connection"])
 
     for data in rows:
         table.add_row(
             [
                 data.id,
                 data.instance_name,
+                ", ".join(data.tags),
                 data.instance_state,
                 f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
             ]
