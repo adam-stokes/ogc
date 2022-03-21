@@ -1,4 +1,9 @@
 #!/bin/bash
+<%namespace name="db" module="ogc.db"/>
 
-echo "I am a teardown script"
+<%
+num_nodes = len(list(db.by_tag('ubuntu')))
+%>
+
+echo "I am a teardown script, I'm on ${num_nodes} nodes."
 exit 0
