@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_debian
     provider: google
-    scale: 5
+    scale: 1
     tags:
       - elastic-agent-7.x
   elastic-agent-ubuntu:
@@ -21,6 +21,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 5
+    scale: 15
     tags:
       - elastic-agent-8.x
+      - ubuntu

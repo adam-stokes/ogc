@@ -1,7 +1,8 @@
 #!/bin/bash
+<%namespace name="db" module="ogc.db"/>
 
-% for id, meta in instances.items():
-    echo "Name: ${meta['instance_name']}"
-    echo "Connection: ${meta['username']}@${meta['public_ip']}"
-    echo "Provider: ${meta['provider']}"
+echo ""
+% for node in db.by_tag('sles'):
+echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
 % endfor
+echo ""

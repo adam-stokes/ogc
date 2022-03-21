@@ -365,19 +365,9 @@ class Deployer:
             log.info("No deployment scripts found, skipping.")
             return DeployerResult(self.deployment, MultiStepDeployment())
 
-        # Were here so lets query db to pass to all scripts for rendering
-        data = NodeModel.select()
-        context = {"instances": {}}
-        for row in data:
-            context["instances"][row.id] = dict(
-                instance_name=row.instance_name,
-                username=row.username,
-                public_ip=row.public_ip,
-                private_ip=row.private_ip,
-                ssh_public_key=row.ssh_public_key,
-                ssh_private_key=row.ssh_private_key,
-                provider=row.provider,
-            )
+        # TODO: maybe support a "vars" section in the spec file to be
+        # added to the context for templates
+        context = {}
         scripts_to_run = list(scripts.glob("**/*"))
         scripts_to_run.reverse()
         for s in scripts_to_run:
