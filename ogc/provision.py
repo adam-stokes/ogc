@@ -368,7 +368,11 @@ class Deployer:
         # TODO: maybe support a "vars" section in the spec file to be
         # added to the context for templates
         context = {}
-        scripts_to_run = list(scripts.glob("**/*"))
+
+        # teardown file is a special file that gets executed before node
+        # destroy
+        scripts_to_run = [fname for fname in scripts.glob("**/*")
+                          if fname != "teardown"]
         scripts_to_run.reverse()
         for s in scripts_to_run:
             if s.is_file():

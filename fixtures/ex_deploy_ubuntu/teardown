@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "I am a teardown script"
+exit 0
