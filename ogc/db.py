@@ -42,10 +42,12 @@ def by_tag(context, tag):
     connect()
     return NodeModel.select().where(NodeModel.tags.contains(tag))
 
+
 def by_name(context, name):
     """Returns rows by instance name"""
     connect()
     return NodeModel.get(NodeModel.instance_name == name)
+
 
 def by_id(context, id):
     """Returns rows by row id"""

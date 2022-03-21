@@ -6,4 +6,6 @@ num_nodes = len(list(db.by_tag('ubuntu')))
 %>
 
 echo "I am a teardown script, I'm on ${num_nodes} nodes."
+
+touch i_was_ran.txt
 exit 0

@@ -38,11 +38,14 @@ def do_destroy(name: str, env: Dict[str, str]) -> None:
         uuid = node_data.uuid
         engine = choose_provisioner(node_data.provider, env=env)
         try:
-            node = engine.node(instance_id=node_data.instance_id)
+            deploy = Deployer(node_data, state.app.env)
+            exec_result = deploy.exec("./teardown")
+            if not exec_result.passed:
+                log.error(f"Unable to run teardown script on {node_data.instance_name}")
             log.info(f"Destroying {node_data.instance_name}")
-            is_destroyed = node.destroy()
+            is_destroyed = deploy.node.destroy()
             if not is_destroyed:
-                log.error(f"Unable to destroy {node.id}")
+                log.error(f"Unable to destroy {deploy.node.id}")
 
             ssh_deleted_err = engine.cleanup(node_data)
             if ssh_deleted_err:

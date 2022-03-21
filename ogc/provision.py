@@ -3,13 +3,17 @@
 
 import re
 import sys
-import uuid
 import tempfile
+import uuid
 from pathlib import Path
 from typing import Dict, List
 
 from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment, FileDeployment
+from libcloud.compute.deployment import (
+    FileDeployment,
+    MultiStepDeployment,
+    ScriptDeployment,
+)
 from libcloud.compute.providers import get_driver
 from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
@@ -356,6 +360,13 @@ class Deployer:
         template = Template(filename=str(fpath))
         return template.render(**context)
 
+    def exec(self, cmd) -> "DeployerResult":
+        """Runs a command on the node"""
+        script = ScriptDeployment(cmd)
+        msd = MultiStepDeployment([script])
+        msd.run(self.node, self._ssh_client)
+        return DeployerResult(self.deployment, msd)
+
     def run(self) -> "DeployerResult":
         log.info(
             f"Establishing connection [{self.deployment.public_ip}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
@@ -371,12 +382,16 @@ class Deployer:
 
         # teardown file is a special file that gets executed before node
         # destroy
-        scripts_to_run = [fname for fname in scripts.glob("**/*")
-                          if fname.stem != "teardown"]
+        scripts_to_run = [
+            fname for fname in scripts.glob("**/*") if fname.stem != "teardown"
+        ]
         scripts_to_run.reverse()
 
-        steps = [ScriptDeployment(self.render(s, context)) for s in scripts_to_run
-                 if s.is_file()]
+        steps = [
+            ScriptDeployment(self.render(s, context))
+            for s in scripts_to_run
+            if s.is_file()
+        ]
 
         # Add teardown script as just a filedeployment
         teardown_script = scripts / "teardown"
@@ -385,7 +400,7 @@ class Deployer:
                 temp_contents = self.render(teardown_script, context)
                 fp.write(temp_contents.encode())
                 steps.append(FileDeployment(fp.name, "teardown"))
-                steps.append(ScriptDeployment('chmod +x teardown'))
+                steps.append(ScriptDeployment("chmod +x teardown"))
 
         if steps:
             log.info(f"[{self.deployment.instance_name}] Executing {len(steps)} steps")
@@ -436,10 +451,18 @@ class DeployerResult:
         self.deployment = deployment
         self.msd = msd
 
+    @property
+    def passed(self):
+        return all(
+            step.exit_status == 0
+            for step in self.msd.steps
+            if hasattr(step, "exit_status")
+        )
+
     def show(self):
         log.info("Deployment Result: ")
         for step in self.msd.steps:
-            if hasattr(step, 'exit_status'):
+            if hasattr(step, "exit_status"):
                 log.info(f"  - [{step.exit_status}]: {step}")
         log.info("Connection Information: ")
         log.info(
