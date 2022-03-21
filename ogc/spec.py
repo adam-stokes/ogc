@@ -3,8 +3,6 @@ import sys
 from pathlib import Path
 
 import yaml
-from libcloud.compute.deployment import ScriptDeployment
-from mako.template import Template
 from melddict import MeldDict
 
 from .state import app
@@ -17,24 +15,6 @@ class SpecLoader(MeldDict):
         for spec in specs:
             cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
         return SpecProvisionPlan(cl)
-
-
-class SpecProvisionLayoutStep:
-    def __init__(self, step):
-        self.step = step
-
-    def render(self, metadata):
-        """Returns the correct deployment based on type of step"""
-        if "script" in self.step:
-            fpath = Path(self.step["script"]).absolute()
-            if fpath.exists():
-                template = Template(filename=str(fpath))
-                contents = template.render(**metadata)
-                return ScriptDeployment(contents)
-            return ScriptDeployment(
-                f"echo \"{self.step['script']}\" >> missing_scripts"
-            )
-        return ScriptDeployment(self.step["run"])
 
 
 class SpecProvisionLayout:
@@ -63,17 +43,30 @@ class SpecProvisionLayout:
         return self.layout.get("username", "admin")
 
     @property
-    def steps(self):
-        _steps = self.layout.get("steps", [])
-        _processed_steps = []
-        if _steps:
-            for _step in _steps:
-                _processed_steps.append(SpecProvisionLayoutStep(_step))
-        return _processed_steps
+    def scripts(self):
+        return self.layout.get("scripts", "scripts")
 
     @property
     def provider(self):
         return self.layout.get("provider", [])
+
+    @property
+    def scale(self):
+        return self.layout.get("scale", 1)
+
+    def as_dict(self):
+        return dict(
+            name=self.name,
+            runs_on=self.runs_on,
+            scale=self.scale,
+            arch=self.arch,
+            constraints=self.constraints,
+            username=self.username,
+            scripts=self.scripts,
+            provider=self.provider,
+            ssh_public_key=str(self.ssh.public),
+            ssh_private_key=str(self.ssh.private),
+        )
 
 
 class SpecProvisionSSHKey:

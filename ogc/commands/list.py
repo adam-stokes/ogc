@@ -1,7 +1,8 @@
 import click
 from texttable import Texttable
 
-from ..cache import Cache
+from ogc import db
+
 from ..provision import choose_provisioner
 from ..state import app
 from .base import cli
@@ -9,24 +10,20 @@ from .base import cli
 
 @click.command(help="List nodes in your inventory")
 def ls():
-    cache_obj = Cache()
-    inventory = cache_obj.inventory
+    db.connect()
+    rows = db.NodeModel.select()
     table = Texttable()
-    table.set_cols_width([25, 20, 10, 15, 65])
+    table.set_cols_width([10, 40, 10, 65])
     table.set_deco(Texttable.HEADER | Texttable.HLINES)
-    table.add_row(["Name", "InstanceID", "Status", "KeyPair", "Connection"])
-    for node_name, data in inventory.items():
-        layout = data.layout
-        node_id = data.node.id
-        engine = choose_provisioner(layout.provider, env=app.env)
-        node = engine.node(instance_id=node_id)
+    table.add_row([f"{len(rows)} Nodes", "Name", "Status", "Connection"])
+
+    for data in rows:
         table.add_row(
             [
-                node_name,
-                node.id,
-                node.state,
                 data.id,
-                f"ssh -i {data.ssh_private_key} {data.username}@{data.host}",
+                data.instance_name,
+                data.instance_state,
+                f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
             ]
         )
 

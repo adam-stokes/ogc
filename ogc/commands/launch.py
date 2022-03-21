@@ -4,7 +4,8 @@ from pathlib import Path
 import click
 from celery import chord
 
-from ogc.tasks import do_deploy, do_provision, end_deploy, end_provision
+from ogc import db, log
+from ogc.tasks import do_deploy, do_provision, end_provision
 
 from ..provision import DeployerResult, ProvisionResult
 from ..spec import SpecLoader
@@ -14,8 +15,15 @@ from .base import cli
 
 @click.command(help="Launches nodes from a provision specification")
 @click.option("--spec", required=True, multiple=True)
-def launch(spec):
-    # Setup cache-dir
+@click.option(
+    "--with-deploy/--with-no-deploy",
+    default=True,
+    help="Also performs script deployments (default: Yes)",
+)
+def launch(spec, with_deploy):
+    # Db connection
+    db.connect()
+
     specs = []
     # Check for local spec
     if Path("ogc.yml").exists() and not spec:
@@ -24,37 +32,28 @@ def launch(spec):
     for sp in spec:
         _path = Path(sp)
         if not _path.exists():
-            app.log.error(f"Unable to find spec: {sp}")
+            log.error(f"Unable to find spec: {sp}")
             sys.exit(1)
         specs.append(_path)
     app.spec = SpecLoader.load(specs)
-    app.log.info(
+    log.info(
         f"Provisioning: [{', '.join([layout.name for layout in app.spec.layouts])}]"
     )
 
-    create_jobs = [do_provision.s(layout, app.env) for layout in app.spec.layouts]
+    create_jobs = [
+        do_provision.s(layout.as_dict(), app.env)
+        for layout in app.spec.layouts
+        for _ in range(layout.scale)
+    ]
 
     callback = end_provision.s()
     result = chord(create_jobs)(callback)
     results = result.get()
 
-    # Load up any stored metadata
-    # TODO: move this to a database for better async
-    metadata = {}
-    for job in results:
-        metadata[job.layout.name.replace("-", "_")] = job
-
-    config_jobs = [
-        do_deploy.s(job, metadata, app.log.info)
-        for job in results
-        if isinstance(job, ProvisionResult)
-    ]
-    callback = end_deploy.s()
-    result = chord(config_jobs)(callback)
-
-    for job in result.get():
-        if isinstance(job, DeployerResult):
-            job.show(msg_cb=app.log.info)
+    if with_deploy:
+        log.info("Performing script deployment.")
+        for job in results:
+            do_deploy.delay(job)
 
 
 cli.add_command(launch)

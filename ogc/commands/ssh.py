@@ -10,17 +10,16 @@ from ..fs import walk
 from ..provision import Deployer
 from ..state import app
 from .base import cli
+from ogc import db
 
 
 @click.command(help="Login to a node")
 @click.argument("name")
 def ssh(name):
-    cache_obj = Cache()
-    node = None
-    if cache_obj.exists(name):
-        node = cache_obj.load(name)
+    db.connect()
+    node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
-        cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.host}"]
+        cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
         sh.ssh(cmd, _fg=True, _env=app.env)
         sys.exit(0)
 

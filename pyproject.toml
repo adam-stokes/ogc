@@ -24,6 +24,8 @@ texttable = "^1.6.4"
 scp = "^0.14.4"
 humanfriendly = "^10.0"
 celery = {extras = ["redis"], version = "^5.2.3"}
+peewee = "^3.14.10"
+psycopg2-binary = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"

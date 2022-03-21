@@ -6,28 +6,25 @@ ssh-keys:
   private: ~/.ssh/id_rsa_libcloud
 
 layouts:
-  cluster: 
-    runs-on: debian-latest
-    constraints: c5.4xlarge
-    username: admin
-    steps:
-      - script: fixtures/show-metadata
-    provider: aws
+  # cluster: 
+  #   runs-on: debian-latest
+  #   constraints: c5.4xlarge
+  #   username: admin
+  #   scripts: fixtures/ex_deploy_debian
+  #   provider: aws
   elastic-agent-ubuntu-gcp:
     runs-on: ubuntu-1804
     constraints: e2-standard-8
     username: root
-    steps:
-      - script: fixtures/show-metadata-gce
+    scripts: fixtures/ex_deploy_ubuntu
     provider: google
-  elastic-agent-ubuntu:
-    runs-on: ubuntu-latest
-    constraints: c5.4xlarge
-    username: ubuntu
-    steps:
-      - run: "sudo apt update"
-      - script: fixtures/show-metadata
-    provider: aws
+    scale: 100
+  # elastic-agent-ubuntu:
+  #   runs-on: ubuntu-latest
+  #   constraints: c5.4xlarge
+  #   username: ubuntu
+  #   scripts: fixtures/ex_deploy_ubuntu
+  #   provider: aws
   # elastic-agent-centos:
   #   runs-on: centos-latest
   #   constraints: c5.4xlarge

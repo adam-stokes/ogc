@@ -11,6 +11,19 @@ services:
     ports:
       - '6379:6379'  
 
+  postgres:
+    image: postgres:11
+    environment:
+      - POSTGRES_DB=ogc
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      retries: 300
+      interval: 1s
+    ports:
+      - '5432:5432'  
+
   celery:
     build: 
       context: "."

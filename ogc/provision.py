@@ -5,17 +5,19 @@ import re
 import sys
 import uuid
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import MultiStepDeployment
+from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
 from libcloud.compute.providers import get_driver
 from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
+from mako.template import Template
 from retry.api import retry_call
 from scp import SCPClient
 
-from ogc.cache import Cache
+from ogc import log
+from ogc.db import NodeModel
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 
@@ -26,24 +28,30 @@ class ProvisionResult:
         self.layout = layout
         self.node = node[0]
         self.host = node[1][0]
-        self.private_ips = self.node.private_ips[0]
+        self.private_ip = self.node.private_ips[0]
         self.env = env
         self.id = id
-        self.username = self.layout.username
-        self.ssh_public_key = self.layout.ssh.public.resolve()
-        self.ssh_private_key = self.layout.ssh.private.resolve()
+        self.username = self.layout["username"]
+        self.scripts = self.layout["scripts"]
+        self.ssh_public_key = self.layout["ssh_public_key"]
+        self.ssh_private_key = self.layout["ssh_private_key"]
 
-    def save(self):
-        cache_obj = Cache()
-        cache_obj.save(self.layout.name, self)
-
-    def reload(self):
-        return ProvisionResult.load(self.layout.name)
-
-    @classmethod
-    def load(cls, name):
-        cache_obj = Cache()
-        cache_obj.load(name)
+    def save(self) -> NodeModel:
+        node_obj = NodeModel(
+            uuid=self.id,
+            instance_name=self.node.name,
+            instance_id=self.node.id,
+            instance_state=self.node.state,
+            username=self.layout["username"],
+            public_ip=self.host,
+            private_ip=self.private_ip,
+            ssh_public_key=self.ssh_public_key,
+            ssh_private_key=self.ssh_private_key,
+            provider=self.layout["provider"],
+            scripts=self.layout["scripts"],
+        )
+        node_obj.save()
+        return node_obj
 
 
 class ProvisionConstraint:
@@ -82,7 +90,7 @@ class BaseProvisioner:
     def __init__(self, env, **kwargs):
         self._args = kwargs
         self.env = env
-        self.uuid = f"ogc-{str(uuid.uuid4())[:8]}"
+        self.uuid = str(uuid.uuid4())[:8]
         self.provisioner = self.connect()
 
     @property
@@ -126,7 +134,7 @@ class BaseProvisioner:
     def images(self, **kwargs):
         return self.provisioner.list_images(**kwargs)
 
-    def _create_node(self, **kwargs) -> ProvisionResult:
+    def _create_node(self, **kwargs) -> NodeModel:
         _opts = kwargs.copy()
         layout = None
         if "ogc_layout" in _opts:
@@ -138,20 +146,21 @@ class BaseProvisioner:
             env = _opts["ogc_env"]
             del _opts["ogc_env"]
 
+        log.info(f"Spinning up {layout['name']}")
         node = self.provisioner.create_node(**_opts)
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]
         result = ProvisionResult(self.uuid, node, layout, env)
-        result.save()
-        return result
+        node_obj = result.save()
+        return node_obj
 
     def node(self, **kwargs):
         return self.provisioner.list_nodes(**kwargs)
 
-    def create_keypair(self, ssh):
+    def create_keypair(self, ssh_public_key):
         return self.provisioner.import_key_pair_from_file(
-            name=self.uuid, key_file_path=str(ssh.public)
+            name=self.uuid, key_file_path=ssh_public_key
         )
 
     def get_key_pair(self, name):
@@ -189,11 +198,11 @@ class AWSProvisioner(BaseProvisioner):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def setup(self, layout):
-        self.create_keypair(layout.ssh)
+    def setup(self, ssh_public_key):
+        self.create_keypair(ssh_public_key)
 
     def cleanup(self, node):
-        key_pair = self.get_key_pair(node.id)
+        key_pair = self.get_key_pair(node.uuid)
         return self.delete_key_pair(key_pair)
 
     def image(self, runs_on, arch):
@@ -204,17 +213,18 @@ class AWSProvisioner(BaseProvisioner):
             _runs_on = CLOUD_IMAGE_MAP["aws"][arch].get(runs_on)
         return super().image(_runs_on, arch)
 
-    def create(self, layout, env, **kwargs) -> ProvisionResult:
-        auth = NodeAuthSSHKey(layout.ssh.public.read_text())
-        image = self.image(layout.runs_on, layout.arch)
-        if not image and not layout.username:
+    def create(self, layout, env, **kwargs) -> NodeModel:
+        pub_key = Path(layout["ssh_public_key"]).read_text()
+        auth = NodeAuthSSHKey(pub_key)
+        image = self.image(layout["runs_on"], layout["arch"])
+        if not image and not layout["username"]:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout.runs_on}/{layout.arch}"
+                f"Could not locate AMI and/or username for: {layout['runs_on']}/{layout['arch']}"
             )
-        size = self.sizes(layout.constraints)
+        size = self.sizes(layout["constraints"])
 
         opts = dict(
-            name=f"ogc-{layout.name}",
+            name=f"ogc-{layout['name']}",
             image=image,
             size=size,
             auth=auth,
@@ -273,25 +283,25 @@ class GCEProvisioner(BaseProvisioner):
         except IndexError:
             raise ProvisionException(f"Could not determine image for {_runs_on}")
 
-    def create(self, layout, env, **kwargs) -> ProvisionResult:
-        image = self.image(layout.runs_on, layout.arch)
-        if not image and not layout.username:
+    def create(self, layout, env, **kwargs) -> NodeModel:
+        image = self.image(layout["runs_on"], layout["arch"])
+        if not image and not layout["username"]:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout.runs_on}/{layout.arch}"
+                f"Could not locate AMI and/or username for: {layout['runs_on']}/{layout['arch']}"
             )
-        size = self.sizes(layout.constraints)
+        size = self.sizes(layout["constraints"])
 
         ex_metadata = {
             "items": [
                 {
                     "key": "ssh-keys",
-                    "value": "root: %s" % (layout.ssh.public.read_text()),
+                    "value": "root: %s" % (Path(layout["ssh_public_key"]).read_text()),
                 }
             ]
         }
 
         opts = dict(
-            name=f"ogc-{layout.name}",
+            name=f"ogc-{self.uuid}-{layout['name']}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,
@@ -321,42 +331,71 @@ def choose_provisioner(name, env, **kwargs):
 
 
 class Deployer:
-    def __init__(self, deployment: ProvisionResult):
+    def __init__(self, deployment: NodeModel, env: Dict[str, str]):
         self.deployment = deployment
-        self.layout = self.deployment.layout
-        self.env = self.deployment.env
+        self.env = env
 
-        engine = choose_provisioner(self.layout.provider, env=self.env)
-        self.node = engine.node(instance_id=self.deployment.node.id)
+        engine = choose_provisioner(self.deployment.provider, env=self.env)
+        self.node = engine.node(instance_id=self.deployment.instance_id)
         self._ssh_client = ParamikoSSHClient(
-            self.deployment.host,
+            self.deployment.public_ip,
             username=self.deployment.username,
             key=str(self.deployment.ssh_private_key),
             timeout=300,
         )
         retry_call(self._ssh_client.connect, tries=15, delay=5)
 
+    def render(self, template: Path, context):
+        """Returns the correct deployment based on type of step"""
+        fpath = template.absolute()
+        template = Template(filename=str(fpath))
+        contents = template.render(**context)
+        return ScriptDeployment(contents)
+
+    def run(self) -> "DeployerResult":
+        log.info(
+            f"Establishing connection [{self.deployment.public_ip}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
+        )
+        scripts = Path(self.deployment.scripts)
+        if not scripts.exists():
+            log.info("No deployment scripts found, skipping.")
+            return DeployerResult(self.deployment, MultiStepDeployment())
+
+        # Were here so lets query db to pass to all scripts for rendering
+        data = NodeModel.select()
+        context = {"instances": {}}
+        for row in data:
+            context["instances"][row.id] = dict(
+                instance_name=row.instance_name,
+                username=row.username,
+                public_ip=row.public_ip,
+                private_ip=row.private_ip,
+                ssh_public_key=row.ssh_public_key,
+                ssh_private_key=row.ssh_private_key,
+                provider=row.provider,
+            )
+        scripts_to_run = scripts.glob("**/*")
+        for s in scripts_to_run:
+            if s.is_file():
+                log.info(f"[{self.deployment.instance_name}] Executing {s}")
+                msd = MultiStepDeployment(self.render(s, context))
+                msd.run(self.node, self._ssh_client)
+                return DeployerResult(self.deployment, msd)
+        return DeployerResult(self.deployment, MultiStepDeployment())
+
     def _progress(self, filename, size, sent, peername):
         if isinstance(filename, bytes):
             filename = filename.decode("utf8")
         sys.stdout.write(
             "[%s:%s] %s progress: %.2f%%                           \r"
-            % (self.layout.name, peername[0], filename, float(sent) / float(size) * 100)
+            % (
+                self.deployment.instance_name,
+                peername[0],
+                filename,
+                float(sent) / float(size) * 100,
+            )
         )
         sys.stdout.flush()
-
-    def run(self, context, msg_cb):
-        msg_cb(
-            f"Establishing connection [{self.deployment.host}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
-        )
-        steps = [step.render(context) for step in self.layout.steps]
-        if steps:
-            msg_cb(f"Executing deployment actions for {self.layout.name}")
-            msd = MultiStepDeployment(steps)
-            msd.run(self.node, self._ssh_client)
-            return DeployerResult(self.deployment, msd)
-        msg_cb("No deployment actions listed, skipping.")
-        return None
 
     def put(self, src: Path, dst: Path, excludes: List[str], msg_cb):
         scp = SCPClient(self._ssh_client._get_transport(), progress4=self._progress)
@@ -382,19 +421,18 @@ class Deployer:
 
 
 class DeployerResult:
-    def __init__(self, deployment: Deployer, msd: MultiStepDeployment):
+    def __init__(self, deployment: NodeModel, msd: MultiStepDeployment):
         self.deployment = deployment
         self.msd = msd
 
-    def show(self, msg_cb):
-        msg_cb("Deployment Result: ")
+    def show(self):
+        log.info("Deployment Result: ")
         for step in self.msd.steps:
-            msg_cb(f"  - [{step.exit_status}]: {step}")
-        msg_cb("Connection Information: ")
-        msg_cb(
-            f"  - Node: {self.deployment.layout.name} [{self.deployment.node.state}]"
+            log.info(f"  - [{step.exit_status}]: {step}")
+        log.info("Connection Information: ")
+        log.info(
+            f"  - Node: {self.deployment.instance_name} [{self.deployment.instance_state}]"
         )
-        msg_cb(
-            f"  - ssh -i {self.deployment.ssh_private_key} {self.deployment.username}@{self.deployment.host}"
+        log.info(
+            f"  - ssh -i {self.deployment.ssh_private_key} {self.deployment.username}@{self.deployment.public_ip}"
         )
-        msg_cb("")
