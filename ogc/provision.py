@@ -156,7 +156,7 @@ class BaseProvisioner:
             del _opts["ogc_env"]
 
         log.info(f"Spinning up {layout['name']}")
-        node = self.provisioner.create_node(**_opts)
+        node = retry_call(self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5)
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]
@@ -353,7 +353,7 @@ class Deployer:
             key=str(self.deployment.ssh_private_key),
             timeout=300,
         )
-        retry_call(self._ssh_client.connect, tries=20, delay=15, backoff=2)
+        retry_call(self._ssh_client.connect, tries=10, delay=5, backoff=2)
 
     def render(self, template: Path, context):
         """Returns the correct deployment based on type of step"""
@@ -420,7 +420,7 @@ class Deployer:
         if isinstance(filename, bytes):
             filename = filename.decode("utf8")
         sys.stdout.write(
-            "[%s:%s] %s progress: %.2f%%                           \r"
+            "[%s:%s] %s progress: %.2f%%                          \r"
             % (
                 self.deployment.instance_name,
                 peername[0],

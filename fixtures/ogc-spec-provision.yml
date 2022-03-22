@@ -12,16 +12,19 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 50
+    scale: 1
     tags:
       - elastic-agent-8.1.x
+      - sles-gcp
   elastic-agent-ubuntu:
     runs-on: ubuntu-1804
     constraints: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 50
+    scale: 1
+    artifcats:
+      - output/*.xml
     tags:
       - elastic-agent-8.1.x
-      - ubuntu
+      - ubuntu-gcp
