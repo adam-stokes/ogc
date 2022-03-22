@@ -1,7 +1,7 @@
 import sys
 
 import click
-from prettytable import PrettyTable
+from prettytable import DOUBLE_BORDER, PrettyTable
 
 from ogc import db
 
@@ -36,7 +36,6 @@ def ls(by_tag, by_name):
     else:
         rows = db.NodeModel.select()
     table = PrettyTable()
-
     table.field_names = [f"{len(rows)} Nodes", "Name", "Status", "Connection", "Tags"]
 
     for data in rows:
@@ -58,6 +57,7 @@ def ls(by_tag, by_name):
         )
 
     table.align = "l"
+    table.set_style(DOUBLE_BORDER)
     click.echo(table)
 
 
