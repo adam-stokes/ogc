@@ -10,9 +10,9 @@ layouts:
     runs-on: sles-15
     constraints: e2-standard-8
     username: root
-    scripts: fixtures/ex_deploy_debian
+    scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 15
+    scale: 50
     tags:
       - elastic-agent-8.1.x
   elastic-agent-ubuntu:
@@ -21,7 +21,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 15
+    scale: 50
     tags:
       - elastic-agent-8.1.x
       - ubuntu
