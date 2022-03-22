@@ -30,7 +30,7 @@ def debug(ctx):
 
 def error(ctx):
     click.secho(ctx, fg="red", bold=True)
-    logger.debug(ctx)
+    logger.error(ctx)
 
 
 def info(ctx):

@@ -17,6 +17,7 @@ from libcloud.compute.deployment import (
 from libcloud.compute.providers import get_driver
 from libcloud.compute.ssh import ParamikoSSHClient
 from libcloud.compute.types import Provider
+from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry.api import retry_call
 from scp import SCPClient
@@ -357,7 +358,13 @@ class Deployer:
     def render(self, template: Path, context):
         """Returns the correct deployment based on type of step"""
         fpath = template.absolute()
-        template = Template(filename=str(fpath))
+        lookup = TemplateLookup(
+            directories=[
+                str(template.parent.absolute()),
+                str(template.parent.parent.absolute()),
+            ]
+        )
+        template = Template(filename=str(fpath), lookup=lookup)
         return template.render(**context)
 
     def exec(self, cmd) -> "DeployerResult":
@@ -378,7 +385,7 @@ class Deployer:
 
         # TODO: maybe support a "vars" section in the spec file to be
         # added to the context for templates
-        context = {}
+        context = {"env": self.env}
 
         # teardown file is a special file that gets executed before node
         # destroy

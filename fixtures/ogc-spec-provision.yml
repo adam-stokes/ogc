@@ -12,16 +12,16 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_debian
     provider: google
-    scale: 1
+    scale: 15
     tags:
-      - elastic-agent-7.x
+      - elastic-agent-8.1.x
   elastic-agent-ubuntu:
     runs-on: ubuntu-1804
     constraints: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 1
+    scale: 15
     tags:
-      - elastic-agent-8.x
+      - elastic-agent-8.1.x
       - ubuntu
