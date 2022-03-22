@@ -1,6 +1,8 @@
 """ Enums
 """
 
+PID_FILE = "ogc-server.pid"
+
 
 class SpecCore:
     NAME = "name"

@@ -54,7 +54,9 @@ def launch(spec, with_deploy):
         for job in results:
             do_deploy.delay(job)
 
-    log.info("All tasks have been submitted, please runn `ogc log` to see status output.")
+    log.info(
+        "All tasks have been submitted, please runn `ogc log` to see status output."
+    )
 
 
 cli.add_command(launch)

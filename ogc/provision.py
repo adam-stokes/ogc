@@ -156,7 +156,9 @@ class BaseProvisioner:
             del _opts["ogc_env"]
 
         log.info(f"Spinning up {layout['name']}")
-        node = retry_call(self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5)
+        node = retry_call(
+            self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5
+        )
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]

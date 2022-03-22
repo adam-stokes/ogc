@@ -20,23 +20,7 @@ services:
       retries: 300
       interval: 1s
     ports:
-      - '5432:5432'  
-
-  celery:
-    build: 
-      context: "."
-      dockerfile: Dockerfile.celery
-    command: celery -A ogc.celery.app worker -l info -E
-    depends_on:
-      - redis
-      - postgres
-    env_file:
-      - .env
-    environment:
-      - CELERY_BROKER_URL="redis://redis:6379"
-      - CELERY_RESULT_BACKEND="redis://redis:6379"
-    volumes:
-      - .:/code
+      - '5432:5432'
 
 volumes:
   redis: {}

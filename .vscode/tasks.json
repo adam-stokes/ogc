@@ -36,7 +36,7 @@
         {
             "label": "celery",
             "type": "shell",
-            "command": "poetry run watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A ogc.celery.app worker -l info -E",
+            "command": "poetry run watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- ogc server",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
