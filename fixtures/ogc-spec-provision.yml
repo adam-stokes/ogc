@@ -8,21 +8,21 @@ ssh-keys:
 layouts:
   elastic-agent-sles: 
     runs-on: sles-15
-    constraints: e2-standard-8
+    instance-size: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 1
+    scale: 5
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
   elastic-agent-ubuntu:
     runs-on: ubuntu-1804
-    constraints: e2-standard-8
+    instance-size: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 1
+    scale: 5
     artifcats:
       - output/*.xml
     tags:

@@ -14,7 +14,9 @@ def server():
     cache_dir = ensure_cache_dir()
     pid_path = cache_dir / PID_FILE
     if not pid_path.exists():
-        worker = app.Worker(pidfile=str(pid_path), include=["ogc.tasks"])
+        worker = app.Worker(
+            pidfile=str(pid_path), include=["ogc.tasks"], loglevel="INFO"
+        )
         worker.start()
     else:
         found_pid = pid_path.read_text().strip()

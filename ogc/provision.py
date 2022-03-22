@@ -63,38 +63,6 @@ class ProvisionResult:
         return node_obj
 
 
-class ProvisionConstraint:
-    """Parses the constraints to give us a proper node size for selected cloud"""
-
-    def __init__(self, constraint):
-        self.constraint = constraint
-
-    def parse(self):
-        items = self.constraint.split(" ")
-        params = {}
-        for item in items:
-            prop, val = item.split("=")
-            try:
-                params[prop] = self.bytesto(self.parse_size(val), "m")
-            except ValueError:
-                params[prop] = val
-        return params
-
-    def bytesto(bytes, to, bsize=1024):
-        a = {"k": 1, "m": 2, "g": 3, "t": 4, "p": 5, "e": 6}
-        r = float(bytes)
-        return int(bytes / (bsize ** a[to]))
-
-    def parse_size(self, size):
-        if isinstance(size, int):
-            return size
-        m = re.match(r"^(\d+(?:\.\d+)?)\s*([KMGT]?B)?$", size.upper())
-        if m:
-            number, unit = m.groups()
-            return int(float(number) * self.units[unit])
-        raise ValueError("Invalid size")
-
-
 class BaseProvisioner:
     def __init__(self, env, **kwargs):
         self._args = kwargs
@@ -123,17 +91,17 @@ class BaseProvisioner:
     def destroy(self, node):
         return self.provisioner.destroy_node(node)
 
-    def sizes(self, constraints):
+    def sizes(self, instance_size):
         _sizes = self.provisioner.list_sizes()
         try:
             return [
                 size
                 for size in _sizes
-                if size.id == constraints or size.name == constraints
+                if size.id == instance_size or size.name == instance_size
             ][0]
         except IndexError:
             raise ProvisionException(
-                f"Could not locate instance size for {constraints}"
+                f"Could not locate instance size for {instance_size}"
             )
 
     def image(self, runs_on, arch):
@@ -227,12 +195,12 @@ class AWSProvisioner(BaseProvisioner):
     def create(self, layout, env, **kwargs) -> NodeModel:
         pub_key = Path(layout["ssh_public_key"]).read_text()
         auth = NodeAuthSSHKey(pub_key)
-        image = self.image(layout["runs_on"], layout["arch"])
+        image = self.image(layout["runs-on"], layout["arch"])
         if not image and not layout["username"]:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout['runs_on']}/{layout['arch']}"
+                f"Could not locate AMI and/or username for: {layout['runs-on']}/{layout['arch']}"
             )
-        size = self.sizes(layout["constraints"])
+        size = self.sizes(layout["instance-size"])
 
         opts = dict(
             name=f"ogc-{layout['name']}",
@@ -295,12 +263,12 @@ class GCEProvisioner(BaseProvisioner):
             raise ProvisionException(f"Could not determine image for {_runs_on}")
 
     def create(self, layout, env, **kwargs) -> NodeModel:
-        image = self.image(layout["runs_on"], layout["arch"])
+        image = self.image(layout["runs-on"], layout["arch"])
         if not image and not layout["username"]:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout['runs_on']}/{layout['arch']}"
+                f"Could not locate AMI and/or username for: {layout['runs-on']}/{layout['arch']}"
             )
-        size = self.sizes(layout["constraints"])
+        size = self.sizes(layout["instance-size"])
 
         ex_metadata = {
             "items": [

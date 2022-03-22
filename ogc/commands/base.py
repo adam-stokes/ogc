@@ -1,7 +1,8 @@
 import click
+from click_didyoumean import DYMGroup
 
 
-@click.group()
+@click.group(cls=DYMGroup)
 def cli():
     pass
 

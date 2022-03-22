@@ -1,5 +1,7 @@
+import sys
+
 import click
-from texttable import Texttable
+from prettytable import PrettyTable
 
 from ogc import db
 
@@ -9,26 +11,54 @@ from .base import cli
 
 
 @click.command(help="List nodes in your inventory")
-def ls():
+@click.option("--by-tag", required=False, help="List nodes by tag")
+@click.option(
+    "--by-name",
+    required=False,
+    help="List nodes by name, this can be a substring match",
+)
+def ls(by_tag, by_name):
+    if by_tag and by_name:
+        click.echo(
+            click.style(
+                "Combined filtered options are not supported, please choose one.",
+                fg="red",
+            )
+        )
+        sys.exit(1)
+
     db.connect()
-    rows = db.NodeModel.select()
-    table = Texttable()
-    table.set_cols_width([10, 40, 20, 10, 65])
-    table.set_deco(Texttable.HEADER | Texttable.HLINES)
-    table.add_row([f"{len(rows)} Nodes", "Name", "Tags", "Status", "Connection"])
+    rows = None
+    if by_tag:
+        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(by_tag))
+    elif by_name:
+        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(by_name))
+    else:
+        rows = db.NodeModel.select()
+    table = PrettyTable()
+
+    table.field_names = [f"{len(rows)} Nodes", "Name", "Status", "Connection", "Tags"]
 
     for data in rows:
         table.add_row(
             [
                 data.id,
                 data.instance_name,
-                ", ".join(data.tags),
                 data.instance_state,
                 f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
+                ",\n".join(
+                    [
+                        click.style(tag, fg="green")
+                        if by_tag and tag == by_tag
+                        else tag
+                        for tag in data.tags
+                    ]
+                ),
             ]
         )
 
-    click.secho(table.draw())
+    table.align = "l"
+    click.echo(table)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

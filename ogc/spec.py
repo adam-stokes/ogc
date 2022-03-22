@@ -35,8 +35,8 @@ class SpecProvisionLayout:
         return self.layout.get("arch", "amd64")
 
     @property
-    def constraints(self):
-        return self.layout.get("constraints", "disk=100G mem=8G cores=16 arch=amd64")
+    def instance_size(self):
+        return self.layout.get("instance_size", "e2-standard-8")
 
     @property
     def username(self):
@@ -59,19 +59,19 @@ class SpecProvisionLayout:
         return self.layout.get("tags", [])
 
     def as_dict(self):
-        return dict(
-            name=self.name,
-            runs_on=self.runs_on,
-            scale=self.scale,
-            arch=self.arch,
-            constraints=self.constraints,
-            username=self.username,
-            scripts=self.scripts,
-            provider=self.provider,
-            ssh_public_key=str(self.ssh.public),
-            ssh_private_key=str(self.ssh.private),
-            tags=self.tags,
-        )
+        return {
+            "name": self.name,
+            "runs-on": self.runs_on,
+            "scale": self.scale,
+            "arch": self.arch,
+            "instance-size": self.instance_size,
+            "username": self.username,
+            "scripts": self.scripts,
+            "provider": self.provider,
+            "ssh_public_key": str(self.ssh.public),
+            "ssh_private_key": str(self.ssh.private),
+            "tags": self.tags,
+        }
 
 
 class SpecProvisionSSHKey:
