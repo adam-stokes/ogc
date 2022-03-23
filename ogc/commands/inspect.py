@@ -19,7 +19,12 @@ from .base import cli
     required=False,
     help="Inspect nodes by tag",
 )
-def inspect(id, name, tag):
+@click.option(
+    "--action-id",
+    required=False,
+    help="If set will only show the action output for a specific action ID",
+)
+def inspect(id, name, tag, action_id):
     if tag and name and id:
         click.echo(
             click.style(
@@ -42,7 +47,11 @@ def inspect(id, name, tag):
         click.echo(f"Deploy Details: [{data.instance_name}]")
         completed_actions = []
         failed_actions = []
-        for action in data.actions.select():
+        if action_id:
+            actions = data.actions.select().where(db.NodeActionResult.id == action_id)
+        else:
+            actions = data.actions.select()
+        for action in actions:
             if action.exit_code != 0:
                 failed_actions.append(action)
             else:
@@ -50,22 +59,24 @@ def inspect(id, name, tag):
 
         if completed_actions:
             click.echo(f"[{len(completed_actions)}] Successful Actions:")
+            click.echo()
             for action in completed_actions:
                 if action.out.strip():
-                    click.echo("Out:")
+                    click.echo(f"(id: {action.id}) Out: {action.created}")
                     click.echo(click.style(action.out, fg="green"))
                 if action.error:
-                    click.echo("Error:")
+                    click.echo(f"(id: {action.id}) Error:")
                     click.echo(click.style(action.error, fg="green"))
 
         if failed_actions:
             click.echo(f"[{len(failed_actions)}] Failed Actions:")
+            click.echo()
             for action in failed_actions:
                 if action.out.strip():
-                    click.echo("Out:")
+                    click.echo(f"(id: {action.id}) Out: {action.created}")
                     click.echo(click.style(action.out, fg="red"))
                 if action.error:
-                    click.echo("Error:")
+                    click.echo(f"(id: {action.id}) Error:")
                     click.echo(click.style(action.error, fg="red"))
 
 
