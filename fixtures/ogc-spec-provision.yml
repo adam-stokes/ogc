@@ -22,7 +22,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 5
+    scale: 8
     artifcats:
       - output/*.xml
     tags:

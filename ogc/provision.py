@@ -1,7 +1,6 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 
-import re
 import sys
 import tempfile
 import uuid

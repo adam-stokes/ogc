@@ -2,12 +2,11 @@ import sys
 from pathlib import Path
 
 import click
-from celery import chord
 
-from ogc import db, log
-from ogc.tasks import do_deploy, do_provision, end_provision
+from ogc import log
+from ogc.actions import deploy as deploy_p
+from ogc.actions import launch as launch_p
 
-from ..provision import DeployerResult, ProvisionResult
 from ..spec import SpecLoader
 from ..state import app
 from .base import cli
@@ -22,8 +21,6 @@ from .base import cli
 )
 def launch(spec, with_deploy):
     # Db connection
-    db.connect()
-
     specs = []
     # Check for local spec
     if Path("ogc.yml").exists() and not spec:
@@ -39,20 +36,10 @@ def launch(spec, with_deploy):
     log.info(
         f"Provisioning: [{', '.join([layout.name for layout in app.spec.layouts])}]"
     )
-
-    create_jobs = [
-        do_provision.s(layout.as_dict(), app.env)
-        for layout in app.spec.layouts
-        for _ in range(layout.scale)
-    ]
-
-    callback = end_provision.s()
-    result = chord(create_jobs)(callback)
-    results = result.get()
+    node_ids = launch_p(app.spec.layouts, app.env)
 
     if with_deploy:
-        for job in results:
-            do_deploy.delay(job)
+        deploy_p(node_ids)
 
     log.info(
         "All tasks have been submitted, please runn `ogc log` to see status output."

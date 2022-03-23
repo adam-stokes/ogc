@@ -3,7 +3,11 @@ import sys
 from pathlib import Path
 
 import yaml
+from celery import chord
 from melddict import MeldDict
+
+from ogc import db, log
+from ogc.tasks import do_deploy, do_destroy, do_provision, end_provision
 
 from .state import app
 
@@ -114,6 +118,35 @@ class SpecProvisionPlan:
     @property
     def ssh(self):
         return SpecProvisionSSHKey(self.plan.get("ssh-keys", {}))
+
+    @property
+    def status(self):
+        """Return the status of the plan based on whats deployed and whats remaining"""
+        db.connect()
+        counts = {
+            layout.name: {"scale": layout.scale, "deployed": 0, "remaining": 0}
+            for layout in self.layouts
+        }
+        for layout in self.layouts:
+            deployed_count = len(
+                db.NodeModel.select().where(
+                    db.NodeModel.instance_name.endswith(layout.name)
+                )
+            )
+            remaining_count = layout.scale - deployed_count
+            action = "add" if remaining_count >= 0 else "remove"
+            counts[layout.name]["deployed"] = deployed_count
+            counts[layout.name]["remaining"] = remaining_count
+            counts[layout.name]["action"] = action
+        return counts
+
+    @property
+    def is_degraded(self):
+        """Returns whether there are missing deployments"""
+        return any(
+            stat["remaining"] > 0 or stat["remaining"] < 0
+            for stat in self.status.values()
+        )
 
     def get_layout(self, name):
         """Returns a layout for a given name/key"""

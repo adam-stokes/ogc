@@ -2,8 +2,8 @@ import sys
 
 import click
 
-from ogc import db, log, state
-from ogc.tasks import do_destroy
+from ogc import state
+from ogc.actions import teardown
 
 from ..provision import choose_provisioner
 from .base import cli
@@ -12,19 +12,14 @@ from .base import cli
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
 @click.option("--name", multiple=True, required=True)
 def rm(name):
-    _names = name
-    log.info(f"Destroying: [{', '.join(_names)}]")
-    for name in _names:
-        do_destroy.delay(name, state.app.env)
+    teardown(name, state.app.env)
+    return
 
 
 @click.command(help="Destroys everything. Use with caution.")
 def rm_all():
-    db.connect()
-
-    for data in db.NodeModel.select():
-        log.info(f"Destroying: {data.instance_name}")
-        do_destroy.delay(data.instance_name, state.app.env)
+    teardown(env=state.app.env)
+    return
 
 
 @click.option("--provider", default="aws", help="Provider to query")
