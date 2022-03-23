@@ -36,9 +36,23 @@ def ls(by_tag, by_name):
     else:
         rows = db.NodeModel.select()
     table = PrettyTable()
-    table.field_names = [f"{len(rows)} Nodes", "Name", "Status", "Connection", "Tags"]
+    table.field_names = [
+        f"{len(rows)} Nodes",
+        "Name",
+        "Status",
+        "Connection",
+        "Tags",
+        "Actions",
+    ]
 
     for data in rows:
+        completed_actions = []
+        failed_actions = []
+        for action in data.actions.select():
+            if action.exit_code != 0:
+                failed_actions.append(action)
+            else:
+                completed_actions.append(action)
         table.add_row(
             [
                 data.id,
@@ -53,6 +67,7 @@ def ls(by_tag, by_name):
                         for tag in data.tags
                     ]
                 ),
+                f"pass: {click.style(len(completed_actions), fg='green')} fail: {len(failed_actions)}",
             ]
         )
 

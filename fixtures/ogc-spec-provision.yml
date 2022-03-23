@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 5
+    scale: 1
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
@@ -22,9 +22,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 8
-    artifcats:
-      - output/*.xml
+    scale: 1
     tags:
       - elastic-agent-8.1.x
       - ubuntu-gcp

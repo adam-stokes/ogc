@@ -1,15 +1,12 @@
 # pylint: disable=unexpected-keyword-arg
 import sys
-from pathlib import Path
 
 import click
 import sh
 
-from ogc import db
+from ogc import actions, db
 
-from ..cache import Cache
-from ..fs import walk
-from ..provision import Deployer
+from ..deployer import Deployer
 from ..state import app
 from .base import cli
 
@@ -28,6 +25,36 @@ def ssh(name):
     sys.exit(1)
 
 
+@click.command(help="Execute a command across node(s)")
+@click.option(
+    "--by-tag",
+    required=False,
+    help="Only run on nodes matching tag",
+)
+@click.option(
+    "--by-name",
+    required=False,
+    help="Only run on nodes matching name",
+)
+@click.argument("cmd")
+def exec(by_tag, by_name, cmd):
+    if by_tag and by_name:
+        click.echo(
+            click.style(
+                "Combined filtered options are not supported, please choose one.",
+                fg="red",
+            )
+        )
+        sys.exit(1)
+    results = actions.exec(by_name, by_tag, cmd)
+    if all(res for res in results):
+        app.log.info("All commands completed.")
+        sys.exit(0)
+
+    app.log.error("Some commands failed to complete.")
+    sys.exit(1)
+
+
 @click.command(help="Scp files or directories to node")
 @click.argument("name")
 @click.argument("src")
@@ -39,15 +66,13 @@ def ssh(name):
     help="Exclude files/directories when uploading",
 )
 def scp_to(name, src, dst, exclude):
-    cache_obj = Cache()
-    node = None
-    if cache_obj.exists(name):
-        node = cache_obj.load(name)
-    if not node:
-        click.secho(f"Could not find {name} in cache", fg="red")
-        sys.exit(1)
-    deploy = Deployer(node)
-    deploy.put(Path(src), Path(dst), excludes=exclude, msg_cb=app.log.info)
+    db.connect()
+    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    if node:
+        deploy = Deployer(node)
+        deploy.put(src, dst, excludes=exclude)
+    app.log.error(f"Unable to locate {name} to connect to")
+    sys.exit(1)
 
 
 @click.command(help="Scp files or directories from node")
@@ -55,17 +80,16 @@ def scp_to(name, src, dst, exclude):
 @click.argument("dst")
 @click.argument("src")
 def scp_get(name, dst, src):
-    cache_obj = Cache()
-    node = None
-    if cache_obj.exists(name):
-        node = cache_obj.load(name)
-    if not node:
-        click.secho(f"Could not find {name} in cache", fg="red")
-        sys.exit(1)
-    deploy = Deployer(node)
-    deploy.get(Path(dst), Path(src), app.log.info)
+    db.connect()
+    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    if node:
+        deploy = Deployer(node)
+        deploy.get(src, dst)
+    app.log.error(f"Unable to locate {name} to connect to")
+    sys.exit(1)
 
 
 cli.add_command(ssh)
 cli.add_command(scp_to)
 cli.add_command(scp_get)
+cli.add_command(exec)

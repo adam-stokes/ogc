@@ -1,9 +1,12 @@
 from typing import Dict
 
+import sh
+
 from ogc import db, log, state
 
 from .celery import app
-from .provision import Deployer, choose_provisioner
+from .deployer import Deployer
+from .provision import choose_provisioner
 
 
 @app.task
@@ -53,3 +56,25 @@ def do_destroy(name: str, env: Dict[str, str]) -> None:
         except:
             log.error("Failed to delete node, removing from database.")
     node_data.delete_instance()
+
+
+@app.task
+def do_exec(
+    cmd: str, ssh_private_key: str, node_id: int, username: str, public_ip: str
+) -> None:
+    node_data = db.NodeModel.get(db.NodeModel.id == node_id)
+    cmd_opts = ["-i", str(ssh_private_key), f"{username}@{public_ip}"]
+    cmd_opts.append(cmd)
+    out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)
+    db.NodeActionResult.create(
+        node=node_data,
+        exit_code=out.exit_code,
+        out=out.stdout.decode(),
+        err=out.stderr.decode(),
+    )
+    return out.exit_code == 0
+
+
+@app.task
+def end_exec(results):
+    return results

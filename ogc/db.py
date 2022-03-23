@@ -1,10 +1,15 @@
 import datetime
+import os
 
 from peewee import *
 from playhouse.postgres_ext import *
 
+DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+DB_NAME = os.environ.get("POSTGRES_DB", "ogc")
+DB_USER = os.environ.get("POSTGRES_USER", "postgres")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
 DATABASE = PostgresqlExtDatabase(
-    "ogc", user="postgres", password="postgres", host="localhost"
+    DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST
 )
 
 
@@ -30,10 +35,19 @@ class NodeModel(BaseModel):
     tags = ArrayField(CharField)
 
 
+class NodeActionResult(BaseModel):
+    """Results of ScriptDeployments and arbitrary commands stored here"""
+
+    exit_code = IntegerField()
+    out = TextField()
+    error = TextField(null=True)
+    node = ForeignKeyField(NodeModel, backref="actions", on_delete="CASCADE")
+
+
 def connect():
     """Create db tables"""
     DATABASE.connect(reuse_if_open=True)
-    DATABASE.create_tables([NodeModel])
+    DATABASE.create_tables([NodeModel, NodeActionResult])
 
 
 # Template helpers

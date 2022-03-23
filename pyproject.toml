@@ -42,6 +42,7 @@ pylint = "^2.12.2"
 Pygments = "^2.11.2"
 pytest = "^7.0.1"
 ipdb = "^0.13.9"
+mypy = "^0.941"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start" 

@@ -13,13 +13,11 @@ from .base import cli
 @click.option("--name", multiple=True, required=True)
 def rm(name):
     teardown(name, state.app.env)
-    return
 
 
 @click.command(help="Destroys everything. Use with caution.")
 def rm_all():
     teardown(env=state.app.env)
-    return
 
 
 @click.option("--provider", default="aws", help="Provider to query")

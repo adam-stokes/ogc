@@ -1,5 +1,3 @@
-import os
-
 from dotenv import load_dotenv
 from invoke import task
 
@@ -31,4 +29,4 @@ def bump_rev(c):
 
 @task
 def celery(c):
-    c.run("celery -A ogc.celery.app worker --loglevel=info -E")
+    c.run("ogc server")

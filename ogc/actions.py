@@ -3,7 +3,14 @@ from typing import Any, Dict, List
 from celery import chord
 
 from ogc import db, log
-from ogc.tasks import do_deploy, do_destroy, do_provision, end_provision
+from ogc.tasks import (
+    do_deploy,
+    do_destroy,
+    do_exec,
+    do_provision,
+    end_exec,
+    end_provision,
+)
 
 
 def launch(layouts, env: Dict[str, str]) -> List[int]:
@@ -58,3 +65,25 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
             ):
                 log.info(f"Destroying: {data.instance_name}")
                 do_destroy.delay(data.instance_name, env)
+
+
+def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
+    db.connect()
+    rows = None
+    if tag:
+        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(tag))
+    elif name:
+        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(name))
+    else:
+        rows = db.NodeModel.select()
+
+    log.info(f"Executing '{cmd}' across {len(rows)} nodes.")
+
+    exec_jobs = [
+        do_exec.s(cmd, node.ssh_private_key, node.id, node.username, node.public_ip)
+        for node in rows
+    ]
+
+    callback = end_exec.s()
+    result = chord(exec_jobs)(callback)
+    return result.get()
