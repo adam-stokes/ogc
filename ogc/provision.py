@@ -30,6 +30,10 @@ class ProvisionResult:
         self.ssh_public_key = self.layout["ssh_public_key"]
         self.ssh_private_key = self.layout["ssh_private_key"]
         self.tags = self.layout["tags"]
+        self.remote_path = self.layout["remote-path"]
+        self.artifacts = self.layout["artifacts"]
+        self.include = self.layout["include"]
+        self.exclude = self.layout["exclude"]
 
     def save(self) -> NodeModel:
         node_obj = NodeModel(
@@ -45,6 +49,10 @@ class ProvisionResult:
             provider=self.provider,
             scripts=self.scripts,
             tags=self.tags,
+            remote_path=self.remote_path,
+            artifacts=self.artifacts,
+            include=self.include,
+            exclude=self.exclude
         )
         node_obj.save()
         return node_obj

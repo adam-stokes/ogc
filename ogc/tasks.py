@@ -1,8 +1,11 @@
+import os
+from pathlib import Path
+from threading import local
 from typing import Dict
 
 import sh
 
-from ogc import db, log, state
+from ogc import db, enums, log, state
 
 from .celery import app
 from .deployer import Deployer
@@ -42,6 +45,17 @@ def do_destroy(name: str, env: Dict[str, str]) -> None:
         engine = choose_provisioner(node_data.provider, env=env)
         try:
             deploy = Deployer(node_data, state.app.env)
+
+            # Pull down artifacts if set
+            if node_data.artifacts:
+                log.info("Downloading artifacts")
+                local_artifact_path = (
+                    Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
+                )
+                if not local_artifact_path.exists():
+                    os.makedirs(str(local_artifact_path), exist_ok=True)
+                deploy.get(node_data.artifacts, str(local_artifact_path))
+
             exec_result = deploy.exec("./teardown")
             if not exec_result.passed:
                 log.error(f"Unable to run teardown script on {node_data.instance_name}")

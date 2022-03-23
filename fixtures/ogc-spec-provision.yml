@@ -13,6 +13,13 @@ layouts:
     scripts: fixtures/ex_deploy_sles
     provider: google
     scale: 1
+    remote-path: /root/ogc
+    include:
+      - .ogc-cache
+    exclude:
+      - .git
+      - .venv
+    artifacts: /root/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
@@ -23,6 +30,11 @@ layouts:
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
     scale: 1
+    remote-path: /root/ogc
+    exclude:
+      - .git
+      - .venv
+    artifacts: /root/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - ubuntu-gcp

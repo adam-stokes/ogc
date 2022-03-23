@@ -2,6 +2,7 @@
 """
 
 PID_FILE = "ogc-server.pid"
+LOCAL_ARTIFACT_PATH = "artifacts"
 
 
 class SpecCore:

@@ -3,11 +3,9 @@ import sys
 from pathlib import Path
 
 import yaml
-from celery import chord
 from melddict import MeldDict
 
-from ogc import db, log
-from ogc.tasks import do_deploy, do_destroy, do_provision, end_provision
+from ogc import db
 
 from .state import app
 
@@ -62,6 +60,22 @@ class SpecProvisionLayout:
     def tags(self):
         return self.layout.get("tags", [])
 
+    @property
+    def artifacts(self):
+        return self.layout.get("artifacts", None)
+
+    @property
+    def remote_path(self):
+        return self.layout.get("remote-path", None)
+
+    @property
+    def include(self):
+        return self.layout.get("include", [])
+
+    @property
+    def exclude(self):
+        return self.layout.get("exclude", [])
+
     def as_dict(self):
         return {
             "name": self.name,
@@ -75,6 +89,10 @@ class SpecProvisionLayout:
             "ssh_public_key": str(self.ssh.public),
             "ssh_private_key": str(self.ssh.private),
             "tags": self.tags,
+            "artifacts": self.artifacts,
+            "remote-path": self.remote_path,
+            "include": self.include,
+            "exclude": self.exclude,
         }
 
 

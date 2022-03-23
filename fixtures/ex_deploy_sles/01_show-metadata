@@ -6,3 +6,6 @@ echo ""
 echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
 % endfor
 echo ""
+
+mkdir -p /root/output
+touch /root/output/test.xml

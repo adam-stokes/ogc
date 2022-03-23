@@ -1,5 +1,6 @@
 import datetime
 import os
+from typing import Text
 
 from peewee import *
 from playhouse.postgres_ext import *
@@ -33,6 +34,10 @@ class NodeModel(BaseModel):
     provider = TextField()
     scripts = TextField()
     tags = ArrayField(CharField)
+    artifacts = TextField(null=True)
+    remote_path = TextField(null=True)
+    include = ArrayField(CharField, null=True)
+    exclude = ArrayField(CharField, null=True)
 
 
 class NodeActionResult(BaseModel):
@@ -41,6 +46,7 @@ class NodeActionResult(BaseModel):
     exit_code = IntegerField()
     out = TextField()
     error = TextField(null=True)
+    command = TextField(null=True)
     node = ForeignKeyField(NodeModel, backref="actions", on_delete="CASCADE")
 
 

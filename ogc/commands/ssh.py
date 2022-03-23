@@ -1,10 +1,12 @@
 # pylint: disable=unexpected-keyword-arg
+import os
 import sys
+from pathlib import Path
 
 import click
 import sh
 
-from ogc import actions, db
+from ogc import actions, db, enums
 
 from ..deployer import Deployer
 from ..state import app
@@ -65,7 +67,7 @@ def exec(by_tag, by_name, cmd):
     multiple=True,
     help="Exclude files/directories when uploading",
 )
-def scp_to(name, src, dst, exclude):
+def push_files(name, src, dst, exclude):
     db.connect()
     node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
@@ -80,7 +82,7 @@ def scp_to(name, src, dst, exclude):
 @click.argument("name")
 @click.argument("dst")
 @click.argument("src")
-def scp_get(name, dst, src):
+def pull_files(name, dst, src):
     db.connect()
     node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
@@ -91,7 +93,29 @@ def scp_get(name, dst, src):
     sys.exit(1)
 
 
+@click.command(help="Download artifacts from node")
+@click.argument("name")
+def pull_artifacts(name):
+    db.connect()
+    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    if node:
+        deploy = Deployer(node, app.env)
+        if node.artifacts:
+            app.log.info("Downloading artifacts")
+            local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
+            if not local_artifact_path.exists():
+                os.makedirs(str(local_artifact_path), exist_ok=True)
+            deploy.get(node.artifacts, str(local_artifact_path))
+            sys.exit(0)
+        else:
+            app.log.error(f"No artifacts found at {node.remote_path}")
+            sys.exit(1)
+    app.log.error(f"Unable to locate {name} to connect to")
+    sys.exit(1)
+
+
 cli.add_command(ssh)
-cli.add_command(scp_to)
-cli.add_command(scp_get)
+cli.add_command(push_files)
+cli.add_command(pull_files)
+cli.add_command(pull_artifacts)
 cli.add_command(exec)

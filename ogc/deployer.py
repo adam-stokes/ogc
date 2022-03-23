@@ -6,7 +6,6 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List
 
-import click
 import sh
 from libcloud.compute.deployment import (
     FileDeployment,
@@ -61,13 +60,21 @@ class Deployer:
         log.info(
             f"Establishing connection [{self.deployment.public_ip}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
         )
+
+        # Upload any files first
+        if self.deployment.remote_path:
+            log.info(
+                f"Uploading file/directory contents to {self.deployment.instance_name}"
+            )
+            self.put(
+                ".", self.deployment.remote_path, self.deployment.exclude, self.deployment.include
+            )
+
         scripts = Path(self.deployment.scripts)
         if not scripts.exists():
             log.info("No deployment scripts found, skipping.")
             return DeployerResult(self.deployment, MultiStepDeployment())
 
-        # TODO: maybe support a "vars" section in the spec file to be
-        # added to the context for templates
         context = {"env": self.env}
 
         # teardown file is a special file that gets executed before node
@@ -99,7 +106,7 @@ class Deployer:
             return DeployerResult(self.deployment, msd)
         return DeployerResult(self.deployment, MultiStepDeployment())
 
-    def put(self, src: str, dst: str, excludes: List[str]):
+    def put(self, src: str, dst: str, excludes: List[str], includes: List[str] = []):
         cmd_opts = [
             "-avz",
             "-e",
@@ -108,8 +115,10 @@ class Deployer:
             f"{self.deployment.username}@{self.deployment.public_ip}:{dst}",
         ]
 
-        # Common excludes
-        cmd_opts.append("--exclude=.git")
+        if includes:
+            for include in includes:
+                cmd_opts.append(f"--include={include}")
+
         if excludes:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
