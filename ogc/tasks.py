@@ -61,18 +61,27 @@ def do_destroy(name: str, env: Dict[str, str]) -> None:
 @app.task
 def do_exec(
     cmd: str, ssh_private_key: str, node_id: int, username: str, public_ip: str
-) -> None:
+) -> bool:
     node_data = db.NodeModel.get(db.NodeModel.id == node_id)
     cmd_opts = ["-i", str(ssh_private_key), f"{username}@{public_ip}"]
     cmd_opts.append(cmd)
-    out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)
-    db.NodeActionResult.create(
-        node=node_data,
-        exit_code=out.exit_code,
-        out=out.stdout.decode(),
-        err=out.stderr.decode(),
-    )
-    return out.exit_code == 0
+    try:
+        out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)
+        db.NodeActionResult.create(
+            node=node_data,
+            exit_code=out.exit_code,
+            out=out.stdout.decode(),
+            err=out.stderr.decode(),
+        )
+        return True
+    except sh.ErrorReturnCode as e:
+        db.NodeActionResult.create(
+            node=node_data,
+            exit_code=e.exit_code,
+            out=e.stdout.decode(),
+            err=e.stderr.decode(),
+        )
+        return e.exit_code == 0
 
 
 @app.task

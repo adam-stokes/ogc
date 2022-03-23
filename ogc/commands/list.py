@@ -67,7 +67,10 @@ def ls(by_tag, by_name):
                         for tag in data.tags
                     ]
                 ),
-                f"pass: {click.style(len(completed_actions), fg='green')} fail: {len(failed_actions)}",
+                (
+                    f"pass: {click.style(len(completed_actions), fg='green')} "
+                    f"fail: {click.style(len(failed_actions), fg='red') if len(failed_actions) > 0 else len(failed_actions)}"
+                ),
             ]
         )
 

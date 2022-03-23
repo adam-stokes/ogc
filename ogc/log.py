@@ -29,7 +29,6 @@ def debug(ctx):
 
 
 def error(ctx):
-    click.secho(ctx, fg="red", bold=True)
     logger.error(ctx)
 
 

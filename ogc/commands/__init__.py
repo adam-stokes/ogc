@@ -1,5 +1,6 @@
 from .base import *
 from .destroy import *
+from .inspect import *
 from .launch import *
 from .list import *
 from .log import *
