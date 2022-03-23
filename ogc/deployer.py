@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 from typing import Dict, List
 
+import click
 import sh
 from libcloud.compute.deployment import (
     FileDeployment,
@@ -102,20 +103,23 @@ class Deployer:
         cmd_opts = [
             "-avz",
             "-e",
-            f"'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {self.deployment.ssh_private_key}'",
+            f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {self.deployment.ssh_private_key}",
             src,
             f"{self.deployment.username}@{self.deployment.public_ip}:{dst}",
         ]
+
+        # Common excludes
+        cmd_opts.append("--exclude=.git")
         if excludes:
             for exclude in excludes:
-                cmd_opts.append(f"--exclude='{exclude}'")
+                cmd_opts.append(f"--exclude={exclude}")
         sh.rsync(cmd_opts)
 
     def get(self, dst: str, src: str):
         cmd_opts = [
             "-avz",
             "-e",
-            f"'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {self.deployment.ssh_private_key}'",
+            f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i {self.deployment.ssh_private_key}",
             f"{self.deployment.username}@{self.deployment.public_ip}:{dst}",
             src,
         ]

@@ -69,8 +69,9 @@ def scp_to(name, src, dst, exclude):
     db.connect()
     node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
-        deploy = Deployer(node)
+        deploy = Deployer(node, app.env)
         deploy.put(src, dst, excludes=exclude)
+        sys.exit(0)
     app.log.error(f"Unable to locate {name} to connect to")
     sys.exit(1)
 
@@ -83,8 +84,9 @@ def scp_get(name, dst, src):
     db.connect()
     node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
-        deploy = Deployer(node)
+        deploy = Deployer(node, app.env)
         deploy.get(src, dst)
+        sys.exit(0)
     app.log.error(f"Unable to locate {name} to connect to")
     sys.exit(1)
 
