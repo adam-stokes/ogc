@@ -35,6 +35,7 @@ nav:
   - 'Getting Started': index.md
   - 'User Guide':
     - 'Navigating a deployment': 'user-guide/navigating-nodes.md'
+    - 'Defining Layouts': 'user-guide/defining-layouts.md'
     - 'Reference Commands':
         - "ogc": 'commands/ogc.md'
         - "ogc exec": 'commands/ogc-exec.md'
