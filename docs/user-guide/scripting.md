@@ -86,7 +86,7 @@ mv elastic-agent-${env['OGC_ELASTIC_AGENT_VERSION']}-linux-x86_64 elastic-agent
 cd elastic-agent && ./elastic-agent install -f --url=${env['OGC_FLEET_URL']} --enrollment-token=${env['OGC_FLEET_ENROLLMENT_TOKEN']}
 ```
 
-### Resuable helpers
+## Reusable helpers
 
 In the above example we reference a file called `/functions.mako` this is just another template file that sits just outside of our defined `scripts`, for example, if our `scripts` is defined to be in `scripts/my_ubuntu_deploy` then this `functions.mako` will live at `scripts/functions.mako`. 
 
