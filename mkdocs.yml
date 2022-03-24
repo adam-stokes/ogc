@@ -24,7 +24,6 @@ markdown_extensions:
     - pymdownx.tasklist:
         custom_checkbox: True
     - pymdownx.tilde
-    - mkdocs-click
 extra:
   palette:
       primary: '#087da1'
@@ -38,7 +37,6 @@ nav:
     - 'Managing a deployment': 'user-guide/managing-nodes.md'
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
     - 'Scripting': 'user-guide/scripting.md'
-    - 'CLI Reference': 'cli.md'
     - 'Reference Commands':
         - "ogc": 'commands/ogc.md'
         - "ogc exec": 'commands/ogc-exec.md'
