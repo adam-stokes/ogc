@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Scripting - OGC</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">OGC</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="../.." class="nav-link">Getting Started</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../navigating-nodes/" class="dropdown-item">Navigating a deployment</a>
+</li>
+                                    
+<li>
+    <a href="../defining-layouts/" class="dropdown-item">Defining Layouts</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active">Scripting</a>
+</li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Reference Commands</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="../../commands/ogc/" class="dropdown-item">ogc</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-exec/" class="dropdown-item">ogc exec</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-inspect/" class="dropdown-item">ogc inspect</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-launch/" class="dropdown-item">ogc launch</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-log/" class="dropdown-item">ogc log</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-ls/" class="dropdown-item">ogc ls</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-pull-artifacts/" class="dropdown-item">ogc pull-artifacts</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-push-files/" class="dropdown-item">ogc push-files</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-rm/" class="dropdown-item">ogc rm</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-server/" class="dropdown-item">ogc server</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-ssh/" class="dropdown-item">ogc ssh</a>
+</li>
+            
+<li>
+    <a href="../../commands/ogc-status/" class="dropdown-item">ogc status</a>
+</li>
+    </ul>
+  </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="../defining-layouts/" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../../commands/ogc/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#scripting" class="nav-link">Scripting</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#before-starting" class="nav-link">Before starting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#writing-scripts" class="nav-link">Writing scripts</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#templating" class="nav-link">Templating</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="scripting">Scripting<a class="headerlink" href="#scripting" title="Permanent link">&para;</a></h1>
+<p>All deployments have the ability to execute scripts once a node becomes available.</p>
+<h2 id="before-starting">Before starting<a class="headerlink" href="#before-starting" title="Permanent link">&para;</a></h2>
+<p>A couple of things to keep in mind:</p>
+<ul>
+<li>All scripts are executed in order based on the filenames. It is recommended to create scripts with a numbered prefix, for example:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>- scripts/
+  -  01-install-deps
+  -  02-configure-services
+</code></pre></div>
+<ul>
+<li>There is a special reserved filename <code>teardown</code>, if this file exists it will only be executed during a removal of a node. This is useful for any cleanup actions that may need to be run, such as removing test users, un-enrolling from a service, etc.</li>
+</ul>
+<h2 id="writing-scripts">Writing scripts<a class="headerlink" href="#writing-scripts" title="Permanent link">&para;</a></h2>
+<p>Scripts can be written in any language, it is up to you to configure the nodes so that any runtimes and library dependencies are met on the target node for your script to execute in. </p>
+<p>One way to accomplish this is to create <code>01-setup-env</code> bash script:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;Installing python3 on ubuntu&quot;</span>
+sudo apt-get update
+sudo apt-get install -qyf python3
+sudo pip install sh
+</code></pre></div>
+<p>Then in subsequent scripts, using <strong>python3</strong> is available. For example, in file <code>02-run-cmd-in-python</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="kn">import</span> <span class="nn">sh</span>
+
+<span class="n">sh</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="n">sh</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;mydir&#39;</span><span class="p">,</span> <span class="s1">&#39;anotherdir&#39;</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="templating">Templating<a class="headerlink" href="#templating" title="Permanent link">&para;</a></h2>
+<p>OGC provides some additional capabilities through templating. Under the hood <a href="https://www.makotemplates.org/">python-mako</a> is used for the parsing.</p>
+<p>With templating, you have the ability to query the underlying database to gather node information. Because mako supports the importing of python modules and our OGC environment is already exposed, we can access our <code>db</code> module and use some helper methods.</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;db&quot;</span> <span class="nv">module</span><span class="o">=</span><span class="s2">&quot;ogc.db&quot;</span>/&gt;
+
+<span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+% <span class="k">for</span> node <span class="k">in</span> db.by_tag<span class="o">(</span><span class="s1">&#39;sles&#39;</span><span class="o">)</span>:
+<span class="nb">echo</span> <span class="s2">&quot;[ID: </span><span class="si">${</span><span class="nv">node</span><span class="p">.id</span><span class="si">}</span><span class="s2">] Name: </span><span class="si">${</span><span class="nv">node</span><span class="p">.instance_name</span><span class="si">}</span><span class="s2"> || Connection: </span><span class="si">${</span><span class="nv">node</span><span class="p">.username</span><span class="si">}</span><span class="s2">@</span><span class="si">${</span><span class="nv">node</span><span class="p">.public_ip</span><span class="si">}</span><span class="s2"> || Provider: </span><span class="si">${</span><span class="nv">node</span><span class="p">.provider</span><span class="si">}</span><span class="s2">&quot;</span>
+% endfor
+<span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+</code></pre></div>
+<p>The runtime environment is also available within the template context. In one example, we can export the following into our <code>.env</code> file and reference those in the templates:</p>
+<ul>
+<li><strong>OGC_ELASTIC_AGENT_VERSION</strong></li>
+<li><strong>OGC_ELASTIC_AGENT_SHA</strong></li>
+<li><strong>OGC_ELASTIC_AGENT_VERSION</strong></li>
+<li><strong>OGC_FLEET_URL</strong></li>
+<li><strong>OGC_FLEET_ENROLLMENT_TOKEN</strong> </li>
+</ul>
+<p>See the below example for downloading elastic-agent and enrolling it into a fleet server. The variable exposed to all templates for accessing the environment variables is <code>env</code></p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;utils&quot;</span> <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;/functions.mako&quot;</span>/&gt;
+
+&lt;%
+<span class="nv">url</span> <span class="o">=</span> <span class="s2">&quot;https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz&quot;</span> % <span class="o">(</span>env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_SHA&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">])</span>
+%&gt;
+<span class="si">${</span><span class="nv">utils</span><span class="p">.setup_env()</span><span class="si">}</span>
+<span class="si">${</span><span class="nv">utils</span><span class="p">.install_pkgs([</span><span class="s1">&#39;nano&#39;</span><span class="p">])</span><span class="si">}</span>
+<span class="si">${</span><span class="nv">utils</span><span class="p">.download(url, </span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="si">${</span><span class="nv">utils</span><span class="p">.extract(</span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
+
+mv elastic-agent-<span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="p">]</span><span class="si">}</span>-linux-x86_64 elastic-agent
+
+<span class="nb">cd</span> elastic-agent <span class="o">&amp;&amp;</span> ./elastic-agent install -f --url<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_URL&#39;</span><span class="p">]</span><span class="si">}</span> --enrollment-token<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_ENROLLMENT_TOKEN&#39;</span><span class="p">]</span><span class="si">}</span>
+</code></pre></div>
+<h3 id="resuable-helpers">Resuable helpers<a class="headerlink" href="#resuable-helpers" title="Permanent link">&para;</a></h3>
+<p>In the above example we reference a file called <code>/functions.mako</code> this is just another template file that sits just outside of our defined <code>scripts</code>, for example, if our <code>scripts</code> is defined to be in <code>scripts/my_ubuntu_deploy</code> then this <code>functions.mako</code> will live at <code>scripts/functions.mako</code>. </p>
+<p>This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.</p>
+<p>Defining helper functions is straight forward, lets look at <code>functions.mako</code> for an example:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">## Helper template functions downloading/extracting files</span>
+&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;setup_env()&quot;</span>&gt;
+<span class="k">if</span> ! <span class="nb">test</span> -f <span class="s2">&quot;/usr/local/bin/pacapt&quot;</span><span class="p">;</span> <span class="k">then</span>
+    wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
+    chmod <span class="m">755</span> /usr/local/bin/pacapt
+    ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman <span class="o">||</span> <span class="nb">true</span>
+<span class="k">fi</span>
+&lt;/%def&gt;
+
+&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;install_pkgs(pkgs)&quot;</span>&gt;
+% <span class="k">for</span> pkg <span class="k">in</span> pkgs:
+pacapt install --noconfirm <span class="si">${</span><span class="nv">pkg</span><span class="si">}</span>
+% endfor
+&lt;/%def&gt;
+
+&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;download(url, src_file)&quot;</span>&gt;
+wget -O <span class="si">${</span><span class="nv">src_file</span><span class="si">}</span> <span class="si">${</span><span class="nv">url</span><span class="si">}</span>
+&lt;/%def&gt;
+
+&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;extract(src, dst=None)&quot;</span>&gt;
+% <span class="k">if</span> dst:
+mkdir -p <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
+tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span> -C <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
+% <span class="k">else</span>:
+tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span>
+% endif
+&lt;/%def&gt;
+</code></pre></div>
+<p>Each <code>%def</code> section defines a function block that when called with any necessary arguments will output that data into the scripts with all necessary translations handled.</p>
+<p>You can see the usage of these functions in the previous example for installing elastic-agent.</p>
+<p>It is worth the time to visit Mako&rsquo;s website and learn about its feature set, particularly <a href="https://docs.makotemplates.org/en/latest/namespaces.html">namespaces</a> and <a href="https://docs.makotemplates.org/en/latest/defs.html">defs and blocks</a>.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

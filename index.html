@@ -48,6 +48,10 @@
     <a href="user-guide/defining-layouts/" class="dropdown-item">Defining Layouts</a>
 </li>
                                     
+<li>
+    <a href="user-guide/scripting/" class="dropdown-item">Scripting</a>
+</li>
+                                    
   <li class="dropdown-submenu">
     <a href="#" class="dropdown-item">Reference Commands</a>
     <ul class="dropdown-menu">
@@ -170,7 +174,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#create-a-provision-specification" class="nav-link">Create a provision specification</a>
+            <li class="nav-item" data-level="2"><a href="#define-provisioning" class="nav-link">Define Provisioning</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -233,7 +237,8 @@ $ poetry install
 <div class="highlight"><pre><span></span><code>$ pip install ogc
 </code></pre></div>
 <h2 id="provider-setup">Provider Setup<a class="headerlink" href="#provider-setup" title="Permanent link">&para;</a></h2>
-<p>OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. Create a <code>.env</code> file in the top level directory where <code>ogc</code> is to be run:</p>
+<p>OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. </p>
+<p>Create a <code>.env</code> file in the top level directory where <code>ogc</code> is to be run:</p>
 <div class="highlight"><pre><span></span><code>AWS_ACCESS_KEY_ID=&quot;&quot;
 AWS_SECRET_ACCESS_KEY=&quot;&quot;
 AWS_REGION=&quot;us-east-2&quot;
@@ -243,8 +248,9 @@ GOOGLE_APPLICATION_SERVICE_ACCOUNT=&quot;..@...iam.gserviceaccount.com&quot;
 GOOGLE_PROJECT=&quot;example-project&quot;
 GOOGLE_DATACENTER=&quot;us-central1-a&quot;
 </code></pre></div>
-<h2 id="create-a-provision-specification">Create a provision specification<a class="headerlink" href="#create-a-provision-specification" title="Permanent link">&para;</a></h2>
-<p>Once setup is complete, a provision specification is needed. This defines ssh keys and one or more layouts to be provisioned. Create a file <code>ogc.yml</code> and place in the top level directory where <code>ogc</code> is run:</p>
+<h2 id="define-provisioning">Define Provisioning<a class="headerlink" href="#define-provisioning" title="Permanent link">&para;</a></h2>
+<p>Once setup is complete, a provision specification is needed. This defines <code>ssh-keys</code> and one or more <code>layouts</code> to be provisioned. </p>
+<p>Create a file <code>ogc.yml</code> and place in the top level directory where <code>ogc</code> is run:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ci</span><span class="w"></span>
 
 <span class="c1"># SSH Keys must be passwordless</span><span class="w"></span>
@@ -366,5 +372,5 @@ The <code>scripts</code> section tells OGC where the template files/scripts are 
 
 <!--
 MkDocs version : 1.2.3
-Build Date UTC : 2022-03-24 14:59:08.550488+00:00
+Build Date UTC : 2022-03-24 15:43:34.023099+00:00
 -->
