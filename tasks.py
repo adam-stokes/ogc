@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 from invoke import task
 from pathlib import Path
-
+import os
 load_dotenv()
 
 
@@ -43,4 +43,7 @@ def prep(c):
 
 @task(pre=[clean, fix, prep, bump_rev])
 def release(c):
-    c.run("poetry publish --build")
+    pypi_user = os.environ.get("PYPI_USER")
+    pypi_pass = os.environ.get("PYPI_PASS")
+    c.run("mkdocs gh-deploy")
+    c.run(f"poetry publish --build -u ")
