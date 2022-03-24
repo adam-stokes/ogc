@@ -9,7 +9,7 @@ load_dotenv()
 @task
 def clean(c):
     print("Cleaning project")
-    c.run("rm -rf site build dist ogc.egg-info __pycache__")
+    c.run("rm -rf site build dist ogc.egg-info __pycache__ artifacts")
 
 
 @task

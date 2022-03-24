@@ -70,7 +70,7 @@ In the case of **Google**, any username can be given. In the case of **AWS**, th
 
 The location on your machine where templates/scripts resides. These will be uploaded and executed during the deployment phase.
 
-*Note*: See writing templates/scripts for more information.
+*Note*: See [scripting](user-guide/../scripting.md) for more information.
 
 **scale**
 
