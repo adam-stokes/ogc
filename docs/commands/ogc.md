@@ -1,10 +1,14 @@
 # NAME
 
-ogc -
+ogc - Just a simple provisioner
 
 # SYNOPSIS
 
 **ogc** \[OPTIONS\] COMMAND \[ARGS\]\...
+
+# DESCRIPTION
+
+Just a simple provisioner
 
 # COMMANDS
 
