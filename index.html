@@ -8,11 +8,11 @@
         
         
         <link rel="shortcut icon" href="img/favicon.ico">
-        <title>OGC, a runner of things</title>
+        <title>OGC</title>
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/docco.min.css">
 
         <script src="js/jquery-1.10.2.min.js" defer></script>
         <script src="js/bootstrap.min.js" defer></script>
@@ -23,10 +23,29 @@
     <body class="homepage">
         <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
             <div class="container">
-                <a class="navbar-brand" href=".">OGC, a runner of things</a>
+                <a class="navbar-brand" href=".">OGC</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
                 <!-- Expanded navigation -->
                 <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem active">
+                                <a href="." class="nav-link">Getting Started</a>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="user-guide/navigating-nodes/" class="dropdown-item">Navigating a deployment</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
 
                     <ul class="nav navbar-nav ml-auto">
                         <li class="nav-item">
@@ -34,6 +53,16 @@
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
+                            <li class="nav-item">
+                                <a rel="prev" class="nav-link disabled">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="user-guide/navigating-nodes/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
                     </ul>
                 </div>
             </div>
@@ -63,10 +92,23 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#provider-setup" class="nav-link">Provider Setup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#create-a-provision-specification" class="nav-link">Create a provision specification</a>
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#provision-and-deploy" class="nav-link">Provision and Deploy</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-level="1"><a href="#next-steps" class="nav-link">Next steps</a>
+              <ul class="nav flex-column">
               </ul>
             </li>
         </ul>
@@ -107,12 +149,25 @@
 <span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
 <span class="w">  </span><span class="nt">redis</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
 </code></pre></div>
+<p>Bring up the services</p>
+<p><code>$ docker-compose up</code></p>
 <p><strong>Next</strong>, is installation of OGC. We use <strong>poetry</strong>:</p>
 <div class="highlight"><pre><span></span><code>$ pip install <span class="nv">poetry</span><span class="o">==</span><span class="m">1</span>.1.12
 $ poetry install
 </code></pre></div>
+<h2 id="provider-setup">Provider Setup<a class="headerlink" href="#provider-setup" title="Permanent link">&para;</a></h2>
+<p>OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. Create a <code>.env</code> file in the top level directory where <code>ogc</code> is to be run:</p>
+<div class="highlight"><pre><span></span><code>AWS_ACCESS_KEY_ID=&quot;&quot;
+AWS_SECRET_ACCESS_KEY=&quot;&quot;
+AWS_REGION=&quot;us-east-2&quot;
+
+GOOGLE_APPLICATION_CREDENTIALS=&quot;svc.json&quot;
+GOOGLE_APPLICATION_SERVICE_ACCOUNT=&quot;..@...iam.gserviceaccount.com&quot;
+GOOGLE_PROJECT=&quot;example-project&quot;
+GOOGLE_DATACENTER=&quot;us-central1-a&quot;
+</code></pre></div>
 <h2 id="create-a-provision-specification">Create a provision specification<a class="headerlink" href="#create-a-provision-specification" title="Permanent link">&para;</a></h2>
-<p>Once setup is complete, a provision specification is needed. This defines ssh keys and one or more layouts to be provisioned.</p>
+<p>Once setup is complete, a provision specification is needed. This defines ssh keys and one or more layouts to be provisioned. Create a file <code>ogc.yml</code> and place in the top level directory where <code>ogc</code> is run:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ci</span><span class="w"></span>
 
 <span class="c1"># SSH Keys must be passwordless</span><span class="w"></span>
@@ -140,7 +195,20 @@ $ poetry install
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-gcp</span><span class="w"></span>
 </code></pre></div>
 <p>This specification tells OGC to deploy 5 nodes running on Google&rsquo;s <strong>e2-standard-8</strong> with SUSE 15 OS. 
-The <code>scripts</code> section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.</p></div>
+The <code>scripts</code> section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.</p>
+<h2 id="provision-and-deploy">Provision and Deploy<a class="headerlink" href="#provision-and-deploy" title="Permanent link">&para;</a></h2>
+<p>OGC uses a client/server architecture to better handle scaling and concurrency needs. A celery server needs to be available prior launching nodes:</p>
+<div class="highlight"><pre><span></span><code>$ ogc server
+</code></pre></div>
+<p><em>Note</em>: An alternative is to run this process in a separate docker container.</p>
+<p>Once the specification is set, environment variables configured and celery is running, execute a deployment in a new terminal:</p>
+<div class="highlight"><pre><span></span><code>$ ogc launch
+</code></pre></div>
+<p><em>Note</em>: If the file is something other than <code>ogc.yml</code> append the <code>--spec</code> option to the launch command:</p>
+<div class="highlight"><pre><span></span><code>$ ogc launch --spec my-custom-provision.yml
+</code></pre></div>
+<h1 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h1>
+<p>Learn how to navigate your deployments in our <a href="user-guide/navigating-nodes/">User Guide - Navigating a deployment</a></p></div>
             </div>
         </div>
 
@@ -221,5 +289,5 @@ The <code>scripts</code> section tells OGC where the template files/scripts are 
 
 <!--
 MkDocs version : 1.2.3
-Build Date UTC : 2022-03-24 13:07:08.872077+00:00
+Build Date UTC : 2022-03-24 14:02:59.561155+00:00
 -->
