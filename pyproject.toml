@@ -4,6 +4,9 @@ version = "2.0.0"
 description = "Provisioner"
 authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
 license = "MIT"
+readme = "readme.md"
+homepage = "https://github.com/adam-stokes/ogc"
+repository = "https://github.com/adam-stokes/ogc"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -43,6 +46,7 @@ ipdb = "^0.13.9"
 mypy = "^0.941"
 mkdocs-material = "^8.2.6"
 mkdocs-bootswatch = "^1.1"
+click-man = "^0.4.1"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start" 

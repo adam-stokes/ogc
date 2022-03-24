@@ -244,6 +244,17 @@ python-versions = ">=3.6.2,<4.0.0"
 click = ">=7"
 
 [[package]]
+name = "click-man"
+version = "0.4.1"
+description = "Generate man pages for click based CLI applications"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+click = "*"
+
+[[package]]
 name = "click-plugins"
 version = "1.1.1"
 description = "An extension module for click to enable registering CLI commands via setuptools entry-points."
@@ -1316,7 +1327,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7887ce31a4f25938b6efe8ad116bed9268ec4d8307e8752a286186c673dba2d6"
+content-hash = "1bc80eda12a0764c534123c2071f32ba4e4b99f5378b2da5551aa4fdebf716cf"
 
 [metadata.files]
 amqp = [
@@ -1467,6 +1478,10 @@ click = [
 click-didyoumean = [
     {file = "click-didyoumean-0.3.0.tar.gz", hash = "sha256:f184f0d851d96b6d29297354ed981b7dd71df7ff500d82fa6d11f0856bee8035"},
     {file = "click_didyoumean-0.3.0-py3-none-any.whl", hash = "sha256:a0713dc7a1de3f06bc0df5a9567ad19ead2d3d5689b434768a6145bff77c0667"},
+]
+click-man = [
+    {file = "click-man-0.4.1.tar.gz", hash = "sha256:d255c14ecee52afa915228f7dc87603ddb571c3d7d1a2eb219244e440fa88bbb"},
+    {file = "click_man-0.4.1-py3-none-any.whl", hash = "sha256:bb4ed0cdbded7494ead67b2c805b9170a5ebd5e0a280fed1079d3adece52fa00"},
 ]
 click-plugins = [
     {file = "click-plugins-1.1.1.tar.gz", hash = "sha256:46ab999744a9d831159c3411bb0c79346d94a444df9a3a3742e9ed63645f264b"},

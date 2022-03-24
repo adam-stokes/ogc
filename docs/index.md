@@ -43,11 +43,17 @@ Bring up the services
 
  `$ docker-compose up`
 
-**Next**, is installation of OGC. We use **poetry**:
+**Next**, is installation of OGC. We use **[Poetry](https://python-poetry.org/)**:
 
 ```shell
 $ pip install poetry==1.1.12
 $ poetry install
+```
+
+Or install from [pypi](https://pypi.org):
+
+```
+$ pip install ogc
 ```
 
 ## Provider Setup
