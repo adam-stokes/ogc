@@ -1,10 +1,8 @@
 import sys
 
 import click
-from rich import print
 from rich.console import Console
 from rich.table import Table
-from rich.text import Text
 
 from ogc import db
 
@@ -84,7 +82,7 @@ def ls_key_pairs(provider, filter):
     if filter:
         kps = [kp for kp in engine.list_key_pairs() if filter in kp.name]
     else:
-        kps = [kp for kp in engine.list_key_pairs()]
+        kps = list(engine.list_key_pairs())
 
     for kp in kps:
         click.secho(kp.name, fg="green")

@@ -87,7 +87,7 @@ def pull_files(name, dst, src):
     node = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node:
         deploy = Deployer(node, app.env)
-        deploy.get(src, dst)
+        deploy.get(dst, src)
         sys.exit(0)
     app.log.error(f"Unable to locate {name} to connect to")
     sys.exit(1)

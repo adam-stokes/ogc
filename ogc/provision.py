@@ -211,9 +211,7 @@ class AWSProvisioner(BaseProvisioner):
         return self._create_node(**opts)
 
     def node(self, **kwargs):
-        instance_id = None
-        if "instance_id" in kwargs:
-            instance_id = kwargs["instance_id"]
+        instance_id = kwargs.get("instance_id", None)
         _nodes = super().node(ex_node_ids=[instance_id])
         if _nodes:
             return _nodes[0]

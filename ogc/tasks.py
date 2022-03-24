@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from threading import local
 from typing import Dict
 
 import sh

@@ -39,7 +39,7 @@ def rm_key_pairs(provider, filter):
     if filter:
         kps = [kp for kp in engine.list_key_pairs() if filter in kp.name]
     else:
-        kps = [kp for kp in engine.list_key_pairs()]
+        kps = list(engine.list_key_pairs())
 
     for kp in kps:
         click.secho(f"Removing keypair: {kp.name}", fg="green")

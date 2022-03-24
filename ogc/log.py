@@ -3,7 +3,6 @@
 
 import sys
 
-import click
 from loguru import logger
 
 logger.remove()
