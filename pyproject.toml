@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ogc"
-version = "2.0.1"
+version = "2.0.2"
 description = "Provisioner"
 authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
 license = "MIT"
@@ -30,7 +30,7 @@ peewee = "^3.14.10"
 psycopg2-binary = "^2.9.3"
 colorama = "^0.4.4"
 click-didyoumean = "^0.3.0"
-rich = "^12.0.1"
+rich = "^12.0.2"
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.0"
@@ -39,7 +39,7 @@ invoke = "^1.6.0"
 mkdocs = "^1.2.3"
 python-frontmatter = "^1.0.0"
 pylint = "^2.12.2"
-"punch.py" = "^2.0.1"
+"punch.py" = "^2.0.2"
 Pygments = "^2.11.2"
 pytest = "^7.0.1"
 ipdb = "^0.13.9"
