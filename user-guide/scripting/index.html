@@ -173,6 +173,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#reusable-helpers" class="nav-link">Reusable helpers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -248,7 +252,7 @@ mv elastic-agent-<span class="si">${</span><span class="nv">env</span><span clas
 
 <span class="nb">cd</span> elastic-agent <span class="o">&amp;&amp;</span> ./elastic-agent install -f --url<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_URL&#39;</span><span class="p">]</span><span class="si">}</span> --enrollment-token<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_ENROLLMENT_TOKEN&#39;</span><span class="p">]</span><span class="si">}</span>
 </code></pre></div>
-<h3 id="resuable-helpers">Resuable helpers<a class="headerlink" href="#resuable-helpers" title="Permanent link">&para;</a></h3>
+<h2 id="reusable-helpers">Reusable helpers<a class="headerlink" href="#reusable-helpers" title="Permanent link">&para;</a></h2>
 <p>In the above example we reference a file called <code>/functions.mako</code> this is just another template file that sits just outside of our defined <code>scripts</code>, for example, if our <code>scripts</code> is defined to be in <code>scripts/my_ubuntu_deploy</code> then this <code>functions.mako</code> will live at <code>scripts/functions.mako</code>. </p>
 <p>This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.</p>
 <p>Defining helper functions is straight forward, lets look at <code>functions.mako</code> for an example:</p>
