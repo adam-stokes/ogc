@@ -34,9 +34,19 @@
             }
         },
         {
-            "label": "celery",
+            "label": "celery-dev",
             "type": "shell",
             "command": "poetry run watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- ogc server",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "celery-prod",
+            "type": "shell",
+            "command": "poetry run ogc server",
             "problemMatcher": [],
             "group": {
                 "kind": "build",

@@ -1,5 +1,5 @@
-site_name: OGC, a runner of things
-theme: material
+site_name: OGC
+theme: flatly
 markdown_extensions:
     - toc:
         permalink: True
@@ -8,7 +8,6 @@ markdown_extensions:
     - wikilinks
     - codehilite:
         linenums: True
-    # - urlize # requires: pip install git+https://github.com/r0wb0t/markdown-urlize.git
     - pymdownx.arithmatex
     - pymdownx.betterem:
         smart_enable: all
@@ -33,4 +32,6 @@ extra:
     - type: 'github'
       link: 'https://github.com/adam-stokes/ogc'
 nav:
-  - Home: index.md
+  - 'Getting Started': index.md
+  - 'User Guide':
+    - 'Navigating a deployment': 'user-guide/navigating-nodes.md'

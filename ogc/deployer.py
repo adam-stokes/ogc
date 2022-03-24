@@ -71,7 +71,10 @@ class Deployer:
                 f"Uploading file/directory contents to {self.deployment.instance_name}"
             )
             self.put(
-                ".", self.deployment.remote_path, self.deployment.exclude, self.deployment.include
+                ".",
+                self.deployment.remote_path,
+                self.deployment.exclude,
+                self.deployment.include,
             )
 
         scripts = Path(self.deployment.scripts)

@@ -2,10 +2,10 @@ import sys
 from pathlib import Path
 
 import click
-
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
+
 from ogc import log
 from ogc.actions import sync
 
@@ -63,22 +63,21 @@ def status(reconcile, spec):
     for name, stats in counts.items():
         if stats["remaining"] > 0 or stats["remaining"] < 0:
             table.add_row(
-                    name,
-                    str(stats["deployed"]),
-                    str(stats["scale"]),
-                    Text(str(stats["remaining"]), style="bold red"),
+                name,
+                str(stats["deployed"]),
+                str(stats["scale"]),
+                Text(str(stats["remaining"]), style="bold red"),
             )
         else:
             table.add_row(
-                    name,
-                    str(stats["deployed"]),
-                    str(stats["scale"]),
-                    Text(str(stats["remaining"]), style="bold green"),
+                name,
+                str(stats["deployed"]),
+                str(stats["scale"]),
+                Text(str(stats["remaining"]), style="bold green"),
             )
 
     console = Console()
     console.print(table)
-
 
 
 cli.add_command(status)

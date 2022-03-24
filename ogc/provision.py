@@ -52,7 +52,7 @@ class ProvisionResult:
             remote_path=self.remote_path,
             artifacts=self.artifacts,
             include=self.include,
-            exclude=self.exclude
+            exclude=self.exclude,
         )
         node_obj.save()
         return node_obj

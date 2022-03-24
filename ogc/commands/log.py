@@ -1,9 +1,9 @@
 import click
 import sh
+from rich import print
 
 from .base import cli
 
-from rich import print
 
 @click.command(help="Stream log output")
 def log():

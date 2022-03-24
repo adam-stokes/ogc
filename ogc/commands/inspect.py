@@ -1,12 +1,12 @@
 import sys
 
 import click
+from rich.console import Console
+from rich.padding import Padding
 
 from ogc import db
 
 from .base import cli
-from rich.console import Console
-from rich.padding import Padding
 
 
 @click.command(help="List nodes in your inventory")
@@ -64,7 +64,11 @@ def inspect(id, name, tag, action_id):
             console.print(f"[{len(completed_actions)}] Successful Actions:")
             for action in completed_actions:
                 if action.out.strip():
-                    console.print(Padding(f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)))
+                    console.print(
+                        Padding(
+                            f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)
+                        )
+                    )
                     console.print(Padding(action.out, (0, 0, 0, 2)))
                 if action.error:
                     console.print(Padding(f"(id: {action.id}) Error:", (1, 0, 1, 2)))
@@ -74,7 +78,11 @@ def inspect(id, name, tag, action_id):
             console.print(f"[{len(failed_actions)}] Failed Actions:")
             for action in failed_actions:
                 if action.out.strip():
-                    console.print(Padding(f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)))
+                    console.print(
+                        Padding(
+                            f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)
+                        )
+                    )
                     console.print(Padding(action.out, (0, 0, 0, 2)))
                 if action.error:
                     console.print(Padding(f"(id: {action.id}) Error:", (1, 0, 1, 2)))

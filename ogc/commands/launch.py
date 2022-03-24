@@ -38,9 +38,7 @@ def launch(spec, with_deploy):
         sys.exit(1)
 
     app.spec = SpecLoader.load(specs)
-    log.info(
-        f"Provisioning: {', '.join([layout.name for layout in app.spec.layouts])}"
-    )
+    log.info(f"Provisioning: {', '.join([layout.name for layout in app.spec.layouts])}")
     node_ids = launch_p(app.spec.layouts, app.env)
 
     if with_deploy:

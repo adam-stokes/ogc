@@ -1,11 +1,11 @@
 import sys
 
 import click
-
 from rich import print
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
+
 from ogc import db
 
 from ..provision import choose_provisioner
@@ -55,22 +55,20 @@ def ls(by_tag, by_name):
             else:
                 completed_actions.append(action)
         table.add_row(
-                str(data.id),
-                data.instance_name,
-                data.instance_state,
-                f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
-                ",\n".join(
-                    [
-                        f"[bold green]{tag}[/]"
-                        if by_tag and tag == by_tag
-                        else tag
-                        for tag in data.tags
-                    ]
-                ),
-                (
-                    f"pass: [green]:heavy_check_mark:[/] "
-                    f"fail: [red]{str(len(failed_actions)) if len(failed_actions) > 0 else len(failed_actions)}[/]"
-                ),
+            str(data.id),
+            data.instance_name,
+            data.instance_state,
+            f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
+            ",\n".join(
+                [
+                    f"[bold green]{tag}[/]" if by_tag and tag == by_tag else tag
+                    for tag in data.tags
+                ]
+            ),
+            (
+                f"pass: [green]:heavy_check_mark:[/] "
+                f"fail: [red]{str(len(failed_actions)) if len(failed_actions) > 0 else len(failed_actions)}[/]"
+            ),
         )
 
     console = Console()
