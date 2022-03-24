@@ -34,8 +34,9 @@ extra:
 nav:
   - 'Getting Started': index.md
   - 'User Guide':
-    - 'Navigating a deployment': 'user-guide/navigating-nodes.md'
+    - 'Managing a deployment': 'user-guide/managing-nodes.md'
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
+    - 'Scripting': 'user-guide/scripting.md'
     - 'Reference Commands':
         - "ogc": 'commands/ogc.md'
         - "ogc exec": 'commands/ogc-exec.md'

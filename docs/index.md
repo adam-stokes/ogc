@@ -58,7 +58,9 @@ $ pip install ogc
 
 ## Provider Setup
 
-OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. Create a `.env` file in the top level directory where `ogc` is to be run:
+OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. 
+
+Create a `.env` file in the top level directory where `ogc` is to be run:
 
 ```
 AWS_ACCESS_KEY_ID=""
@@ -71,9 +73,11 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
-## Create a provision specification
+## Define Provisioning
 
-Once setup is complete, a provision specification is needed. This defines ssh keys and one or more layouts to be provisioned. Create a file `ogc.yml` and place in the top level directory where `ogc` is run:
+Once setup is complete, a provision specification is needed. This defines `ssh-keys` and one or more `layouts` to be provisioned. 
+
+Create a file `ogc.yml` and place in the top level directory where `ogc` is run:
 
 ```yaml
 name: ci
@@ -130,4 +134,4 @@ $ ogc launch --spec my-custom-provision.yml
 
 # Next steps
 
-Learn how to navigate your deployments in our [User Guide - Navigating a deployment](user-guide/navigating-nodes.md)
+Learn how to manage your deployments in our [User Guide - Managing a deployment](user-guide/managing-nodes.md)
