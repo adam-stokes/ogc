@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>ogc push-files - OGC</title>
+        <title>Defining Layouts - OGC</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -41,11 +41,11 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../../user-guide/navigating-nodes/" class="dropdown-item">Navigating a deployment</a>
+    <a href="../navigating-nodes/" class="dropdown-item">Navigating a deployment</a>
 </li>
                                     
 <li>
-    <a href="../../user-guide/defining-layouts/" class="dropdown-item">Defining Layouts</a>
+    <a href="./" class="dropdown-item active">Defining Layouts</a>
 </li>
                                     
   <li class="dropdown-submenu">
@@ -53,67 +53,67 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="../ogc/" class="dropdown-item">ogc</a>
+    <a href="../../commands/ogc/" class="dropdown-item">ogc</a>
 </li>
             
 <li>
-    <a href="../ogc-exec/" class="dropdown-item">ogc exec</a>
+    <a href="../../commands/ogc-exec/" class="dropdown-item">ogc exec</a>
 </li>
             
 <li>
-    <a href="../ogc-inspect/" class="dropdown-item">ogc inspect</a>
+    <a href="../../commands/ogc-inspect/" class="dropdown-item">ogc inspect</a>
 </li>
             
 <li>
-    <a href="../ogc-launch/" class="dropdown-item">ogc launch</a>
+    <a href="../../commands/ogc-launch/" class="dropdown-item">ogc launch</a>
 </li>
             
 <li>
-    <a href="../ogc-log/" class="dropdown-item">ogc log</a>
+    <a href="../../commands/ogc-log/" class="dropdown-item">ogc log</a>
 </li>
             
 <li>
-    <a href="../ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
+    <a href="../../commands/ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
 </li>
             
 <li>
-    <a href="../ogc-ls/" class="dropdown-item">ogc ls</a>
+    <a href="../../commands/ogc-ls/" class="dropdown-item">ogc ls</a>
 </li>
             
 <li>
-    <a href="../ogc-pull-artifacts/" class="dropdown-item">ogc pull-artifacts</a>
+    <a href="../../commands/ogc-pull-artifacts/" class="dropdown-item">ogc pull-artifacts</a>
 </li>
             
 <li>
-    <a href="../ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
+    <a href="../../commands/ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
 </li>
             
 <li>
-    <a href="./" class="dropdown-item active">ogc push-files</a>
+    <a href="../../commands/ogc-push-files/" class="dropdown-item">ogc push-files</a>
 </li>
             
 <li>
-    <a href="../ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
+    <a href="../../commands/ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
 </li>
             
 <li>
-    <a href="../ogc-rm/" class="dropdown-item">ogc rm</a>
+    <a href="../../commands/ogc-rm/" class="dropdown-item">ogc rm</a>
 </li>
             
 <li>
-    <a href="../ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
+    <a href="../../commands/ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
 </li>
             
 <li>
-    <a href="../ogc-server/" class="dropdown-item">ogc server</a>
+    <a href="../../commands/ogc-server/" class="dropdown-item">ogc server</a>
 </li>
             
 <li>
-    <a href="../ogc-ssh/" class="dropdown-item">ogc ssh</a>
+    <a href="../../commands/ogc-ssh/" class="dropdown-item">ogc ssh</a>
 </li>
             
 <li>
-    <a href="../ogc-status/" class="dropdown-item">ogc status</a>
+    <a href="../../commands/ogc-status/" class="dropdown-item">ogc status</a>
 </li>
     </ul>
   </li>
@@ -128,12 +128,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../ogc-pull-files/" class="nav-link">
+                                <a rel="prev" href="../navigating-nodes/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../ogc-rm-all/" class="nav-link">
+                                <a rel="next" href="../../commands/ogc/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -155,22 +155,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#name" class="nav-link">NAME</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-level="1"><a href="#synopsis" class="nav-link">SYNOPSIS</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-level="1"><a href="#description" class="nav-link">DESCRIPTION</a>
-              <ul class="nav flex-column">
-              </ul>
-            </li>
-            
-            <li class="nav-item" data-level="1"><a href="#options" class="nav-link">OPTIONS</a>
+            <li class="nav-item" data-level="1"><a href="#defining-layouts" class="nav-link">Defining Layouts</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -179,15 +164,126 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="name">NAME<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
-<p>ogc-push-files - Scp files or directories to node</p>
-<h1 id="synopsis">SYNOPSIS<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h1>
-<p><strong>ogc push-files</strong> [OPTIONS] NAME SRC DST</p>
-<h1 id="description">DESCRIPTION<a class="headerlink" href="#description" title="Permanent link">&para;</a></h1>
-<p>Scp files or directories to node</p>
-<h1 id="options">OPTIONS<a class="headerlink" href="#options" title="Permanent link">&para;</a></h1>
-<p><strong>--exclude</strong> TEXT</p>
-<p>:   Exclude files/directories when uploading</p></div>
+<h1 id="defining-layouts">Defining Layouts<a class="headerlink" href="#defining-layouts" title="Permanent link">&para;</a></h1>
+<p>Learn the layout specification and how to create your own provisioning layouts.</p>
+<p>All layouts reside under the <code>layouts</code> key in the provision specification:</p>
+<div class="highlight"><pre><span></span><code>layouts:
+  elastic-agent-sles: 
+    runs-on: sles-15
+    instance-size: e2-standard-8
+    username: root
+    scripts: fixtures/ex_deploy_sles
+    provider: google
+    scale: 5
+    remote-path: /root/ogc
+    include:
+      - .ogc-cache
+    exclude:
+      - .git
+      - .venv
+    artifacts: /root/output/*.xml
+    tags:
+      - elastic-agent-8.1.x
+      - sles-gcp
+</code></pre></div>
+<p>Each layout has a friendly name associated as seen by <code>elastic-agent-sles</code>. The next section is going to go over each option and describe its meaning.</p>
+<p><strong>provider</strong></p>
+<p>Define which cloud the layout will operate in. Currently supported options are <strong>aws</strong> and <strong>google</strong>.</p>
+<p><strong>runs-on</strong></p>
+<p>Define the base OS image to be deployed on to the nodes. The current supported list of names are:</p>
+<table>
+<thead>
+<tr>
+<th>AWS</th>
+<th>Google</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ubuntu-latest</td>
+<td>ubuntu-latest</td>
+</tr>
+<tr>
+<td>ubuntu-2004</td>
+<td>ubuntu-2004</td>
+</tr>
+<tr>
+<td>ubuntu-1804</td>
+<td>ubuntu-1804</td>
+</tr>
+<tr>
+<td>centos-latest</td>
+<td>sles-latest</td>
+</tr>
+<tr>
+<td>centos-8</td>
+<td>sles-15</td>
+</tr>
+<tr>
+<td>sles-latest</td>
+<td>debian-latest</td>
+</tr>
+<tr>
+<td>sles-15</td>
+<td>debian-10</td>
+</tr>
+<tr>
+<td>debian-latest</td>
+<td>debian-9</td>
+</tr>
+<tr>
+<td>debian-11</td>
+<td></td>
+</tr>
+<tr>
+<td>debian-10</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>instance-size</strong></p>
+<p>Define the machine size, this is dependent on which <strong>provider</strong> is chosen. The <strong>instance-size</strong> correlates with the instance size naming for each cloud. </p>
+<p>For example, on AWS you would use <code>instance-size: c5.4xlarge</code> and in Google&rsquo;s case, <code>instance-size: e2-standard-8</code>.</p>
+<p><strong>username</strong></p>
+<p>The ssh user to use when deploying and accessing the nodes. This is also somewhat dependent on which <strong>provider</strong> is used.</p>
+<p>In the case of <strong>Google</strong>, any username can be given. In the case of <strong>AWS</strong>, the base machines have a pre-loaded user that must be used:</p>
+<table>
+<thead>
+<tr>
+<th>AWS</th>
+<th>Username</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ubuntu</td>
+<td>ubuntu</td>
+</tr>
+<tr>
+<td>centos</td>
+<td>ec2-user</td>
+</tr>
+<tr>
+<td>debian</td>
+<td>admin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>scripts</strong></p>
+<p>The location on your machine where templates/scripts resides. These will be uploaded and executed during the deployment phase.</p>
+<p><em>Note</em>: See writing templates/scripts for more information.</p>
+<p><strong>scale</strong></p>
+<p>How many nodes of each layout to deploy. This is also referenced during a deployment reconciliation phase.</p>
+<p><strong>remote-path</strong> (optional)</p>
+<p>If set, any uploads/downloads outside of what&rsquo;s defined in <code>scripts</code> will be placed in that remote path.</p>
+<p><strong>include</strong> (optional)</p>
+<p>A list of files/wildcards to include in the upload</p>
+<p><strong>exclude</strong> (optional)</p>
+<p>A list of files/wildcards to exclude in the upload</p>
+<p><strong>artifacts</strong> (optional)</p>
+<p>The remote path where script execution output is stored. This is used when pulling artifacts with <code>ogc pull-artifacts</code> and also utilized during node teardown. This will download any artifacts found into <code>artifacts/instance-name/</code>.</p>
+<p><strong>tags</strong> (optional)</p>
+<p>Define tags for each layout, allows additional filtering capabilities and deployment options when used with <code>ogc ls</code> and <code>ogc exec</code></p></div>
             </div>
         </div>
 
