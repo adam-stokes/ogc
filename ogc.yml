@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 1
+    scale: 5
     remote-path: /root/ogc
     include:
       - .ogc-cache
@@ -29,7 +29,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
-    scale: 1
+    scale: 5
     remote-path: /root/ogc
     exclude:
       - .git

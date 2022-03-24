@@ -11,13 +11,23 @@ from .base import cli
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
 @click.option("--name", multiple=True, required=True)
-def rm(name):
-    teardown(name, state.app.env)
+@click.option(
+    "--force/--no-force",
+    default=False,
+    help="Force removal regardless of connectivity",
+)
+def rm(name, force):
+    teardown(name, env=state.app.env, force=force)
 
 
 @click.command(help="Destroys everything. Use with caution.")
-def rm_all():
-    teardown(env=state.app.env)
+@click.option(
+    "--force/--no-force",
+    default=False,
+    help="Force removal regardless of connectivity",
+)
+def rm_all(force):
+    teardown(env=state.app.env, force=force)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

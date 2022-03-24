@@ -1,8 +1,11 @@
 import sys
 
 import click
-from prettytable import DOUBLE_BORDER, PrettyTable
 
+from rich import print
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
 from ogc import db
 
 from ..provision import choose_provisioner
@@ -35,15 +38,13 @@ def ls(by_tag, by_name):
         rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(by_name))
     else:
         rows = db.NodeModel.select()
-    table = PrettyTable()
-    table.field_names = [
-        f"{len(rows)} Nodes",
-        "Name",
-        "Status",
-        "Connection",
-        "Tags",
-        "Actions",
-    ]
+    table = Table()
+    table.add_column(f"{len(rows)} Nodes")
+    table.add_column("Name")
+    table.add_column("Status")
+    table.add_column("Connection")
+    table.add_column("Tags")
+    table.add_column("Actions")
 
     for data in rows:
         completed_actions = []
@@ -54,29 +55,26 @@ def ls(by_tag, by_name):
             else:
                 completed_actions.append(action)
         table.add_row(
-            [
-                data.id,
+                str(data.id),
                 data.instance_name,
                 data.instance_state,
                 f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
                 ",\n".join(
                     [
-                        click.style(tag, fg="green")
+                        f"[bold green]{tag}[/]"
                         if by_tag and tag == by_tag
                         else tag
                         for tag in data.tags
                     ]
                 ),
                 (
-                    f"pass: {click.style(len(completed_actions), fg='green')} "
-                    f"fail: {click.style(len(failed_actions), fg='red') if len(failed_actions) > 0 else len(failed_actions)}"
+                    f"pass: [green]:heavy_check_mark:[/] "
+                    f"fail: [red]{str(len(failed_actions)) if len(failed_actions) > 0 else len(failed_actions)}[/]"
                 ),
-            ]
         )
 
-    table.align = "l"
-    table.set_style(DOUBLE_BORDER)
-    click.echo(table)
+    console = Console()
+    console.print(table)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

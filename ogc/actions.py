@@ -30,17 +30,17 @@ def deploy(node_ids: List[int]) -> None:
         do_deploy.delay(id)
 
 
-def teardown(names: List[str] = None, env: Dict[str, str] = {}) -> None:
+def teardown(names: List[str] = None, env: Dict[str, str] = {}, force: bool = False) -> None:
     """Tear down nodes"""
     if names:
         log.info(f"Destroying: [{', '.join(names)}]")
         for name in names:
-            do_destroy.delay(name, env)
+            do_destroy.delay(name, env, force)
     else:
         db.connect()
         for data in db.NodeModel.select():
             log.info(f"Destroying: {data.instance_name}")
-            do_destroy.delay(data.instance_name, env)
+            do_destroy.delay(data.instance_name, env, force)
 
 
 def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
@@ -64,7 +64,7 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
                 .limit(abs(override["remaining"]))
             ):
                 log.info(f"Destroying: {data.instance_name}")
-                do_destroy.delay(data.instance_name, env)
+                do_destroy.delay(data.instance_name, env, force=True)
 
 
 def exec(name: str = None, tag: str = None, cmd: str = None) -> None:

@@ -5,6 +5,8 @@ import click
 from ogc import db
 
 from .base import cli
+from rich.console import Console
+from rich.padding import Padding
 
 
 @click.command(help="List nodes in your inventory")
@@ -43,8 +45,9 @@ def inspect(id, name, tag, action_id):
     else:
         rows = db.NodeModel.select().where(db.NodeModel.id == id)
 
+    console = Console()
     for data in rows:
-        click.echo(f"Deploy Details: [{data.instance_name}]")
+        console.print(f"Deploy Details: [green]{data.instance_name}[/]")
         completed_actions = []
         failed_actions = []
         if action_id:
@@ -58,26 +61,24 @@ def inspect(id, name, tag, action_id):
                 completed_actions.append(action)
 
         if completed_actions:
-            click.echo(f"[{len(completed_actions)}] Successful Actions:")
-            click.echo()
+            console.print(f"[{len(completed_actions)}] Successful Actions:")
             for action in completed_actions:
                 if action.out.strip():
-                    click.echo(f"(id: {action.id}) Out: {action.created}")
-                    click.echo(click.style(action.out, fg="green"))
+                    console.print(Padding(f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)))
+                    console.print(Padding(action.out, (0, 0, 0, 2)))
                 if action.error:
-                    click.echo(f"(id: {action.id}) Error:")
-                    click.echo(click.style(action.error, fg="green"))
+                    console.print(Padding(f"(id: {action.id}) Error:", (1, 0, 1, 2)))
+                    console.print(Padding(action.error, (0, 0, 0, 2)))
 
         if failed_actions:
-            click.echo(f"[{len(failed_actions)}] Failed Actions:")
-            click.echo()
+            console.print(f"[{len(failed_actions)}] Failed Actions:")
             for action in failed_actions:
                 if action.out.strip():
-                    click.echo(f"(id: {action.id}) Out: {action.created}")
-                    click.echo(click.style(action.out, fg="red"))
+                    console.print(Padding(f"(id: {action.id}) Out: {action.created}", (1, 0, 1, 2)))
+                    console.print(Padding(action.out, (0, 0, 0, 2)))
                 if action.error:
-                    click.echo(f"(id: {action.id}) Error:")
-                    click.echo(click.style(action.error, fg="red"))
+                    console.print(Padding(f"(id: {action.id}) Error:", (1, 0, 1, 2)))
+                    console.print(Padding(action.error, (0, 0, 0, 2)))
 
 
 cli.add_command(inspect)

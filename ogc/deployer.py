@@ -23,9 +23,10 @@ from ogc.provision import choose_provisioner
 
 
 class Deployer:
-    def __init__(self, deployment: NodeModel, env: Dict[str, str]):
+    def __init__(self, deployment: NodeModel, env: Dict[str, str], force: bool = False):
         self.deployment = deployment
         self.env = env
+        self.force = force
 
         engine = choose_provisioner(self.deployment.provider, env=self.env)
         self.node = engine.node(instance_id=self.deployment.instance_id)
@@ -35,7 +36,10 @@ class Deployer:
             key=str(self.deployment.ssh_private_key),
             timeout=300,
         )
-        retry_call(self._ssh_client.connect, tries=10, delay=5, backoff=2)
+        tries = 10
+        if self.force:
+            tries = 1
+        retry_call(self._ssh_client.connect, tries=tries, delay=5, backoff=1)
 
     def render(self, template: Path, context):
         """Returns the correct deployment based on type of step"""

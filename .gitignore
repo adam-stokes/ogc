@@ -9,4 +9,5 @@ site
 ogc.log
 .tox
 .ogc-cache
+.mypy*
 adam-stokes-svc.json

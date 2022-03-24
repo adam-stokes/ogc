@@ -38,13 +38,13 @@ def do_deploy(node_id: int):
 
 
 @app.task
-def do_destroy(name: str, env: Dict[str, str]) -> None:
+def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
     node_data = db.NodeModel.get(db.NodeModel.instance_name == name)
     if node_data:
         uuid = node_data.uuid
         engine = choose_provisioner(node_data.provider, env=env)
         try:
-            deploy = Deployer(node_data, state.app.env)
+            deploy = Deployer(node_data, env=state.app.env, force=force)
 
             # Pull down artifacts if set
             if node_data.artifacts:

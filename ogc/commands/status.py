@@ -2,8 +2,10 @@ import sys
 from pathlib import Path
 
 import click
-from prettytable import DOUBLE_BORDER, PrettyTable
 
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
 from ogc import log
 from ogc.actions import sync
 
@@ -18,7 +20,7 @@ from .base import cli
     default=False,
     help="Attempt to fix deployment to match scale",
 )
-@click.option("--spec", required=True, multiple=True)
+@click.option("--spec", required=False, multiple=True)
 def status(reconcile, spec):
     # Db connection
     specs = []
@@ -32,6 +34,11 @@ def status(reconcile, spec):
             log.error(f"Unable to find spec: {sp}")
             sys.exit(1)
         specs.append(_path)
+
+    if not specs:
+        log.error("No provision specs found, please specify with `--spec <file.yml>`")
+        sys.exit(1)
+
     app.spec = SpecLoader.load(specs)
     counts = app.spec.status
 
@@ -42,38 +49,36 @@ def status(reconcile, spec):
         sync(app.spec.layouts, counts, app.env)
         return
 
-    table = PrettyTable()
-    table.field_names = ["Name", "Deployed", "Scale", "Remaining"]
+    deploy_status = (
+        "[bold green]Healthy[/]"
+        if not app.spec.is_degraded
+        else "[bold red]Degraded[/]"
+    )
+
+    table = Table(title=f"Deployment Status: {deploy_status}")
+    table.add_column("Name")
+    table.add_column("Deployed")
+    table.add_column("Scale")
+    table.add_column("Remaining")
     for name, stats in counts.items():
         if stats["remaining"] > 0 or stats["remaining"] < 0:
             table.add_row(
-                [
                     name,
-                    stats["deployed"],
-                    stats["scale"],
-                    click.style(stats["remaining"], fg="red"),
-                ]
+                    str(stats["deployed"]),
+                    str(stats["scale"]),
+                    Text(str(stats["remaining"]), style="bold red"),
             )
         else:
             table.add_row(
-                [
                     name,
-                    stats["deployed"],
-                    stats["scale"],
-                    click.style(stats["remaining"], fg="green"),
-                ]
+                    str(stats["deployed"]),
+                    str(stats["scale"]),
+                    Text(str(stats["remaining"]), style="bold green"),
             )
 
-    table.align = "l"
-    table.set_style(DOUBLE_BORDER)
-    click.echo(table)
-    click.echo()
-    deploy_status = (
-        click.style("Healthy", fg="green")
-        if not app.spec.is_degraded
-        else click.style("Degraded", fg="red")
-    )
-    click.echo(f"Deployment Status: {deploy_status}")
+    console = Console()
+    console.print(table)
+
 
 
 cli.add_command(status)
