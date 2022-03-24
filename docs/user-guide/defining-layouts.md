@@ -95,3 +95,68 @@ The remote path where script execution output is stored. This is used when pulli
 **tags** (optional)
 
 Define tags for each layout, allows additional filtering capabilities and deployment options when used with `ogc ls` and `ogc exec`
+
+## Variants
+
+OGC supports the concept of variants. In OGC's case, variants are handled by multiple provision spec files and are then merged in a merge-left fashion.
+
+What this means is that we can take a base spec file such as:
+
+```yaml
+name: ci
+ssh-keys:
+  public: id_rsa.pub
+  private: id_rsa
+
+layouts:
+  elastic-agent-sles: 
+    runs-on: sles-15
+    instance-size: e2-standard-8
+    username: root
+    scripts: fixtures/ex_deploy_sles
+    provider: google
+    scale: 5
+    remote-path: /root/ogc
+    include:
+      - .ogc-cache
+    exclude:
+      - .git
+      - .venv
+    artifacts: /root/output/*.xml
+    tags:
+      - elastic-agent-8.1.x
+      - sles-gcp
+  elastic-agent-ubuntu: 
+    runs-on: ubuntu-latest
+    instance-size: e2-standard-8
+    username: root
+    scripts: fixtures/ex_deploy_ubuntu
+    provider: google
+    scale: 5
+    remote-path: /root/ogc
+    exclude:
+      - .git
+      - .venv
+    artifacts: /root/output/*.xml
+    tags:
+      - elastic-agent-8.1.x
+      - ubuntu-gcp
+```
+
+The name of the file doesn't matter, we'll call this file `base-spec.yml`.
+
+Now if we need to change certain aspects of this base deploy specification we can define a second YAML file, we'll call it `ubuntu-1804-no-sles.yml`. 
+
+In this example, let's change the `username` and `runs-on` for the **ubuntu** layout, and let's also remove the **sles** layout:
+
+```yaml
+layouts:
+  elastic-agent-sles: {}
+  elastic-agent-ubuntu: 
+    runs-on: ubuntu-1804
+    username: ubuntu
+```
+
+The merging of the specifications will remove any keys that exist if the value of the key is `{}` (signaling an empty stanza). The remaining keys that match up with the original spec will then be overridden and the rest of the specification is left untouched.
+
+Adding new layouts is just a matter of defining another section under `layouts` in the additional spec files passed to OGC.
