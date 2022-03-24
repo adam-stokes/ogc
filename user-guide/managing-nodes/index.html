@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>Navigating a deployment - OGC</title>
+        <title>Managing a deployment - OGC</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -41,7 +41,7 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="./" class="dropdown-item active">Navigating a deployment</a>
+    <a href="./" class="dropdown-item active">Managing a deployment</a>
 </li>
                                     
 <li>
@@ -159,7 +159,7 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#navigating-a-deployment" class="nav-link">Navigating a Deployment</a>
+            <li class="nav-item" data-level="1"><a href="#managing-a-deployment" class="nav-link">Managing a Deployment</a>
               <ul class="nav flex-column">
             <li class="nav-item" data-level="2"><a href="#listing-nodes" class="nav-link">Listing Nodes</a>
               <ul class="nav flex-column">
@@ -173,7 +173,19 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#downloading-files" class="nav-link">Downloading files</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#uploading-files" class="nav-link">Uploading files</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#inspecting-nodes" class="nav-link">Inspecting nodes</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#syncing-a-deployment" class="nav-link">Syncing a deployment</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -188,7 +200,7 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="navigating-a-deployment">Navigating a Deployment<a class="headerlink" href="#navigating-a-deployment" title="Permanent link">&para;</a></h1>
+<h1 id="managing-a-deployment">Managing a Deployment<a class="headerlink" href="#managing-a-deployment" title="Permanent link">&para;</a></h1>
 <p>Learn how to list, inspect, access and debug your node deployments.</p>
 <h2 id="listing-nodes">Listing Nodes<a class="headerlink" href="#listing-nodes" title="Permanent link">&para;</a></h2>
 <p>To list nodes in your deployment, run the following:</p>
@@ -254,6 +266,28 @@ root@ogc-d7cd61a7-elastic-agent-ubuntu:~#
 <p>Or if tags are defined, run a command across a set of machines:</p>
 <div class="highlight"><pre><span></span><code>$ ogc exec --by-tag ubuntu-gcp &#39;touch this_is_an_ubuntu_machine.txt&#39;
 </code></pre></div>
+<h2 id="downloading-files">Downloading files<a class="headerlink" href="#downloading-files" title="Permanent link">&para;</a></h2>
+<p>There are 2 ways to download files, the first is to use <code>ogc pull-files</code>, this gives you the ability to download any arbitrary files:</p>
+<div class="highlight"><pre><span></span><code>$ ogc pull-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt im_on_a_computer.txt
+$ stat im_downloaded_computer.txt 
+16777221 24809112 -rw-r--r-- 1 adam staff 0 0 &quot;Mar 24 11:56:24 2022&quot; &quot;Mar 24 11:55:16 2022&quot; &quot;Mar 24 11:56:24 2022&quot; &quot;Mar 24 11:55:16 2022&quot; 4096 0 0 im_downloaded_computer.txt
+</code></pre></div>
+<p>Another way is if the <code>artifacts</code> key is defined in a layout. To grab files defined by that <code>artifacts</code> option run the following:</p>
+<div class="highlight"><pre><span></span><code>$ ogc pull-artifacts ogc-d7cd61a7-elastic-agent-ubuntu
+</code></pre></div>
+<p>By default, artifacts are stored in <code>$(pwd)/artifacts/ogc-d7cd61a7-elastic-agent-ubuntu</code></p>
+<div class="highlight"><pre><span></span><code>tree artifacts/ogc-d7cd61a7-elastic-agent-ubuntu/
+artifacts/ogc-d7cd61a7-elastic-agent-ubuntu/
+└── test.xml
+
+0 directories, 1 file
+</code></pre></div>
+<h2 id="uploading-files">Uploading files<a class="headerlink" href="#uploading-files" title="Permanent link">&para;</a></h2>
+<p>OGC provides a simple way to upload arbitrary files to a node:</p>
+<div class="highlight"><pre><span></span><code>$ ogc push-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt dl.txt
+</code></pre></div>
+<p>Optionally, if <code>--exclude</code> is provided, uploading files will ignore any wildcards matched. </p>
+<p>Passing multiple <code>--exclude</code> is supported and will be added to the list of excludes during upload. Useful if uploading directories and want to ignore things like <code>.git</code> and <code>.venv</code>.</p>
 <h2 id="inspecting-nodes">Inspecting nodes<a class="headerlink" href="#inspecting-nodes" title="Permanent link">&para;</a></h2>
 <p>Each action performed on a node is tracked. This allows you to quickly investigate why scripts failed. To inspect a node and see action results run:</p>
 <div class="highlight"><pre><span></span><code>$ ogc inspect --id 38
@@ -277,6 +311,49 @@ root@ogc-d7cd61a7-elastic-agent-ubuntu:~#
 </code></pre></div>
 <p>If multiple actions exist, further drill down into the action you want (<em>seen here &ldquo;(id: 90) Out: 2022-03-24 12:37:08.&rdquo; in our example</em>):</p>
 <div class="highlight"><pre><span></span><code>$ ogc inspect --id 38 --action-id 90
+</code></pre></div>
+<h2 id="syncing-a-deployment">Syncing a deployment<a class="headerlink" href="#syncing-a-deployment" title="Permanent link">&para;</a></h2>
+<p>In some cases nodes will fail to deploy or you remembered you needed more than 5 nodes or maybe you need less nodes than what the original <code>scale</code> was set. </p>
+<p>In all these cases, OGC provides a way to keep the deployment in sync with the layouts.</p>
+<p>To get an idea of the health of the deployment, run:</p>
+<div class="highlight"><pre><span></span><code>$ ogc status
+</code></pre></div>
+<p>The output returned will be a table displaying what&rsquo;s deployed, the scale, and if there are any remaining nodes left:</p>
+<div class="highlight"><pre><span></span><code>              Deployment Status: Healthy               
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
+┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
+│ elastic-agent-sles   │ 5        │ 5     │ 0         │
+│ elastic-agent-ubuntu │ 5        │ 5     │ 0         │
+└──────────────────────┴──────────┴───────┴───────────┘
+</code></pre></div>
+<p>In cases where you want to add more nodes, update your layout and increase the <code>scale</code> option, in this case we want to add 10 more nodes to our <code>elastic-agent-sles</code> layout:</p>
+<div class="highlight"><pre><span></span><code>              Deployment Status: Degraded              
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
+┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
+│ elastic-agent-sles   │ 5        │ 15    │ 10        │
+│ elastic-agent-ubuntu │ 5        │ 5     │ 0         │
+└──────────────────────┴──────────┴───────┴───────────┘
+</code></pre></div>
+<p>Or another case where we need to reduce the number of nodes from 5 to 3:</p>
+<div class="highlight"><pre><span></span><code>             Deployment Status: Degraded              
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
+┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
+│ elastic-agent-sles   │ 5        │ 3     │ -2        │
+│ elastic-agent-ubuntu │ 5        │ 3     │ -2        │
+└──────────────────────┴──────────┴───────┴───────────┘
+</code></pre></div>
+<p>To perform the sync, run the following:</p>
+<div class="highlight"><pre><span></span><code>$ ogc status --reconcile
+</code></pre></div>
+<p>And the output will show OGC destroying 2 nodes from each layout:</p>
+<div class="highlight"><pre><span></span><code>2022-03-24 at 11:52:37 | INFO Reconciling: [elastic-agent-sles, elastic-agent-ubuntu]
+2022-03-24 at 11:52:37 | INFO Destroying: ogc-87ba30fc-elastic-agent-sles
+2022-03-24 at 11:52:37 | INFO Destroying: ogc-51b971ad-elastic-agent-sles
+2022-03-24 at 11:52:37 | INFO Destroying: ogc-b3befadc-elastic-agent-ubuntu
+2022-03-24 at 11:52:37 | INFO Destroying: ogc-d54a5848-elastic-agent-ubuntu
 </code></pre></div>
 <h2 id="destroying-nodes">Destroying nodes<a class="headerlink" href="#destroying-nodes" title="Permanent link">&para;</a></h2>
 <p>OGC allows destroying of individual or a full blown cleanup. To remove a single node we run:</p>
