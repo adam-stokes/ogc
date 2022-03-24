@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from invoke import task
 from pathlib import Path
 import os
+
 load_dotenv()
 
 
@@ -46,4 +47,4 @@ def release(c):
     pypi_user = os.environ.get("PYPI_USER")
     pypi_pass = os.environ.get("PYPI_PASS")
     c.run("mkdocs gh-deploy")
-    c.run(f"poetry publish --build -u ")
+    c.run(f"poetry publish --build -u {pypi_user} -p {pypi_pass}")
