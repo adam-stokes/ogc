@@ -43,6 +43,76 @@
 <li>
     <a href="user-guide/navigating-nodes/" class="dropdown-item">Navigating a deployment</a>
 </li>
+                                    
+  <li class="dropdown-submenu">
+    <a href="#" class="dropdown-item">Reference Commands</a>
+    <ul class="dropdown-menu">
+            
+<li>
+    <a href="commands/ogc/" class="dropdown-item">ogc</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-exec/" class="dropdown-item">ogc exec</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-inspect/" class="dropdown-item">ogc inspect</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-launch/" class="dropdown-item">ogc launch</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-log/" class="dropdown-item">ogc log</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-ls/" class="dropdown-item">ogc ls</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-pull-artifacts/" class="dropdown-item">ogc pull-artifacts</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-push-files/" class="dropdown-item">ogc push-files</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-rm/" class="dropdown-item">ogc rm</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-server/" class="dropdown-item">ogc server</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-ssh/" class="dropdown-item">ogc ssh</a>
+</li>
+            
+<li>
+    <a href="commands/ogc-status/" class="dropdown-item">ogc status</a>
+</li>
+    </ul>
+  </li>
                                 </ul>
                             </li>
                         </ul>
@@ -151,9 +221,12 @@
 </code></pre></div>
 <p>Bring up the services</p>
 <p><code>$ docker-compose up</code></p>
-<p><strong>Next</strong>, is installation of OGC. We use <strong>poetry</strong>:</p>
+<p><strong>Next</strong>, is installation of OGC. We use <strong><a href="https://python-poetry.org/">Poetry</a></strong>:</p>
 <div class="highlight"><pre><span></span><code>$ pip install <span class="nv">poetry</span><span class="o">==</span><span class="m">1</span>.1.12
 $ poetry install
+</code></pre></div>
+<p>Or install from <a href="https://pypi.org">pypi</a>:</p>
+<div class="highlight"><pre><span></span><code>$ pip install ogc
 </code></pre></div>
 <h2 id="provider-setup">Provider Setup<a class="headerlink" href="#provider-setup" title="Permanent link">&para;</a></h2>
 <p>OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. Create a <code>.env</code> file in the top level directory where <code>ogc</code> is to be run:</p>
@@ -289,5 +362,5 @@ The <code>scripts</code> section tells OGC where the template files/scripts are 
 
 <!--
 MkDocs version : 1.2.3
-Build Date UTC : 2022-03-24 14:02:59.561155+00:00
+Build Date UTC : 2022-03-24 14:30:53.703334+00:00
 -->
