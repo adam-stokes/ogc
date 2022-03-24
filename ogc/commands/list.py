@@ -66,7 +66,7 @@ def ls(by_tag, by_name):
                 ]
             ),
             (
-                f"pass: [green]:heavy_check_mark:[/] "
+                f"pass: {'[green]:heavy_check_mark:[/]' if not failed_actions else len(completed_actions)} "
                 f"fail: [red]{str(len(failed_actions)) if len(failed_actions) > 0 else len(failed_actions)}[/]"
             ),
         )
