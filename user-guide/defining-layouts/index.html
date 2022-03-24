@@ -52,6 +52,10 @@
     <a href="../scripting/" class="dropdown-item">Scripting</a>
 </li>
                                     
+<li>
+    <a href="../../cli.md" class="dropdown-item">CLI Reference</a>
+</li>
+                                    
   <li class="dropdown-submenu">
     <a href="#" class="dropdown-item">Reference Commands</a>
     <ul class="dropdown-menu">
@@ -161,6 +165,10 @@
             
             <li class="nav-item" data-level="1"><a href="#defining-layouts" class="nav-link">Defining Layouts</a>
               <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#variants" class="nav-link">Variants</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
               </ul>
             </li>
         </ul>
@@ -287,7 +295,60 @@
 <p><strong>artifacts</strong> (optional)</p>
 <p>The remote path where script execution output is stored. This is used when pulling artifacts with <code>ogc pull-artifacts</code> and also utilized during node teardown. This will download any artifacts found into <code>artifacts/instance-name/</code>.</p>
 <p><strong>tags</strong> (optional)</p>
-<p>Define tags for each layout, allows additional filtering capabilities and deployment options when used with <code>ogc ls</code> and <code>ogc exec</code></p></div>
+<p>Define tags for each layout, allows additional filtering capabilities and deployment options when used with <code>ogc ls</code> and <code>ogc exec</code></p>
+<h2 id="variants">Variants<a class="headerlink" href="#variants" title="Permanent link">&para;</a></h2>
+<p>OGC supports the concept of variants. In OGC&rsquo;s case, variants are handled by multiple provision spec files and are then merged in a merge-left fashion.</p>
+<p>What this means is that we can take a base spec file such as:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ci</span><span class="w"></span>
+<span class="nt">ssh-keys</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">public</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id_rsa.pub</span><span class="w"></span>
+<span class="w">  </span><span class="nt">private</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id_rsa</span><span class="w"></span>
+
+<span class="nt">layouts</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">elastic-agent-sles</span><span class="p">:</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-15</span><span class="w"></span>
+<span class="w">    </span><span class="nt">instance-size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">e2-standard-8</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scripts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixtures/ex_deploy_sles</span><span class="w"></span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/ogc</span><span class="w"></span>
+<span class="w">    </span><span class="nt">include</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.ogc-cache</span><span class="w"></span>
+<span class="w">    </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.git</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.venv</span><span class="w"></span>
+<span class="w">    </span><span class="nt">artifacts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/output/*.xml</span><span class="w"></span>
+<span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elastic-agent-8.1.x</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-gcp</span><span class="w"></span>
+<span class="w">  </span><span class="nt">elastic-agent-ubuntu</span><span class="p">:</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span><span class="w"></span>
+<span class="w">    </span><span class="nt">instance-size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">e2-standard-8</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scripts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixtures/ex_deploy_ubuntu</span><span class="w"></span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/ogc</span><span class="w"></span>
+<span class="w">    </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.git</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.venv</span><span class="w"></span>
+<span class="w">    </span><span class="nt">artifacts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/output/*.xml</span><span class="w"></span>
+<span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elastic-agent-8.1.x</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-gcp</span><span class="w"></span>
+</code></pre></div>
+<p>The name of the file doesn&rsquo;t matter, we&rsquo;ll call this file <code>base-spec.yml</code>.</p>
+<p>Now if we need to change certain aspects of this base deploy specification we can define a second YAML file, we&rsquo;ll call it <code>ubuntu-1804-no-sles.yml</code>. </p>
+<p>In this example, let&rsquo;s change the <code>username</code> and <code>runs-on</code> for the <strong>ubuntu</strong> layout, and let&rsquo;s also remove the <strong>sles</strong> layout:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">layouts</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">elastic-agent-sles</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
+<span class="w">  </span><span class="nt">elastic-agent-ubuntu</span><span class="p">:</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-1804</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu</span><span class="w"></span>
+</code></pre></div>
+<p>The merging of the specifications will remove any keys that exist if the value of the key is <code>{}</code> (signaling an empty stanza). The remaining keys that match up with the original spec will then be overridden and the rest of the specification is left untouched.</p>
+<p>Adding new layouts is just a matter of defining another section under <code>layouts</code> in the additional spec files passed to OGC.</p></div>
             </div>
         </div>
 
