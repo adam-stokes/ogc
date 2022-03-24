@@ -48,3 +48,4 @@ def release(c):
     pypi_pass = os.environ.get("PYPI_PASS")
     c.run("mkdocs gh-deploy")
     c.run(f"poetry publish --build -u {pypi_user} -p {pypi_pass}")
+    c.run("git push --tags")
