@@ -4,6 +4,7 @@ from pathlib import Path
 
 import yaml
 from melddict import MeldDict
+from slugify import slugify
 
 from ogc import db
 
@@ -58,7 +59,8 @@ class SpecProvisionLayout:
 
     @property
     def tags(self):
-        return self.layout.get("tags", [])
+        _tags = self.layout.get("tags", [])
+        return [slugify(tag) for tag in _tags if tag]
 
     @property
     def artifacts(self):
@@ -75,6 +77,10 @@ class SpecProvisionLayout:
     @property
     def exclude(self):
         return self.layout.get("exclude", [])
+
+    @property
+    def ports(self):
+        return self.layout.get("ports", [])
 
     def as_dict(self):
         return {
@@ -93,6 +99,7 @@ class SpecProvisionLayout:
             "remote-path": self.remote_path,
             "include": self.include,
             "exclude": self.exclude,
+            "ports": self.ports,
         }
 
 

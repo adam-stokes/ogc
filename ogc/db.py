@@ -33,11 +33,12 @@ class NodeModel(BaseModel):
     ssh_private_key = TextField()
     provider = TextField()
     scripts = TextField()
-    tags = ArrayField(CharField)
+    tags = ArrayField(CharField, null=True)
     artifacts = TextField(null=True)
     remote_path = TextField(null=True)
     include = ArrayField(CharField, null=True)
     exclude = ArrayField(CharField, null=True)
+    ports = ArrayField(CharField, null=True)
 
 
 class NodeActionResult(BaseModel):

@@ -23,6 +23,9 @@ layouts:
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
+    ports:
+      - "80:80"
+      - "443:443"
 ```
 
 Each layout has a friendly name associated as seen by `elastic-agent-sles`. The next section is going to go over each option and describe its meaning.
@@ -95,6 +98,10 @@ The remote path where script execution output is stored. This is used when pulli
 **tags** (optional)
 
 Define tags for each layout, allows additional filtering capabilities and deployment options when used with `ogc ls` and `ogc exec`
+
+**ports** (optional)
+
+Define what ingress ports are available when accessing the node.
 
 ## Variants
 

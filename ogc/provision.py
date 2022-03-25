@@ -4,6 +4,7 @@
 import uuid
 from pathlib import Path
 
+from libcloud.common.google import ResourceExistsError, ResourceNotFoundError
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
@@ -34,6 +35,7 @@ class ProvisionResult:
         self.artifacts = self.layout["artifacts"]
         self.include = self.layout["include"]
         self.exclude = self.layout["exclude"]
+        self.ports = self.layout["ports"]
 
     def save(self) -> NodeModel:
         node_obj = NodeModel(
@@ -53,6 +55,7 @@ class ProvisionResult:
             artifacts=self.artifacts,
             include=self.include,
             exclude=self.exclude,
+            ports=self.ports,
         )
         node_obj.save()
         return node_obj
@@ -176,6 +179,7 @@ class AWSProvisioner(BaseProvisioner):
         self.create_keypair(ssh_public_key)
 
     def cleanup(self, node):
+        self._delete_firewall(f"ogc-{node.uuid}")
         key_pair = self.get_key_pair(node.uuid)
         return self.delete_key_pair(key_pair)
 
@@ -187,6 +191,21 @@ class AWSProvisioner(BaseProvisioner):
             _runs_on = CLOUD_IMAGE_MAP["aws"][arch].get(runs_on)
         return super().image(_runs_on, arch)
 
+    def _create_firewall(self, name, ports):
+        """Creates the security group for enabling traffic between nodes"""
+        self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)
+
+        for port in ports:
+            ingress, egress = port.split(":")
+            self.provisioner.ex_authorize_security_group(
+                name, ingress, egress, "0.0.0.0/0", "tcp"
+            )
+            # udp
+            # self.provisioner.ex_authorize_security_group(name, ingress, egress, "0.0.0.0/0", "udp")
+
+    def _delete_firewall(self, name):
+        return self.provisioner.ex_delete_security_group(name)
+
     def create(self, layout, env, **kwargs) -> NodeModel:
         pub_key = Path(layout["ssh_public_key"]).read_text()
         auth = NodeAuthSSHKey(pub_key)
@@ -197,12 +216,15 @@ class AWSProvisioner(BaseProvisioner):
             )
         size = self.sizes(layout["instance-size"])
 
+        if layout["ports"]:
+            self._create_firewall(f"ogc-{self.uuid}", layout["ports"])
+
         opts = dict(
-            name=f"ogc-{layout['name']}",
+            name=f"ogc-{self.uuid}-{layout['name']}",
             image=image,
             size=size,
             auth=auth,
-            ex_securitygroup="e2e",
+            ex_securitygroup=f"ogc-{self.uuid}",
             ex_spot=True,
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
@@ -246,7 +268,7 @@ class GCEProvisioner(BaseProvisioner):
         pass
 
     def cleanup(self, node):
-        pass
+        self._delete_firewall(f"ogc-{node.uuid}")
 
     def image(self, runs_on, arch):
         _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
@@ -254,6 +276,18 @@ class GCEProvisioner(BaseProvisioner):
             return [i for i in self.images() if i.name == _runs_on][0]
         except IndexError:
             raise ProvisionException(f"Could not determine image for {_runs_on}")
+
+    def _create_firewall(self, name, ports, tags):
+        ports = [port.split(":")[0] for port in ports]
+        self.provisioner.ex_create_firewall(
+            name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
+        )
+
+    def _delete_firewall(self, name):
+        try:
+            self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))
+        except ResourceNotFoundError:
+            log.error(f"Unable to delete firewall {name}")
 
     def create(self, layout, env, **kwargs) -> NodeModel:
         image = self.image(layout["runs-on"], layout["arch"])
@@ -272,12 +306,15 @@ class GCEProvisioner(BaseProvisioner):
             ]
         }
 
+        if layout["ports"]:
+            self._create_firewall(f"ogc-{self.uuid}", layout["ports"], layout["tags"])
+
         opts = dict(
             name=f"ogc-{self.uuid}-{layout['name']}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,
-            ex_tags=["e2e"],
+            ex_tags=layout["tags"],
             ogc_layout=layout,
             ogc_env=env,
         )
