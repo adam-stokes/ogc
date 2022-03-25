@@ -98,5 +98,15 @@ def do_exec(
 
 
 @app.task
+def do_exec_scripts(node_id: int, path: str) -> bool:
+    node_data = db.NodeModel.get(db.NodeModel.id == node_id)
+    choose_provisioner(node_data.provider, env=state.app.env)
+    deploy = Deployer(node_data, env=state.app.env)
+    result = deploy.exec_scripts(path)
+    result.save()
+    return result.passed
+
+
+@app.task
 def end_exec(results):
     return results

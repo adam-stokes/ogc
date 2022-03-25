@@ -60,24 +60,8 @@ class Deployer:
         msd.run(self.node, self._ssh_client)
         return DeployerResult(self.deployment, msd)
 
-    def run(self) -> "DeployerResult":
-        log.info(
-            f"Establishing connection [{self.deployment.public_ip}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
-        )
-
-        # Upload any files first
-        if self.deployment.remote_path:
-            log.info(
-                f"Uploading file/directory contents to {self.deployment.instance_name}"
-            )
-            self.put(
-                ".",
-                self.deployment.remote_path,
-                self.deployment.exclude,
-                self.deployment.include,
-            )
-
-        scripts = Path(self.deployment.scripts)
+    def exec_scripts(self, script_dir) -> "DeployerResult":
+        scripts = Path(script_dir)
         if not scripts.exists():
             log.info("No deployment scripts found, skipping.")
             return DeployerResult(self.deployment, MultiStepDeployment())
@@ -112,6 +96,25 @@ class Deployer:
             msd.run(self.node, self._ssh_client)
             return DeployerResult(self.deployment, msd)
         return DeployerResult(self.deployment, MultiStepDeployment())
+
+    def run(self) -> "DeployerResult":
+        log.info(
+            f"Establishing connection [{self.deployment.public_ip}] [{self.deployment.username}] [{str(self.deployment.ssh_private_key)}]"
+        )
+
+        # Upload any files first
+        if self.deployment.remote_path:
+            log.info(
+                f"Uploading file/directory contents to {self.deployment.instance_name}"
+            )
+            self.put(
+                ".",
+                self.deployment.remote_path,
+                self.deployment.exclude,
+                self.deployment.include,
+            )
+
+        return self.exec_scripts(self.deployment.scripts)
 
     def put(self, src: str, dst: str, excludes: List[str], includes: List[str] = []):
         cmd_opts = [
@@ -155,8 +158,7 @@ class DeployerResult:
             if hasattr(step, "exit_status")
         )
 
-    def show(self):
-        log.info("Deployment Result: ")
+    def save(self):
         for step in self.msd.steps:
             if hasattr(step, "exit_status"):
                 NodeActionResult.create(
@@ -165,6 +167,12 @@ class DeployerResult:
                     out=step.stdout,
                     err=step.stderr,
                 )
+
+    def show(self):
+        self.save()
+        log.info("Deployment Result: ")
+        for step in self.msd.steps:
+            if hasattr(step, "exit_status"):
                 log.info(f"  - [{step.exit_status}]: {step}")
         log.info("Connection Information: ")
         log.info(

@@ -7,6 +7,7 @@ from ogc.tasks import (
     do_deploy,
     do_destroy,
     do_exec,
+    do_exec_scripts,
     do_provision,
     end_exec,
     end_provision,
@@ -85,6 +86,25 @@ def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
         do_exec.s(cmd, node.ssh_private_key, node.id, node.username, node.public_ip)
         for node in rows
     ]
+
+    callback = end_exec.s()
+    result = chord(exec_jobs)(callback)
+    return result.get()
+
+
+def exec_scripts(name: str = None, tag: str = None, path: str = None) -> None:
+    db.connect()
+    rows = None
+    if tag:
+        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(tag))
+    elif name:
+        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(name))
+    else:
+        rows = db.NodeModel.select()
+
+    log.info(f"Executing scripts from '{path}' across {len(rows)} nodes.")
+
+    exec_jobs = [do_exec_scripts.s(node.id, path) for node in rows]
 
     callback = end_exec.s()
     result = chord(exec_jobs)(callback)

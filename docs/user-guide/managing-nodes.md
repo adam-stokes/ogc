@@ -90,6 +90,22 @@ Or if tags are defined, run a command across a set of machines:
 $ ogc exec --by-tag ubuntu-gcp 'touch this_is_an_ubuntu_machine.txt'
 ```
 
+## Executing a scripts directory
+
+In addition to running arbitrary commands, OGC can also execute a directory of templates/scripts:
+
+```
+$ ogc exec-scripts --by-name ogc-d7cd61a7-elastic-agent-ubuntu fixtures/ex_deploy_ubuntu
+```
+
+Or if tags are defined, run across a set of machines:
+
+```
+$ ogc exec-scripts --by-tag ubuntu-gcp fixtures/ex_deploy_ubuntu
+```
+
+This can be useful to re-run a deployment or add new functionality/one-offs to a node without disturbing the original layout specifications. Access to the database and all templating is available as well.
+
 ## Downloading files
 
 There are 2 ways to download files, the first is to use `ogc pull-files`, this gives you the ability to download any arbitrary files:

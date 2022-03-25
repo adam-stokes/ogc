@@ -57,6 +57,36 @@ def exec(by_tag, by_name, cmd):
     sys.exit(1)
 
 
+@click.command(help="(R)Execute a set of scripts")
+@click.option(
+    "--by-tag",
+    required=False,
+    help="Only run on nodes matching tag",
+)
+@click.option(
+    "--by-name",
+    required=False,
+    help="Only run on nodes matching name",
+)
+@click.argument("path")
+def exec_scripts(by_tag, by_name, path):
+    if by_tag and by_name:
+        click.echo(
+            click.style(
+                "Combined filtered options are not supported, please choose one.",
+                fg="red",
+            )
+        )
+        sys.exit(1)
+    results = actions.exec_scripts(by_name, by_tag, path)
+    if all(res for res in results):
+        app.log.info("All commands completed.")
+        sys.exit(0)
+
+    app.log.error("Some commands failed to complete.")
+    sys.exit(1)
+
+
 @click.command(help="Scp files or directories to node")
 @click.argument("name")
 @click.argument("src")
@@ -119,3 +149,4 @@ cli.add_command(push_files)
 cli.add_command(pull_files)
 cli.add_command(pull_artifacts)
 cli.add_command(exec)
+cli.add_command(exec_scripts)
