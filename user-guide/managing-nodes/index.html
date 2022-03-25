@@ -177,6 +177,10 @@
               <ul class="nav flex-column">
               </ul>
             </li>
+            <li class="nav-item" data-level="2"><a href="#executing-a-scripts-directory" class="nav-link">Executing a scripts directory</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
             <li class="nav-item" data-level="2"><a href="#downloading-files" class="nav-link">Downloading files</a>
               <ul class="nav flex-column">
               </ul>
@@ -270,6 +274,14 @@ root@ogc-d7cd61a7-elastic-agent-ubuntu:~#
 <p>Or if tags are defined, run a command across a set of machines:</p>
 <div class="highlight"><pre><span></span><code>$ ogc exec --by-tag ubuntu-gcp &#39;touch this_is_an_ubuntu_machine.txt&#39;
 </code></pre></div>
+<h2 id="executing-a-scripts-directory">Executing a scripts directory<a class="headerlink" href="#executing-a-scripts-directory" title="Permanent link">&para;</a></h2>
+<p>In addition to running arbitrary commands, OGC can also execute a directory of templates/scripts:</p>
+<div class="highlight"><pre><span></span><code>$ ogc exec-scripts --by-name ogc-d7cd61a7-elastic-agent-ubuntu fixtures/ex_deploy_ubuntu
+</code></pre></div>
+<p>Or if tags are defined, run across a set of machines:</p>
+<div class="highlight"><pre><span></span><code>$ ogc exec-scripts --by-tag ubuntu-gcp fixtures/ex_deploy_ubuntu
+</code></pre></div>
+<p>This can be useful to re-run a deployment or add new functionality/one-offs to a node without disturbing the original layout specifications. Access to the database and all templating is available as well.</p>
 <h2 id="downloading-files">Downloading files<a class="headerlink" href="#downloading-files" title="Permanent link">&para;</a></h2>
 <p>There are 2 ways to download files, the first is to use <code>ogc pull-files</code>, this gives you the ability to download any arbitrary files:</p>
 <div class="highlight"><pre><span></span><code>$ ogc pull-files ogc-d7cd61a7-elastic-agent-ubuntu im_on_a_computer.txt im_downloaded_computer.txt

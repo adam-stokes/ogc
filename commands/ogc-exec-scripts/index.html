@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>ogc - OGC</title>
+        <title>NAME - OGC</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -36,7 +36,7 @@
                             <li class="navitem">
                                 <a href="../.." class="nav-link">Getting Started</a>
                             </li>
-                            <li class="dropdown active">
+                            <li class="dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">User Guide <b class="caret"></b></a>
                                 <ul class="dropdown-menu">
                                     
@@ -61,7 +61,7 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="./" class="dropdown-item active">ogc</a>
+    <a href="../ogc/" class="dropdown-item">ogc</a>
 </li>
             
 <li>
@@ -135,16 +135,6 @@
                                 <i class="fa fa-search"></i> Search
                             </a>
                         </li>
-                            <li class="nav-item">
-                                <a rel="prev" href="../../user-guide/providers/" class="nav-link">
-                                    <i class="fa fa-arrow-left"></i> Previous
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a rel="next" href="../ogc-exec/" class="nav-link">
-                                    Next <i class="fa fa-arrow-right"></i>
-                                </a>
-                            </li>
                     </ul>
                 </div>
             </div>
@@ -178,7 +168,7 @@
               </ul>
             </li>
             
-            <li class="nav-item" data-level="1"><a href="#commands" class="nav-link">COMMANDS</a>
+            <li class="nav-item" data-level="1"><a href="#options" class="nav-link">OPTIONS</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -188,47 +178,16 @@
                     <div class="col-md-9" role="main">
 
 <h1 id="name">NAME<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
-<p>ogc - Just a simple provisioner</p>
+<p>ogc-exec-scripts - (R)Execute a set of scripts</p>
 <h1 id="synopsis">SYNOPSIS<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h1>
-<p><strong>ogc</strong> [OPTIONS] COMMAND [ARGS]...</p>
+<p><strong>ogc exec-scripts</strong> [OPTIONS] PATH</p>
 <h1 id="description">DESCRIPTION<a class="headerlink" href="#description" title="Permanent link">&para;</a></h1>
-<p>Just a simple provisioner</p>
-<h1 id="commands">COMMANDS<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h1>
-<p><strong>rm</strong> Destroys a node and its associated keys,... See <strong>ogc-rm(1)</strong>
-for full documentation on the <strong>rm</strong> command.</p>
-<p><strong>rm-all</strong> Destroys everything. See <strong>ogc-rm-all(1)</strong> for full
-documentation on the <strong>rm-all</strong> command.</p>
-<p><strong>rm-key-pairs</strong> Remove keypairs See <strong>ogc-rm-key-pairs(1)</strong> for full
-documentation on the <strong>rm-key-pairs</strong> command.</p>
-<p><strong>inspect</strong> List nodes in your inventory See <strong>ogc-inspect(1)</strong> for full
-documentation on the <strong>inspect</strong> command.</p>
-<p><strong>launch</strong> Launches nodes from a provision specification See
-<strong>ogc-launch(1)</strong> for full documentation on the <strong>launch</strong> command.</p>
-<p><strong>ls</strong> List nodes in your inventory See <strong>ogc-ls(1)</strong> for full
-documentation on the <strong>ls</strong> command.</p>
-<p><strong>ls-key-pairs</strong> List keypairs See <strong>ogc-ls-key-pairs(1)</strong> for full
-documentation on the <strong>ls-key-pairs</strong> command.</p>
-<p><strong>log</strong> Stream log output See <strong>ogc-log(1)</strong> for full documentation on
-the <strong>log</strong> command.</p>
-<p><strong>server</strong> Starts the tasks server See <strong>ogc-server(1)</strong> for full
-documentation on the <strong>server</strong> command.</p>
-<p><strong>ssh</strong> Login to a node See <strong>ogc-ssh(1)</strong> for full documentation on the
-<strong>ssh</strong> command.</p>
-<p><strong>push-files</strong> Scp files or directories to node See
-<strong>ogc-push-files(1)</strong> for full documentation on the <strong>push-files</strong>
-command.</p>
-<p><strong>pull-files</strong> Scp files or directories from node See
-<strong>ogc-pull-files(1)</strong> for full documentation on the <strong>pull-files</strong>
-command.</p>
-<p><strong>pull-artifacts</strong> Download artifacts from node See
-<strong>ogc-pull-artifacts(1)</strong> for full documentation on the
-<strong>pull-artifacts</strong> command.</p>
-<p><strong>exec</strong> Execute a command across node(s) See <strong>ogc-exec(1)</strong> for full
-documentation on the <strong>exec</strong> command.</p>
-<p><strong>exec-scripts</strong> (R)Execute a set of scripts See <strong>ogc-exec-scripts(1)</strong>
-for full documentation on the <strong>exec-scripts</strong> command.</p>
-<p><strong>status</strong> Get status of deployment See <strong>ogc-status(1)</strong> for full
-documentation on the <strong>status</strong> command.</p></div>
+<p>(R)Execute a set of scripts</p>
+<h1 id="options">OPTIONS<a class="headerlink" href="#options" title="Permanent link">&para;</a></h1>
+<p><strong>--by-tag</strong> TEXT</p>
+<p>:   Only run on nodes matching tag</p>
+<p><strong>--by-name</strong> TEXT</p>
+<p>:   Only run on nodes matching name</p></div>
             </div>
         </div>
 
