@@ -57,5 +57,8 @@ command.
 **exec** Execute a command across node(s) See **ogc-exec(1)** for full
 documentation on the **exec** command.
 
+**exec-scripts** (R)Execute a set of scripts See **ogc-exec-scripts(1)**
+for full documentation on the **exec-scripts** command.
+
 **status** Get status of deployment See **ogc-status(1)** for full
 documentation on the **status** command.
