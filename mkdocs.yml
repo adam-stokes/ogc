@@ -41,6 +41,7 @@ nav:
     - 'Reference Commands':
         - "ogc": 'commands/ogc.md'
         - "ogc exec": 'commands/ogc-exec.md'
+        - "ogc exec-scripts": 'commands/ogc-exec-scripts.md'
         - "ogc inspect": 'commands/ogc-inspect.md'
         - "ogc launch": 'commands/ogc-launch.md'
         - "ogc log": 'commands/ogc-log.md'
