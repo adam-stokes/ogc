@@ -95,7 +95,7 @@ $ ogc exec --by-tag ubuntu-gcp 'touch this_is_an_ubuntu_machine.txt'
 There are 2 ways to download files, the first is to use `ogc pull-files`, this gives you the ability to download any arbitrary files:
 
 ```
-$ ogc pull-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt im_on_a_computer.txt
+$ ogc pull-files ogc-d7cd61a7-elastic-agent-ubuntu im_on_a_computer.txt im_downloaded_computer.txt
 $ stat im_downloaded_computer.txt 
 16777221 24809112 -rw-r--r-- 1 adam staff 0 0 "Mar 24 11:56:24 2022" "Mar 24 11:55:16 2022" "Mar 24 11:56:24 2022" "Mar 24 11:55:16 2022" 4096 0 0 im_downloaded_computer.txt
 ```

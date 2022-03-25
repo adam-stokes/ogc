@@ -37,6 +37,7 @@ nav:
     - 'Managing a deployment': 'user-guide/managing-nodes.md'
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
     - 'Scripting': 'user-guide/scripting.md'
+    - 'Providers': 'user-guide/providers.md'
     - 'Reference Commands':
         - "ogc": 'commands/ogc.md'
         - "ogc exec": 'commands/ogc-exec.md'

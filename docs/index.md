@@ -73,6 +73,8 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
+More information can be found in our [Providers](user-guide/providers.md) documentation.
+
 ## Define Provisioning
 
 Once setup is complete, a provision specification is needed. This defines `ssh-keys` and one or more `layouts` to be provisioned. 
