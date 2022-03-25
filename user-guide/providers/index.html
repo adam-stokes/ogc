@@ -8,7 +8,7 @@
         
         
         <link rel="shortcut icon" href="../../img/favicon.ico">
-        <title>ogc pull-artifacts - OGC</title>
+        <title>Providers - OGC</title>
         <link href="../../css/bootstrap.min.css" rel="stylesheet">
         <link href="../../css/font-awesome.min.css" rel="stylesheet">
         <link href="../../css/base.css" rel="stylesheet">
@@ -41,19 +41,19 @@
                                 <ul class="dropdown-menu">
                                     
 <li>
-    <a href="../../user-guide/managing-nodes/" class="dropdown-item">Managing a deployment</a>
+    <a href="../managing-nodes/" class="dropdown-item">Managing a deployment</a>
 </li>
                                     
 <li>
-    <a href="../../user-guide/defining-layouts/" class="dropdown-item">Defining Layouts</a>
+    <a href="../defining-layouts/" class="dropdown-item">Defining Layouts</a>
 </li>
                                     
 <li>
-    <a href="../../user-guide/scripting/" class="dropdown-item">Scripting</a>
+    <a href="../scripting/" class="dropdown-item">Scripting</a>
 </li>
                                     
 <li>
-    <a href="../../user-guide/providers/" class="dropdown-item">Providers</a>
+    <a href="./" class="dropdown-item active">Providers</a>
 </li>
                                     
   <li class="dropdown-submenu">
@@ -61,67 +61,67 @@
     <ul class="dropdown-menu">
             
 <li>
-    <a href="../ogc/" class="dropdown-item">ogc</a>
+    <a href="../../commands/ogc/" class="dropdown-item">ogc</a>
 </li>
             
 <li>
-    <a href="../ogc-exec/" class="dropdown-item">ogc exec</a>
+    <a href="../../commands/ogc-exec/" class="dropdown-item">ogc exec</a>
 </li>
             
 <li>
-    <a href="../ogc-inspect/" class="dropdown-item">ogc inspect</a>
+    <a href="../../commands/ogc-inspect/" class="dropdown-item">ogc inspect</a>
 </li>
             
 <li>
-    <a href="../ogc-launch/" class="dropdown-item">ogc launch</a>
+    <a href="../../commands/ogc-launch/" class="dropdown-item">ogc launch</a>
 </li>
             
 <li>
-    <a href="../ogc-log/" class="dropdown-item">ogc log</a>
+    <a href="../../commands/ogc-log/" class="dropdown-item">ogc log</a>
 </li>
             
 <li>
-    <a href="../ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
+    <a href="../../commands/ogc-ls-key-pairs/" class="dropdown-item">ogc ls-key-pairs</a>
 </li>
             
 <li>
-    <a href="../ogc-ls/" class="dropdown-item">ogc ls</a>
+    <a href="../../commands/ogc-ls/" class="dropdown-item">ogc ls</a>
 </li>
             
 <li>
-    <a href="./" class="dropdown-item active">ogc pull-artifacts</a>
+    <a href="../../commands/ogc-pull-artifacts/" class="dropdown-item">ogc pull-artifacts</a>
 </li>
             
 <li>
-    <a href="../ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
+    <a href="../../commands/ogc-pull-files/" class="dropdown-item">ogc pull-files</a>
 </li>
             
 <li>
-    <a href="../ogc-push-files/" class="dropdown-item">ogc push-files</a>
+    <a href="../../commands/ogc-push-files/" class="dropdown-item">ogc push-files</a>
 </li>
             
 <li>
-    <a href="../ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
+    <a href="../../commands/ogc-rm-all/" class="dropdown-item">ogc rm-all</a>
 </li>
             
 <li>
-    <a href="../ogc-rm/" class="dropdown-item">ogc rm</a>
+    <a href="../../commands/ogc-rm/" class="dropdown-item">ogc rm</a>
 </li>
             
 <li>
-    <a href="../ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
+    <a href="../../commands/ogc-rm-key-pairs/" class="dropdown-item">ogc rm-key-pairs</a>
 </li>
             
 <li>
-    <a href="../ogc-server/" class="dropdown-item">ogc server</a>
+    <a href="../../commands/ogc-server/" class="dropdown-item">ogc server</a>
 </li>
             
 <li>
-    <a href="../ogc-ssh/" class="dropdown-item">ogc ssh</a>
+    <a href="../../commands/ogc-ssh/" class="dropdown-item">ogc ssh</a>
 </li>
             
 <li>
-    <a href="../ogc-status/" class="dropdown-item">ogc status</a>
+    <a href="../../commands/ogc-status/" class="dropdown-item">ogc status</a>
 </li>
     </ul>
   </li>
@@ -136,12 +136,12 @@
                             </a>
                         </li>
                             <li class="nav-item">
-                                <a rel="prev" href="../ogc-ls/" class="nav-link">
+                                <a rel="prev" href="../scripting/" class="nav-link">
                                     <i class="fa fa-arrow-left"></i> Previous
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a rel="next" href="../ogc-pull-files/" class="nav-link">
+                                <a rel="next" href="../../commands/ogc/" class="nav-link">
                                     Next <i class="fa fa-arrow-right"></i>
                                 </a>
                             </li>
@@ -163,18 +163,16 @@
     <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
         <ul class="nav flex-column">
             
-            <li class="nav-item" data-level="1"><a href="#name" class="nav-link">NAME</a>
+            <li class="nav-item" data-level="1"><a href="#providers" class="nav-link">Providers</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#aws" class="nav-link">AWS</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            
-            <li class="nav-item" data-level="1"><a href="#synopsis" class="nav-link">SYNOPSIS</a>
+            <li class="nav-item" data-level="2"><a href="#google" class="nav-link">Google</a>
               <ul class="nav flex-column">
               </ul>
             </li>
-            
-            <li class="nav-item" data-level="1"><a href="#description" class="nav-link">DESCRIPTION</a>
-              <ul class="nav flex-column">
               </ul>
             </li>
         </ul>
@@ -182,12 +180,21 @@
 </div></div>
                     <div class="col-md-9" role="main">
 
-<h1 id="name">NAME<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
-<p>ogc-pull-artifacts - Download artifacts from node</p>
-<h1 id="synopsis">SYNOPSIS<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h1>
-<p><strong>ogc pull-artifacts</strong> [OPTIONS] NAME</p>
-<h1 id="description">DESCRIPTION<a class="headerlink" href="#description" title="Permanent link">&para;</a></h1>
-<p>Download artifacts from node</p></div>
+<h1 id="providers">Providers<a class="headerlink" href="#providers" title="Permanent link">&para;</a></h1>
+<p>In order to access a cloud provider, there are certain environment variables that need to be exposed for each. Each environment variable should be defined in <code>.env</code> file so it will be automatically loaded when running OGC.</p>
+<h2 id="aws">AWS<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>AWS_ACCESS_KEY_ID</strong></li>
+<li><strong>AWS_SECRET_ACCESS_KEY</strong></li>
+<li><strong>AWS_REGION</strong></li>
+</ul>
+<h2 id="google">Google<a class="headerlink" href="#google" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>GOOGLE_APPLICATION_CREDENTIALS</strong></li>
+<li><strong>GOOGLE_APPLICATION_SERVICE_ACCOUNT</strong></li>
+<li><strong>GOOGLE_PROJECT</strong></li>
+<li><strong>GOOGLE_DATACENTER</strong></li>
+</ul></div>
             </div>
         </div>
 
