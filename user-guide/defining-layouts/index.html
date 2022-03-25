@@ -193,6 +193,9 @@
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
+    ports:
+      - &quot;80:80&quot;
+      - &quot;443:443&quot;
 </code></pre></div>
 <p>Each layout has a friendly name associated as seen by <code>elastic-agent-sles</code>. The next section is going to go over each option and describe its meaning.</p>
 <p><strong>provider</strong></p>
@@ -292,6 +295,8 @@
 <p>The remote path where script execution output is stored. This is used when pulling artifacts with <code>ogc pull-artifacts</code> and also utilized during node teardown. This will download any artifacts found into <code>artifacts/instance-name/</code>.</p>
 <p><strong>tags</strong> (optional)</p>
 <p>Define tags for each layout, allows additional filtering capabilities and deployment options when used with <code>ogc ls</code> and <code>ogc exec</code></p>
+<p><strong>ports</strong> (optional)</p>
+<p>Define what ingress ports are available when accessing the node.</p>
 <h2 id="variants">Variants<a class="headerlink" href="#variants" title="Permanent link">&para;</a></h2>
 <p>OGC supports the concept of variants. In OGC&rsquo;s case, variants are handled by multiple provision spec files and are then merged in a merge-left fashion.</p>
 <p>What this means is that we can take a base spec file such as:</p>
