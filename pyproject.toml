@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ogc"
-version = "2.0.5"
+version = "2.0.6"
 description = "Provisioner"
 authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
 license = "MIT"
