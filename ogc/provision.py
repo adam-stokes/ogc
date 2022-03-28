@@ -10,8 +10,7 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
 
-from ogc import log
-from ogc.db import NodeModel
+from ogc import db, log
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 
@@ -37,8 +36,9 @@ class ProvisionResult:
         self.exclude = self.layout["exclude"]
         self.ports = self.layout["ports"]
 
-    def save(self) -> NodeModel:
-        node_obj = NodeModel(
+    def save(self) -> db.Node:
+        session = db.connect()
+        node_obj = db.Node(
             uuid=self.id,
             instance_name=self.node.name,
             instance_id=self.node.id,
@@ -57,7 +57,8 @@ class ProvisionResult:
             exclude=self.exclude,
             ports=self.ports,
         )
-        node_obj.save()
+        session.add(node_obj)
+        session.commit()
         return node_obj
 
 
@@ -109,7 +110,7 @@ class BaseProvisioner:
     def images(self, **kwargs):
         return self.provisioner.list_images(**kwargs)
 
-    def _create_node(self, **kwargs) -> NodeModel:
+    def _create_node(self, **kwargs) -> db.Node:
         _opts = kwargs.copy()
         layout = None
         if "ogc_layout" in _opts:
@@ -206,7 +207,7 @@ class AWSProvisioner(BaseProvisioner):
     def _delete_firewall(self, name):
         return self.provisioner.ex_delete_security_group(name)
 
-    def create(self, layout, env, **kwargs) -> NodeModel:
+    def create(self, layout, env, **kwargs) -> db.Node:
         pub_key = Path(layout["ssh_public_key"]).read_text()
         auth = NodeAuthSSHKey(pub_key)
         image = self.image(layout["runs-on"], layout["arch"])
@@ -289,7 +290,7 @@ class GCEProvisioner(BaseProvisioner):
         except ResourceNotFoundError:
             log.error(f"Unable to delete firewall {name}")
 
-    def create(self, layout, env, **kwargs) -> NodeModel:
+    def create(self, layout, env, **kwargs) -> db.Node:
         image = self.image(layout["runs-on"], layout["arch"])
         if not image and not layout["username"]:
             raise ProvisionException(

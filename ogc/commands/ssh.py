@@ -16,8 +16,8 @@ from .base import cli
 @click.command(help="Login to a node")
 @click.argument("name")
 def ssh(name):
-    db.connect()
-    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    session = db.connect()
+    node = session.query(db.Node).filter(db.Node.instance_name == name).one()
     if node:
         cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
         sh.ssh(cmd, _fg=True, _env=app.env)
@@ -98,8 +98,8 @@ def exec_scripts(by_tag, by_name, path):
     help="Exclude files/directories when uploading",
 )
 def push_files(name, src, dst, exclude):
-    db.connect()
-    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    session = db.connect()
+    node = session.query(db.Node).filter(db.Node.instance_name == name).one()
     if node:
         deploy = Deployer(node, app.env)
         deploy.put(src, dst, excludes=exclude)
@@ -113,8 +113,8 @@ def push_files(name, src, dst, exclude):
 @click.argument("dst")
 @click.argument("src")
 def pull_files(name, dst, src):
-    db.connect()
-    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    session = db.connect()
+    node = session.query(db.Node).filter(db.Node.instance_name == name).one()
     if node:
         deploy = Deployer(node, app.env)
         deploy.get(dst, src)
@@ -126,8 +126,8 @@ def pull_files(name, dst, src):
 @click.command(help="Download artifacts from node")
 @click.argument("name")
 def pull_artifacts(name):
-    db.connect()
-    node = db.NodeModel.get(db.NodeModel.instance_name == name)
+    session = db.connect()
+    node = session.query(db.Node).filter(db.Node.instance_name == name).one()
     if node:
         deploy = Deployer(node, app.env)
         if node.artifacts:

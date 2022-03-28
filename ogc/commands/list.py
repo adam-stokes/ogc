@@ -28,14 +28,14 @@ def ls(by_tag, by_name):
         )
         sys.exit(1)
 
-    db.connect()
+    session = db.connect()
     rows = None
     if by_tag:
-        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(by_tag))
+        rows = session.query(db.Node).filter(db.Node.tags.in_(by_tag))
     elif by_name:
-        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(by_name))
+        rows = session.query(db.Node).filter_by(instance_name=by_name).one()
     else:
-        rows = db.NodeModel.select()
+        rows = session.query(db.Node).all()
     table = Table()
     table.add_column(f"{len(rows)} Nodes")
     table.add_column("Name")
@@ -47,7 +47,7 @@ def ls(by_tag, by_name):
     for data in rows:
         completed_actions = []
         failed_actions = []
-        for action in data.actions.select():
+        for action in data.actions:
             if action.exit_code != 0:
                 failed_actions.append(action)
             else:

@@ -17,13 +17,12 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry.api import retry_call
 
-from ogc import log
-from ogc.db import NodeActionResult, NodeModel
+from ogc import db, log
 from ogc.provision import choose_provisioner
 
 
 class Deployer:
-    def __init__(self, deployment: NodeModel, env: Dict[str, str], force: bool = False):
+    def __init__(self, deployment: db.Node, env: Dict[str, str], force: bool = False):
         self.deployment = deployment
         self.env = env
         self.force = force
@@ -146,7 +145,7 @@ class Deployer:
 
 
 class DeployerResult:
-    def __init__(self, deployment: NodeModel, msd: MultiStepDeployment):
+    def __init__(self, deployment: db.Node, msd: MultiStepDeployment):
         self.deployment = deployment
         self.msd = msd
 
@@ -159,14 +158,17 @@ class DeployerResult:
         )
 
     def save(self):
+        session = db.connect()
         for step in self.msd.steps:
             if hasattr(step, "exit_status"):
-                NodeActionResult.create(
+                result = db.Actions(
                     node=self.deployment,
                     exit_code=step.exit_status,
                     out=step.stdout,
                     err=step.stderr,
                 )
+                session.add(result)
+                session.commit()
 
     def show(self):
         self.save()

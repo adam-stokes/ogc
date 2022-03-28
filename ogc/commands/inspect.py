@@ -36,14 +36,14 @@ def inspect(id, name, tag, action_id):
         )
         sys.exit(1)
 
-    db.connect()
+    session = db.connect()
     rows = None
     if tag:
-        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(tag))
+        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
     elif name:
-        rows = db.NodeModel.select().where(db.NodeModel.instance_name == name)
+        rows = session.query(db.Node).filter(db.Node.instance_name == name)
     else:
-        rows = db.NodeModel.select().where(db.NodeModel.id == id)
+        rows = session.query(db.Node).filter(db.Node.id == id)
 
     console = Console()
     for data in rows:
@@ -51,9 +51,9 @@ def inspect(id, name, tag, action_id):
         completed_actions = []
         failed_actions = []
         if action_id:
-            actions = data.actions.select().where(db.NodeActionResult.id == action_id)
+            actions = data.actions.filter(db.Actions.id == action_id)
         else:
-            actions = data.actions.select()
+            actions = data.actions
         for action in actions:
             if action.exit_code != 0:
                 failed_actions.append(action)

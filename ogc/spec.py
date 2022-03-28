@@ -147,16 +147,16 @@ class SpecProvisionPlan:
     @property
     def status(self):
         """Return the status of the plan based on whats deployed and whats remaining"""
-        db.connect()
+        session = db.connect()
         counts = {
             layout.name: {"scale": layout.scale, "deployed": 0, "remaining": 0}
             for layout in self.layouts
         }
         for layout in self.layouts:
-            deployed_count = len(
-                db.NodeModel.select().where(
-                    db.NodeModel.instance_name.endswith(layout.name)
-                )
+            deployed_count = (
+                session.query(db.Node)
+                .filter(db.Node.instance_name.endswith(layout.name))
+                .count()
             )
             remaining_count = layout.scale - deployed_count
             action = "add" if remaining_count >= 0 else "remove"

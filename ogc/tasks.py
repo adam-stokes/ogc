@@ -28,7 +28,8 @@ def end_provision(results):
 
 @app.task
 def do_deploy(node_id: int):
-    node = db.NodeModel.get(db.NodeModel.id == node_id)
+    session = db.connect()
+    node = session.query(db.Node).filter(db.Node.id == node_id).one()
 
     log.info(f"Deploying to: {node.instance_name}")
     result = Deployer(node, state.app.env).run()
@@ -38,7 +39,8 @@ def do_deploy(node_id: int):
 
 @app.task
 def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
-    node_data = db.NodeModel.get(db.NodeModel.instance_name == name)
+    session = db.connect()
+    node_data = session.query(db.Node).filter(db.Node.instance_name == name).one()
     if node_data:
         uuid = node_data.uuid
         engine = choose_provisioner(node_data.provider, env=env)
@@ -75,31 +77,37 @@ def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
 def do_exec(
     cmd: str, ssh_private_key: str, node_id: int, username: str, public_ip: str
 ) -> bool:
-    node_data = db.NodeModel.get(db.NodeModel.id == node_id)
+    session = db.connect()
+    node_data = session.query(db.Node).filter(db.Node.id == node_id).one()
     cmd_opts = ["-i", str(ssh_private_key), f"{username}@{public_ip}"]
     cmd_opts.append(cmd)
     try:
         out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)
-        db.NodeActionResult.create(
+        result_obj = db.Actions(
             node=node_data,
             exit_code=out.exit_code,
             out=out.stdout.decode(),
             err=out.stderr.decode(),
         )
+        session.add(result_obj)
+        session.commit()
         return True
     except sh.ErrorReturnCode as e:
-        db.NodeActionResult.create(
+        result_obj = db.Actions(
             node=node_data,
             exit_code=e.exit_code,
             out=e.stdout.decode(),
             err=e.stderr.decode(),
         )
+        session.add(result_obj)
+        session.commit()
         return e.exit_code == 0
 
 
 @app.task
 def do_exec_scripts(node_id: int, path: str) -> bool:
-    node_data = db.NodeModel.get(db.NodeModel.id == node_id)
+    session = db.connect()
+    node_data = session.query(db.Node).filter(db.Node.id == node_id).one()
     choose_provisioner(node_data.provider, env=state.app.env)
     deploy = Deployer(node_data, env=state.app.env)
     result = deploy.exec_scripts(path)

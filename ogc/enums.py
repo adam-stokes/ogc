@@ -78,9 +78,9 @@ CLOUD_IMAGE_MAP = {
             "debian-9": "",
         },
         "amd64": {
-            "ubuntu-latest": "ubuntu-2004-focal-v20220308",
-            "ubuntu-2004": "ubuntu-2004-focal-v20220308",
-            "ubuntu-1804": "ubuntu-1804-bionic-v20220308",
+            "ubuntu-latest": "ubuntu-2004-focal-v20220325",
+            "ubuntu-2004": "ubuntu-2004-focal-v20220325",
+            "ubuntu-1804": "ubuntu-1804-bionic-v20220325",
             "sles-latest": "sles-15-sp3-v20220223",
             "sles-15": "sles-15-sp3-v20220223",
             "debian-latest": "debian-11-bullseye-v20220317",

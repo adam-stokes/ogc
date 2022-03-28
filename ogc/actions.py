@@ -40,8 +40,8 @@ def teardown(
         for name in names:
             do_destroy.delay(name, env, force)
     else:
-        db.connect()
-        for data in db.NodeModel.select():
+        session = db.connect()
+        for data in session.query(db.Node).all():
             log.info(f"Destroying: {data.instance_name}")
             do_destroy.delay(data.instance_name, env, force)
 
@@ -59,11 +59,12 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
             result = chord(create_jobs)(callback)
             deploy(result.get())
         elif override["action"] == "remove":
-            db.connect()
+            session = db.connect()
             for data in (
-                db.NodeModel.select()
-                .where(db.NodeModel.instance_name.endswith(layout.name))
-                .order_by(db.NodeModel.id)
+                session.query(db.Node)
+                .all()
+                .filter(db.Node.instance_name.endswith(layout.name))
+                .order_by(db.Node.id)
                 .limit(abs(override["remaining"]))
             ):
                 log.info(f"Destroying: {data.instance_name}")
@@ -71,14 +72,14 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
 
 
 def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
-    db.connect()
+    session = db.connect()
     rows = None
     if tag:
-        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(tag))
+        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
     elif name:
-        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(name))
+        rows = session.query(db.Node).filter(db.Node.instance_name == name)
     else:
-        rows = db.NodeModel.select()
+        rows = session.query(db.Node).all()
 
     log.info(f"Executing '{cmd}' across {len(rows)} nodes.")
 
@@ -93,14 +94,14 @@ def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
 
 
 def exec_scripts(name: str = None, tag: str = None, path: str = None) -> None:
-    db.connect()
+    session = db.connect()
     rows = None
     if tag:
-        rows = db.NodeModel.select().where(db.NodeModel.tags.contains(tag))
+        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
     elif name:
-        rows = db.NodeModel.select().where(db.NodeModel.instance_name.contains(name))
+        rows = session.query(db.Node).filter(db.Node.instance_name == name)
     else:
-        rows = db.NodeModel.select()
+        rows = session.query(db.Node).all()
 
     log.info(f"Executing scripts from '{path}' across {len(rows)} nodes.")
 
