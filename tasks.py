@@ -50,3 +50,4 @@ def release(c):
     c.run(f"poetry publish --build -u {pypi_user} -p {pypi_pass}")
     c.run("git commit -asm 'Next Release'")
     c.run("git push --tags")
+    c.run("git push")

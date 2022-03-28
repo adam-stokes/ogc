@@ -1,8 +1,9 @@
 from typing import Any, Dict, List
 
 from celery import chord
+from rich.console import Console
 
-from ogc import db, log
+from ogc import db
 from ogc.tasks import (
     do_deploy,
     do_destroy,
@@ -13,6 +14,7 @@ from ogc.tasks import (
     end_provision
 )
 
+console = Console()
 
 def launch(layouts, env: Dict[str, str]) -> List[int]:
     create_jobs = [
@@ -36,13 +38,13 @@ def teardown(
 ) -> None:
     """Tear down nodes"""
     if names:
-        log.info(f"Destroying: [{', '.join(names)}]")
+        console.log(f"Destroying: {', '.join(names)}")
         for name in names:
             do_destroy.delay(name, env, force)
     else:
         session = db.connect()
         for data in session.query(db.Node).all():
-            log.info(f"Destroying: {data.instance_name}")
+            console.log(f"Destroying: {data.instance_name}")
             do_destroy.delay(data.instance_name, env, force)
 
 
@@ -67,7 +69,7 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
                 .order_by(db.Node.id)
                 .limit(abs(override["remaining"]))
             ):
-                log.info(f"Destroying: {data.instance_name}")
+                console.log(f"Destroying: {data.instance_name}")
                 do_destroy.delay(data.instance_name, env, force=True)
 
 
@@ -81,7 +83,7 @@ def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
     else:
         rows = session.query(db.Node).all()
 
-    log.info(f"Executing '{cmd}' across {len(rows)} nodes.")
+    console.log(f"Executing '{cmd}' across {len(rows)} nodes.")
 
     exec_jobs = [
         do_exec.s(cmd, node.ssh_private_key, node.id, node.username, node.public_ip)
@@ -103,7 +105,7 @@ def exec_scripts(name: str = None, tag: str = None, path: str = None) -> None:
     else:
         rows = session.query(db.Node).all()
 
-    log.info(f"Executing scripts from '{path}' across {len(rows)} nodes.")
+    console.log(f"Executing scripts from '{path}' across {len(rows)} nodes.")
 
     exec_jobs = [do_exec_scripts.s(node.id, path) for node in rows]
 

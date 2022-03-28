@@ -50,6 +50,18 @@ $ pip install poetry==1.1.12
 $ poetry install
 ```
 
+*Note*: If using poetry make sure to prefix running of `ogc` with the following:
+
+```
+$ poetry run ogc
+```
+
+Optionally, load up the virtualenv beforehand:
+
+```
+$ poetry shell
+```
+
 Or install from [pypi](https://pypi.org):
 
 ```

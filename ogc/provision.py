@@ -4,16 +4,18 @@
 import uuid
 from pathlib import Path
 
-from libcloud.common.google import ResourceExistsError, ResourceNotFoundError
+from libcloud.common.google import ResourceNotFoundError
 from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
+from rich.console import Console
 
 from ogc import db, log
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 
+console = Console()
 
 class ProvisionResult:
     def __init__(self, id, node, layout, env):
@@ -59,6 +61,7 @@ class ProvisionResult:
         )
         session.add(node_obj)
         session.commit()
+        session.close()
         return node_obj
 
 
@@ -122,7 +125,7 @@ class BaseProvisioner:
             env = _opts["ogc_env"]
             del _opts["ogc_env"]
 
-        log.info(f"Spinning up {layout['name']}")
+        console.log(f"Spinning up {layout['name']}")
         node = retry_call(
             self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5
         )

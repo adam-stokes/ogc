@@ -1,4 +1,3 @@
-import datetime
 import os
 from typing import Text
 
@@ -9,10 +8,14 @@ DB_NAME = os.environ.get("POSTGRES_DB", "ogc")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
 
-
 from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import ARRAY
-from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from sqlalchemy.orm import (
+    declarative_base,
+    relationship,
+    scoped_session,
+    sessionmaker
+)
 
 Base = declarative_base()
 
@@ -63,7 +66,7 @@ def connect():
     db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
     engine = create_engine(db_string, echo=False, future=True)
     Base.metadata.create_all(engine)
-    _session = sessionmaker(bind=engine, expire_on_commit=False)
+    _session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
     return _session()
 
 

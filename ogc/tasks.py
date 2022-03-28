@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict
 
 import sh
+from rich.console import Console
 
 from ogc import db, enums, log, state
 
@@ -10,14 +11,15 @@ from .celery import app
 from .deployer import Deployer
 from .provision import choose_provisioner
 
+console = Console()
 
 @app.task
 def do_provision(layout, env):
-    log.info(f"Provisioning: {layout['name']}")
+    console.log(f"Provisioning: {layout['name']}")
     engine = choose_provisioner(layout["provider"], env=env)
     engine.setup(layout["ssh_public_key"])
     model = engine.create(layout=layout, env=env)
-    log.info(f"Saved {model.instance_name}")
+    console.log(f"Saved {model.instance_name}")
     return model.id
 
 
@@ -30,8 +32,9 @@ def end_provision(results):
 def do_deploy(node_id: int):
     session = db.connect()
     node = session.query(db.Node).filter(db.Node.id == node_id).one()
+    session.close()
 
-    log.info(f"Deploying to: {node.instance_name}")
+    console.log(f"Deploying to: {node.instance_name}")
     result = Deployer(node, state.app.env).run()
     result.show()
     return True
@@ -49,7 +52,7 @@ def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
 
             # Pull down artifacts if set
             if node_data.artifacts:
-                log.info("Downloading artifacts")
+                console.log("Downloading artifacts")
                 local_artifact_path = (
                     Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
                 )
@@ -60,7 +63,7 @@ def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
             exec_result = deploy.exec("./teardown")
             if not exec_result.passed:
                 log.error(f"Unable to run teardown script on {node_data.instance_name}")
-            log.info(f"Destroying {node_data.instance_name}")
+            console.log(f"Destroying {node_data.instance_name}")
             is_destroyed = deploy.node.destroy()
             if not is_destroyed:
                 log.error(f"Unable to destroy {deploy.node.id}")
@@ -70,7 +73,9 @@ def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
                 log.error(f"Could not delete ssh keypair {uuid}")
         except:
             log.error("Failed to delete node, removing from database.")
-    node_data.delete_instance()
+    session.delete(node_data)
+    session.commit()
+    session.close()
 
 
 @app.task
@@ -87,20 +92,22 @@ def do_exec(
             node=node_data,
             exit_code=out.exit_code,
             out=out.stdout.decode(),
-            err=out.stderr.decode(),
+            error=out.stderr.decode(),
         )
         session.add(result_obj)
         session.commit()
+        session.close()
         return True
     except sh.ErrorReturnCode as e:
         result_obj = db.Actions(
             node=node_data,
             exit_code=e.exit_code,
             out=e.stdout.decode(),
-            err=e.stderr.decode(),
+            error=e.stderr.decode(),
         )
         session.add(result_obj)
         session.commit()
+        session.close()
         return e.exit_code == 0
 
 
@@ -108,6 +115,7 @@ def do_exec(
 def do_exec_scripts(node_id: int, path: str) -> bool:
     session = db.connect()
     node_data = session.query(db.Node).filter(db.Node.id == node_id).one()
+    session.close()
     choose_provisioner(node_data.provider, env=state.app.env)
     deploy = Deployer(node_data, env=state.app.env)
     result = deploy.exec_scripts(path)
