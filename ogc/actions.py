@@ -10,7 +10,7 @@ from ogc.tasks import (
     do_exec_scripts,
     do_provision,
     end_exec,
-    end_provision,
+    end_provision
 )
 
 

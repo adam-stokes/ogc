@@ -10,7 +10,7 @@ import sh
 from libcloud.compute.deployment import (
     FileDeployment,
     MultiStepDeployment,
-    ScriptDeployment,
+    ScriptDeployment
 )
 from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
