@@ -1,6 +1,7 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 
+import datetime
 import uuid
 from pathlib import Path
 
@@ -58,6 +59,7 @@ class ProvisionResult:
             include=self.include,
             exclude=self.exclude,
             ports=self.ports,
+            created=datetime.datetime.utcnow()
         )
         session.add(node_obj)
         session.commit()

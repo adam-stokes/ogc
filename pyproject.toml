@@ -29,6 +29,8 @@ click-didyoumean = "^0.3.0"
 rich = "^12.0.1"
 python-slugify = "^6.1.1"
 SQLAlchemy = "^1.4.32"
+alembic = "^1.7.7"
+attrs = "^21.4.0"
 
 
 [tool.poetry.dev-dependencies]
@@ -41,12 +43,12 @@ Pygments = "^2.11.2"
 pytest = "^7.0.1"
 ipdb = "^0.13.9"
 mypy = "^0.941"
-mkdocs = "^1.2.3"
-Jinja2 = "3.0.3"
+mkdocs = "^1.3.0"
 mkdocs-bootswatch = "^1.1"
 "punch.py" = "^2.0.0"
 pymdown-extensions = "^9.3"
 click-man = "^0.4.1"
+mkdocs-material = "^8.2.8"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start" 
