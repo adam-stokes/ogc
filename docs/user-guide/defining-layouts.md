@@ -4,7 +4,7 @@ Learn the layout specification and how to create your own provisioning layouts.
 
 All layouts reside under the `layouts` key in the provision specification:
 
-```
+```yaml
 layouts:
   elastic-agent-sles: 
     runs-on: sles-15
