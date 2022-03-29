@@ -2,7 +2,6 @@ import sys
 
 import click
 
-from ogc import db
 from ogc.celery import app
 from ogc.enums import PID_FILE
 from ogc.fs import ensure_cache_dir

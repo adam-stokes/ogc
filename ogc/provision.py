@@ -270,7 +270,7 @@ class GCEProvisioner(BaseProvisioner):
         pass
 
     def cleanup(self, node):
-        self._delete_firewall(f"ogc-{node.uuid}")
+        self.delete_firewall(f"ogc-{node.uuid}")
 
     def image(self, runs_on, arch):
         _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
@@ -279,17 +279,20 @@ class GCEProvisioner(BaseProvisioner):
         except IndexError:
             raise ProvisionException(f"Could not determine image for {_runs_on}")
 
-    def _create_firewall(self, name, ports, tags):
+    def create_firewall(self, name, ports, tags):
         ports = [port.split(":")[0] for port in ports]
         self.provisioner.ex_create_firewall(
             name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
         )
 
-    def _delete_firewall(self, name):
+    def delete_firewall(self, name):
         try:
             self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))
         except ResourceNotFoundError:
             log.error(f"Unable to delete firewall {name}")
+
+    def list_firewalls(self):
+        return self.provisioner.ex_list_firewalls()
 
     def create(self, layout, env, **kwargs) -> db.Node:
         image = self.image(layout["runs-on"], layout["arch"])
@@ -309,7 +312,7 @@ class GCEProvisioner(BaseProvisioner):
         }
 
         if layout["ports"]:
-            self._create_firewall(f"ogc-{self.uuid}", layout["ports"], layout["tags"])
+            self.create_firewall(f"ogc-{self.uuid}", layout["ports"], layout["tags"])
 
         opts = dict(
             name=f"ogc-{self.uuid}-{layout['name']}",

@@ -1,6 +1,8 @@
 import click
 from click_didyoumean import DYMGroup
+
 from ogc import db
+
 
 @click.group(cls=DYMGroup)
 def cli():
