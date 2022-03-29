@@ -50,17 +50,18 @@ $ pip install poetry==1.1.12
 $ poetry install
 ```
 
-*Note*: If using poetry make sure to prefix running of `ogc` with the following:
+!!! caution
+    If using poetry make sure to prefix running of `ogc` with the following:
 
-```
-$ poetry run ogc
-```
+    ```
+    $ poetry run ogc
+    ```
 
-Optionally, load up the virtualenv beforehand:
+    Optionally, load up the virtualenv beforehand:
 
-```
-$ poetry shell
-```
+    ```
+    $ poetry shell
+    ```
 
 Or install from [pypi](https://pypi.org):
 
@@ -85,7 +86,8 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
-More information can be found in our [Providers](user-guide/providers.md) documentation.
+!!! note
+    More information can be found in our [Providers](user-guide/providers.md) documentation.
 
 ## Define Provisioning
 
@@ -132,7 +134,8 @@ OGC uses a client/server architecture to better handle scaling and concurrency n
 $ ogc server
 ```
 
-*Note*: An alternative is to run this process in a separate docker container.
+!!! note
+    An alternative is to run this process in a separate docker container.
 
 Once the specification is set, environment variables configured and celery is running, execute a deployment in a new terminal:
 
@@ -140,7 +143,8 @@ Once the specification is set, environment variables configured and celery is ru
 $ ogc launch
 ```
 
-*Note*: If the file is something other than `ogc.yml` append the `--spec` option to the launch command:
+!!! note
+    If the file is something other than `ogc.yml` append the `--spec` option to the launch command:
 
 ```shell
 $ ogc launch --spec my-custom-provision.yml

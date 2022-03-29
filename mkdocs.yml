@@ -1,5 +1,15 @@
 site_name: OGC
-theme: flatly
+repo_url: https://github.com/adam-stokes/ogc
+theme: 
+    name: material
+    palette:
+        scheme: slate
+        primary: green
+    features:
+        - navigation.instant
+    font:
+        text: Ubuntu
+        code: Ubuntu Mono        
 markdown_extensions:
     - toc:
         permalink: True
@@ -24,13 +34,6 @@ markdown_extensions:
     - pymdownx.tasklist:
         custom_checkbox: True
     - pymdownx.tilde
-extra:
-  palette:
-      primary: '#087da1'
-      accent: '#00a889'
-  social:
-    - type: 'github'
-      link: 'https://github.com/adam-stokes/ogc'
 nav:
   - 'Getting Started': 'index.md'
   - 'User Guide':
