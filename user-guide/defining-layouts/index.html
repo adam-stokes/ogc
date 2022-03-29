@@ -640,27 +640,27 @@
 <h1 id="defining-layouts">Defining Layouts<a class="headerlink" href="#defining-layouts" title="Permanent link">&para;</a></h1>
 <p>Learn the layout specification and how to create your own provisioning layouts.</p>
 <p>All layouts reside under the <code>layouts</code> key in the provision specification:</p>
-<div class="highlight"><pre><span></span><code>layouts:
-  elastic-agent-sles: 
-    runs-on: sles-15
-    instance-size: e2-standard-8
-    username: root
-    scripts: fixtures/ex_deploy_sles
-    provider: google
-    scale: 5
-    remote-path: /root/ogc
-    include:
-      - .ogc-cache
-    exclude:
-      - .git
-      - .venv
-    artifacts: /root/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - sles-gcp
-    ports:
-      - &quot;80:80&quot;
-      - &quot;443:443&quot;
+<div class="highlight"><pre><span></span><code><span class="nt">layouts</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">elastic-agent-sles</span><span class="p">:</span><span class="w"> </span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-15</span><span class="w"></span>
+<span class="w">    </span><span class="nt">instance-size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">e2-standard-8</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scripts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixtures/ex_deploy_sles</span><span class="w"></span>
+<span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/ogc</span><span class="w"></span>
+<span class="w">    </span><span class="nt">include</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.ogc-cache</span><span class="w"></span>
+<span class="w">    </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.git</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.venv</span><span class="w"></span>
+<span class="w">    </span><span class="nt">artifacts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/output/*.xml</span><span class="w"></span>
+<span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elastic-agent-8.1.x</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-gcp</span><span class="w"></span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;80:80&quot;</span><span class="w"></span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;443:443&quot;</span><span class="w"></span>
 </code></pre></div>
 <p>Each layout has a friendly name associated as seen by <code>elastic-agent-sles</code>. The next section is going to go over each option and describe its meaning.</p>
 <p><strong>provider</strong></p>
