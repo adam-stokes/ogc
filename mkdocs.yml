@@ -7,6 +7,10 @@ theme:
         primary: green
     features:
         - navigation.instant
+        - navigation.expand
+        - navigation.top
+        - toc.integrate
+        - toc.follow
     font:
         text: Ubuntu
         code: Ubuntu Mono        
