@@ -74,12 +74,23 @@ class Actions(Base):
     created = Column(DateTime(), server_default=func.now())
 
 def connect():
+    """Return a db session"""
+    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+    engine = create_engine(db_string, echo=False, future=True)
+    _session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
+    return _session()
+
+def createtbl():
     """Create db tables"""
     db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
     engine = create_engine(db_string, echo=False, future=True)
     Base.metadata.create_all(engine)
-    _session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
-    return _session()
+
+def droptbl():
+    """Create db tables"""
+    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+    engine = create_engine(db_string, echo=False, future=True)
+    Base.metadata.drop_all(engine)
 
 def model_as_dict(obj):
     return {c.key: getattr(obj, c.key)
