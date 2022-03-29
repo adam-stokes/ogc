@@ -1,9 +1,9 @@
 from typing import Any, Dict, List
 
 from celery import chord
-from rich.console import Console
 
 from ogc import db
+from ogc.log import Logger as log
 from ogc.tasks import (
     do_deploy,
     do_destroy,
@@ -14,7 +14,6 @@ from ogc.tasks import (
     end_provision
 )
 
-console = Console()
 
 def launch(layouts, env: Dict[str, str]) -> List[int]:
     create_jobs = [
@@ -38,14 +37,18 @@ def teardown(
 ) -> None:
     """Tear down nodes"""
     if names:
-        console.log(f"Destroying: {', '.join(names)}")
+        log.info(f"Destroying: {', '.join(names)}")
         for name in names:
             do_destroy.delay(name, env, force)
     else:
-        session = db.connect()
-        for data in session.query(db.Node).all():
-            console.log(f"Destroying: {data.instance_name}")
-            do_destroy.delay(data.instance_name, env, force)
+        with db.connect() as session:
+            rows = session.query(db.Node)
+            count = rows.count()
+            total = count
+            for data in rows.all():
+                log.info(f"Destroying: {data.instance_name} ({count} of {total})")
+                do_destroy.delay(data.instance_name, env, force)
+                count = count - 1
 
 
 def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
@@ -61,29 +64,28 @@ def sync(layouts, overrides: Dict[Any, Any], env: Dict[str, str]) -> None:
             result = chord(create_jobs)(callback)
             deploy(result.get())
         elif override["action"] == "remove":
-            session = db.connect()
-            for data in (
-                session.query(db.Node)
-                .all()
-                .filter(db.Node.instance_name.endswith(layout.name))
-                .order_by(db.Node.id)
-                .limit(abs(override["remaining"]))
-            ):
-                console.log(f"Destroying: {data.instance_name}")
-                do_destroy.delay(data.instance_name, env, force=True)
+            with db.connect() as session:
+                for data in (
+                    session.query(db.Node)
+                    .filter(db.Node.instance_name.endswith(layout.name))
+                    .order_by(db.Node.id)
+                    .limit(abs(override["remaining"]))
+                ):
+                    log.info(f"Destroying: {data.instance_name}")
+                    do_destroy.delay(data.instance_name, env, force=True)
 
 
 def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
-    session = db.connect()
-    rows = None
-    if tag:
-        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-    elif name:
-        rows = session.query(db.Node).filter(db.Node.instance_name == name)
-    else:
-        rows = session.query(db.Node).all()
+    rows = []
+    with db.connect() as session:
+        if tag:
+            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
+        elif name:
+            rows = session.query(db.Node).filter(db.Node.instance_name == name)
+        else:
+            rows = session.query(db.Node).all()
 
-    console.log(f"Executing '{cmd}' across {len(rows)} nodes.")
+    log.info(f"Executing '{cmd}' across [green]{rows.count()}[/] nodes.")
 
     exec_jobs = [
         do_exec.s(cmd, node.ssh_private_key, node.id, node.username, node.public_ip)
@@ -96,16 +98,16 @@ def exec(name: str = None, tag: str = None, cmd: str = None) -> None:
 
 
 def exec_scripts(name: str = None, tag: str = None, path: str = None) -> None:
-    session = db.connect()
-    rows = None
-    if tag:
-        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-    elif name:
-        rows = session.query(db.Node).filter(db.Node.instance_name == name)
-    else:
-        rows = session.query(db.Node).all()
+    rows = []
+    with db.connect() as session:
+        if tag:
+            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
+        elif name:
+            rows = session.query(db.Node).filter(db.Node.instance_name == name)
+        else:
+            rows = session.query(db.Node).all()
 
-    console.log(f"Executing scripts from '{path}' across {len(rows)} nodes.")
+    log.info(f"Executing scripts from '{path}' across {rows.count()} nodes.")
 
     exec_jobs = [do_exec_scripts.s(node.id, path) for node in rows]
 

@@ -2,17 +2,15 @@ import sys
 from pathlib import Path
 
 import click
-from rich.console import Console
 
-from ogc import log
 from ogc.actions import deploy as deploy_p
 from ogc.actions import launch as launch_p
+from ogc.log import Logger as log
 
 from ..spec import SpecLoader
 from ..state import app
 from .base import cli
 
-console = Console()
 
 @click.command(help="Launches nodes from a provision specification")
 @click.option("--spec", required=False, multiple=True)
@@ -40,13 +38,13 @@ def launch(spec, with_deploy):
         sys.exit(1)
 
     app.spec = SpecLoader.load(specs)
-    console.log(f"Provisioning: {', '.join([layout.name for layout in app.spec.layouts])}")
+    log.info(f"Provisioning: {', '.join([layout.name for layout in app.spec.layouts])}")
     node_ids = launch_p(app.spec.layouts, app.env)
 
     if with_deploy:
         deploy_p(node_ids)
 
-    console.log(
+    log.info(
         "All tasks have been submitted, please run `ogc log` to see status output."
     )
 

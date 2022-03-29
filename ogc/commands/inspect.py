@@ -36,14 +36,14 @@ def inspect(id, name, tag, action_id):
         )
         sys.exit(1)
 
-    session = db.connect()
-    rows = None
-    if tag:
-        rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-    elif name:
-        rows = session.query(db.Node).filter(db.Node.instance_name == name)
-    else:
-        rows = session.query(db.Node).filter(db.Node.id == id)
+    rows = []
+    with db.connect() as session:
+        if tag:
+            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
+        elif name:
+            rows = session.query(db.Node).filter(db.Node.instance_name == name)
+        else:
+            rows = session.query(db.Node).filter(db.Node.id == id)
 
     console = Console()
     for data in rows:

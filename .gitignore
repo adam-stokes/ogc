@@ -11,3 +11,4 @@ ogc.log
 .ogc-cache
 .mypy*
 adam-stokes-svc.json
+ogc.debug.log

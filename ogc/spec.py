@@ -147,23 +147,23 @@ class SpecProvisionPlan:
     @property
     def status(self):
         """Return the status of the plan based on whats deployed and whats remaining"""
-        session = db.connect()
-        counts = {
-            layout.name: {"scale": layout.scale, "deployed": 0, "remaining": 0}
-            for layout in self.layouts
-        }
-        for layout in self.layouts:
-            deployed_count = (
-                session.query(db.Node)
-                .filter(db.Node.instance_name.endswith(layout.name))
-                .count()
-            )
-            remaining_count = layout.scale - deployed_count
-            action = "add" if remaining_count >= 0 else "remove"
-            counts[layout.name]["deployed"] = deployed_count
-            counts[layout.name]["remaining"] = remaining_count
-            counts[layout.name]["action"] = action
-        return counts
+        with db.connect() as session:
+            counts = {
+                layout.name: {"scale": layout.scale, "deployed": 0, "remaining": 0}
+                for layout in self.layouts
+            }
+            for layout in self.layouts:
+                deployed_count = (
+                    session.query(db.Node)
+                    .filter(db.Node.instance_name.endswith(layout.name))
+                    .count()
+                )
+                remaining_count = layout.scale - deployed_count
+                action = "add" if remaining_count >= 0 else "remove"
+                counts[layout.name]["deployed"] = deployed_count
+                counts[layout.name]["remaining"] = remaining_count
+                counts[layout.name]["action"] = action
+            return counts
 
     @property
     def is_degraded(self):

@@ -16,12 +16,12 @@ from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry.api import retry_call
-from rich.console import Console
 
 from ogc import db
+from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
 
-console = Console()
+
 class Deployer:
     def __init__(self, deployment: db.Node, env: Dict[str, str], force: bool = False):
         self.deployment = deployment
@@ -63,7 +63,7 @@ class Deployer:
     def exec_scripts(self, script_dir) -> "DeployerResult":
         scripts = Path(script_dir)
         if not scripts.exists():
-            console.log("No deployment scripts found, skipping.")
+            log.info("No deployment scripts found, skipping.")
             return DeployerResult(self.deployment, MultiStepDeployment())
 
         context = {"env": self.env}
@@ -91,20 +91,20 @@ class Deployer:
                 steps.append(ScriptDeployment("chmod +x teardown"))
 
         if steps:
-            console.log(f"({self.deployment.instance_name}) Executing {len(steps)} steps")
+            log.info(f"({self.deployment.instance_name}) Executing {len(steps)} steps")
             msd = MultiStepDeployment(steps)
             msd.run(self.node, self._ssh_client)
             return DeployerResult(self.deployment, msd)
         return DeployerResult(self.deployment, MultiStepDeployment())
 
     def run(self) -> "DeployerResult":
-        console.log(
+        log.info(
             f"Establishing connection ({self.deployment.public_ip}) ({self.deployment.username}) ({str(self.deployment.ssh_private_key)})"
         )
 
         # Upload any files first
         if self.deployment.remote_path:
-            console.log(
+            log.info(
                 f"Uploading file/directory contents to {self.deployment.instance_name}"
             )
             self.put(
@@ -159,30 +159,29 @@ class DeployerResult:
         )
 
     def save(self):
-        session = db.connect()
         for step in self.msd.steps:
-            if hasattr(step, "exit_status"):
-                result = db.Actions(
-                    node=self.deployment,
-                    exit_code=step.exit_status,
-                    out=step.stdout,
-                    error=step.stderr,
-                )
-                session.add(result)
-        session.commit()
-        session.close()
+            with db.connect() as session:
+                if hasattr(step, "exit_status"):
+                    result = db.Actions(
+                        node=self.deployment,
+                        exit_code=step.exit_status,
+                        out=step.stdout,
+                        error=step.stderr,
+                    )
+                    session.add(result)
+                    session.commit()
 
 
     def show(self):
         self.save()
-        console.log("Deployment Result: ")
+        log.info("Deployment Result: ")
         for step in self.msd.steps:
             if hasattr(step, "exit_status"):
-                console.log(f"  - ({step.exit_status}): {step}")
-        console.log("Connection Information: ")
-        console.log(
+                log.info(f"  - ({step.exit_status}): {step}")
+        log.info("Connection Information: ")
+        log.info(
             f"  - Node: {self.deployment.instance_name} {self.deployment.instance_state}"
         )
-        console.log(
+        log.info(
             f"  - ssh -i {self.deployment.ssh_private_key} {self.deployment.username}@{self.deployment.public_ip}"
         )

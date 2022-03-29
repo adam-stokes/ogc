@@ -6,8 +6,8 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from ogc import log
 from ogc.actions import sync
+from ogc.log import Logger as log
 
 from ..spec import SpecLoader
 from ..state import app
@@ -44,7 +44,7 @@ def status(reconcile, spec):
 
     if reconcile and app.spec.is_degraded:
         log.info(
-            f"Reconciling: [{', '.join([layout.name for layout in app.spec.layouts])}]"
+            f"Reconciling: {', '.join([layout.name for layout in app.spec.layouts])}"
         )
         sync(app.spec.layouts, counts, app.env)
         return

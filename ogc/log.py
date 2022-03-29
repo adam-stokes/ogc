@@ -1,35 +1,33 @@
 """ log module
 """
 
-import sys
+import logging
+from logging.handlers import TimedRotatingFileHandler
 
-from loguru import logger
+from rich.logging import RichHandler
 
-logger.remove()
-logger.add(
-    "ogc.log", rotation="500 MB", level="DEBUG"
-)  # Automatically rotate too big file
-logger.add(
-    sys.stderr,
-    colorize=True,
-    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <green><b>{message}</b></green>",
+logging.basicConfig(
     level="INFO",
-)
-logger.add(
-    sys.stderr,
-    colorize=True,
-    format="{time:YYYY-MM-DD at HH:mm:ss} | <level>{level}</level> <red><b>{message}</b></red>",
-    level="ERROR",
+    format="%(message)s",
+    datefmt="[%X]",
+    handlers=[RichHandler(rich_tracebacks=True)]
 )
 
+cmdslog = TimedRotatingFileHandler("ogc.log",
+                                    when='D',
+                                    interval=1,
+                                    backupCount=7)
+cmdslog.setLevel(logging.INFO)                                    
+cmdslog.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
-def debug(ctx):
-    logger.debug(ctx)
+debuglog = TimedRotatingFileHandler("ogc.debug.log",
+                                    when='D',
+                                    interval=1,
+                                    backupCount=7)
+debuglog.setLevel(logging.DEBUG)
+debuglog.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 
-
-def error(ctx):
-    logger.error(ctx)
-
-
-def info(ctx):
-    logger.info(ctx)
+Logger = logging.getLogger("ogc")
+Logger.setLevel(logging.INFO)
+Logger.addHandler(cmdslog)
+Logger.addHandler(debuglog)

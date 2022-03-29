@@ -1,15 +1,22 @@
 import click
 import sh
-from rich.console import Console
 
 from .base import cli
 
 
 @click.command(help="Stream log output")
-def log():
-    console = Console()
-    for line in sh.tail("-f", "ogc.log", _iter=True):
-        console.log(line.rstrip("\n"), markup=True, end="")
+@click.option(
+    "--debug/--no-debug",
+    default=False,
+    help="Stream debug logging instead",
+)
+def log(debug):
+    logfile = "ogc.log"
+    if debug:
+        logfile = "ogc.debug.log"    
+
+    for line in sh.tail("-f", logfile, _iter=True, ):
+        print(line.rstrip("\n"))
 
 
 cli.add_command(log)

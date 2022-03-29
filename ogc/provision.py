@@ -1,7 +1,6 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 
-import datetime
 import uuid
 from pathlib import Path
 
@@ -10,13 +9,12 @@ from libcloud.compute.base import NodeAuthSSHKey
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
-from rich.console import Console
 
-from ogc import db, log
+from ogc import db
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
+from ogc.log import Logger as log
 
-console = Console()
 
 class ProvisionResult:
     def __init__(self, id, node, layout, env):
@@ -40,31 +38,29 @@ class ProvisionResult:
         self.ports = self.layout["ports"]
 
     def save(self) -> db.Node:
-        session = db.connect()
-        node_obj = db.Node(
-            uuid=self.id,
-            instance_name=self.node.name,
-            instance_id=self.node.id,
-            instance_state=self.node.state,
-            username=self.username,
-            public_ip=self.host,
-            private_ip=self.private_ip,
-            ssh_public_key=self.ssh_public_key,
-            ssh_private_key=self.ssh_private_key,
-            provider=self.provider,
-            scripts=self.scripts,
-            tags=self.tags,
-            remote_path=self.remote_path,
-            artifacts=self.artifacts,
-            include=self.include,
-            exclude=self.exclude,
-            ports=self.ports,
-            created=datetime.datetime.utcnow()
-        )
-        session.add(node_obj)
-        session.commit()
-        session.close()
-        return node_obj
+        with db.connect() as session:
+            node_obj = db.Node(
+                uuid=self.id,
+                instance_name=self.node.name,
+                instance_id=self.node.id,
+                instance_state=self.node.state,
+                username=self.username,
+                public_ip=self.host,
+                private_ip=self.private_ip,
+                ssh_public_key=self.ssh_public_key,
+                ssh_private_key=self.ssh_private_key,
+                provider=self.provider,
+                scripts=self.scripts,
+                tags=self.tags,
+                remote_path=self.remote_path,
+                artifacts=self.artifacts,
+                include=self.include,
+                exclude=self.exclude,
+                ports=self.ports,
+            )
+            session.add(node_obj)
+            session.commit()
+            return node_obj
 
 
 class BaseProvisioner:
@@ -127,7 +123,7 @@ class BaseProvisioner:
             env = _opts["ogc_env"]
             del _opts["ogc_env"]
 
-        console.log(f"Spinning up {layout['name']}")
+        log.info(f"Spinning up {layout['name']}")
         node = retry_call(
             self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5
         )
