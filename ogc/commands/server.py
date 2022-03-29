@@ -12,8 +12,6 @@ from .base import cli
 
 @click.command(help="Starts the tasks server")
 def server():
-    # Make sure latest db schema is set
-    db.migrate()
     cache_dir = ensure_cache_dir()
     pid_path = cache_dir / PID_FILE
     if not pid_path.exists():
