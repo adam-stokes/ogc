@@ -13,7 +13,7 @@
     
     
       
-        <title>ogc - OGC</title>
+        <title>NAME - OGC</title>
       
     
     
@@ -96,7 +96,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ogc
+              NAME
             
           </span>
         </div>
@@ -221,14 +221,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" data-md-state="indeterminate" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -305,14 +303,12 @@
               
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" type="checkbox" id="__nav_2_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" data-md-state="indeterminate" type="checkbox" id="__nav_2_5" checked>
       
       
       
@@ -333,21 +329,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../ogc/" class="md-nav__link">
         ogc
       </a>
-      
     </li>
   
 
@@ -602,60 +588,18 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/adam-stokes/ogc/edit/master/docs/commands/ogc.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/adam-stokes/ogc/edit/master/docs/commands/ogc-shell.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
 <h1 id="name">NAME<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
-<p>ogc - Just a simple provisioner</p>
+<p>ogc-shell - Launches IPython repl</p>
 <h1 id="synopsis">SYNOPSIS<a class="headerlink" href="#synopsis" title="Permanent link">&para;</a></h1>
-<p><strong>ogc</strong> [OPTIONS] COMMAND [ARGS]...</p>
+<p><strong>ogc shell</strong> [OPTIONS]</p>
 <h1 id="description">DESCRIPTION<a class="headerlink" href="#description" title="Permanent link">&para;</a></h1>
-<p>Just a simple provisioner</p>
-<h1 id="commands">COMMANDS<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h1>
-<p><strong>db-migrate</strong> Database migrations See <strong>ogc-db-migrate(1)</strong> for full
-documentation on the <strong>db-migrate</strong> command.</p>
-<p><strong>shell</strong> Launches IPython repl See <strong>ogc-shell(1)</strong> for full
-documentation on the <strong>shell</strong> command.</p>
-<p><strong>rm</strong> Destroys a node and its associated keys,... See <strong>ogc-rm(1)</strong>
-for full documentation on the <strong>rm</strong> command.</p>
-<p><strong>rm-all</strong> Destroys everything. See <strong>ogc-rm-all(1)</strong> for full
-documentation on the <strong>rm-all</strong> command.</p>
-<p><strong>rm-key-pairs</strong> Remove keypairs See <strong>ogc-rm-key-pairs(1)</strong> for full
-documentation on the <strong>rm-key-pairs</strong> command.</p>
-<p><strong>init</strong> Initialize OGC See <strong>ogc-init(1)</strong> for full documentation on
-the <strong>init</strong> command.</p>
-<p><strong>inspect</strong> List nodes in your inventory See <strong>ogc-inspect(1)</strong> for full
-documentation on the <strong>inspect</strong> command.</p>
-<p><strong>launch</strong> Launches nodes from a provision specification See
-<strong>ogc-launch(1)</strong> for full documentation on the <strong>launch</strong> command.</p>
-<p><strong>ls</strong> List nodes in your inventory See <strong>ogc-ls(1)</strong> for full
-documentation on the <strong>ls</strong> command.</p>
-<p><strong>ls-key-pairs</strong> List keypairs See <strong>ogc-ls-key-pairs(1)</strong> for full
-documentation on the <strong>ls-key-pairs</strong> command.</p>
-<p><strong>log</strong> Stream log output See <strong>ogc-log(1)</strong> for full documentation on
-the <strong>log</strong> command.</p>
-<p><strong>server</strong> Starts the tasks server See <strong>ogc-server(1)</strong> for full
-documentation on the <strong>server</strong> command.</p>
-<p><strong>ssh</strong> Login to a node See <strong>ogc-ssh(1)</strong> for full documentation on the
-<strong>ssh</strong> command.</p>
-<p><strong>push-files</strong> Scp files or directories to node See
-<strong>ogc-push-files(1)</strong> for full documentation on the <strong>push-files</strong>
-command.</p>
-<p><strong>pull-files</strong> Scp files or directories from node See
-<strong>ogc-pull-files(1)</strong> for full documentation on the <strong>pull-files</strong>
-command.</p>
-<p><strong>pull-artifacts</strong> Download artifacts from node See
-<strong>ogc-pull-artifacts(1)</strong> for full documentation on the
-<strong>pull-artifacts</strong> command.</p>
-<p><strong>exec</strong> Execute a command across node(s) See <strong>ogc-exec(1)</strong> for full
-documentation on the <strong>exec</strong> command.</p>
-<p><strong>exec-scripts</strong> (R)Execute a set of scripts See <strong>ogc-exec-scripts(1)</strong>
-for full documentation on the <strong>exec-scripts</strong> command.</p>
-<p><strong>status</strong> Get status of deployment See <strong>ogc-status(1)</strong> for full
-documentation on the <strong>status</strong> command.</p>
+<p>Launches IPython repl</p>
 
               
             </article>
@@ -670,41 +614,6 @@ documentation on the <strong>status</strong> command.</p>
       </main>
       
         <footer class="md-footer">
-  
-    <nav class="md-footer__inner md-grid" aria-label="Footer">
-      
-        
-        <a href="../../user-guide/providers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Providers" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              Providers
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../ogc-exec/" class="md-footer__link md-footer__link--next" aria-label="Next: ogc exec" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              ogc exec
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
