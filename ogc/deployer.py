@@ -17,7 +17,7 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry.api import retry_call
 
-from ogc import db
+from ogc import db, state
 from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
 
@@ -160,7 +160,7 @@ class DeployerResult:
 
     def save(self):
         for step in self.msd.steps:
-            with db.connect() as session:
+            with state.app.session as session:
                 if hasattr(step, "exit_status"):
                     result = db.Actions(
                         node=self.deployment,

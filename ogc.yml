@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 3
+    scale: 50
     remote-path: /root/ogc
     include:
       - .ogc-cache
@@ -23,25 +23,6 @@ layouts:
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
-    ports:
-      - "80:80"
-      - "443:443"
-      - "5601:5601"
-  elastic-agent-ubuntu:
-    runs-on: ubuntu-1804
-    instance-size: e2-standard-8
-    username: root
-    scripts: fixtures/ex_deploy_ubuntu
-    provider: google
-    scale: 3
-    remote-path: /root/ogc
-    exclude:
-      - .git
-      - .venv
-    artifacts: /root/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - ubuntu-gcp
     ports:
       - "80:80"
       - "443:443"

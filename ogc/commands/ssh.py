@@ -5,27 +5,29 @@ from pathlib import Path
 
 import click
 import sh
-from rich.console import Console
 
-from ogc import actions, db, enums
+from ogc import actions, db, enums, state
+from ogc.log import Logger as log
 
 from ..deployer import Deployer
-from ..state import app
 from .base import cli
 
-console = Console()
+# DB Connection
+if not state.app.engine:
+    state.app.engine = db.connect()
+    state.app.session = db.session(state.app.engine)
 
 @click.command(help="Login to a node")
 @click.argument("name")
 def ssh(name):
-    with db.connect() as session:
+    with state.app.session as session:
         node = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node:
             cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
-            sh.ssh(cmd, _fg=True, _env=app.env)
+            sh.ssh(cmd, _fg=True, _env=state.app.env)
             sys.exit(0)
 
-    console.log(f"Unable to locate {name} to connect to", style='bold red')
+    log.error(f"Unable to locate {name} to connect to", style='bold red')
     sys.exit(1)
 
 
@@ -43,17 +45,17 @@ def ssh(name):
 @click.argument("cmd")
 def exec(by_tag, by_name, cmd):
     if by_tag and by_name:
-        console.log(
+        log.error(
                 "Combined filtered options are not supported, please choose one.",
                 style="bold red"
         )
         sys.exit(1)
     results = actions.exec(by_name, by_tag, cmd)
     if all(res for res in results):
-        console.log("All commands completed.")
+        log.info("All commands completed.")
         sys.exit(0)
 
-    console.log("Some commands failed to complete.", style='bold red')
+    log.error("Some commands failed to complete.", style='bold red')
     sys.exit(1)
 
 
@@ -71,17 +73,17 @@ def exec(by_tag, by_name, cmd):
 @click.argument("path")
 def exec_scripts(by_tag, by_name, path):
     if by_tag and by_name:
-        console.log(
+        log.error(
                 "Combined filtered options are not supported, please choose one.",
                 style="bold red"
         )
         sys.exit(1)
     results = actions.exec_scripts(by_name, by_tag, path)
     if all(res for res in results):
-        console.log("All commands completed: [green]:heavy_check_mark:[/]")
+        log.info("All commands completed: [green]:heavy_check_mark:[/]")
         sys.exit(0)
 
-    console.log("Some commands [bold red]failed[/] to complete.")
+    log.error("Some commands [bold red]failed[/] to complete.")
     sys.exit(1)
 
 
@@ -96,13 +98,13 @@ def exec_scripts(by_tag, by_name, path):
     help="Exclude files/directories when uploading",
 )
 def push_files(name, src, dst, exclude):
-    with db.connect() as session:
+    with state.app.session as session:
         node = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node:
-            deploy = Deployer(node, app.env)
+            deploy = Deployer(node, state.app.env)
             deploy.put(src, dst, excludes=exclude)
             sys.exit(0)
-        app.log.error(f"Unable to locate {name} to connect to")
+        log.error(f"Unable to locate {name} to connect to")
         sys.exit(1)
 
 
@@ -111,34 +113,34 @@ def push_files(name, src, dst, exclude):
 @click.argument("dst")
 @click.argument("src")
 def pull_files(name, dst, src):
-    with db.connect() as session:
+    with state.app.session as session:
         node = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node:
-            deploy = Deployer(node, app.env)
+            deploy = Deployer(node, state.app.env)
             deploy.get(dst, src)
             sys.exit(0)
-        console.log(f"Unable to locate {name} to connect to", style='bold red')
+        log.error(f"Unable to locate {name} to connect to", style='bold red')
         sys.exit(1)
 
 
 @click.command(help="Download artifacts from node")
 @click.argument("name")
 def pull_artifacts(name):
-    with db.connect() as session:
+    with state.app.session as session:
         node = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node:
-            deploy = Deployer(node, app.env)
+            deploy = Deployer(node, state.app.env)
             if node.artifacts:
-                console.log("Downloading artifacts")
+                log.info("Downloading artifacts")
                 local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
                 if not local_artifact_path.exists():
                     os.makedirs(str(local_artifact_path), exist_ok=True)
                 deploy.get(node.artifacts, str(local_artifact_path))
                 sys.exit(0)
             else:
-                console.log(f"No artifacts found at {node.remote_path}", style='bold red')
+                log.error(f"No artifacts found at {node.remote_path}", style='bold red')
                 sys.exit(1)
-        console.log(f"Unable to locate {name} to connect to", style='bold red')
+        log.error(f"Unable to locate {name} to connect to", style='bold red')
         sys.exit(1)
 
 

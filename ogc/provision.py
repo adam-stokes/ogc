@@ -1,8 +1,11 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 
+import datetime
+import json
 import uuid
 from pathlib import Path
+from typing import Optional
 
 from libcloud.common.google import ResourceNotFoundError
 from libcloud.compute.base import NodeAuthSSHKey
@@ -14,17 +17,17 @@ from ogc import db
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import Logger as log
+from ogc.state import app
 
 
 class ProvisionResult:
-    def __init__(self, id, node, layout, env):
+    def __init__(self, node, layout, env):
         self.node = node
         self.layout = layout
         self.node = node[0]
-        self.host = node[1][0]
+        self.public_ip = node[1][0]
         self.private_ip = self.node.private_ips[0]
         self.env = env
-        self.id = id
         self.username = self.layout["username"]
         self.scripts = self.layout["scripts"]
         self.provider = self.layout["provider"]
@@ -38,14 +41,14 @@ class ProvisionResult:
         self.ports = self.layout["ports"]
 
     def save(self) -> db.Node:
-        with db.connect() as session:
+        with app.session as session:
+            user = session.query(db.User).first()
             node_obj = db.Node(
-                uuid=self.id,
                 instance_name=self.node.name,
                 instance_id=self.node.id,
                 instance_state=self.node.state,
                 username=self.username,
-                public_ip=self.host,
+                public_ip=self.public_ip,
                 private_ip=self.private_ip,
                 ssh_public_key=self.ssh_public_key,
                 ssh_private_key=self.ssh_private_key,
@@ -57,6 +60,9 @@ class ProvisionResult:
                 include=self.include,
                 exclude=self.exclude,
                 ports=self.ports,
+                layout=json.dumps(self.layout),
+                extra=json.dumps({"env": self.env}),
+                user=user
             )
             session.add(node_obj)
             session.commit()
@@ -67,7 +73,6 @@ class BaseProvisioner:
     def __init__(self, env, **kwargs):
         self._args = kwargs
         self.env = env
-        self.uuid = str(uuid.uuid4())[:8]
         self.provisioner = self.connect()
 
     @property
@@ -80,11 +85,11 @@ class BaseProvisioner:
     def create(self, layout, env, **kwargs):
         raise NotImplementedError()
 
-    def setup(self):
+    def setup(self, layout, **kwargs):
         """Perform some provider specific setup before launch"""
         raise NotImplementedError()
 
-    def cleanup(self, node):
+    def cleanup(self, node, **kwargs):
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
@@ -104,7 +109,7 @@ class BaseProvisioner:
                 f"Could not locate instance size for {instance_size}"
             )
 
-    def image(self, runs_on, arch):
+    def image(self, runs_on: str, arch: Optional[str] = None):
         """Gets a single image from registry of provider"""
         return self.provisioner.get_image(runs_on)
 
@@ -130,16 +135,16 @@ class BaseProvisioner:
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0]
-        result = ProvisionResult(self.uuid, node, layout, env)
+        result = ProvisionResult(node, layout, env)
         node_obj = result.save()
         return node_obj
 
     def node(self, **kwargs):
         return self.provisioner.list_nodes(**kwargs)
 
-    def create_keypair(self, ssh_public_key):
+    def create_keypair(self, name, ssh_public_key):
         return self.provisioner.import_key_pair_from_file(
-            name=self.uuid, key_file_path=ssh_public_key
+            name=name, key_file_path=ssh_public_key
         )
 
     def get_key_pair(self, name):
@@ -177,13 +182,15 @@ class AWSProvisioner(BaseProvisioner):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def setup(self, ssh_public_key):
-        self.create_keypair(ssh_public_key)
+    def setup(self, layout, **kwargs):
+        if layout["ports"]:
+            self.create_firewall(layout["name"], layout["ports"])
+        if not self.get_key_pair(layout['name']):
+            self.create_keypair(layout['name'], layout['ssh_public_key'])
 
-    def cleanup(self, node):
-        self._delete_firewall(f"ogc-{node.uuid}")
-        key_pair = self.get_key_pair(node.uuid)
-        return self.delete_key_pair(key_pair)
+    def cleanup(self, node, **kwargs):
+        key_pair = self.get_key_pair(node.layout['name'])
+        self.delete_key_pair(key_pair)
 
     def image(self, runs_on, arch):
         if runs_on.startswith("ami-"):
@@ -193,9 +200,10 @@ class AWSProvisioner(BaseProvisioner):
             _runs_on = CLOUD_IMAGE_MAP["aws"][arch].get(runs_on)
         return super().image(_runs_on, arch)
 
-    def _create_firewall(self, name, ports):
+    def create_firewall(self, name, ports):
         """Creates the security group for enabling traffic between nodes"""
-        self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)
+        if not self.provisioner.ex_get_security_groups(group_names=[name]):
+            self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)
 
         for port in ports:
             ingress, egress = port.split(":")
@@ -205,8 +213,8 @@ class AWSProvisioner(BaseProvisioner):
             # udp
             # self.provisioner.ex_authorize_security_group(name, ingress, egress, "0.0.0.0/0", "udp")
 
-    def _delete_firewall(self, name):
-        return self.provisioner.ex_delete_security_group(name)
+    def delete_firewall(self, name):
+        pass
 
     def create(self, layout, env, **kwargs) -> db.Node:
         pub_key = Path(layout["ssh_public_key"]).read_text()
@@ -218,15 +226,12 @@ class AWSProvisioner(BaseProvisioner):
             )
         size = self.sizes(layout["instance-size"])
 
-        if layout["ports"]:
-            self._create_firewall(f"ogc-{self.uuid}", layout["ports"])
-
         opts = dict(
-            name=f"ogc-{self.uuid}-{layout['name']}",
+            name=f"ogc-{str(uuid.uuid4())[:8]}-{layout['name']}",
             image=image,
             size=size,
             auth=auth,
-            ex_securitygroup=f"ogc-{self.uuid}",
+            ex_securitygroup=layout["name"],
             ex_spot=True,
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
@@ -266,11 +271,11 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def setup(self, layout):
-        pass
+    def setup(self, layout, **kwargs):
+        self.create_firewall(layout['name'], layout["ports"], layout["tags"])
 
-    def cleanup(self, node):
-        self.delete_firewall(f"ogc-{node.uuid}")
+    def cleanup(self, node, **kwargs):
+        pass
 
     def image(self, runs_on, arch):
         _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
@@ -281,9 +286,13 @@ class GCEProvisioner(BaseProvisioner):
 
     def create_firewall(self, name, ports, tags):
         ports = [port.split(":")[0] for port in ports]
-        self.provisioner.ex_create_firewall(
-            name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
-        )
+        try:
+            self.provisioner.ex_get_firewall(name)
+        except ResourceNotFoundError:
+            log.warning("No firewall found, will create one to attach nodes to.")
+            self.provisioner.ex_create_firewall(
+                name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
+            )
 
     def delete_firewall(self, name):
         try:
@@ -312,10 +321,17 @@ class GCEProvisioner(BaseProvisioner):
         }
 
         if layout["ports"]:
-            self.create_firewall(f"ogc-{self.uuid}", layout["ports"], layout["tags"])
+            self.create_firewall(layout["name"], layout["ports"], layout["tags"])
+
+        with app.session as session:
+            user = session.query(db.User).first()
+            # Store some metadata for helping with cleanup
+            now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
+            layout['tags'].append(now)
+            layout['tags'].append(f"user-{user.slug}")    
 
         opts = dict(
-            name=f"ogc-{self.uuid}-{layout['name']}",
+            name=f"ogc-{str(uuid.uuid4())[:8]}-{layout['name']}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,

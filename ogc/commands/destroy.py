@@ -15,7 +15,7 @@ from .base import cli
     help="Force removal regardless of connectivity",
 )
 def rm(name, force):
-    teardown(name, env=state.app.env, force=force)
+    teardown(name, force=force)
 
 
 @click.command(help="Destroys everything. Use with caution.")
@@ -25,7 +25,7 @@ def rm(name, force):
     help="Force removal regardless of connectivity",
 )
 def rm_all(force):
-    teardown(env=state.app.env, force=force)
+    teardown(force=force)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

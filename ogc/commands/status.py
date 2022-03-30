@@ -22,40 +22,17 @@ from .base import cli
 )
 @click.option("--spec", required=False, multiple=True)
 def status(reconcile, spec):
-    # Db connection
-    specs = []
-    # Check for local spec
-    if Path("ogc.yml").exists() and not spec:
-        specs.append(Path("ogc.yml"))
-
-    for sp in spec:
-        _path = Path(sp)
-        if not _path.exists():
-            log.error(f"Unable to find spec: {sp}")
-            sys.exit(1)
-        specs.append(_path)
-
-    if not specs:
-        log.error("No provision specs found, please specify with `--spec <file.yml>`")
-        sys.exit(1)
-
-    app.spec = SpecLoader.load(specs)
+    app.spec = SpecLoader.load(list(spec))
     counts = app.spec.status
 
     if reconcile and app.spec.is_degraded:
         log.info(
             f"Reconciling: {', '.join([layout.name for layout in app.spec.layouts])}"
         )
-        sync(app.spec.layouts, counts, app.env)
+        sync(app.spec.layouts, counts)
         return
 
-    deploy_status = (
-        "[bold green]Healthy[/]"
-        if not app.spec.is_degraded
-        else "[bold red]Degraded[/]"
-    )
-
-    table = Table(title=f"Deployment Status: {deploy_status}")
+    table = Table(title=f"Deployment Status: {app.spec.deploy_status}")
     table.add_column("Name")
     table.add_column("Deployed")
     table.add_column("Scale")

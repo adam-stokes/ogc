@@ -4,10 +4,13 @@ import click
 from rich.console import Console
 from rich.padding import Padding
 
-from ogc import db
+from ogc import db, state
 
 from .base import cli
 
+if not state.app.engine:
+    state.app.engine = db.connect()
+    state.app.session = db.session(state.app.engine)
 
 @click.command(help="List nodes in your inventory")
 @click.option("--id", required=False, help="Inspect node by DB ID")
@@ -37,7 +40,7 @@ def inspect(id, name, tag, action_id):
         sys.exit(1)
 
     rows = []
-    with db.connect() as session:
+    with state.app.session as session:
         if tag:
             rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
         elif name:

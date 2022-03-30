@@ -11,14 +11,17 @@ from .celery import app
 from .deployer import Deployer
 from .provision import choose_provisioner
 
+if not state.app.engine:
+    state.app.engine = db.connect()
+    state.app.session = db.session(state.app.engine)
 
 @app.task
-def do_provision(layout, env):
+def do_provision(layout: Dict[str, str]) -> int:
     log.info(f"Provisioning: {layout['name']}")
-    engine = choose_provisioner(layout["provider"], env=env)
-    engine.setup(layout["ssh_public_key"])
-    model = engine.create(layout=layout, env=env)
-    log.info(f"Saved {model.instance_name}")
+    engine = choose_provisioner(layout["provider"], env=state.app.env)
+    engine.setup(layout)
+    model = engine.create(layout=layout, env=state.app.env)
+    log.debug(f"Saved {model.instance_name} to database")
     return model.id
 
 
@@ -29,7 +32,7 @@ def end_provision(results):
 
 @app.task
 def do_deploy(node_id: int):
-    with db.connect() as session:
+    with state.app.session as session:
         node = session.query(db.Node).filter(db.Node.id == node_id).one()
 
     log.info(f"Deploying to: {node.instance_name}")
@@ -39,38 +42,33 @@ def do_deploy(node_id: int):
 
 
 @app.task
-def do_destroy(name: str, env: Dict[str, str], force: bool = False) -> None:
-    with db.connect() as session:
+def do_destroy(name: str, force: bool = False) -> None:
+    with state.app.session as session:
         node_data = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node_data:
-            uuid = node_data.uuid
-            engine = choose_provisioner(node_data.provider, env=env)
-            try:
-                deploy = Deployer(node_data, env=state.app.env, force=force)
+            engine = choose_provisioner(node_data.provider, env=state.app.env)
 
-                # Pull down artifacts if set
-                if node_data.artifacts:
-                    log.info("Downloading artifacts")
-                    local_artifact_path = (
-                        Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
-                    )
-                    if not local_artifact_path.exists():
-                        os.makedirs(str(local_artifact_path), exist_ok=True)
-                    deploy.get(node_data.artifacts, str(local_artifact_path))
+            deploy = Deployer(node_data, env=state.app.env, force=force)
 
-                exec_result = deploy.exec("./teardown")
-                if not exec_result.passed:
-                    log.error(f"Unable to run teardown script on {node_data.instance_name}")
-                log.info(f"Destroying {node_data.instance_name}")
-                is_destroyed = deploy.node.destroy()
-                if not is_destroyed:
-                    log.error(f"Unable to destroy {deploy.node.id}")
+            # Pull down artifacts if set
+            if node_data.artifacts:
+                log.info("Downloading artifacts")
+                local_artifact_path = (
+                    Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
+                )
+                if not local_artifact_path.exists():
+                    os.makedirs(str(local_artifact_path), exist_ok=True)
+                deploy.get(node_data.artifacts, str(local_artifact_path))
 
-                ssh_deleted_err = engine.cleanup(node_data)
-                if ssh_deleted_err:
-                    log.error(f"Could not delete ssh keypair {uuid}")
-            except:
-                log.error("Failed to delete node, removing from database.")
+            exec_result = deploy.exec("./teardown")
+            if not exec_result.passed:
+                log.error(f"Unable to run teardown script on {node_data.instance_name}")
+            log.info(f"Destroying {node_data.instance_name}")
+            is_destroyed = deploy.node.destroy()
+            if not is_destroyed:
+                log.error(f"Unable to destroy {deploy.node.id}")
+
+            engine.cleanup(node_data)
             session.delete(node_data)
             session.commit()
 
@@ -80,7 +78,7 @@ def do_exec(
     cmd: str, ssh_private_key: str, node_id: int, username: str, public_ip: str
 ) -> bool:
     result = None
-    with db.connect() as session:
+    with state.app.session as session:
         node_data = session.query(db.Node).filter(db.Node.id == node_id).one()
         cmd_opts = ["-i", str(ssh_private_key), f"{username}@{public_ip}"]
         cmd_opts.append(cmd)
@@ -106,7 +104,7 @@ def do_exec(
 
 @app.task
 def do_exec_scripts(node_id: int, path: str) -> bool:
-    with db.connect() as session:
+    with state.app.session as session:
         node_data = session.query(db.Node).filter(db.Node.id == node_id).one()
         choose_provisioner(node_data.provider, env=state.app.env)
         deploy = Deployer(node_data, env=state.app.env)

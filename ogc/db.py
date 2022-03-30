@@ -1,4 +1,5 @@
 import os
+import uuid
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -21,7 +22,7 @@ from sqlalchemy import (
     Text,
     inspect
 )
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSON, UUID
 from sqlalchemy.orm import (
     declarative_base,
     relationship,
@@ -31,10 +32,22 @@ from sqlalchemy.orm import (
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = "user"
+    id = Column(Integer, primary_key=True)
+    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4)
+    name = Column(String(255))
+    slug = Column(String(255), unique=True)
+    created = Column(DateTime(), server_default=func.now())
+
+    extra = Column(JSON(), nullable=True)
+    nodes = relationship(
+        "Node", back_populates="user", cascade="all, delete-orphan"
+    )
+
 class Node(Base):
     __tablename__ = "node"
     id = Column(Integer, primary_key=True)
-    uuid = Column(Text())
     instance_name = Column(Text())
     instance_id = Column(Text())
     instance_state = Column(Text())
@@ -52,14 +65,20 @@ class Node(Base):
     exclude = Column(ARRAY(String), nullable=True)
     ports = Column(ARRAY(String), nullable=True)
     created = Column(DateTime(), server_default=func.now())
+
+    # Store layout config here for easier reference
+    layout = Column(JSON())
+    extra = Column(JSON(), nullable=True)
     
     actions = relationship(
         "Actions", back_populates="node", cascade="all, delete-orphan"
     )
 
-    def __repr__(self):
-        return f"Node(id={self.id!r})"
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    user = relationship("User", back_populates="nodes")
 
+    def __repr__(self):
+        return f"Node(id={self.id!r}, user={self.user.name!r})"
 
 class Actions(Base):
     __tablename__ = "actions"
@@ -72,24 +91,23 @@ class Actions(Base):
     node_id = Column(Integer, ForeignKey("node.id"), nullable=False)
     node = relationship("Node", back_populates="actions")
     created = Column(DateTime(), server_default=func.now())
+    extra = Column(JSON(), nullable=True)
 
 def connect():
-    """Return a db session"""
+    """Return a db connection"""
     db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
-    engine = create_engine(db_string, echo=False, future=True)
+    return create_engine(db_string, echo=False, future=True)
+
+def session(engine):
     _session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
     return _session()
 
-def createtbl():
+def createtbl(engine):
     """Create db tables"""
-    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
-    engine = create_engine(db_string, echo=False, future=True)
     Base.metadata.create_all(engine)
 
-def droptbl():
+def droptbl(engine):
     """Create db tables"""
-    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
-    engine = create_engine(db_string, echo=False, future=True)
     Base.metadata.drop_all(engine)
 
 def model_as_dict(obj):
@@ -112,17 +130,17 @@ def migrate():
 # Template helpers
 def by_tag(context, tag):
     """Returns rows by tags"""
-    with connect() as session:
-        return session.query(Node).filter(Node.tags.contains([tag]))
+    with session(connect()) as _session:
+        return _session.query(Node).filter(Node.tags.contains([tag]))
 
 
 def by_name(context, name):
     """Returns rows by instance name"""
-    with connect() as session:
-        return session.query(Node).filter_by(instance_name=name).one()
+    with session(connect()) as _session:
+        return _session.query(Node).filter_by(instance_name=name).one()
 
 
 def by_id(context, id):
     """Returns rows by row id"""
-    with connect() as session:
-        return session.query(Node).filter_by(id=id).one()
+    with session(connect()) as _session:
+        return _session.query(Node).filter_by(id=id).one()

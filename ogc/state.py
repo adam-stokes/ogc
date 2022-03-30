@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from dotenv import dotenv_values
 
-from . import log
+from ogc.log import Logger as log
 
 app = SimpleNamespace(
     # spec object
@@ -16,6 +16,8 @@ app = SimpleNamespace(
     env={**dotenv_values(".env"), **os.environ},
     # logger
     log=log,
-    # run prefix
-    prefix=None,
+    # db engine
+    engine=None, 
+    # session
+    session=None,
 )

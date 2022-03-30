@@ -1,3 +1,4 @@
+import json
 import signal
 import sys
 from pathlib import Path
@@ -7,17 +8,9 @@ from melddict import MeldDict
 from slugify import slugify
 
 from ogc import db
+from ogc.exceptions import SpecLoaderException
 
 from .state import app
-
-
-class SpecLoader(MeldDict):
-    @classmethod
-    def load(cls, specs):
-        cl = SpecLoader()
-        for spec in specs:
-            cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
-        return SpecProvisionPlan(cl)
 
 
 class SpecProvisionLayout:
@@ -102,6 +95,10 @@ class SpecProvisionLayout:
             "ports": self.ports,
         }
 
+    def as_json(self):
+        return json.dumps(self.as_dict())
+
+
 
 class SpecProvisionSSHKey:
     def __init__(self, sshkeys):
@@ -147,7 +144,7 @@ class SpecProvisionPlan:
     @property
     def status(self):
         """Return the status of the plan based on whats deployed and whats remaining"""
-        with db.connect() as session:
+        with app.session as session:
             counts = {
                 layout.name: {"scale": layout.scale, "deployed": 0, "remaining": 0}
                 for layout in self.layouts
@@ -172,6 +169,23 @@ class SpecProvisionPlan:
             stat["remaining"] > 0 or stat["remaining"] < 0
             for stat in self.status.values()
         )
+    
+    @property
+    def is_deployed(self):
+        """Returns whether there are any deployments at all"""
+        return any(
+            stat["deployed"] > 0
+            for stat in self.status.values()
+        )
+
+    @property
+    def deploy_status(self):
+        status_text = "[bold green]Healthy[/]"
+        if self.is_degraded and self.is_deployed:
+            status_text = "[bold red]Degraded[/]"
+        elif not self.is_deployed:
+            status_text = "Idle"
+        return status_text
 
     def get_layout(self, name):
         """Returns a layout for a given name/key"""
@@ -184,3 +198,25 @@ class SpecProvisionPlan:
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}")
         sys.exit(1)
+
+class SpecLoader(MeldDict):
+    @classmethod
+    def load(cls, specs: list[str]) -> "SpecProvisionPlan":
+        if Path("ogc.yml").exists():
+            specs.insert(0, "ogc.yml")
+
+        _specs = []
+        for sp in specs:
+            _path = Path(sp)
+            if not _path.exists():
+                raise SpecLoaderException(f"Could not find {_path}")
+            _specs.append(_path)
+
+
+        if not _specs:
+            raise SpecLoaderException(f"No provision specs found, please specify with `--spec <file.yml>`")
+
+        cl = SpecLoader()
+        for spec in _specs:
+            cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
+        return SpecProvisionPlan(cl)

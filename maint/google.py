@@ -13,7 +13,7 @@ def cli():
     pass
 
 @click.command()
-@click.option("--contains", required=True, default="ogc-", help="Firewall name contains string")
+@click.option("--contains", required=True, default="ogc", help="Firewall name contains string")
 @click.option(
     "--with-delete/--no-with-delete",
     default=False,
