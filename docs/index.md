@@ -69,6 +69,16 @@ Or install from [pypi](https://pypi.org):
 $ pip install ogc
 ```
 
+## Initialize
+
+Next is to initialize the OGC environment, to do that run:
+
+```
+$ ogc init
+```
+
+It will ask you for a name, feel free to put something other than your actual name if desired.
+
 ## Provider Setup
 
 OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. 
