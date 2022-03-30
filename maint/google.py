@@ -9,6 +9,11 @@ from click_didyoumean import DYMGroup
 from ogc.provision import choose_provisioner
 from ogc.state import app
 from ogc.actions import teardown
+from ogc import db
+
+if not app.engine:
+    app.engine = db.connect()
+    app.session = db.session(app.engine)
 
 @click.group(cls=DYMGroup)
 def cli():
@@ -46,7 +51,7 @@ def ls_vms(by_tag, with_delete):
         if by_tag in node.extra['tags']:
             click.secho(f"{'Deleting' if with_delete else ''} ({node.id}) - {node.name}")
             if with_delete:
-                teardown(node.name, force=True)
+                teardown([node.name], force=True)
 
 cli.add_command(ls_firewalls)
 cli.add_command(ls_vms)

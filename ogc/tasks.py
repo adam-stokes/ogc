@@ -44,7 +44,7 @@ def do_deploy(node_id: int):
 @app.task
 def do_destroy(name: str, force: bool = False, only_db: bool = False) -> None:
     with state.app.session as session:
-        node_data = session.query(db.Node).filter(db.Node.instance_name == name).one()
+        node_data = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
         if node_data and not only_db:
             try:
                 engine = choose_provisioner(node_data.provider, env=state.app.env)

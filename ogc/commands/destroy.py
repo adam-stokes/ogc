@@ -14,8 +14,13 @@ from .base import cli
     default=False,
     help="Force removal regardless of connectivity",
 )
-def rm(name, force):
-    teardown(name, force=force)
+@click.option(
+    "--only-db/--no-only-db",
+    default=False,
+    help="Force removal of database records only",
+)
+def rm(name, force, only_db):
+    teardown(list(name), force=force, only_db=only_db)
 
 
 @click.command(help="Destroys everything. Use with caution.")

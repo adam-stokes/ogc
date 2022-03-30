@@ -24,6 +24,7 @@ def launch(layouts) -> List[int]:
 
     callback = end_provision.s()
     result = chord(create_jobs)(callback)
+    output = None
     try:
         output = result.get()
     except Exception as e:
