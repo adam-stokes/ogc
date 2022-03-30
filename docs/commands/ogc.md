@@ -12,6 +12,12 @@ Just a simple provisioner
 
 # COMMANDS
 
+**db-migrate** Database migrations See **ogc-db-migrate(1)** for full
+documentation on the **db-migrate** command.
+
+**shell** Launches IPython repl See **ogc-shell(1)** for full
+documentation on the **shell** command.
+
 **rm** Destroys a node and its associated keys,\... See **ogc-rm(1)**
 for full documentation on the **rm** command.
 
@@ -20,6 +26,9 @@ documentation on the **rm-all** command.
 
 **rm-key-pairs** Remove keypairs See **ogc-rm-key-pairs(1)** for full
 documentation on the **rm-key-pairs** command.
+
+**init** Initialize OGC See **ogc-init(1)** for full documentation on
+the **init** command.
 
 **inspect** List nodes in your inventory See **ogc-inspect(1)** for full
 documentation on the **inspect** command.

@@ -9,3 +9,9 @@ ogc-log - Stream log output
 # DESCRIPTION
 
 Stream log output
+
+# OPTIONS
+
+**\--debug** / \--no-debug
+
+:   Stream debug logging instead
