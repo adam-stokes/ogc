@@ -17,6 +17,7 @@ if not state.app.engine:
 
 @click.command(help="Initialize OGC")
 def init():
+    db.createtbl(state.app.engine)
     with state.app.session as session:
         has_user = session.query(db.User).first()
         if has_user:
