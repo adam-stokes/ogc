@@ -24,7 +24,11 @@ def launch(layouts) -> List[int]:
 
     callback = end_provision.s()
     result = chord(create_jobs)(callback)
-    return result.get()
+    try:
+        output = result.get()
+    except Exception as e:
+        log.warning(e)
+    return output
 
 
 def deploy(node_ids: List[int]) -> None:
