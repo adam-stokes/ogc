@@ -24,8 +24,13 @@ def rm(name, force):
     default=False,
     help="Force removal regardless of connectivity",
 )
-def rm_all(force):
-    teardown(force=force)
+@click.option(
+    "--only-db/--no-only-db",
+    default=False,
+    help="Force removal of database records only",
+)
+def rm_all(force, only_db):
+    teardown(force=force, only_db=only_db)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

@@ -37,13 +37,13 @@ def deploy(node_ids: List[int]) -> None:
 
 
 def teardown(
-    names: List[str] = None, force: bool = False
+    names: List[str] = None, force: bool = False, only_db: bool = False
 ) -> None:
     """Tear down nodes"""
     if names:
         log.info(f"Destroying: {', '.join(names)}")
         for name in names:
-            do_destroy.delay(name, force)
+            do_destroy.delay(name, force, only_db)
     else:
         with state.app.session as session:
             rows = session.query(db.Node)
@@ -51,7 +51,7 @@ def teardown(
             total = count
             for data in rows.all():
                 log.info(f"Destroying: {data.instance_name} ({count} of {total})")
-                do_destroy.delay(data.instance_name, force)
+                do_destroy.delay(data.instance_name, force, only_db)
                 count = count - 1
 
 

@@ -42,10 +42,10 @@ def do_deploy(node_id: int):
 
 
 @app.task
-def do_destroy(name: str, force: bool = False) -> None:
+def do_destroy(name: str, force: bool = False, only_db: bool = False) -> None:
     with state.app.session as session:
         node_data = session.query(db.Node).filter(db.Node.instance_name == name).one()
-        if node_data:
+        if node_data and not only_db:
             try:
                 engine = choose_provisioner(node_data.provider, env=state.app.env)
 
@@ -72,8 +72,8 @@ def do_destroy(name: str, force: bool = False) -> None:
             except:
                 log.warning(f"Couldn't destroy {node_data.instance_name}")
             engine.cleanup(node_data)
-            session.delete(node_data)
-            session.commit()
+        session.delete(node_data)
+        session.commit()
 
 
 @app.task
