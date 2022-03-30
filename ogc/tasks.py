@@ -46,28 +46,31 @@ def do_destroy(name: str, force: bool = False) -> None:
     with state.app.session as session:
         node_data = session.query(db.Node).filter(db.Node.instance_name == name).one()
         if node_data:
-            engine = choose_provisioner(node_data.provider, env=state.app.env)
+            try:
+                engine = choose_provisioner(node_data.provider, env=state.app.env)
 
-            deploy = Deployer(node_data, env=state.app.env, force=force)
+                deploy = Deployer(node_data, env=state.app.env, force=force)
 
-            # Pull down artifacts if set
-            if node_data.artifacts:
-                log.info("Downloading artifacts")
-                local_artifact_path = (
-                    Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
-                )
-                if not local_artifact_path.exists():
-                    os.makedirs(str(local_artifact_path), exist_ok=True)
-                deploy.get(node_data.artifacts, str(local_artifact_path))
+                if not force:
+                    # Pull down artifacts if set
+                    if node_data.artifacts:
+                        log.info("Downloading artifacts")
+                        local_artifact_path = (
+                            Path(enums.LOCAL_ARTIFACT_PATH) / node_data.instance_name
+                        )
+                        if not local_artifact_path.exists():
+                            os.makedirs(str(local_artifact_path), exist_ok=True)
+                        deploy.get(node_data.artifacts, str(local_artifact_path))
 
-            exec_result = deploy.exec("./teardown")
-            if not exec_result.passed:
-                log.error(f"Unable to run teardown script on {node_data.instance_name}")
-            log.info(f"Destroying {node_data.instance_name}")
-            is_destroyed = deploy.node.destroy()
-            if not is_destroyed:
-                log.error(f"Unable to destroy {deploy.node.id}")
-
+                    exec_result = deploy.exec("./teardown")
+                    if not exec_result.passed:
+                        log.error(f"Unable to run teardown script on {node_data.instance_name}")
+                log.info(f"Destroying {node_data.instance_name}")
+                is_destroyed = deploy.node.destroy()
+                if not is_destroyed:
+                    log.error(f"Unable to destroy {deploy.node.id}")
+            except:
+                log.warning(f"Couldn't destroy {node_data.instance_name}")
             engine.cleanup(node_data)
             session.delete(node_data)
             session.commit()

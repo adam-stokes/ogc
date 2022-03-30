@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 50
+    scale: 1
     remote-path: /root/ogc
     include:
       - .ogc-cache

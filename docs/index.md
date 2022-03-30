@@ -46,7 +46,7 @@ Bring up the services
 **Next**, is installation of OGC. We use **[Poetry](https://python-poetry.org/)**:
 
 ```shell
-$ pip install poetry==1.1.12
+$ pip install poetry
 $ poetry install
 ```
 

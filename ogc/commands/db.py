@@ -14,7 +14,7 @@ def db_migrate():
     db.migrate()
 
 
-@click.command(help="Launches IPython repl")
+@click.command(help="Launches IPython REPL")
 def shell():
     try:
         from IPython import embed
