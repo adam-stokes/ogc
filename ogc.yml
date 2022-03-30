@@ -12,13 +12,12 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 1
+    scale: 100
     remote-path: /root/ogc
-    include:
-      - .ogc-cache
     exclude:
       - .git
       - .venv
+      - artifacts
     artifacts: /root/output/*.xml
     tags:
       - elastic-agent-8.1.x
