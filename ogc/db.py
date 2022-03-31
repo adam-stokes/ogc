@@ -9,6 +9,7 @@ import alembic.command
 import alembic.config
 
 DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
+DB_PORT = os.environ.get("POSTGRES_PORT", 5432)
 DB_NAME = os.environ.get("POSTGRES_DB", "ogc")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
@@ -84,7 +85,7 @@ class Actions(Base):
 
 def connect():
     """Return a db connection"""
-    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
     return create_engine(db_string, echo=False, future=True)
 
 

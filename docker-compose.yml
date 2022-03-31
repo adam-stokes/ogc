@@ -1,14 +1,6 @@
 version: "3.9"
 
 services:
-  redis:
-    image: "redis:6.2-alpine"
-    restart: always
-    volumes:
-      - "redis:/data"
-    ports:
-      - '6379:6379'  
-
   postgres:
     image: postgres:11
     environment:
@@ -21,6 +13,3 @@ services:
       interval: 1s
     ports:
       - '5432:5432'
-
-volumes:
-  redis: {}

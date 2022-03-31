@@ -32,6 +32,15 @@ Bring up the services
 
  `$ docker-compose up`
 
+!!! info
+    To connect to a remote postgres database export the following environment variables
+
+    - **POSTGRES_HOST**
+    - **POSTGRES_PORT**
+    - **POSTGRES_DB**
+    - **POSTGRES_USER**
+    - **POSTGRES_PASSWORD**
+
 **Next**, is installation of OGC. We use **[Poetry](https://python-poetry.org/)**:
 
 ```shell

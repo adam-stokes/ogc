@@ -11,7 +11,11 @@ if not state.app.engine:
 
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
-@click.option("--name", multiple=True, required=True)
+@click.option(
+    "--by-name",
+    required=False,
+    help="Remove node by its Name",
+)
 @click.option(
     "--force/--no-force",
     default=False,
@@ -22,8 +26,8 @@ if not state.app.engine:
     default=False,
     help="Force removal of database records only",
 )
-def rm(name, force, only_db):
-    actions.teardown_async(name, force=force, only_db=only_db)
+def rm(by_name, force, only_db):
+    actions.teardown_async(by_name, force=force, only_db=only_db)
 
 
 @click.command(help="Destroys everything. Use with caution.")

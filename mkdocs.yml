@@ -62,7 +62,6 @@ nav:
         - "ogc rm-all": 'commands/ogc-rm-all.md'
         - "ogc rm-key-pairs": 'commands/ogc-rm-key-pairs.md'
         - "ogc rm": 'commands/ogc-rm.md'
-        - "ogc server": 'commands/ogc-server.md'
         - "ogc shell": 'commands/ogc-shell.md'
         - "ogc ssh": 'commands/ogc-ssh.md'
         - "ogc status": 'commands/ogc-status.md'
