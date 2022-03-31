@@ -788,11 +788,14 @@
 <h2 id="accessing-nodes">Accessing nodes<a class="headerlink" href="#accessing-nodes" title="Permanent link">&para;</a></h2>
 <p>OGC provides a helper command for easily accessing any of the nodes in your deployment.</p>
 <p>To login to one of the above nodes <code>ogc-d7cd61a7-elastic-agent-ubuntu</code> run:</p>
-<div class="highlight"><pre><span></span><code>$ ogc ssh ogc-d7cd61a7-elastic-agent-ubuntu
+<div class="highlight"><pre><span></span><code>$ ogc ssh --by-name ogc-d7cd61a7-elastic-agent-ubuntu
 
 ... ssh output ...
 
 root@ogc-d7cd61a7-elastic-agent-ubuntu:~#
+</code></pre></div>
+<p>Alternatively, use the <code>ID</code>:</p>
+<div class="highlight"><pre><span></span><code>$ ogc ssh --by-id 38
 </code></pre></div>
 <h2 id="executing-commands">Executing commands<a class="headerlink" href="#executing-commands" title="Permanent link">&para;</a></h2>
 <p>Running arbitrary commands can be accomplished with:</p>
