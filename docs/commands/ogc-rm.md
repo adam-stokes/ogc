@@ -12,9 +12,9 @@ Destroys a node and its associated keys, storage, etc.
 
 # OPTIONS
 
-**\--name** TEXT
+**\--by-name** TEXT
 
-:   \[required\]
+:   Remove node by its Name
 
 **\--force** / \--no-force
 
