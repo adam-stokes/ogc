@@ -656,6 +656,17 @@
 </code></pre></div>
 <p>Bring up the services</p>
 <p><code>$ docker-compose up</code></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>To connect to a remote postgres database export the following environment variables</p>
+<ul>
+<li><strong>POSTGRES_HOST</strong></li>
+<li><strong>POSTGRES_PORT</strong></li>
+<li><strong>POSTGRES_DB</strong></li>
+<li><strong>POSTGRES_USER</strong></li>
+<li><strong>POSTGRES_PASSWORD</strong></li>
+</ul>
+</div>
 <p><strong>Next</strong>, is installation of OGC. We use <strong><a href="https://python-poetry.org/">Poetry</a></strong>:</p>
 <div class="highlight"><pre><span></span><code>$ pip install poetry
 $ poetry install
