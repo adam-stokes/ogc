@@ -17,6 +17,7 @@ if not state.app.engine:
     state.app.engine = db.connect()
     state.app.session = db.session(state.app.engine)
 
+
 @click.command(help="Login to a node")
 @click.argument("name")
 def ssh(name):
@@ -27,7 +28,7 @@ def ssh(name):
             sh.ssh(cmd, _fg=True, _env=state.app.env)
             sys.exit(0)
 
-    log.error(f"Unable to locate {name} to connect to", style='bold red')
+    log.error(f"Unable to locate {name} to connect to", style="bold red")
     sys.exit(1)
 
 
@@ -46,16 +47,16 @@ def ssh(name):
 def exec(by_tag, by_name, cmd):
     if by_tag and by_name:
         log.error(
-                "Combined filtered options are not supported, please choose one.",
-                style="bold red"
+            "Combined filtered options are not supported, please choose one.",
+            style="bold red",
         )
         sys.exit(1)
-    results = actions.exec(by_name, by_tag, cmd)
+    results = actions.exec_async(by_name, by_tag, cmd)
     if all(res for res in results):
         log.info("All commands completed.")
         sys.exit(0)
 
-    log.error("Some commands failed to complete.", style='bold red')
+    log.error("Some commands failed to complete.", style="bold red")
     sys.exit(1)
 
 
@@ -74,11 +75,11 @@ def exec(by_tag, by_name, cmd):
 def exec_scripts(by_tag, by_name, path):
     if by_tag and by_name:
         log.error(
-                "Combined filtered options are not supported, please choose one.",
-                style="bold red"
+            "Combined filtered options are not supported, please choose one.",
+            style="bold red",
         )
         sys.exit(1)
-    results = actions.exec_scripts(by_name, by_tag, path)
+    results = actions.exec_scripts_async(by_name, by_tag, path)
     if all(res for res in results):
         log.info("All commands completed: [green]:heavy_check_mark:[/]")
         sys.exit(0)
@@ -119,7 +120,7 @@ def pull_files(name, dst, src):
             deploy = Deployer(node, state.app.env)
             deploy.get(dst, src)
             sys.exit(0)
-        log.error(f"Unable to locate {name} to connect to", style='bold red')
+        log.error(f"Unable to locate {name} to connect to", style="bold red")
         sys.exit(1)
 
 
@@ -132,15 +133,17 @@ def pull_artifacts(name):
             deploy = Deployer(node, state.app.env)
             if node.artifacts:
                 log.info("Downloading artifacts")
-                local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
+                local_artifact_path = (
+                    Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
+                )
                 if not local_artifact_path.exists():
                     os.makedirs(str(local_artifact_path), exist_ok=True)
                 deploy.get(node.artifacts, str(local_artifact_path))
                 sys.exit(0)
             else:
-                log.error(f"No artifacts found at {node.remote_path}", style='bold red')
+                log.error(f"No artifacts found at {node.remote_path}", style="bold red")
                 sys.exit(1)
-        log.error(f"Unable to locate {name} to connect to", style='bold red')
+        log.error(f"Unable to locate {name} to connect to", style="bold red")
         sys.exit(1)
 
 

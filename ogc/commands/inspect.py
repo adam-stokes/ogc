@@ -12,6 +12,7 @@ if not state.app.engine:
     state.app.engine = db.connect()
     state.app.session = db.session(state.app.engine)
 
+
 @click.command(help="List nodes in your inventory")
 @click.option("--id", required=False, help="Inspect node by DB ID")
 @click.option(

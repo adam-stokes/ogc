@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
-from ogc.actions import sync
+from ogc import actions
 from ogc.log import Logger as log
 
 from ..spec import SpecLoader
@@ -29,7 +29,7 @@ def status(reconcile, spec):
         log.info(
             f"Reconciling: {', '.join([layout.name for layout in app.spec.layouts])}"
         )
-        sync(app.spec.layouts, counts)
+        actions.sync_async(app.spec.layouts, counts)
         return
 
     table = Table(title=f"Deployment Status: {app.spec.deploy_status}")

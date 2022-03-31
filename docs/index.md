@@ -8,20 +8,12 @@ Welcome to the getting started guide! This should be a quick introduction to get
 
 ## Setup
 
-OGC requires Redis and Postgres to function. The easiest way to fulfill these requirements is with **docker-compose**:
+OGC requires Postgres to function. The easiest way to fulfill this requirement is with **docker-compose**:
 
 ```yaml
 version: "3.9"
 
 services:
-  redis:
-    image: "redis:6.2-alpine"
-    restart: always
-    volumes:
-      - "redis:/data"
-    ports:
-      - '6379:6379'  
-
   postgres:
     image: postgres:11
     environment:
@@ -34,9 +26,6 @@ services:
       interval: 1s
     ports:
       - '5432:5432'
-
-volumes:
-  redis: {}
 ```
 
 Bring up the services
@@ -137,15 +126,6 @@ This specification tells OGC to deploy 5 nodes running on Google's **e2-standard
 The `scripts` section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.
 
 ## Provision and Deploy
-
-OGC uses a client/server architecture to better handle scaling and concurrency needs. A celery server needs to be available prior launching nodes:
-
-```shell
-$ ogc server
-```
-
-!!! note
-    An alternative is to run this process in a separate docker container.
 
 Once the specification is set, environment variables configured and celery is running, execute a deployment in a new terminal:
 

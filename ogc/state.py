@@ -17,7 +17,7 @@ app = SimpleNamespace(
     # logger
     log=log,
     # db engine
-    engine=None, 
+    engine=None,
     # session
     session=None,
 )

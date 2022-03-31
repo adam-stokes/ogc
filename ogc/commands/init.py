@@ -15,6 +15,7 @@ if not state.app.engine:
     state.app.engine = db.connect()
     state.app.session = db.session(state.app.engine)
 
+
 @click.command(help="Initialize OGC")
 def init():
     db.createtbl(state.app.engine)
@@ -25,9 +26,8 @@ def init():
             sys.exit(1)
 
         # begin setup
-        name = Prompt.ask("Enter your name", default=os.environ.get('USER', ''))
-        user = db.User(name=name,
-                    slug=slugify(name))
+        name = Prompt.ask("Enter your name", default=os.environ.get("USER", ""))
+        user = db.User(name=name, slug=slugify(name))
         session.add(user)
         session.commit()
     log.info("Setup complete.")

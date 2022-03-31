@@ -12,7 +12,7 @@ layouts:
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 100
+    scale: 3
     remote-path: /root/ogc
     exclude:
       - .git

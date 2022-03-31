@@ -18,6 +18,7 @@ class SpecProvisionLayout:
         self.name, self.layout = layout
         self.env = env
         self.ssh = ssh
+        self._scale = self.layout.get("scale", 1)
 
     def __repr__(self):
         return f"<SpecProvisionLayout [{self.name}]>"
@@ -48,7 +49,11 @@ class SpecProvisionLayout:
 
     @property
     def scale(self):
-        return self.layout.get("scale", 1)
+        return self._scale
+
+    @scale.setter
+    def scale(self, val):
+        self._scale = val
 
     @property
     def tags(self):
@@ -97,7 +102,6 @@ class SpecProvisionLayout:
 
     def as_json(self):
         return json.dumps(self.as_dict())
-
 
 
 class SpecProvisionSSHKey:
@@ -169,14 +173,11 @@ class SpecProvisionPlan:
             stat["remaining"] > 0 or stat["remaining"] < 0
             for stat in self.status.values()
         )
-    
+
     @property
     def is_deployed(self):
         """Returns whether there are any deployments at all"""
-        return any(
-            stat["deployed"] > 0
-            for stat in self.status.values()
-        )
+        return any(stat["deployed"] > 0 for stat in self.status.values())
 
     @property
     def deploy_status(self):
@@ -199,6 +200,7 @@ class SpecProvisionPlan:
         app.log.debug(f"Caught signal {sig} - {frame}")
         sys.exit(1)
 
+
 class SpecLoader(MeldDict):
     @classmethod
     def load(cls, specs: list[str]) -> "SpecProvisionPlan":
@@ -212,9 +214,10 @@ class SpecLoader(MeldDict):
                 raise SpecLoaderException(f"Could not find {_path}")
             _specs.append(_path)
 
-
         if not _specs:
-            raise SpecLoaderException(f"No provision specs found, please specify with `--spec <file.yml>`")
+            raise SpecLoaderException(
+                f"No provision specs found, please specify with `--spec <file.yml>`"
+            )
 
         cl = SpecLoader()
         for spec in _specs:

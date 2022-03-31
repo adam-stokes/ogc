@@ -13,24 +13,12 @@ DB_NAME = os.environ.get("POSTGRES_DB", "ogc")
 DB_USER = os.environ.get("POSTGRES_USER", "postgres")
 DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
 
-from sqlalchemy import (
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    inspect
-)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, inspect
 from sqlalchemy.dialects.postgresql import ARRAY, JSON, UUID
-from sqlalchemy.orm import (
-    declarative_base,
-    relationship,
-    scoped_session,
-    sessionmaker
-)
+from sqlalchemy.orm import declarative_base, relationship, scoped_session, sessionmaker
 
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = "user"
@@ -41,9 +29,8 @@ class User(Base):
     created = Column(DateTime(), server_default=func.now())
 
     extra = Column(JSON(), nullable=True)
-    nodes = relationship(
-        "Node", back_populates="user", cascade="all, delete-orphan"
-    )
+    nodes = relationship("Node", back_populates="user", cascade="all, delete-orphan")
+
 
 class Node(Base):
     __tablename__ = "node"
@@ -69,7 +56,7 @@ class Node(Base):
     # Store layout config here for easier reference
     layout = Column(JSON())
     extra = Column(JSON(), nullable=True)
-    
+
     actions = relationship(
         "Actions", back_populates="node", cascade="all, delete-orphan"
     )
@@ -79,6 +66,7 @@ class Node(Base):
 
     def __repr__(self):
         return f"Node(id={self.id!r}, user={self.user.name!r})"
+
 
 class Actions(Base):
     __tablename__ = "actions"
@@ -93,30 +81,39 @@ class Actions(Base):
     created = Column(DateTime(), server_default=func.now())
     extra = Column(JSON(), nullable=True)
 
+
 def connect():
     """Return a db connection"""
     db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
     return create_engine(db_string, echo=False, future=True)
 
+
 def session(engine):
-    _session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=True, expire_on_commit=False))
+    _session = scoped_session(
+        sessionmaker(
+            bind=engine, autocommit=False, autoflush=True, expire_on_commit=False
+        )
+    )
     return _session()
+
 
 def createtbl(engine):
     """Create db tables"""
     Base.metadata.create_all(engine)
 
+
 def droptbl(engine):
     """Create db tables"""
     Base.metadata.drop_all(engine)
 
+
 def model_as_dict(obj):
-    return {c.key: getattr(obj, c.key)
-            for c in inspect(obj).mapper.column_attrs}
+    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+
 
 def migrate():
     # retrieves the directory that *this* file is in
-    migrations_dir = Path(__file__).parent.parent / 'alembic'
+    migrations_dir = Path(__file__).parent.parent / "alembic"
     # this assumes the alembic.ini is also contained in this same directory
     config_file = migrations_dir.parent / "alembic.ini"
 
@@ -124,7 +121,7 @@ def migrate():
     config.set_main_option("script_location", str(migrations_dir))
 
     # upgrade the database to the latest revision
-    alembic.command.upgrade(config, "head")    
+    alembic.command.upgrade(config, "head")
 
 
 # Template helpers

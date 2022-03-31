@@ -1,9 +1,10 @@
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import click
 
-from ogc.actions import deploy as deploy_p
-from ogc.actions import launch as launch_p
+from ogc import actions
 from ogc.log import Logger as log
 
 from ..spec import SpecLoader
@@ -21,15 +22,14 @@ from .base import cli
 def launch(spec, with_deploy):
     # Db connection
     app.spec = SpecLoader.load(list(spec))
-    log.info(f"Provisioning: {', '.join([layout.name for layout in app.spec.layouts])}")
-    node_ids = launch_p(app.spec.layouts)
-
+    node_ids = actions.launch_async(app.spec.layouts)
     if with_deploy:
-        deploy_p(node_ids)
-
-    log.info(
-        "All tasks have been submitted, please run `ogc log` to see status output."
-    )
+        log.info(f"Starting script deployments")
+        script_deploy_results = actions.deploy_async(node_ids)
+        if all(result == True for result in script_deploy_results):
+            log.info("All deployments have been completed.")
+            return
+        log.error("Some tasks could not be completed.")
 
 
 cli.add_command(launch)

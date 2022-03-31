@@ -27,5 +27,6 @@ def shell():
     c.InteractiveShellEmbed.colors = "Linux"
     embed(config=c)
 
+
 cli.add_command(db_migrate)
 cli.add_command(shell)

@@ -62,7 +62,7 @@ class ProvisionResult:
                 ports=self.ports,
                 layout=json.dumps(self.layout),
                 extra=json.dumps({"env": self.env}),
-                user=user
+                user=user,
             )
             session.add(node_obj)
             session.commit()
@@ -185,11 +185,11 @@ class AWSProvisioner(BaseProvisioner):
     def setup(self, layout, **kwargs):
         if layout["ports"]:
             self.create_firewall(layout["name"], layout["ports"])
-        if not self.get_key_pair(layout['name']):
-            self.create_keypair(layout['name'], layout['ssh_public_key'])
+        if not self.get_key_pair(layout["name"]):
+            self.create_keypair(layout["name"], layout["ssh_public_key"])
 
     def cleanup(self, node, **kwargs):
-        key_pair = self.get_key_pair(node.layout['name'])
+        key_pair = self.get_key_pair(node.layout["name"])
         self.delete_key_pair(key_pair)
 
     def image(self, runs_on, arch):
@@ -272,7 +272,7 @@ class GCEProvisioner(BaseProvisioner):
         return gce(**self.options)
 
     def setup(self, layout, **kwargs):
-        self.create_firewall(layout['name'], layout["ports"], layout["tags"])
+        self.create_firewall(layout["name"], layout["ports"], layout["tags"])
 
     def cleanup(self, node, **kwargs):
         pass
@@ -327,8 +327,8 @@ class GCEProvisioner(BaseProvisioner):
             user = session.query(db.User).first()
             # Store some metadata for helping with cleanup
             now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
-            layout['tags'].append(now)
-            layout['tags'].append(f"user-{user.slug}")    
+            layout["tags"].append(now)
+            layout["tags"].append(f"user-{user.slug}")
 
         opts = dict(
             name=f"ogc-{str(uuid.uuid4())[:8]}-{layout['name']}",

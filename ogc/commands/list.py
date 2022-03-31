@@ -17,6 +17,7 @@ if not state.app.engine:
     state.app.engine = db.connect()
     state.app.session = db.session(state.app.engine)
 
+
 @click.command(help="List nodes in your inventory")
 @click.option("--by-tag", required=False, help="List nodes by tag")
 @click.option(
@@ -27,10 +28,9 @@ if not state.app.engine:
 def ls(by_tag, by_name):
     if by_tag and by_name:
         log.error(
-                "Combined filtered options are not supported, please choose one.",
+            "Combined filtered options are not supported, please choose one.",
         )
         sys.exit(1)
-
 
     rows = None
     with state.app.session as session:
