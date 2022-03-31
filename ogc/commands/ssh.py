@@ -32,11 +32,17 @@ if not state.app.engine:
 def ssh(by_id, by_name):
     with state.app.session as session:
         if by_name:
-            node = session.query(db.Node).filter(db.Node.instance_name == by_name).first() or None
+            node = (
+                session.query(db.Node).filter(db.Node.instance_name == by_name).first()
+                or None
+            )
         elif by_id:
             node = session.query(db.Node).filter(db.Node.id == by_id).first() or None
         else:
-            log.error("Unable to locate node in database, please double check spelling.", style="bold red")
+            log.error(
+                "Unable to locate node in database, please double check spelling.",
+                style="bold red",
+            )
             sys.exit(1)
         if node:
             cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
@@ -112,7 +118,9 @@ def exec_scripts(by_tag, by_name, path):
 )
 def push_files(name, src, dst, exclude):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        node = (
+            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        )
         if node:
             deploy = Deployer(node, state.app.env)
             deploy.put(src, dst, excludes=exclude)
@@ -127,7 +135,9 @@ def push_files(name, src, dst, exclude):
 @click.argument("src")
 def pull_files(name, dst, src):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        node = (
+            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        )
         if node:
             deploy = Deployer(node, state.app.env)
             deploy.get(dst, src)
@@ -140,7 +150,9 @@ def pull_files(name, dst, src):
 @click.argument("name")
 def pull_artifacts(name):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        node = (
+            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+        )
         if node:
             deploy = Deployer(node, state.app.env)
             if node.artifacts:

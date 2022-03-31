@@ -15,7 +15,7 @@ Just a simple provisioner
 **db-migrate** Database migrations See **ogc-db-migrate(1)** for full
 documentation on the **db-migrate** command.
 
-**shell** Launches IPython repl See **ogc-shell(1)** for full
+**shell** Launches IPython REPL See **ogc-shell(1)** for full
 documentation on the **shell** command.
 
 **rm** Destroys a node and its associated keys,\... See **ogc-rm(1)**
@@ -41,12 +41,6 @@ documentation on the **ls** command.
 
 **ls-key-pairs** List keypairs See **ogc-ls-key-pairs(1)** for full
 documentation on the **ls-key-pairs** command.
-
-**log** Stream log output See **ogc-log(1)** for full documentation on
-the **log** command.
-
-**server** Starts the tasks server See **ogc-server(1)** for full
-documentation on the **server** command.
 
 **ssh** Login to a node See **ogc-ssh(1)** for full documentation on the
 **ssh** command.

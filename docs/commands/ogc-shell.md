@@ -1,6 +1,6 @@
 # NAME
 
-ogc-shell - Launches IPython repl
+ogc-shell - Launches IPython REPL
 
 # SYNOPSIS
 
@@ -8,4 +8,4 @@ ogc-shell - Launches IPython repl
 
 # DESCRIPTION
 
-Launches IPython repl
+Launches IPython REPL

@@ -15,3 +15,7 @@ Destroys everything. Use with caution.
 **\--force** / \--no-force
 
 :   Force removal regardless of connectivity
+
+**\--only-db** / \--no-only-db
+
+:   Force removal of database records only
