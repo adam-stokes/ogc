@@ -651,18 +651,10 @@
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h1>
 <p>Welcome to the getting started guide! This should be a quick introduction to get up and running with OGC. More information on customizing and extending OGC can be found in the user documentation.</p>
 <h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
-<p>OGC requires Redis and Postgres to function. The easiest way to fulfill these requirements is with <strong>docker-compose</strong>:</p>
+<p>OGC requires Postgres to function. The easiest way to fulfill this requirement is with <strong>docker-compose</strong>:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3.9&quot;</span><span class="w"></span>
 
 <span class="nt">services</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">redis</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;redis:6.2-alpine&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">always</span><span class="w"></span>
-<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;redis:/data&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;6379:6379&#39;</span><span class="w">  </span>
-
 <span class="w">  </span><span class="nt">postgres</span><span class="p">:</span><span class="w"></span>
 <span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postgres:11</span><span class="w"></span>
 <span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w"></span>
@@ -675,9 +667,6 @@
 <span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1s</span><span class="w"></span>
 <span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&#39;5432:5432&#39;</span><span class="w"></span>
-
-<span class="nt">volumes</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">redis</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span><span class="w"></span>
 </code></pre></div>
 <p>Bring up the services</p>
 <p><code>$ docker-compose up</code></p>
@@ -750,13 +739,6 @@ GOOGLE_DATACENTER=&quot;us-central1-a&quot;
 <p>This specification tells OGC to deploy 5 nodes running on Google&rsquo;s <strong>e2-standard-8</strong> with SUSE 15 OS. 
 The <code>scripts</code> section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.</p>
 <h2 id="provision-and-deploy">Provision and Deploy<a class="headerlink" href="#provision-and-deploy" title="Permanent link">&para;</a></h2>
-<p>OGC uses a client/server architecture to better handle scaling and concurrency needs. A celery server needs to be available prior launching nodes:</p>
-<div class="highlight"><pre><span></span><code>$ ogc server
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>An alternative is to run this process in a separate docker container.</p>
-</div>
 <p>Once the specification is set, environment variables configured and celery is running, execute a deployment in a new terminal:</p>
 <div class="highlight"><pre><span></span><code>$ ogc launch
 </code></pre></div>
