@@ -819,7 +819,10 @@ artifacts/ogc-d7cd61a7-elastic-agent-ubuntu/
 <div class="highlight"><pre><span></span><code>$ ogc push-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt dl.txt
 </code></pre></div>
 <p>Optionally, if <code>--exclude</code> is provided, uploading files will ignore any wildcards matched. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Passing multiple <code>--exclude</code> is supported and will be added to the list of excludes during upload. Useful if uploading directories and want to ignore things like <code>.git</code> and <code>.venv</code>.</p>
+</div>
 <h2 id="inspecting-nodes">Inspecting nodes<a class="headerlink" href="#inspecting-nodes" title="Permanent link">&para;</a></h2>
 <p>Each action performed on a node is tracked. This allows you to quickly investigate why scripts failed. To inspect a node and see action results run:</p>
 <div class="highlight"><pre><span></span><code>$ ogc inspect --id 38
