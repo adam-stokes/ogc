@@ -69,11 +69,17 @@ OGC provides a helper command for easily accessing any of the nodes in your depl
 To login to one of the above nodes `ogc-d7cd61a7-elastic-agent-ubuntu` run:
 
 ```shell
-$ ogc ssh ogc-d7cd61a7-elastic-agent-ubuntu
+$ ogc ssh --by-name ogc-d7cd61a7-elastic-agent-ubuntu
 
 ... ssh output ...
 
 root@ogc-d7cd61a7-elastic-agent-ubuntu:~#
+```
+
+Alternatively, use the `ID`:
+
+```
+$ ogc ssh --by-id 38
 ```
 
 ## Executing commands

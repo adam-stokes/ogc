@@ -19,17 +19,29 @@ if not state.app.engine:
 
 
 @click.command(help="Login to a node")
-@click.argument("name")
-def ssh(name):
+@click.option(
+    "--by-id",
+    required=False,
+    help="Login to a node by its ID",
+)
+@click.option(
+    "--by-name",
+    required=False,
+    help="Login to a node by its Name",
+)
+def ssh(by_id, by_name):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).one()
+        if by_name:
+            node = session.query(db.Node).filter(db.Node.instance_name == by_name).first() or None
+        elif by_id:
+            node = session.query(db.Node).filter(db.Node.id == by_id).first() or None
+        else:
+            log.error("Unable to locate node in database, please double check spelling.", style="bold red")
+            sys.exit(1)
         if node:
             cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
             sh.ssh(cmd, _fg=True, _env=state.app.env)
             sys.exit(0)
-
-    log.error(f"Unable to locate {name} to connect to", style="bold red")
-    sys.exit(1)
 
 
 @click.command(help="Execute a command across node(s)")
@@ -81,7 +93,7 @@ def exec_scripts(by_tag, by_name, path):
         sys.exit(1)
     results = actions.exec_scripts_async(by_name, by_tag, path)
     if all(res for res in results):
-        log.info("All commands completed: [green]:heavy_check_mark:[/]")
+        log.info("All commands completed successfully ...")
         sys.exit(0)
 
     log.error("Some commands [bold red]failed[/] to complete.")
@@ -100,7 +112,7 @@ def exec_scripts(by_tag, by_name, path):
 )
 def push_files(name, src, dst, exclude):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).one()
+        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
         if node:
             deploy = Deployer(node, state.app.env)
             deploy.put(src, dst, excludes=exclude)
@@ -115,7 +127,7 @@ def push_files(name, src, dst, exclude):
 @click.argument("src")
 def pull_files(name, dst, src):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).one()
+        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
         if node:
             deploy = Deployer(node, state.app.env)
             deploy.get(dst, src)
@@ -128,7 +140,7 @@ def pull_files(name, dst, src):
 @click.argument("name")
 def pull_artifacts(name):
     with state.app.session as session:
-        node = session.query(db.Node).filter(db.Node.instance_name == name).one()
+        node = session.query(db.Node).filter(db.Node.instance_name == name).first() or None
         if node:
             deploy = Deployer(node, state.app.env)
             if node.artifacts:
