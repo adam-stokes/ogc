@@ -718,17 +718,17 @@ GOOGLE_DATACENTER=&quot;us-central1-a&quot;
 <span class="w">  </span><span class="nt">elastic-agent-sles</span><span class="p">:</span><span class="w"> </span>
 <span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-15</span><span class="w"></span>
 <span class="w">    </span><span class="nt">instance-size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">e2-standard-8</span><span class="w"></span>
-<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span><span class="w"></span>
+<span class="w">    </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ogc</span><span class="w"></span>
 <span class="w">    </span><span class="nt">scripts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixtures/ex_deploy_sles</span><span class="w"></span>
 <span class="w">    </span><span class="nt">provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">google</span><span class="w"></span>
 <span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w"></span>
-<span class="w">    </span><span class="nt">remote-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/ogc</span><span class="w"></span>
+<span class="w">    </span><span class="nt">remote-path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/ogc/ogc</span><span class="w"></span>
 <span class="w">    </span><span class="nt">include</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.ogc-cache</span><span class="w"></span>
 <span class="w">    </span><span class="nt">exclude</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.git</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.venv</span><span class="w"></span>
-<span class="w">    </span><span class="nt">artifacts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/output/*.xml</span><span class="w"></span>
+<span class="w">    </span><span class="nt">artifacts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/ogc/output/*.xml</span><span class="w"></span>
 <span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">elastic-agent-8.1.x</span><span class="w"></span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sles-gcp</span><span class="w"></span>
