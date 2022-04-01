@@ -115,17 +115,17 @@ layouts:
   elastic-agent-sles: 
     runs-on: sles-15
     instance-size: e2-standard-8
-    username: root
+    username: ogc
     scripts: fixtures/ex_deploy_sles
     provider: google
     scale: 5
-    remote-path: /root/ogc
+    remote-path: /home/ogc/ogc
     include:
       - .ogc-cache
     exclude:
       - .git
       - .venv
-    artifacts: /root/output/*.xml
+    artifacts: /home/ogc/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - sles-gcp

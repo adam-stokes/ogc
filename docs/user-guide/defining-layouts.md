@@ -9,17 +9,17 @@ layouts:
   elastic-agent-sles: 
     runs-on: sles-15
     instance-size: e2-standard-8
-    username: root
+    username: ogc
     scripts: fixtures/ex_deploy_sles
     provider: google
     scale: 5
-    remote-path: /root/ogc
+    remote-path: /home/ogc/ogc
     include:
       - .ogc-cache
     exclude:
       - .git
       - .venv
-    artifacts: /root/output/*.xml
+    artifacts: /home/ogc/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
@@ -75,7 +75,7 @@ In the case of **Google**, any username can be given. In the case of **AWS**, th
 | ubuntu | ubuntu   |
 
 !!! caution
-    A lot of cloud machine images disable `root` login, try to avoid using that as a user and utilize `sudo` for anything needed elevated permissions.
+    A lot of cloud machine images disable `root` login, try to avoid using that as a user and utilize `sudo` for anything requiring elevated permissions.
 
 **scripts**
 
@@ -128,32 +128,32 @@ layouts:
   elastic-agent-sles: 
     runs-on: sles-15
     instance-size: e2-standard-8
-    username: root
+    username: ogc
     scripts: fixtures/ex_deploy_sles
     provider: google
     scale: 5
-    remote-path: /root/ogc
+    remote-path: /home/ogc/ogc
     include:
       - .ogc-cache
     exclude:
       - .git
       - .venv
-    artifacts: /root/output/*.xml
+    artifacts: /home/ogc/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - sles-gcp
   elastic-agent-ubuntu: 
     runs-on: ubuntu-latest
     instance-size: e2-standard-8
-    username: root
+    username: ogc
     scripts: fixtures/ex_deploy_ubuntu
     provider: google
     scale: 5
-    remote-path: /root/ogc
+    remote-path: /home/ogc/ogc
     exclude:
       - .git
       - .venv
-    artifacts: /root/output/*.xml
+    artifacts: /home/ogc/output/*.xml
     tags:
       - elastic-agent-8.1.x
       - ubuntu-gcp
