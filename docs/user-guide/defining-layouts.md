@@ -40,16 +40,19 @@ Define the base OS image to be deployed on to the nodes. The current supported l
 
 | AWS | Google |
 | ---- | ----- |
-| ubuntu-latest | ubuntu-latest |
-| ubuntu-2004   | ubuntu-2004 |
+| ubuntu-2004 | ubuntu-2004 |
 | ubuntu-1804 | ubuntu-1804 |
-| centos-latest | sles-latest |
-| centos-8 | sles-15 |
-| sles-latest | debian-latest |
-| sles-15 | debian-10 |
-| debian-latest | debian-9 |
-| debian-11 | |
-| debian-10 | |
+| ubuntu-1604 | ubuntu-1604 |
+| sles-15 | sles-15 |
+| sles-12 | sles-12 |
+| sles-11 | sles-11 |
+| debian-10 | debian-10 |
+| debian-9 | debian-9 |
+| debian-8 | debian-8 |
+|| rhel-8 |
+|| rhel-7 |
+|| rhel-6 |
+
 
 **instance-size**
 
@@ -63,11 +66,13 @@ The ssh user to use when deploying and accessing the nodes. This is also somewha
 
 In the case of **Google**, any username can be given. In the case of **AWS**, the base machines have a pre-loaded user that must be used:
 
-| AWS | Username |
-| ---- | ------- |
-| ubuntu | ubuntu |
-| centos | ec2-user |
-| debian | admin |
+| AWS    | Username |
+| ------ | -------  |
+| centos | centos   |
+| debian | admin    |
+| oracle | ec2-user |
+| sles   | ec2-user |
+| ubuntu | ubuntu   |
 
 **scripts**
 

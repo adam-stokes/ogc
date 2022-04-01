@@ -7,12 +7,12 @@ ssh-keys:
 
 layouts:
   elastic-agent-sles: 
-    runs-on: sles-15
+    runs-on: rhel-8
     instance-size: e2-standard-8
     username: root
     scripts: fixtures/ex_deploy_sles
     provider: google
-    scale: 3
+    scale: 0
     remote-path: /root/ogc
     exclude:
       - .git
@@ -21,8 +21,29 @@ layouts:
     artifacts: /root/output/*.xml
     tags:
       - elastic-agent-8.1.x
-      - sles-gcp
+      - ubuntu-gcp
     ports:
       - "80:80"
       - "443:443"
       - "5601:5601"
+  elastic-agent-ubuntu: 
+    runs-on: debian-10
+    instance-size: c5.4xlarge
+    username: admin
+    scripts: fixtures/ex_deploy_ubuntu
+    provider: aws
+    scale: 1
+    remote-path: /home/admin/ogc
+    exclude:
+      - .git
+      - .venv
+      - artifacts
+    artifacts: /home/admin/output/*.xml
+    tags:
+      - elastic-agent-8.1.x
+      - debian-gcp
+    ports:
+      - "22:22"
+      - "80:80"
+      - "443:443"
+      - "5601:5601"      

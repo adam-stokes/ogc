@@ -7,13 +7,19 @@ from dotenv import dotenv_values
 
 from ogc.log import Logger as log
 
+
+def load_env():
+    """Loads environment variables"""
+    return {**dotenv_values(".env"), **os.environ}
+
+
 app = SimpleNamespace(
     # spec object
     spec=None,
     # Machine provisioning layouts from spec
     layouts=None,
     # environment variables, these are accessible throughout the provisioning
-    env={**dotenv_values(".env"), **os.environ},
+    env=load_env(),
     # logger
     log=log,
     # db engine

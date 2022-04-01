@@ -33,7 +33,7 @@ class SpecProvisionLayout:
 
     @property
     def instance_size(self):
-        return self.layout.get("instance_size", "e2-standard-8")
+        return self.layout.get("instance-size", "e2-standard-8")
 
     @property
     def username(self):
@@ -190,7 +190,7 @@ class SpecProvisionPlan:
 
     def get_layout(self, name):
         """Returns a layout for a given name/key"""
-        return [layout for layout in self.layouts if layout.name == name]
+        return [layout for layout in self.layouts if layout.name == name][0]
 
     def __repr__(self):
         return f"<SpecProvisionPlan [{self.name}] {self.layouts}>"

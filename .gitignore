@@ -6,9 +6,10 @@ build
 pytest.log
 .env
 site
-ogc.log
+ogc*log*
 .tox
 .ogc-cache
 .mypy*
 adam-stokes-svc.json
-ogc.debug.log
+venv
+.venv

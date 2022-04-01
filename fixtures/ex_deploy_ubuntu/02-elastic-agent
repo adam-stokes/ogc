@@ -7,10 +7,10 @@ set -x
 url = "https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz" % (env['OGC_ELASTIC_AGENT_VERSION'], env['OGC_ELASTIC_AGENT_SHA'], env['OGC_ELASTIC_AGENT_VERSION'])
 %>
 ${utils.setup_env()}
-${utils.install_pkgs(['nano'])}
+${utils.install_pkgs(['rsync'])}
 ${utils.download(url, 'elastic-agent.tar.gz')}
 ${utils.extract('elastic-agent.tar.gz')}
 
 mv elastic-agent-${env['OGC_ELASTIC_AGENT_VERSION']}-linux-x86_64 elastic-agent
 
-cd elastic-agent && ./elastic-agent install -f --url=${env['OGC_FLEET_URL']} --enrollment-token=${env['OGC_FLEET_ENROLLMENT_TOKEN']}
+cd elastic-agent && sudo ./elastic-agent install -f --url=${env['OGC_FLEET_URL']} --enrollment-token=${env['OGC_FLEET_ENROLLMENT_TOKEN']}

@@ -136,7 +136,7 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 
 ## Provision and Deploy
 
-Once the specification is set, environment variables configured and celery is running, execute a deployment in a new terminal:
+Once the specification is set, environment variables configured and a postgres database is accessible, execute a deployment in a new terminal:
 
 ```shell
 $ ogc launch

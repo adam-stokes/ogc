@@ -148,7 +148,8 @@ $ ogc push-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt dl
 
 Optionally, if `--exclude` is provided, uploading files will ignore any wildcards matched. 
 
-Passing multiple `--exclude` is supported and will be added to the list of excludes during upload. Useful if uploading directories and want to ignore things like `.git` and `.venv`.
+!!! note
+    Passing multiple `--exclude` is supported and will be added to the list of excludes during upload. Useful if uploading directories and want to ignore things like `.git` and `.venv`.
 
 ## Inspecting nodes
 
@@ -253,7 +254,7 @@ And the output will show OGC destroying 2 nodes from each layout:
 OGC allows destroying of individual or a full blown cleanup. To remove a single node we run:
 
 ```
-$ ogc rm ogc-d7cd61a7-elastic-agent-ubuntu --force
+$ ogc rm --by-name ogc-d7cd61a7-elastic-agent-ubuntu --force
 ```
 
 Or if we wanted to do a full teardown, run:

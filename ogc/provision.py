@@ -178,6 +178,18 @@ class AWSProvisioner(BaseProvisioner):
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
+    def __userdata(self):
+        """Some instances on AWS do not include rsync which is needed for file transfers"""
+        return """#!/usr/bin/env bash
+if ! test -f "/usr/local/bin/pacapt"; then
+    sudo wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
+    sudo chmod 755 /usr/local/bin/pacapt
+    sudo ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman || true
+fi
+pacapt update || true
+pacapt install rsync || true
+"""
+
     def connect(self):
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
@@ -185,12 +197,11 @@ class AWSProvisioner(BaseProvisioner):
     def setup(self, layout, **kwargs):
         if layout["ports"]:
             self.create_firewall(layout["name"], layout["ports"])
-        if not self.get_key_pair(layout["name"]):
+        if not any(kp.name == layout["name"] for kp in self.list_key_pairs()):
             self.create_keypair(layout["name"], layout["ssh_public_key"])
 
     def cleanup(self, node, **kwargs):
-        key_pair = self.get_key_pair(node.layout["name"])
-        self.delete_key_pair(key_pair)
+        pass
 
     def image(self, runs_on, arch):
         if runs_on.startswith("ami-"):
@@ -202,7 +213,7 @@ class AWSProvisioner(BaseProvisioner):
 
     def create_firewall(self, name, ports):
         """Creates the security group for enabling traffic between nodes"""
-        if not self.provisioner.ex_get_security_groups(group_names=[name]):
+        if not any(sg.name == name for sg in self.provisioner.ex_get_security_groups()):
             self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)
 
         for port in ports:
@@ -224,6 +235,7 @@ class AWSProvisioner(BaseProvisioner):
             raise ProvisionException(
                 f"Could not locate AMI and/or username for: {layout['runs-on']}/{layout['arch']}"
             )
+
         size = self.sizes(layout["instance-size"])
 
         opts = dict(
@@ -232,12 +244,25 @@ class AWSProvisioner(BaseProvisioner):
             size=size,
             auth=auth,
             ex_securitygroup=layout["name"],
-            ex_spot=True,
+            # ex_spot=True,
+            ex_userdata=self.__userdata(),
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
             ogc_env=env,
         )
-        return self._create_node(**opts)
+        tags = {}
+        with app.session as session:
+            user = session.query(db.User).first()
+            # Store some metadata for helping with cleanup
+            now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
+            layout["tags"].append(now)
+            layout["tags"].append(f"user-{user.slug}")
+            tags["Created"] = now
+            tags["UserTag"] = f"user-{user.slug}"
+
+        node = self._create_node(**opts)
+        self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)
+        return node
 
     def node(self, **kwargs):
         instance_id = kwargs.get("instance_id", None)
@@ -278,6 +303,13 @@ class GCEProvisioner(BaseProvisioner):
         pass
 
     def image(self, runs_on, arch):
+        # Pull from partial first
+        try:
+            partial_image = self.provisioner.ex_get_image(runs_on)
+            if partial_image:
+                return partial_image
+        except ResourceNotFoundError:
+            log.debug(f"Could not find {runs_on}, falling back internal image map")
         _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
         try:
             return [i for i in self.images() if i.name == _runs_on][0]

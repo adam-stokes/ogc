@@ -132,7 +132,10 @@ class Deployer:
         if excludes:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
-        sh.rsync(cmd_opts)
+        try:
+            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)
+        except sh.ErrorReturnCode as e:
+            log.error(f"Unable to upload files: {e.stderr}")
 
     def get(self, dst: str, src: str):
         cmd_opts = [
@@ -142,7 +145,10 @@ class Deployer:
             f"{self.deployment.username}@{self.deployment.public_ip}:{dst}",
             src,
         ]
-        sh.rsync(cmd_opts)
+        try:
+            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)
+        except sh.ErrorReturnCode as e:
+            log.error(f"Unable to download files: {e.stderr}")
 
 
 class DeployerResult:

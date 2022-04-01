@@ -76,10 +76,7 @@ def teardown(
             log.info(f"Destroying: {node_data.instance_name}")
             if not only_db:
                 try:
-                    engine = choose_provisioner(node_data.provider, env=state.app.env)
-
                     deploy = Deployer(node_data, env=state.app.env, force=force)
-
                     if not force:
                         # Pull down artifacts if set
                         if node_data.artifacts:
@@ -104,7 +101,6 @@ def teardown(
                 except:
                     result = False
                     log.warning(f"Couldn't destroy {node_data.instance_name}")
-            engine.cleanup(node_data)
             session.delete(node_data)
             session.commit()
     return result

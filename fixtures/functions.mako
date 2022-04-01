@@ -20,8 +20,8 @@ wget -O ${src_file} ${url}
 <%def name="extract(src, dst=None)">
 % if dst:
 mkdir -p ${dst}
-tar -xvf ${src} -C ${dst}
+tar -xf ${src} -C ${dst}
 % else:
-tar -xvf ${src}
+tar -xf ${src}
 % endif
 </%def>

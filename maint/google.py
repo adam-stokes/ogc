@@ -21,6 +21,7 @@ def _destroy_async(node):
     engine = choose_provisioner("google", app.env)
     app.log.info(f"Removing :: {node}")
     engine.node(instance_id=node).destroy()
+    return True
 
 
 def teardown(nodes: list[int]) -> list[bool]:
