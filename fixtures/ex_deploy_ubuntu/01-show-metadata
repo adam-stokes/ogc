@@ -8,4 +8,4 @@ echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.usernam
 echo ""
 
 mkdir -p $HOME/output
-touch $HOME/test.xml
+touch $HOME/output/test.xml

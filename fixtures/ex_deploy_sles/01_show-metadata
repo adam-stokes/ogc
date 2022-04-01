@@ -7,5 +7,5 @@ echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.usernam
 % endfor
 echo ""
 
-mkdir -p /root/output
-touch /root/output/test.xml
+mkdir -p $HOME/output
+touch $HOME/output/test.xml

@@ -161,6 +161,18 @@ class BaseProvisioner:
     def __repr__(self):
         raise NotImplementedError()
 
+    def _userdata(self):
+        """Some instances on AWS do not include rsync which is needed for file transfers"""
+        return """#!/usr/bin/env bash
+if ! test -f "/usr/local/bin/pacapt"; then
+    sudo wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
+    sudo chmod 755 /usr/local/bin/pacapt
+    sudo ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman || true
+fi
+pacapt update || true
+pacapt install rsync || true
+"""        
+
 
 class AWSProvisioner(BaseProvisioner):
     """AWS Provisioner
@@ -178,17 +190,6 @@ class AWSProvisioner(BaseProvisioner):
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
-    def __userdata(self):
-        """Some instances on AWS do not include rsync which is needed for file transfers"""
-        return """#!/usr/bin/env bash
-if ! test -f "/usr/local/bin/pacapt"; then
-    sudo wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
-    sudo chmod 755 /usr/local/bin/pacapt
-    sudo ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman || true
-fi
-pacapt update || true
-pacapt install rsync || true
-"""
 
     def connect(self):
         aws = get_driver(Provider.EC2)
@@ -245,7 +246,7 @@ pacapt install rsync || true
             auth=auth,
             ex_securitygroup=layout["name"],
             # ex_spot=True,
-            ex_userdata=self.__userdata(),
+            ex_userdata=self._userdata(),
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
             ogc_env=env,
@@ -347,7 +348,11 @@ class GCEProvisioner(BaseProvisioner):
             "items": [
                 {
                     "key": "ssh-keys",
-                    "value": "root: %s" % (Path(layout["ssh_public_key"]).read_text()),
+                    "value": "%s: %s" % (layout["username"], Path(layout["ssh_public_key"]).read_text()),
+                },
+                {
+                    "key": "startup-script",
+                    "value": self._userdata(),
                 }
             ]
         }

@@ -1,5 +1,5 @@
 #!/bin/bash
 set -x
 echo "im run from a random script" > random_out.txt
-pacapt upgrade
+sudo pacapt upgrade
 exit 0
