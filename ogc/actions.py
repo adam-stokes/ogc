@@ -1,7 +1,7 @@
 import os
-from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any, Dict
 
@@ -18,6 +18,7 @@ if not state.app.engine:
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
+
 
 def launch(layout) -> int:
     try:

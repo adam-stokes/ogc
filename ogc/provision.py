@@ -171,7 +171,7 @@ if ! test -f "/usr/local/bin/pacapt"; then
 fi
 pacapt update || true
 pacapt install rsync || true
-"""        
+"""
 
 
 class AWSProvisioner(BaseProvisioner):
@@ -189,7 +189,6 @@ class AWSProvisioner(BaseProvisioner):
             "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
-
 
     def connect(self):
         aws = get_driver(Provider.EC2)
@@ -348,12 +347,13 @@ class GCEProvisioner(BaseProvisioner):
             "items": [
                 {
                     "key": "ssh-keys",
-                    "value": "%s: %s" % (layout["username"], Path(layout["ssh_public_key"]).read_text()),
+                    "value": "%s: %s"
+                    % (layout["username"], Path(layout["ssh_public_key"]).read_text()),
                 },
                 {
                     "key": "startup-script",
                     "value": self._userdata(),
-                }
+                },
             ]
         }
 
