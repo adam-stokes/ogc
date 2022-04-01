@@ -1,4 +1,5 @@
 import os
+from multiprocessing import cpu_count
 from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 from pathlib import Path
@@ -15,6 +16,8 @@ if not state.app.engine:
     state.app.engine = db.connect()
     state.app.session = db.session(state.app.engine)
 
+# Not advertised, but available for those who seek moar power.
+MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 
 def launch(layout) -> int:
     try:
@@ -30,7 +33,7 @@ def launch(layout) -> int:
 
 
 def launch_async(layouts) -> list[int]:
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = executor.map(
             launch,
             [layout.as_dict() for layout in layouts for _ in range(layout.scale)],
@@ -56,7 +59,7 @@ def deploy(node: int) -> bool:
 
 
 def deploy_async(nodes) -> list[bool]:
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = executor.map(deploy, [node for node in nodes if node > 0])
     return results
 
@@ -111,7 +114,7 @@ def teardown_async(
 ) -> list[bool]:
     if not isinstance(names, list):
         names = list(names)
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(teardown, only_db=only_db, force=force)
         results = executor.map(func, names)
     return results
@@ -139,7 +142,7 @@ def sync(layout, overrides: Dict[Any, Any]) -> None:
 
 
 def sync_async(layouts, overrides: Dict[Any, Any]) -> list[bool]:
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(sync, overrides=overrides)
         results = executor.map(
             func,
@@ -192,7 +195,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
             rows = session.query(db.Node).all()
 
     log.info(f"Executing '{cmd}' across [green]{rows.count()}[/] nodes.")
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = executor.map(
             func,
@@ -220,7 +223,7 @@ def exec_scripts_async(name: str, tag: str, path: str) -> list[bool]:
             rows = session.query(db.Node).all()
 
     log.info(f"Executing scripts from '{path}' across {rows.count()} nodes.")
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec_scripts, path=path)
         results = executor.map(
             func,

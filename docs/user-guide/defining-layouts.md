@@ -74,6 +74,9 @@ In the case of **Google**, any username can be given. In the case of **AWS**, th
 | sles   | ec2-user |
 | ubuntu | ubuntu   |
 
+!!! caution
+    A lot of cloud machine images disable `root` login, try to avoid using that as a user and utilize `sudo` for anything needed elevated permissions.
+
 **scripts**
 
 The location on your machine where templates/scripts resides. These will be uploaded and executed during the deployment phase.

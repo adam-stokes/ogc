@@ -7,21 +7,21 @@ ssh-keys:
 
 layouts:
   elastic-agent-debian: 
-    runs-on: debian-10
-    instance-size: e2-standard-8
-    username: ogc
+    runs-on: ubuntu-2004
+    instance-size: c5.2xlarge
+    username: ubuntu
     scripts: fixtures/ex_deploy_ubuntu
-    provider: google
-    scale: 1
-    remote-path: /home/ogc/ogc
+    provider: aws
+    scale: 50
+    remote-path: /home/ubuntu/ogc
     exclude:
       - .git
       - .venv
       - artifacts
-    artifacts: /home/ogc/*.xml
+    artifacts: /home/ubuntu/output/*.xml
     tags:
       - elastic-agent-8.1.x
-      - ubuntu-gcp
+      - ubuntu-aws
     ports:
       - "22:22"
       - "80:80"
