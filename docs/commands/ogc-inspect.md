@@ -27,3 +27,7 @@ List nodes in your inventory
 **\--action-id** TEXT
 
 :   If set will only show the action output for a specific action ID
+
+**\--extend** / \--no-extend
+
+:   Show extended action output at once
