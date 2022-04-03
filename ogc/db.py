@@ -59,7 +59,7 @@ class Node(Base):
     extra = Column(JSON(), nullable=True)
 
     actions = relationship(
-        "Actions", back_populates="node", cascade="all, delete-orphan"
+        "Actions", back_populates="node", cascade="all, delete-orphan", lazy="dynamic"
     )
 
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
