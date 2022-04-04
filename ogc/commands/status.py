@@ -21,7 +21,11 @@ from .base import cli
     help="Attempt to fix deployment to match scale",
 )
 @click.option("--spec", required=False, multiple=True)
-@click.option("--output-file", required=False, help="Stores the table output to svg or html. Determined by the file extension.")
+@click.option(
+    "--output-file",
+    required=False,
+    help="Stores the table output to svg or html. Determined by the file extension.",
+)
 def status(reconcile, spec, output_file):
     app.spec = SpecLoader.load(list(spec))
     counts = app.spec.status
@@ -57,13 +61,15 @@ def status(reconcile, spec, output_file):
     console = Console(record=True)
     console.print(table, justify="center")
     if output_file:
-        if output_file.endswith('svg'):
+        if output_file.endswith("svg"):
             console.save_svg(output_file, title="Node Status Output")
-        elif output_file.endswith('html'):
+        elif output_file.endswith("html"):
             console.save_html(output_file)
         else:
-            log.error(f"Unknown extension for {output_file}, must end in '.svg' or '.html'")
-            sys.exit(1)    
+            log.error(
+                f"Unknown extension for {output_file}, must end in '.svg' or '.html'"
+            )
+            sys.exit(1)
 
 
 cli.add_command(status)

@@ -25,7 +25,11 @@ if not state.app.engine:
     required=False,
     help="List nodes by name, this can be a substring match",
 )
-@click.option("--output-file", required=False, help="Stores the table output to svg or html. Determined by the file extension.")
+@click.option(
+    "--output-file",
+    required=False,
+    help="Stores the table output to svg or html. Determined by the file extension.",
+)
 def ls(by_tag, by_name, output_file):
     if by_tag and by_name:
         log.error(
@@ -84,12 +88,14 @@ def ls(by_tag, by_name, output_file):
 
         console.print(table, justify="center")
         if output_file:
-            if output_file.endswith('svg'):
+            if output_file.endswith("svg"):
                 console.save_svg(output_file, title="Node List Output")
-            elif output_file.endswith('html'):
+            elif output_file.endswith("html"):
                 console.save_html(output_file)
             else:
-                log.error(f"Unknown extension for {output_file}, must end in '.svg' or '.html'")
+                log.error(
+                    f"Unknown extension for {output_file}, must end in '.svg' or '.html'"
+                )
                 sys.exit(1)
 
 

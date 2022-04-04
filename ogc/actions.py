@@ -81,7 +81,28 @@ def launch_async(layouts) -> list[int]:
     return results
 
 
-def deploy(node: int) -> bool:
+def deploy(node: db.Node) -> bool:
+    """Execute the deployment
+
+    Function for executing the deployment on a node.
+
+    Synopsis:
+
+        from ogc.spec import SpecLoader
+        from ogc import actions
+
+        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        layout = app.spec.layouts[0]
+        node_ids = actions.launch(layout.as_dict())
+        script_deploy_results = actions.deploy(node_id)
+
+    Args:
+        node (ogc.db.Node): The node object from the launch
+
+    Returns:
+        bool: True if successful, False otherwise.
+    """
+
     try:
         with state.app.session as session:
             node_obj = session.query(db.Node).filter(db.Node.id == node).first() or None
@@ -99,6 +120,25 @@ def deploy(node: int) -> bool:
 
 
 def deploy_async(nodes) -> list[bool]:
+    """Execute the deployment
+
+    Asynchronous function for executing the deployment on a node.
+
+    Synopsis:
+
+        from ogc.spec import SpecLoader
+        from ogc import actions
+
+        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        node_ids = actions.launch_async(app.spec.layouts)
+        script_deploy_results = actions.deploy_async(node_ids)
+
+    Args:
+        nodes (list[ogc.db.Node]): The node objects from the launch
+
+    Returns:
+        list[bool]: A list of booleans from result of deployment.
+    """
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = executor.map(deploy, [node for node in nodes if node > 0])
     return results
