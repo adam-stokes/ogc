@@ -814,39 +814,56 @@
 <p>Next, create the database tables, OGC provides a helper for this:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">db</span><span class="o">.</span><span class="n">createtbl</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
 </code></pre></div>
+<p>Additionally, dropping the tables can be achieved this way:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">db</span><span class="o">.</span><span class="n">droptabl</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>If altering the database models make sure to perform migrations for users who upgrade OGC versions.</p>
+<p>First create the migration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$ alembic revision --autogenerate -m <span class="s2">&quot;A new modification made&quot;</span>
+</code></pre></div>
+<p>Next perform the migration</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$ alembic upgrade head
+</code></pre></div>
+<p>Or programatically:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">db</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">db</span><span class="o">.</span><span class="n">migrate</span><span class="p">()</span>
+</code></pre></div>
+<p>See <a href="https://alembic.sqlalchemy.org/en/latest/autogenerate.html">Alembic auto generating migrations</a> for more info.</p>
+</div>
 <h3 id="create-user">Create User<a class="headerlink" href="#create-user" title="Permanent link">&para;</a></h3>
 <p>A single user record is required in the database, this allows OGC to track cloud resources by certain tags associated with the OGC user.</p>
 <p>To create an initial user:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">with</span> <span class="n">session</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">has_user</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">None</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_user</span><span class="p">:</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slugify</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="k">return</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User exists, nothing to do here&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">with</span> <span class="n">session</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    <span class="n">has_user</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">None</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_user</span><span class="p">:</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        <span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slugify</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        <span class="k">return</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User exists, nothing to do here&quot;</span><span class="p">)</span>
 </code></pre></div>
 <p>Querying the database uses standard <a href="https://sqlalchemy.org">SQLAlchemy</a>, please reference that site for additional information.</p>
 <h2 id="nodes">Nodes<a class="headerlink" href="#nodes" title="Permanent link">&para;</a></h2>
 <p>Once the database is setup in your code, you are ready to begin creating and managing nodes. OGC provides both synchronous and asynchronous support depending on your needs.</p>
 <h3 id="launch-node">Launch Node<a class="headerlink" href="#launch-node" title="Permanent link">&para;</a></h3>
 <p>To launch a node an OGC specification is required with at least one <a href="../../user-guide/defining-layouts/">layout</a> defined.</p>
-<p>Once a specification is created it needs to be loaded in our code:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">ogc.spec</span> <span class="kn">import</span> <span class="n">SpecLoader</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">app</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">SpecLoader</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="s2">&quot;/Users/adam/specs/ogc.yml&quot;</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span> <span class="nn">ogc.spec</span> <span class="kn">import</span> <span class="n">SpecLoader</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">app</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">SpecLoader</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="s2">&quot;/Users/adam/specs/ogc.yml&quot;</span><span class="p">])</span>
 </code></pre></div>
 <p>To launch this node layout synchronously:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="p">[</span><span class="n">actions</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="p">[</span><span class="n">actions</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">]</span>
 </code></pre></div>
 <p>For an asynchronous version:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">launch_async</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">launch_async</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -855,14 +872,14 @@
 <h3 id="script-deployment">Script Deployment<a class="headerlink" href="#script-deployment" title="Permanent link">&para;</a></h3>
 <p>Launching and deploying are separated into two parts, this allows for further customization between bringing up a machine and letting OGC handle the remaining deployment options.</p>
 <p>To deploy the scripts defined in your specification, use the results from the previous launch of <code>node_ids_created</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">script_deploy_results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">deploy_async</span><span class="p">(</span><span class="n">node_ids_created</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">script_deploy_results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">deploy_async</span><span class="p">(</span><span class="n">node_ids_created</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="checking-results">Checking Results<a class="headerlink" href="#checking-results" title="Permanent link">&para;</a></h3>
 <p>Checking the results of the deployment can be done in this way:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">script_deploy_results</span><span class="p">):</span>
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully deployed&quot;</span><span class="p">)</span>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One or more deployments failed&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">script_deploy_results</span><span class="p">):</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully deployed&quot;</span><span class="p">)</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One or more deployments failed&quot;</span><span class="p">)</span>
 </code></pre></div>
 
               
