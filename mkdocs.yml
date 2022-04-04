@@ -1,5 +1,8 @@
 site_name: OGC
 repo_url: https://github.com/adam-stokes/ogc
+plugins:
+    - search
+    - mkdocstrings
 theme: 
     name: material
     palette:
@@ -63,6 +66,8 @@ nav:
     - 'Providers': 'user-guide/providers.md'
   - 'Developer Guide':
     - 'Managing nodes': 'developer-guide/managing-nodes.md'
+    - 'API':
+        - 'ogc': 'developer-guide/api/actions.md'
   - 'Reference Commands':
     - "ogc": 'commands/ogc.md'
     - "ogc db-migrate": 'commands/ogc-db-migrate.md'

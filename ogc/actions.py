@@ -21,6 +21,25 @@ MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 
 
 def launch(layout) -> int:
+    """Launch a node.
+
+    Synchronous function for launching a node in a cloud environment.
+
+    Synopsis:
+
+        from ogc.spec import SpecLoader
+        from ogc import actions
+
+        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        node_ids_created = [actions.launch(layout.as_dict()) for layout in app.spec.layouts]
+
+    Args:
+        layout (ogc.spec.SpecProvisionLayout): The layout specification used
+            when launching a node.
+
+    Returns:
+        id (int): The database row ID of the node that was deployed.
+    """
     try:
         log.info(f"Provisioning: {layout['name']}")
         engine = choose_provisioner(layout["provider"], env=state.app.env)
@@ -34,6 +53,26 @@ def launch(layout) -> int:
 
 
 def launch_async(layouts) -> list[int]:
+    """Launch a node asynchronously.
+
+    Asynchronous function for launching a node in a cloud environment.
+
+    Synopsis:
+
+        from ogc.spec import SpecLoader
+        from ogc import actions
+
+        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        node_ids_created = actions.launch_async(app.spec.layouts)
+
+    Args:
+        layouts (list[ogc.spec.SpecProvisionLayout]): The layout specification used
+            when launching a node.
+
+    Returns:
+        ids (list[int]): The database row ID's of the node(s) that were deployed.
+    """
+
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = executor.map(
             launch,
