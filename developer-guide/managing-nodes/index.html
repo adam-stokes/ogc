@@ -13,7 +13,7 @@
     
     
       
-        <title>Managing a deployment - OGC</title>
+        <title>Managing nodes - OGC</title>
       
     
     
@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#managing-a-deployment" class="md-skip">
+        <a href="#managing-nodes-programatically" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Managing a deployment
+              Managing nodes
             
           </span>
         </div>
@@ -221,14 +221,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" data-md-state="indeterminate" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -249,108 +247,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Managing a deployment
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../user-guide/managing-nodes/" class="md-nav__link">
         Managing a deployment
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#listing-nodes" class="md-nav__link">
-    Listing Nodes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#accessing-nodes" class="md-nav__link">
-    Accessing nodes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#executing-commands" class="md-nav__link">
-    Executing commands
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#executing-a-scripts-directory" class="md-nav__link">
-    Executing a scripts directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#downloading-files" class="md-nav__link">
-    Downloading files
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#uploading-files" class="md-nav__link">
-    Uploading files
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspecting-nodes" class="md-nav__link">
-    Inspecting nodes
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#syncing-a-deployment" class="md-nav__link">
-    Syncing a deployment
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#destroying-nodes" class="md-nav__link">
-    Destroying nodes
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -362,7 +263,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../defining-layouts/" class="md-nav__link">
+      <a href="../../user-guide/defining-layouts/" class="md-nav__link">
         Defining Layouts
       </a>
     </li>
@@ -376,7 +277,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scripting/" class="md-nav__link">
+      <a href="../../user-guide/scripting/" class="md-nav__link">
         Scripting
       </a>
     </li>
@@ -390,7 +291,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../providers/" class="md-nav__link">
+      <a href="../../user-guide/providers/" class="md-nav__link">
         Providers
       </a>
     </li>
@@ -410,12 +311,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" data-md-state="indeterminate" type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
       
       
       
@@ -436,11 +339,120 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../developer-guide/managing-nodes/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Managing nodes
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         Managing nodes
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database" class="md-nav__link">
+    Database
+  </a>
+  
+    <nav class="md-nav" aria-label="Database">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connect" class="md-nav__link">
+    Connect
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#initialize-tables" class="md-nav__link">
+    Initialize Tables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-user" class="md-nav__link">
+    Create User
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nodes" class="md-nav__link">
+    Nodes
+  </a>
+  
+    <nav class="md-nav" aria-label="Nodes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launch-node" class="md-nav__link">
+    Launch Node
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#script-deployment" class="md-nav__link">
+    Script Deployment
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#checking-results" class="md-nav__link">
+    Checking Results
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -764,130 +776,94 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/adam-stokes/ogc/edit/master/docs/user-guide/managing-nodes.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/adam-stokes/ogc/edit/master/docs/developer-guide/managing-nodes.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
-<h1 id="managing-a-deployment">Managing a Deployment<a class="headerlink" href="#managing-a-deployment" title="Permanent link">&para;</a></h1>
-<p>Learn how to list, inspect, access and debug your node deployments.</p>
-<h2 id="listing-nodes">Listing Nodes<a class="headerlink" href="#listing-nodes" title="Permanent link">&para;</a></h2>
-<p>To list nodes in your deployment, run the following:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$ ogc ls
+<h1 id="managing-nodes-programatically">Managing Nodes Programatically<a class="headerlink" href="#managing-nodes-programatically" title="Permanent link">&para;</a></h1>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<p>Accessing the functionality of OGC programatically requires that both cloud credentials and database access are configured. The environment variables for working with <strong>AWS</strong> or <strong>Google</strong> should be defined in your environment either by setting it in the <code>.env</code> or in the abscence of a dotenv file they can be exported by your current running shell.</p>
+<p>Using the <code>.env</code> is easiest and is what we'll use for the remaining documentation, the following will configure access to both AWS and Google along with defining where our Postgres database resides:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span><span class="s2">&quot;abbcc&quot;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span><span class="s2">&quot;sshitsasecret&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">AWS_REGION</span><span class="o">=</span><span class="s2">&quot;us-east-2&quot;</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nv">GOOGLE_APPLICATION_CREDENTIALS</span><span class="o">=</span><span class="s2">&quot;mycreds.json&quot;</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nv">GOOGLE_APPLICATION_SERVICE_ACCOUNT</span><span class="o">=</span><span class="s2">&quot;bob@whodunit.iam.gserviceaccount.com&quot;</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="nv">GOOGLE_PROJECT</span><span class="o">=</span><span class="s2">&quot;my-awesome-project&quot;</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="nv">GOOGLE_DATACENTER</span><span class="o">=</span><span class="s2">&quot;us-central1-a&quot;</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="nv">POSTGRES_HOST</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nv">POSTGRES_DB</span><span class="o">=</span><span class="s2">&quot;ogc&quot;</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="nv">POSTGRES_USER</span><span class="o">=</span><span class="s2">&quot;postgres&quot;</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span><span class="s2">&quot;postgres&quot;</span>
 </code></pre></div>
-<p>Which gives a table output of current node deployments:</p>
-<p><img alt="Listing Nodes" src="../assets/list_nodes.svg" /></p>
-<p>You can further drill down with a couple of options:</p>
-<p>To filter <code>by-tag</code> run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$ ogc ls --by-tag user-adam
+<h2 id="database">Database<a class="headerlink" href="#database" title="Permanent link">&para;</a></h2>
+<h3 id="connect">Connect<a class="headerlink" href="#connect" title="Permanent link">&para;</a></h3>
+<p>Everything is tracked in the database, first thing to do is setup that database connection.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">db</span><span class="p">,</span> <span class="n">state</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">if</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
 </code></pre></div>
-<p><img alt="Listing Nodes by Tag" src="../assets/list_nodes_by_tag.svg" /></p>
-<h2 id="accessing-nodes">Accessing nodes<a class="headerlink" href="#accessing-nodes" title="Permanent link">&para;</a></h2>
-<p>OGC provides a helper command for easily accessing any of the nodes in your deployment.</p>
-<p>To login to one of the above nodes <code>ogc-d7cd61a7-elastic-agent-ubuntu</code> run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$ ogc ssh --by-name ogc-d7cd61a7-elastic-agent-ubuntu
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>... ssh output ...
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>ogc@ogc-d7cd61a7-elastic-agent-ubuntu:~#
+<h3 id="initialize-tables">Initialize Tables<a class="headerlink" href="#initialize-tables" title="Permanent link">&para;</a></h3>
+<p>Next, create the database tables, OGC provides a helper for this:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">db</span><span class="o">.</span><span class="n">createtbl</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
 </code></pre></div>
-<p>Alternatively, use the <code>ID</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$ ogc ssh --by-id 38
+<h3 id="create-user">Create User<a class="headerlink" href="#create-user" title="Permanent link">&para;</a></h3>
+<p>A single user record is required in the database, this allows OGC to track cloud resources by certain tags associated with the OGC user.</p>
+<p>To create an initial user:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span> <span class="nn">slugify</span> <span class="kn">import</span> <span class="n">slugify</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">with</span> <span class="n">session</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">has_user</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span> <span class="ow">or</span> <span class="kc">None</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">has_user</span><span class="p">:</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span> <span class="n">slug</span><span class="o">=</span><span class="n">slugify</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">s</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="k">return</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;User exists, nothing to do here&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="executing-commands">Executing commands<a class="headerlink" href="#executing-commands" title="Permanent link">&para;</a></h2>
-<p>Running arbitrary commands can be accomplished with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$ ogc exec --by-name ogc-d7cd61a7-elastic-agent-ubuntu &#39;ls -l /&#39;
+<p>Querying the database uses standard <a href="https://sqlalchemy.org">SQLAlchemy</a>, please reference that site for additional information.</p>
+<h2 id="nodes">Nodes<a class="headerlink" href="#nodes" title="Permanent link">&para;</a></h2>
+<p>Once the database is setup in your code, you are ready to begin creating and managing nodes. OGC provides both synchronous and asynchronous support depending on your needs.</p>
+<h3 id="launch-node">Launch Node<a class="headerlink" href="#launch-node" title="Permanent link">&para;</a></h3>
+<p>To launch a node an OGC specification is required with at least one <a href="../../user-guide/defining-layouts/">layout</a> defined.</p>
+<p>Once a specification is created it needs to be loaded in our code:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span> <span class="nn">ogc.spec</span> <span class="kn">import</span> <span class="n">SpecLoader</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">app</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">SpecLoader</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="s2">&quot;/Users/adam/specs/ogc.yml&quot;</span><span class="p">])</span>
 </code></pre></div>
-<p>Or if tags are defined, run a command across a set of machines:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$ ogc exec --by-tag ubuntu-gcp &#39;touch this_is_an_ubuntu_machine.txt&#39;
+<p>To launch this node layout synchronously:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="p">[</span><span class="n">actions</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">]</span>
 </code></pre></div>
-<h2 id="executing-a-scripts-directory">Executing a scripts directory<a class="headerlink" href="#executing-a-scripts-directory" title="Permanent link">&para;</a></h2>
-<p>In addition to running arbitrary commands, OGC can also execute a directory of templates/scripts:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>$ ogc exec-scripts --by-name ogc-d7cd61a7-elastic-agent-ubuntu fixtures/ex_deploy_ubuntu
+<p>For an asynchronous version:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">node_ids_created</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">launch_async</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">)</span>
 </code></pre></div>
-<p>Or if tags are defined, run across a set of machines:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$ ogc exec-scripts --by-tag ubuntu-gcp fixtures/ex_deploy_ubuntu
-</code></pre></div>
-<p>This can be useful to re-run a deployment or add new functionality/one-offs to a node without disturbing the original layout specifications. Access to the database and all templating is available as well.</p>
-<h2 id="downloading-files">Downloading files<a class="headerlink" href="#downloading-files" title="Permanent link">&para;</a></h2>
-<p>There are 2 ways to download files, the first is to use <code>ogc pull-files</code>, this gives you the ability to download any arbitrary files:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>$ ogc pull-files ogc-d7cd61a7-elastic-agent-ubuntu im_on_a_computer.txt im_downloaded_computer.txt
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>$ stat im_downloaded_computer.txt 
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>16777221 24809112 -rw-r--r-- 1 adam staff 0 0 &quot;Mar 24 11:56:24 2022&quot; &quot;Mar 24 11:55:16 2022&quot; &quot;Mar 24 11:56:24 2022&quot; &quot;Mar 24 11:55:16 2022&quot; 4096 0 0 im_downloaded_computer.txt
-</code></pre></div>
-<p>Another way is if the <code>artifacts</code> key is defined in a layout. To grab files defined by that <code>artifacts</code> option run the following:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>$ ogc pull-artifacts ogc-d7cd61a7-elastic-agent-ubuntu
-</code></pre></div>
-<p>By default, artifacts are stored in <code>$(pwd)/artifacts/ogc-d7cd61a7-elastic-agent-ubuntu</code></p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>tree artifacts/ogc-d7cd61a7-elastic-agent-ubuntu/
-<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>artifacts/ogc-d7cd61a7-elastic-agent-ubuntu/
-<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>└── test.xml
-<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>0 directories, 1 file
-</code></pre></div>
-<h2 id="uploading-files">Uploading files<a class="headerlink" href="#uploading-files" title="Permanent link">&para;</a></h2>
-<p>OGC provides a simple way to upload arbitrary files to a node:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>$ ogc push-files ogc-d7cd61a7-elastic-agent-ubuntu im_downloaded_computer.txt dl.txt
-</code></pre></div>
-<p>Optionally, if <code>--exclude</code> is provided, uploading files will ignore any wildcards matched. </p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Passing multiple <code>--exclude</code> is supported and will be added to the list of excludes during upload. Useful if uploading directories and want to ignore things like <code>.git</code> and <code>.venv</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>The naming conventions used for async functions is to append the suffix of <code>async</code> to the synchronous function name, for example, <code>actions.exec</code> and <code>actions.exec_async</code>.</p>
 </div>
-<h2 id="inspecting-nodes">Inspecting nodes<a class="headerlink" href="#inspecting-nodes" title="Permanent link">&para;</a></h2>
-<p>Each action performed on a node is tracked. This allows you to quickly investigate why scripts failed. To inspect a node and see action results run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>$ ogc inspect --id 38
+<h3 id="script-deployment">Script Deployment<a class="headerlink" href="#script-deployment" title="Permanent link">&para;</a></h3>
+<p>Launching and deploying are separated into two parts, this allows for further customization between bringing up a machine and letting OGC handle the remaining deployment options.</p>
+<p>To deploy the scripts defined in your specification, use the results from the previous launch of <code>node_ids_created</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">script_deploy_results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">deploy_async</span><span class="p">(</span><span class="n">node_ids_created</span><span class="p">)</span>
 </code></pre></div>
-<p>This will return the following output:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>Deploy Details: ogc-d7cd61a7-elastic-agent-ubuntu
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>[3] Successful Actions:
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>  (id: 90) Out: 2022-03-24 12:37:08.657289                                                                                                                                                                                                                                                 
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>  &#39;/usr/local/bin/pacman&#39; -&gt; &#39;/usr/local/bin/pacapt&#39;                                                                                                                                                                                                                                       
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>  Reading package lists...                                                                                                                                                                                                                                                                 
-<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>  Building dependency tree...                                                                                                                                                                                                                                                              
-<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>  Reading state information...                                                                                                                                                                                                                                                             
-<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>  nano is already the newest version (2.9.3-2).                                                                                                                                                                                                                                            
-<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>  nano set to manually installed.                                                                                                                                                                                                                                                          
-<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>  The following package was automatically installed and is no longer required:                                                                                                                                                                                                             
-<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>    libnuma1                                                                                                                                                                                                                                                                               
-<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>  Use &#39;apt autoremove&#39; to remove it.                                                                                                                                                                                                                                                       
-<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>  0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+<h3 id="checking-results">Checking Results<a class="headerlink" href="#checking-results" title="Permanent link">&para;</a></h3>
+<p>Checking the results of the deployment can be done in this way:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">script_deploy_results</span><span class="p">):</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Successfully deployed&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One or more deployments failed&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>If multiple actions exist, further drill down into the action you want (<em>seen here "(id: 90) Out: 2022-03-24 12:37:08." in our example</em>):</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>$ ogc inspect --id 38 --action-id 90
-</code></pre></div>
-<h2 id="syncing-a-deployment">Syncing a deployment<a class="headerlink" href="#syncing-a-deployment" title="Permanent link">&para;</a></h2>
-<p>In some cases nodes will fail to deploy or you remembered you needed more than 5 nodes or maybe you need less nodes than what the original <code>scale</code> was set. </p>
-<p>In all these cases, OGC provides a way to keep the deployment in sync with the layouts.</p>
-<p>To get an idea of the health of the deployment, run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>$ ogc status
-</code></pre></div>
-<p>The output returned will be a table displaying what's deployed, the scale, and if there are any remaining nodes left:</p>
-<p><img alt="Node Status Health" src="../assets/healthy_status.svg" /></p>
-<p>In cases where you want to add more nodes, update your layout and increase the <code>scale</code> option, in this case we want to add 10 more nodes to our <code>elastic-agent-sles</code> layout:</p>
-<p><img alt="Node Status Degraded" src="../assets/degraded_status_scale_up.svg" /></p>
-<p>Or another case where we need to reduce the number of nodes from 5 to 3:</p>
-<p><img alt="Node Status Degraded" src="../assets/degraded_status_scale_down.svg" /></p>
-<p>To perform the sync, run the following:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>$ ogc status --reconcile
-</code></pre></div>
-<p>And the output will show OGC destroying 2 nodes from each layout:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>2022-03-24 at 11:52:37 | INFO Reconciling: [elastic-agent-sles, elastic-agent-ubuntu]
-<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>2022-03-24 at 11:52:37 | INFO Destroying: ogc-87ba30fc-elastic-agent-sles
-<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>2022-03-24 at 11:52:37 | INFO Destroying: ogc-51b971ad-elastic-agent-sles
-<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>2022-03-24 at 11:52:37 | INFO Destroying: ogc-b3befadc-elastic-agent-ubuntu
-<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>2022-03-24 at 11:52:37 | INFO Destroying: ogc-d54a5848-elastic-agent-ubuntu
-</code></pre></div>
-<h2 id="destroying-nodes">Destroying nodes<a class="headerlink" href="#destroying-nodes" title="Permanent link">&para;</a></h2>
-<p>OGC allows destroying of individual or a full blown cleanup. To remove a single node we run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>$ ogc rm --by-name ogc-d7cd61a7-elastic-agent-ubuntu --force
-</code></pre></div>
-<p>Or if we wanted to do a full teardown, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>$ ogc rm-all --force
-</code></pre></div></p>
 
               
             </article>
@@ -906,7 +882,7 @@
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started" rel="prev">
+        <a href="../../user-guide/providers/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Providers" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -915,20 +891,20 @@
               <span class="md-footer__direction">
                 Previous
               </span>
-              Getting Started
+              Providers
             </div>
           </div>
         </a>
       
       
         
-        <a href="../defining-layouts/" class="md-footer__link md-footer__link--next" aria-label="Next: Defining Layouts" rel="next">
+        <a href="../../commands/ogc/" class="md-footer__link md-footer__link--next" aria-label="Next: ogc" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Defining Layouts
+              ogc
             </div>
           </div>
           <div class="md-footer__button md-icon">

@@ -363,8 +363,16 @@
 
             
           
-            
-              
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
   
   
   
@@ -372,18 +380,66 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" data-md-state="indeterminate" type="checkbox" id="__nav_2_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" data-md-state="indeterminate" type="checkbox" id="__nav_3" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_2_5">
+        <label class="md-nav__link" for="__nav_3">
+          Developer Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Developer Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/managing-nodes/" class="md-nav__link">
+        Managing nodes
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" data-md-state="indeterminate" type="checkbox" id="__nav_4" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_4">
           Reference Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Reference Commands" data-md-level="2">
-        <label class="md-nav__title" for="__nav_2_5">
+      <nav class="md-nav" aria-label="Reference Commands" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Reference Commands
         </label>
@@ -660,13 +716,6 @@
     </li>
   
 
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
     
   </ul>
 </nav>
@@ -693,9 +742,9 @@
 <ul>
 <li>All scripts are executed in order based on the filenames. It is recommended to create scripts with a numbered prefix, for example:</li>
 </ul>
-<div class="highlight"><pre><span></span><code>- scripts/
-  -  01-install-deps
-  -  02-configure-services
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>- scripts/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  -  01-install-deps
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  -  02-configure-services
 </code></pre></div>
 <ul>
 <li>There is a special reserved filename <code>teardown</code>, if this file exists it will only be executed during a removal of a node. This is useful for any cleanup actions that may need to be run, such as removing test users, un-enrolling from a service, etc.</li>
@@ -703,32 +752,32 @@
 <h2 id="writing-scripts">Writing scripts<a class="headerlink" href="#writing-scripts" title="Permanent link">&para;</a></h2>
 <p>Scripts can be written in any language, it is up to you to configure the nodes so that any runtimes and library dependencies are met on the target node for your script to execute in. </p>
 <p>One way to accomplish this is to create <code>01-setup-env</code> bash script:</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-
-<span class="nb">echo</span> <span class="s2">&quot;Installing python3 on ubuntu&quot;</span>
-sudo apt-get update
-sudo apt-get install -qyf python3
-sudo pip install sh
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">echo</span> <span class="s2">&quot;Installing python3 on ubuntu&quot;</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>sudo apt-get update
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>sudo apt-get install -qyf python3
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>sudo pip install sh
 </code></pre></div>
 <p>Then in subsequent scripts, using <strong>python3</strong> is available. For example, in file <code>02-run-cmd-in-python</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
-
-<span class="kn">import</span> <span class="nn">sh</span>
-
-<span class="n">sh</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-<span class="n">sh</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;mydir&#39;</span><span class="p">,</span> <span class="s1">&#39;anotherdir&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="ch">#!/usr/bin/env python3</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">import</span> <span class="nn">sh</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">sh</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">sh</span><span class="o">.</span><span class="n">cp</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;mydir&#39;</span><span class="p">,</span> <span class="s1">&#39;anotherdir&#39;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="templating">Templating<a class="headerlink" href="#templating" title="Permanent link">&para;</a></h2>
 <p>OGC provides some additional capabilities through templating. Under the hood <a href="https://www.makotemplates.org/">python-mako</a> is used for the parsing.</p>
 <p>With templating, you have the ability to query the underlying database to gather node information. Because mako supports the importing of python modules and our OGC environment is already exposed, we can access our <code>db</code> module and use some helper methods.</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;db&quot;</span> <span class="nv">module</span><span class="o">=</span><span class="s2">&quot;ogc.db&quot;</span>/&gt;
-
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
-% <span class="k">for</span> node <span class="k">in</span> db.by_tag<span class="o">(</span><span class="s1">&#39;sles&#39;</span><span class="o">)</span>:
-<span class="nb">echo</span> <span class="s2">&quot;[ID: </span><span class="si">${</span><span class="nv">node</span><span class="p">.id</span><span class="si">}</span><span class="s2">] Name: </span><span class="si">${</span><span class="nv">node</span><span class="p">.instance_name</span><span class="si">}</span><span class="s2"> || Connection: </span><span class="si">${</span><span class="nv">node</span><span class="p">.username</span><span class="si">}</span><span class="s2">@</span><span class="si">${</span><span class="nv">node</span><span class="p">.public_ip</span><span class="si">}</span><span class="s2"> || Provider: </span><span class="si">${</span><span class="nv">node</span><span class="p">.provider</span><span class="si">}</span><span class="s2">&quot;</span>
-% endfor
-<span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;db&quot;</span> <span class="nv">module</span><span class="o">=</span><span class="s2">&quot;ogc.db&quot;</span>/&gt;
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>% <span class="k">for</span> node <span class="k">in</span> db.by_tag<span class="o">(</span><span class="s1">&#39;sles&#39;</span><span class="o">)</span>:
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">echo</span> <span class="s2">&quot;[ID: </span><span class="si">${</span><span class="nv">node</span><span class="p">.id</span><span class="si">}</span><span class="s2">] Name: </span><span class="si">${</span><span class="nv">node</span><span class="p">.instance_name</span><span class="si">}</span><span class="s2"> || Connection: </span><span class="si">${</span><span class="nv">node</span><span class="p">.username</span><span class="si">}</span><span class="s2">@</span><span class="si">${</span><span class="nv">node</span><span class="p">.public_ip</span><span class="si">}</span><span class="s2"> || Provider: </span><span class="si">${</span><span class="nv">node</span><span class="p">.provider</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>% endfor
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div>
 <p>The runtime environment is also available within the template context. In one example, we can export the following into our <code>.env</code> file and reference those in the templates:</p>
 <ul>
@@ -739,56 +788,56 @@ sudo pip install sh
 <li><strong>OGC_FLEET_ENROLLMENT_TOKEN</strong> </li>
 </ul>
 <p>See the below example for downloading elastic-agent and enrolling it into a fleet server. The variable exposed to all templates for accessing the environment variables is <code>env</code></p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;utils&quot;</span> <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;/functions.mako&quot;</span>/&gt;
-
-&lt;%
-<span class="nv">url</span> <span class="o">=</span> <span class="s2">&quot;https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz&quot;</span> % <span class="o">(</span>env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_SHA&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">])</span>
-%&gt;
-<span class="si">${</span><span class="nv">utils</span><span class="p">.setup_env()</span><span class="si">}</span>
-<span class="si">${</span><span class="nv">utils</span><span class="p">.install_pkgs([</span><span class="s1">&#39;nano&#39;</span><span class="p">])</span><span class="si">}</span>
-<span class="si">${</span><span class="nv">utils</span><span class="p">.download(url, </span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
-<span class="si">${</span><span class="nv">utils</span><span class="p">.extract(</span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
-
-mv elastic-agent-<span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="p">]</span><span class="si">}</span>-linux-x86_64 elastic-agent
-
-<span class="nb">cd</span> elastic-agent <span class="o">&amp;&amp;</span> ./elastic-agent install -f --url<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_URL&#39;</span><span class="p">]</span><span class="si">}</span> --enrollment-token<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_ENROLLMENT_TOKEN&#39;</span><span class="p">]</span><span class="si">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;utils&quot;</span> <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;/functions.mako&quot;</span>/&gt;
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>&lt;%
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nv">url</span> <span class="o">=</span> <span class="s2">&quot;https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz&quot;</span> % <span class="o">(</span>env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_SHA&#39;</span><span class="o">]</span>, env<span class="o">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="o">])</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>%&gt;
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="si">${</span><span class="nv">utils</span><span class="p">.setup_env()</span><span class="si">}</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="si">${</span><span class="nv">utils</span><span class="p">.install_pkgs([</span><span class="s1">&#39;nano&#39;</span><span class="p">])</span><span class="si">}</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="si">${</span><span class="nv">utils</span><span class="p">.download(url, </span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="si">${</span><span class="nv">utils</span><span class="p">.extract(</span><span class="s1">&#39;elastic-agent.tar.gz&#39;</span><span class="p">)</span><span class="si">}</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>mv elastic-agent-<span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_ELASTIC_AGENT_VERSION&#39;</span><span class="p">]</span><span class="si">}</span>-linux-x86_64 elastic-agent
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="nb">cd</span> elastic-agent <span class="o">&amp;&amp;</span> ./elastic-agent install -f --url<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_URL&#39;</span><span class="p">]</span><span class="si">}</span> --enrollment-token<span class="o">=</span><span class="si">${</span><span class="nv">env</span><span class="p">[</span><span class="s1">&#39;OGC_FLEET_ENROLLMENT_TOKEN&#39;</span><span class="p">]</span><span class="si">}</span>
 </code></pre></div>
 <h2 id="reusable-helpers">Reusable helpers<a class="headerlink" href="#reusable-helpers" title="Permanent link">&para;</a></h2>
 <p>In the above example we reference a file called <code>/functions.mako</code> this is just another template file that sits just outside of our defined <code>scripts</code>, for example, if our <code>scripts</code> is defined to be in <code>scripts/my_ubuntu_deploy</code> then this <code>functions.mako</code> will live at <code>scripts/functions.mako</code>. </p>
 <p>This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.</p>
 <p>Defining helper functions is straight forward, lets look at <code>functions.mako</code> for an example:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">## Helper template functions downloading/extracting files</span>
-&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;setup_env()&quot;</span>&gt;
-<span class="k">if</span> ! <span class="nb">test</span> -f <span class="s2">&quot;/usr/local/bin/pacapt&quot;</span><span class="p">;</span> <span class="k">then</span>
-    wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
-    chmod <span class="m">755</span> /usr/local/bin/pacapt
-    ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman <span class="o">||</span> <span class="nb">true</span>
-<span class="k">fi</span>
-&lt;/%def&gt;
-
-&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;install_pkgs(pkgs)&quot;</span>&gt;
-% <span class="k">for</span> pkg <span class="k">in</span> pkgs:
-pacapt install --noconfirm <span class="si">${</span><span class="nv">pkg</span><span class="si">}</span>
-% endfor
-&lt;/%def&gt;
-
-&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;download(url, src_file)&quot;</span>&gt;
-wget -O <span class="si">${</span><span class="nv">src_file</span><span class="si">}</span> <span class="si">${</span><span class="nv">url</span><span class="si">}</span>
-&lt;/%def&gt;
-
-&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;extract(src, dst=None)&quot;</span>&gt;
-% <span class="k">if</span> dst:
-mkdir -p <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
-tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span> -C <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
-% <span class="k">else</span>:
-tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span>
-% endif
-&lt;/%def&gt;
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">## Helper template functions downloading/extracting files</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;setup_env()&quot;</span>&gt;
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">if</span> ! <span class="nb">test</span> -f <span class="s2">&quot;/usr/local/bin/pacapt&quot;</span><span class="p">;</span> <span class="k">then</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    wget -O /usr/local/bin/pacapt https://github.com/icy/pacapt/raw/ng/pacapt
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    chmod <span class="m">755</span> /usr/local/bin/pacapt
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    ln -sv /usr/local/bin/pacapt /usr/local/bin/pacman <span class="o">||</span> <span class="nb">true</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="k">fi</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>&lt;/%def&gt;
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;install_pkgs(pkgs)&quot;</span>&gt;
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>% <span class="k">for</span> pkg <span class="k">in</span> pkgs:
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>pacapt install --noconfirm <span class="si">${</span><span class="nv">pkg</span><span class="si">}</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>% endfor
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>&lt;/%def&gt;
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;download(url, src_file)&quot;</span>&gt;
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>wget -O <span class="si">${</span><span class="nv">src_file</span><span class="si">}</span> <span class="si">${</span><span class="nv">url</span><span class="si">}</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>&lt;/%def&gt;
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;extract(src, dst=None)&quot;</span>&gt;
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>% <span class="k">if</span> dst:
+<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>mkdir -p <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span> -C <span class="si">${</span><span class="nv">dst</span><span class="si">}</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>% <span class="k">else</span>:
+<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a>tar -xvf <span class="si">${</span><span class="nv">src</span><span class="si">}</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a>% endif
+<a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a>&lt;/%def&gt;
 </code></pre></div>
 <p>Each <code>%def</code> section defines a function block that when called with any necessary arguments will output that data into the scripts with all necessary translations handled.</p>
 <p>You can see the usage of these functions in the previous example for installing elastic-agent.</p>
-<p>It is worth the time to visit Mako&rsquo;s website and learn about its feature set, particularly <a href="https://docs.makotemplates.org/en/latest/namespaces.html">namespaces</a> and <a href="https://docs.makotemplates.org/en/latest/defs.html">defs and blocks</a>.</p>
+<p>It is worth the time to visit Mako's website and learn about its feature set, particularly <a href="https://docs.makotemplates.org/en/latest/namespaces.html">namespaces</a> and <a href="https://docs.makotemplates.org/en/latest/defs.html">defs and blocks</a>.</p>
 
               
             </article>

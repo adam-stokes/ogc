@@ -221,14 +221,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" data-md-state="indeterminate" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -301,8 +299,64 @@
 
             
           
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" data-md-state="indeterminate" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3">
+          Developer Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Developer Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
             
               
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/managing-nodes/" class="md-nav__link">
+        Managing nodes
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
   
   
     
@@ -312,18 +366,18 @@
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_5" type="checkbox" id="__nav_2_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_2_5">
+        <label class="md-nav__link" for="__nav_4">
           Reference Commands
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <nav class="md-nav" aria-label="Reference Commands" data-md-level="2">
-        <label class="md-nav__title" for="__nav_2_5">
+      <nav class="md-nav" aria-label="Reference Commands" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
           <span class="md-nav__icon md-icon"></span>
           Reference Commands
         </label>
@@ -610,13 +664,6 @@
     </li>
   
 
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
     
   </ul>
 </nav>
@@ -643,10 +690,16 @@
 <h1 id="description">DESCRIPTION<a class="headerlink" href="#description" title="Permanent link">&para;</a></h1>
 <p>List nodes in your inventory</p>
 <h1 id="options">OPTIONS<a class="headerlink" href="#options" title="Permanent link">&para;</a></h1>
-<p><strong>--by-tag</strong> TEXT</p>
-<p>:   List nodes by tag</p>
-<p><strong>--by-name</strong> TEXT</p>
-<p>:   List nodes by name, this can be a substring match</p>
+<dl>
+<dt><strong>--by-tag</strong> TEXT</dt>
+<dd>
+<p>List nodes by tag</p>
+</dd>
+<dt><strong>--by-name</strong> TEXT</dt>
+<dd>
+<p>List nodes by name, this can be a substring match</p>
+</dd>
+</dl>
 
               
             </article>
