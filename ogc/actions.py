@@ -25,7 +25,7 @@ def launch(layout) -> int:
 
     Synchronous function for launching a node in a cloud environment.
 
-    Synopsis:
+    **Synopsis:**
 
         from ogc.spec import SpecLoader
         from ogc import actions
@@ -57,7 +57,7 @@ def launch_async(layouts) -> list[int]:
 
     Asynchronous function for launching a node in a cloud environment.
 
-    Synopsis:
+    **Synopsis:**
 
         from ogc.spec import SpecLoader
         from ogc import actions
@@ -86,7 +86,7 @@ def deploy(node: db.Node) -> bool:
 
     Function for executing the deployment on a node.
 
-    Synopsis:
+    **Synopsis:**
 
         from ogc.spec import SpecLoader
         from ogc import actions
@@ -124,7 +124,7 @@ def deploy_async(nodes) -> list[bool]:
 
     Asynchronous function for executing the deployment on a node.
 
-    Synopsis:
+    **Synopsis:**
 
         from ogc.spec import SpecLoader
         from ogc import actions
