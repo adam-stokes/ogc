@@ -12,7 +12,7 @@ $ ogc ls
 
 Which gives a table output of current node deployments:
 
-![Listing Nodes](./user-guide/assets/../../assets/list_nodes.svg)
+![Listing Nodes](./assets/list_nodes.svg)
 
 
 You can further drill down with a couple of options:
@@ -22,10 +22,10 @@ To filter `by-tag` run:
 
 
 ```shell
-$ ogc ls --by-tag ubuntu-gcp
+$ ogc ls --by-tag user-adam
 ```
 
-![Listing Nodes by Tag](./user-guide/assets/../../assets/list_nodes_by_tag.svg)
+![Listing Nodes by Tag](./assets/list_nodes_by_tag.svg)
 
 ## Accessing nodes
 
@@ -164,39 +164,15 @@ $ ogc status
 
 The output returned will be a table displaying what's deployed, the scale, and if there are any remaining nodes left:
 
-```
-              Deployment Status: Healthy               
-┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
-┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
-┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
-│ elastic-agent-sles   │ 5        │ 5     │ 0         │
-│ elastic-agent-ubuntu │ 5        │ 5     │ 0         │
-└──────────────────────┴──────────┴───────┴───────────┘
-```
+![Node Status Health](./assets/healthy_status.svg)
 
 In cases where you want to add more nodes, update your layout and increase the `scale` option, in this case we want to add 10 more nodes to our `elastic-agent-sles` layout:
 
-```
-              Deployment Status: Degraded              
-┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
-┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
-┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
-│ elastic-agent-sles   │ 5        │ 15    │ 10        │
-│ elastic-agent-ubuntu │ 5        │ 5     │ 0         │
-└──────────────────────┴──────────┴───────┴───────────┘
-```
+![Node Status Degraded](./assets/degraded_status_scale_up.svg)
 
 Or another case where we need to reduce the number of nodes from 5 to 3:
 
-```
-             Deployment Status: Degraded              
-┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━━━┓
-┃ Name                 ┃ Deployed ┃ Scale ┃ Remaining ┃
-┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━╇━━━━━━━━━━━┩
-│ elastic-agent-sles   │ 5        │ 3     │ -2        │
-│ elastic-agent-ubuntu │ 5        │ 3     │ -2        │
-└──────────────────────┴──────────┴───────┴───────────┘
-```
+![Node Status Degraded](./assets/degraded_status_scale_down.svg)
 
 To perform the sync, run the following:
 

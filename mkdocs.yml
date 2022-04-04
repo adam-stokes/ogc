@@ -18,10 +18,18 @@ markdown_extensions:
     - toc:
         permalink: True
     - admonition
-    - smarty
-    - wikilinks
-    - codehilite:
+    - attr_list
+    - def_list
+    - md_in_html
+    - meta
+    - footnotes
+    - abbr
+    - markdown.extensions.codehilite:
         linenums: True
+        guess_lang: false
+        use_pygments: true
+        noclasses: true
+        pygments_style: monokai
     - pymdownx.arithmatex
     - pymdownx.betterem:
         smart_enable: all
@@ -30,8 +38,16 @@ markdown_extensions:
     - pymdownx.details
     - pymdownx.emoji:
         emoji_generator: !!python/name:pymdownx.emoji.to_svg
+    - pymdownx.highlight:
+        anchor_linenums: true
     - pymdownx.inlinehilite
-    - pymdownx.magiclink
+    - pymdownx.keys
+    - pymdownx.magiclink:
+        repo_url_shorthand: true
+        user: adam-stokes
+        repo: ogc
+    - pymdownx.tabbed:
+        alternate_style: true
     - pymdownx.mark
     - pymdownx.smartsymbols
     - pymdownx.superfences
@@ -45,23 +61,25 @@ nav:
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
     - 'Scripting': 'user-guide/scripting.md'
     - 'Providers': 'user-guide/providers.md'
-    - 'Reference Commands':
-        - "ogc": 'commands/ogc.md'
-        - "ogc db-migrate": 'commands/ogc-db-migrate.md'
-        - "ogc exec-scripts": 'commands/ogc-exec-scripts.md'
-        - "ogc exec": 'commands/ogc-exec.md'
-        - "ogc init": 'commands/ogc-init.md'
-        - "ogc inspect": 'commands/ogc-inspect.md'
-        - "ogc launch": 'commands/ogc-launch.md'
-        - "ogc log": 'commands/ogc-log.md'
-        - "ogc ls-key-pairs": 'commands/ogc-ls-key-pairs.md'
-        - "ogc ls": 'commands/ogc-ls.md'
-        - "ogc pull-artifacts": 'commands/ogc-pull-artifacts.md'
-        - "ogc pull-files": 'commands/ogc-pull-files.md'
-        - "ogc push-files": 'commands/ogc-push-files.md'
-        - "ogc rm-all": 'commands/ogc-rm-all.md'
-        - "ogc rm-key-pairs": 'commands/ogc-rm-key-pairs.md'
-        - "ogc rm": 'commands/ogc-rm.md'
-        - "ogc shell": 'commands/ogc-shell.md'
-        - "ogc ssh": 'commands/ogc-ssh.md'
-        - "ogc status": 'commands/ogc-status.md'
+  - 'Developer Guide':
+    - 'Managing nodes': 'developer-guide/managing-nodes.md'
+  - 'Reference Commands':
+    - "ogc": 'commands/ogc.md'
+    - "ogc db-migrate": 'commands/ogc-db-migrate.md'
+    - "ogc exec-scripts": 'commands/ogc-exec-scripts.md'
+    - "ogc exec": 'commands/ogc-exec.md'
+    - "ogc init": 'commands/ogc-init.md'
+    - "ogc inspect": 'commands/ogc-inspect.md'
+    - "ogc launch": 'commands/ogc-launch.md'
+    - "ogc log": 'commands/ogc-log.md'
+    - "ogc ls-key-pairs": 'commands/ogc-ls-key-pairs.md'
+    - "ogc ls": 'commands/ogc-ls.md'
+    - "ogc pull-artifacts": 'commands/ogc-pull-artifacts.md'
+    - "ogc pull-files": 'commands/ogc-pull-files.md'
+    - "ogc push-files": 'commands/ogc-push-files.md'
+    - "ogc rm-all": 'commands/ogc-rm-all.md'
+    - "ogc rm-key-pairs": 'commands/ogc-rm-key-pairs.md'
+    - "ogc rm": 'commands/ogc-rm.md'
+    - "ogc shell": 'commands/ogc-shell.md'
+    - "ogc ssh": 'commands/ogc-ssh.md'
+    - "ogc status": 'commands/ogc-status.md'
