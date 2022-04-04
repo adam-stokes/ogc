@@ -427,6 +427,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ogc.actions.deploy" class="md-nav__link">
+    deploy()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.deploy_async" class="md-nav__link">
+    deploy_async()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ogc.actions.launch" class="md-nav__link">
     launch()
   </a>
@@ -817,6 +831,146 @@
 
 
 
+<h3 id="ogc.actions.deploy" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">deploy</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.deploy" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute the deployment</p>
+<p>Function for executing the deployment on a node.</p>
+<p>Synopsis:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">6</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">7</span></pre></div></td><td class="code"><div class="codehilite" style="background: #272822"><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
+from ogc import actions
+
+app.spec = SpecLoader.load([&quot;/Users/adam/specs/ogc.yml&quot;])
+layout = app.spec.layouts[0]
+node_ids = actions.launch(layout.as_dict())
+script_deploy_results = actions.deploy(node_id)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>node</code></td>
+        <td><code>ogc.db.Node</code></td>
+        <td><p>The node object from the launch</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bool</code></td>
+      <td><p>True if successful, False otherwise.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.deploy_async" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">deploy_async</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.deploy_async" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute the deployment</p>
+<p>Asynchronous function for executing the deployment on a node.</p>
+<p>Synopsis:</p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">6</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
+from ogc import actions
+
+app.spec = SpecLoader.load([&quot;/Users/adam/specs/ogc.yml&quot;])
+node_ids = actions.launch_async(app.spec.layouts)
+script_deploy_results = actions.deploy_async(node_ids)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>nodes</code></td>
+        <td><code>list[ogc.db.Node]</code></td>
+        <td><p>The node objects from the launch</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list[bool]</code></td>
+      <td><p>A list of booleans from result of deployment.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
 <h3 id="ogc.actions.launch" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></code>
 
@@ -832,7 +986,7 @@
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div class="codehilite" style="background: #272822"><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
 from ogc import actions
 
 app.spec = SpecLoader.load([&quot;/Users/adam/specs/ogc.yml&quot;])
