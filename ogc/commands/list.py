@@ -11,7 +11,7 @@ from ogc.log import Logger as log
 from ..provision import choose_provisioner
 from .base import cli
 
-console = Console()
+console = Console(record=True)
 
 if not state.app.engine:
     state.app.engine = db.connect()
@@ -25,7 +25,8 @@ if not state.app.engine:
     required=False,
     help="List nodes by name, this can be a substring match",
 )
-def ls(by_tag, by_name):
+@click.option("--output-file", required=False, help="Stores the table output to svg or html. Determined by the file extension.")
+def ls(by_tag, by_name, output_file):
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
@@ -81,7 +82,15 @@ def ls(by_tag, by_name):
                 ),
             )
 
-        console.print(table)
+        console.print(table, justify="center")
+        if output_file:
+            if output_file.endswith('svg'):
+                console.save_svg(output_file, title="Node List Output")
+            elif output_file.endswith('html'):
+                console.save_html(output_file)
+            else:
+                log.error(f"Unknown extension for {output_file}, must end in '.svg' or '.html'")
+                sys.exit(1)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

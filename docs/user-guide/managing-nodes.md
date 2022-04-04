@@ -12,55 +12,20 @@ $ ogc ls
 
 Which gives a table output of current node deployments:
 
-```shell
+![Listing Nodes](./user-guide/assets/../../assets/list_nodes.svg)
 
-┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ 10 Nodes ┃ Name                              ┃ Status  ┃ Connection                                                  ┃ Tags                 ┃ Actions         ┃
-┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
-│ 20       │ ogc-87ba30fc-elastic-agent-sles   │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.123.103.9   │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ sles-gcp             │                 │
-│ 34       │ ogc-b3befadc-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.184.43.81   │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 35       │ ogc-d54a5848-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.121.133.188 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 36       │ ogc-cbb9d5bc-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.67.108.205  │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 21       │ ogc-51b971ad-elastic-agent-sles   │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.239.181.14  │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ sles-gcp             │                 │
-│ 22       │ ogc-c4f812b7-elastic-agent-sles   │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.184.34.2    │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ sles-gcp             │                 │
-│ 23       │ ogc-7c8cb271-elastic-agent-sles   │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.72.237.134  │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ sles-gcp             │                 │
-│ 24       │ ogc-d4467204-elastic-agent-sles   │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.132.30.47   │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ sles-gcp             │                 │
-│ 37       │ ogc-92f1c5ec-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@104.197.37.199 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 38       │ ogc-d7cd61a7-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.225.239.252 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│          │                                   │         │                                                             │ ubuntu-gcp           │                 │
-└──────────┴───────────────────────────────────┴─────────┴─────────────────────────────────────────────────────────────┴──────────────────────┴─────────────────┘
-```
 
 You can further drill down with a couple of options:
 
 To filter `by-tag` run:
 
+
+
 ```shell
 $ ogc ls --by-tag ubuntu-gcp
-┏━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ 5 Nodes ┃ Name                              ┃ Status  ┃ Connection                                                  ┃ Tags                 ┃ Actions         ┃
-┡━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
-│ 34      │ ogc-b3befadc-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.184.43.81   │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│         │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 35      │ ogc-d54a5848-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.121.133.188 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│         │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 36      │ ogc-cbb9d5bc-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@34.67.108.205  │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│         │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 37      │ ogc-92f1c5ec-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@104.197.37.199 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│         │                                   │         │                                                             │ ubuntu-gcp           │                 │
-│ 38      │ ogc-d7cd61a7-elastic-agent-ubuntu │ running │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ogc@35.225.239.252 │ elastic-agent-8.1.x, │ pass: ✔ fail: 0 │
-│         │                                   │         │                                                             │ ubuntu-gcp           │                 │
-└─────────┴───────────────────────────────────┴─────────┴─────────────────────────────────────────────────────────────┴──────────────────────┴─────────────────┘
 ```
+
+![Listing Nodes by Tag](./user-guide/assets/../../assets/list_nodes_by_tag.svg)
 
 ## Accessing nodes
 
