@@ -48,7 +48,7 @@ db.createtbl(state.app.engine)
 Additionally, dropping the tables can be achieved this way:
 
 ``` python
-db.droptabl(state.app.engine)
+db.droptbl(state.app.engine)
 ```
 
 !!! caution
