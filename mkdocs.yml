@@ -66,6 +66,8 @@ nav:
     - 'Scripting': 'user-guide/scripting.md'
     - 'Providers': 'user-guide/providers.md'
     - 'Upgrading': 'user-guide/upgrading.md'
+    - 'Cookbook':
+        - 'Access node info': 'user-guide/cookbook/template-access-node-info.md'
   - 'Developer Guide':
     - 'Managing nodes': 'developer-guide/managing-nodes.md'
     - 'API':

@@ -385,15 +385,19 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
         list[bool]: True if all execs complete succesfully, False otherwise.
     """
     rows = []
+    count = 0
     with state.app.session as session:
         if tag:
             rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
+            count = rows.count()
         elif name:
             rows = session.query(db.Node).filter(db.Node.instance_name == name)
+            count = rows.count()
         else:
             rows = session.query(db.Node).all()
+            count = len(rows)
 
-    log.info(f"Executing '{cmd}' across [green]{rows.count()}[/] nodes.")
+    log.info(f"Executing '{cmd}' across [green]{count}[/] nodes.")
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = executor.map(

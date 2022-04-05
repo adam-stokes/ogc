@@ -195,6 +195,12 @@ class SpecProvisionPlan:
     def __repr__(self):
         return f"<SpecProvisionPlan [{self.name}] {self.layouts}>"
 
+    def as_dict(self):
+        return {
+            "name": self.name,
+            "layouts": [layout.as_dict() for layout in self.layouts],
+        }
+
     def _sighandler(self, sig, frame):
         self.force_shutdown = True
         app.log.debug(f"Caught signal {sig} - {frame}")

@@ -66,7 +66,7 @@ class Deployer:
             log.info("No deployment scripts found, skipping.")
             return DeployerResult(self.deployment, MultiStepDeployment())
 
-        context = {"env": self.env}
+        context = {"env": self.env, "node": self.deployment}
         with state.app.session as session:
             context["db"] = db
             context["session"] = session

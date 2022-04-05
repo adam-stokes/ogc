@@ -13,14 +13,14 @@ logging.basicConfig(
     handlers=[RichHandler(rich_tracebacks=True)],
 )
 
-cmdslog = TimedRotatingFileHandler("ogc.log", when="D", interval=1, backupCount=7)
+cmdslog = TimedRotatingFileHandler("ogc.log", when="D", interval=1, backupCount=2)
 cmdslog.setLevel(logging.INFO)
 cmdslog.setFormatter(
     logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 )
 
 debuglog = TimedRotatingFileHandler(
-    "ogc.debug.log", when="D", interval=1, backupCount=7
+    "ogc.debug.log", when="D", interval=1, backupCount=2
 )
 debuglog.setLevel(logging.DEBUG)
 debuglog.setFormatter(
