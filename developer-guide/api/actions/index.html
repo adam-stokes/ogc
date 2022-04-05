@@ -441,6 +441,34 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ogc.actions.exec" class="md-nav__link">
+    exec()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.exec_async" class="md-nav__link">
+    exec_async()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.exec_scripts" class="md-nav__link">
+    exec_scripts()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.exec_scripts_async" class="md-nav__link">
+    exec_scripts_async()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ogc.actions.launch" class="md-nav__link">
     launch()
   </a>
@@ -450,6 +478,34 @@
           <li class="md-nav__item">
   <a href="#ogc.actions.launch_async" class="md-nav__link">
     launch_async()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.sync" class="md-nav__link">
+    sync()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.sync_async" class="md-nav__link">
+    sync_async()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.teardown" class="md-nav__link">
+    teardown()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ogc.actions.teardown_async" class="md-nav__link">
+    teardown_async()
   </a>
   
 </li>
@@ -832,7 +888,7 @@
 
 
 <h3 id="ogc.actions.deploy" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">deploy</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">deploy</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span></code>
 
 
 <a href="#ogc.actions.deploy" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -871,8 +927,8 @@ script_deploy_results = actions.deploy(node_id)
   <tbody>
       <tr>
         <td><code>node</code></td>
-        <td><code>ogc.db.Node</code></td>
-        <td><p>The node object from the launch</p></td>
+        <td><code>int</code></td>
+        <td><p>The node ID from the launch</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -940,8 +996,8 @@ script_deploy_results = actions.deploy_async(node_ids)
   <tbody>
       <tr>
         <td><code>nodes</code></td>
-        <td><code>list[ogc.db.Node]</code></td>
-        <td><p>The node objects from the launch</p></td>
+        <td><code>list[int]</code></td>
+        <td><p>The node id's from the launch</p></td>
         <td><em>required</em></td>
       </tr>
   </tbody>
@@ -958,6 +1014,304 @@ script_deploy_results = actions.deploy_async(node_ids)
     <tr>
       <td><code>list[bool]</code></td>
       <td><p>A list of booleans from result of deployment.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.exec" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">exec</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.exec" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute command on Node</p>
+<p>Function for executing a command on a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
+node = db.select(db.Node).first()
+actions.exec(node, &quot;ls -l /&quot;)
+for action in node.actions:
+    print(action.exit_code, action.out, action.error)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>node</code></td>
+        <td><code>ogc.db.Node</code></td>
+        <td><p>The node to execute a command on</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cmd</code></td>
+        <td><code>str</code></td>
+        <td><p>The command string</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bool</code></td>
+      <td><p>True if succesful, False otherwise</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.exec_async" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">exec_async</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.exec_async" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute command on Nodes</p>
+<p>Async function for executing a command on a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
+node = db.select(db.Node).filter(db.Node.tags.contains([tag]))
+results = actions.exec_async(node, &quot;ls -l /&quot;)
+all(result == True for result in results)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The node name to execute a command on</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>tag</code></td>
+        <td><code>str</code></td>
+        <td><p>The tag to query for nodes. Allows running commands across multiple nodes.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cmd</code></td>
+        <td><code>str</code></td>
+        <td><p>The command string</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list[bool]</code></td>
+      <td><p>True if all execs complete succesfully, False otherwise.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.exec_scripts" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">exec_scripts</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.exec_scripts" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute a scripts/template directory on a Node</p>
+<p>Function for executing scripts/templates on a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
+node = db.select(db.Node).first()
+result = actions.exec_scripts(node, &quot;templates/deploy/ubuntu&quot;)
+result == True
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>node</code></td>
+        <td><code>ogc.db.Node</code></td>
+        <td><p>The node to execute scripts on</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>path</code></td>
+        <td><code>str</code></td>
+        <td><p>The path where the scripts reside locally</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bool</code></td>
+      <td><p>True if succesful, False otherwise.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.exec_scripts_async" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">exec_scripts_async</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.exec_scripts_async" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Execute a scripts/template directory on a Node</p>
+<p>Async function for executing scripts/templates on a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
+nodes = db.select(db.Node).all()
+results = actions.exec_scripts_async(nodes, &quot;templates/deploy/ubuntu&quot;)
+all(result == True for result in results)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The node name to execute scripts on</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>tag</code></td>
+        <td><code>str</code></td>
+        <td><p>The node tag to query, allows running across multiple nodes.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>path</code></td>
+        <td><code>str</code></td>
+        <td><p>The path where the scripts reside locally</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list[bool]</code></td>
+      <td><p>True if succesful, False otherwise.</p></td>
     </tr>
   </tbody>
 </table>
@@ -1094,6 +1448,300 @@ when launching a node.</p></td>
     <tr>
       <td><code>ids (list[int])</code></td>
       <td><p>The database row ID's of the node(s) that were deployed.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.sync" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sync</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">overrides</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.sync" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Sync a deployment</p>
+<p>Function for syncing a deployment to correct scale.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state
+layout = app.spec.layouts[0]
+result = actions.sync(layout, overrides={&#39;elastic-agent-ubuntu&#39;: {&#39;action&#39;: &#39;add&#39;, remaining: 5}})
+result == True
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>layout</code></td>
+        <td><code>ogc.spec.SpecProvisionLayout</code></td>
+        <td><p>The layout of the deployment</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>overrides</code></td>
+        <td><code>dict</code></td>
+        <td><p>Override dictionary of what the new count of nodes should be</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bool</code></td>
+      <td><p>True if synced, False otherwise</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.sync_async" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">sync_async</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="n">overrides</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.sync_async" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Sync a deployment</p>
+<p>Async function for syncing a deployment to correct scale.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state
+results = actions.sync_async(app.spec.layouts, 
+    overrides={&#39;elastic-agent-ubuntu&#39;: {&#39;action&#39;: &#39;add&#39;, remaining: 5}})
+all(result == True for result in results)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>layout</code></td>
+        <td><code>ogc.spec.SpecProvisionLayout</code></td>
+        <td><p>The layout of the deployment</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>overrides</code></td>
+        <td><code>dict</code></td>
+        <td><p>Override dictionary of what the new count of nodes should be</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list[bool]</code></td>
+      <td><p>True if synced, False otherwise</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.teardown" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">teardown</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">only_db</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.teardown" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Teardown deployment</p>
+<p>Function for tearing down a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions
+name = &quot;ogc-234342-elastic-agent-ubuntu&quot;
+is_down = actions.teardown(name, force=True)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The node name to teardown</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>force</code></td>
+        <td><code>bool</code></td>
+        <td><p>Force</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>only_db</code></td>
+        <td><code>bool</code></td>
+        <td><p>Will remove from database regardless of cloud state. Use with
+caution.</p></td>
+        <td><code>False</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>bool</code></td>
+      <td><p>True if teardown is successful, False otherwise.</p></td>
+    </tr>
+  </tbody>
+</table>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h3 id="ogc.actions.teardown_async" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">teardown_async</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">only_db</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+<a href="#ogc.actions.teardown_async" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Teardown deployment</p>
+<p>Async function for tearing down a node.</p>
+<p><strong>Synopsis:</strong></p>
+<table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
+<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions
+names = [&quot;ogc-234342-elastic-agent-ubuntu&quot;, &quot;ogc-abce34-kibana-ubuntu&quot;]
+is_down = actions.teardown_async(names, force=True)
+</code></pre></div>
+</td></tr></table>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>list[str]</code></td>
+        <td><p>The node name to teardown</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>force</code></td>
+        <td><code>bool</code></td>
+        <td><p>Force</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>only_db</code></td>
+        <td><code>bool</code></td>
+        <td><p>Will remove from database regardless of cloud state. Use with
+caution.</p></td>
+        <td><code>False</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list[bool]</code></td>
+      <td><p>True if teardown is successful, False otherwise.</p></td>
     </tr>
   </tbody>
 </table>
