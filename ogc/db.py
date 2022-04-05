@@ -123,22 +123,3 @@ def migrate():
 
     # upgrade the database to the latest revision
     alembic.command.upgrade(config, "head")
-
-
-# Template helpers
-def by_tag(context, tag):
-    """Returns rows by tags"""
-    with session(connect()) as _session:
-        return _session.query(Node).filter(Node.tags.contains([tag]))
-
-
-def by_name(context, name):
-    """Returns rows by instance name"""
-    with session(connect()) as _session:
-        return _session.query(Node).filter_by(instance_name=name).one()
-
-
-def by_id(context, id):
-    """Returns rows by row id"""
-    with session(connect()) as _session:
-        return _session.query(Node).filter_by(id=id).one()

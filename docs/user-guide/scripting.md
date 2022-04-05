@@ -46,14 +46,19 @@ sh.cp('-a', 'mydir', 'anotherdir')
 
 OGC provides some additional capabilities through templating. Under the hood [python-mako](https://www.makotemplates.org/) is used for the parsing.
 
-With templating, you have the ability to query the underlying database to gather node information. Because mako supports the importing of python modules and our OGC environment is already exposed, we can access our `db` module and use some helper methods.
+With templating, you have the ability to query the underlying database to gather node information, a couple of modules are already exposed in the templates context:
+
+| Var | Description |
+| ----| ---- |
+| db  | Exposes access to the database models such as `db.Node` and `db.Actions`
+| session | Database session manager that allows querying the database, for example, `session.query(db.Node).all()`
+| env | Environment variables are made available through this key, `env['USER']`
+
 
 ```bash
 #!/bin/bash
-<%namespace name="db" module="ogc.db"/>
-
 echo ""
-% for node in db.by_tag('sles'):
+% for node in session.query(db.Node).filter(db.Node.tags.contains(['sles'])):
 echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
 % endfor
 echo ""
@@ -67,9 +72,9 @@ The runtime environment is also available within the template context. In one ex
 - **OGC_FLEET_URL**
 - **OGC_FLEET_ENROLLMENT_TOKEN** 
 
-See the below example for downloading elastic-agent and enrolling it into a fleet server. The variable exposed to all templates for accessing the environment variables is `env`
+See the below example for downloading elastic-agent and enrolling it into a fleet server:
 
-```bash
+``` bash
 #!/bin/bash
 <%namespace name="utils" file="/functions.mako"/>
 
@@ -90,7 +95,8 @@ cd elastic-agent && ./elastic-agent install -f --url=${env['OGC_FLEET_URL']} --e
 
 In the above example we reference a file called `/functions.mako` this is just another template file that sits just outside of our defined `scripts`, for example, if our `scripts` is defined to be in `scripts/my_ubuntu_deploy` then this `functions.mako` will live at `scripts/functions.mako`. 
 
-This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.
+!!! alert
+    This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.
 
 Defining helper functions is straight forward, lets look at `functions.mako` for an example:
 

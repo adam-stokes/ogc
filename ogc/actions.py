@@ -172,7 +172,7 @@ def teardown(
     result = True
     with state.app.session as session:
         node_data = (
-            session.select(db.Node).filter(db.Node.instance_name == name).first() or None
+            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
         )
         if node_data:
             log.info(f"Destroying: {node_data.instance_name}")
@@ -320,7 +320,7 @@ def exec(node: db.Node, cmd: str) -> bool:
     **Synopsis:**
 
         from ogc import actions, state, db
-        node = db.select(db.Node).first()
+        node = db.query(db.Node).first()
         actions.exec(node, "ls -l /")
         for action in node.actions:
             print(action.exit_code, action.out, action.error)
@@ -369,7 +369,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
     **Synopsis:**
 
         from ogc import actions, state, db
-        node = db.select(db.Node).filter(db.Node.tags.contains([tag]))
+        node = db.query(db.Node).filter(db.Node.tags.contains([tag]))
         results = actions.exec_async(node, "ls -l /")
         all(result == True for result in results)
 
@@ -408,7 +408,7 @@ def exec_scripts(node: db.Node, path: str) -> bool:
     **Synopsis:**
 
         from ogc import actions, state, db
-        node = db.select(db.Node).first()
+        node = db.query(db.Node).first()
         result = actions.exec_scripts(node, "templates/deploy/ubuntu")
         result == True
 
@@ -435,7 +435,7 @@ def exec_scripts_async(name: str, tag: str, path: str) -> list[bool]:
     **Synopsis:**
 
         from ogc import actions, state, db
-        nodes = db.select(db.Node).all()
+        nodes = db.query(db.Node).all()
         results = actions.exec_scripts_async(nodes, "templates/deploy/ubuntu")
         all(result == True for result in results)
 

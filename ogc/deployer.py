@@ -67,6 +67,9 @@ class Deployer:
             return DeployerResult(self.deployment, MultiStepDeployment())
 
         context = {"env": self.env}
+        with state.app.session as session:
+            context["db"] = db
+            context["session"] = session
 
         # teardown file is a special file that gets executed before node
         # destroy

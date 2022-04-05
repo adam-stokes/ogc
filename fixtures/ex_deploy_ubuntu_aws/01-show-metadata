@@ -1,8 +1,8 @@
 #!/bin/bash
-<%namespace name="db" module="ogc.db"/>
 
 echo ""
-% for node in db.by_tag('ubuntu'):
+% for node in session.query(db.Node).filter(db.Node.tags.contains(['user-adam'])):
+
 echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
 % endfor
 echo ""
