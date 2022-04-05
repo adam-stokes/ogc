@@ -832,15 +832,35 @@
 </code></pre></div>
 <h2 id="templating">Templating<a class="headerlink" href="#templating" title="Permanent link">&para;</a></h2>
 <p>OGC provides some additional capabilities through templating. Under the hood <a href="https://www.makotemplates.org/">python-mako</a> is used for the parsing.</p>
-<p>With templating, you have the ability to query the underlying database to gather node information. Because mako supports the importing of python modules and our OGC environment is already exposed, we can access our <code>db</code> module and use some helper methods.</p>
+<p>With templating, you have the ability to query the underlying database to gather node information, a couple of modules are already exposed in the templates context:</p>
+<table>
+<thead>
+<tr>
+<th>Var</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>db</td>
+<td>Exposes access to the database models such as <code>db.Node</code> and <code>db.Actions</code></td>
+</tr>
+<tr>
+<td>session</td>
+<td>Database session manager that allows querying the database, for example, <code>session.query(db.Node).all()</code></td>
+</tr>
+<tr>
+<td>env</td>
+<td>Environment variables are made available through this key, <code>env['USER']</code></td>
+</tr>
+</tbody>
+</table>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="ch">#!/bin/bash</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;db&quot;</span> <span class="nv">module</span><span class="o">=</span><span class="s2">&quot;ogc.db&quot;</span>/&gt;
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>% <span class="k">for</span> node <span class="k">in</span> db.by_tag<span class="o">(</span><span class="s1">&#39;sles&#39;</span><span class="o">)</span>:
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">echo</span> <span class="s2">&quot;[ID: </span><span class="si">${</span><span class="nv">node</span><span class="p">.id</span><span class="si">}</span><span class="s2">] Name: </span><span class="si">${</span><span class="nv">node</span><span class="p">.instance_name</span><span class="si">}</span><span class="s2"> || Connection: </span><span class="si">${</span><span class="nv">node</span><span class="p">.username</span><span class="si">}</span><span class="s2">@</span><span class="si">${</span><span class="nv">node</span><span class="p">.public_ip</span><span class="si">}</span><span class="s2"> || Provider: </span><span class="si">${</span><span class="nv">node</span><span class="p">.provider</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>% endfor
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>% <span class="k">for</span> node <span class="k">in</span> session.query<span class="o">(</span>db.Node<span class="o">)</span>.filter<span class="o">(</span>db.Node.tags.contains<span class="o">([</span><span class="s1">&#39;sles&#39;</span><span class="o">]))</span>:
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nb">echo</span> <span class="s2">&quot;[ID: </span><span class="si">${</span><span class="nv">node</span><span class="p">.id</span><span class="si">}</span><span class="s2">] Name: </span><span class="si">${</span><span class="nv">node</span><span class="p">.instance_name</span><span class="si">}</span><span class="s2"> || Connection: </span><span class="si">${</span><span class="nv">node</span><span class="p">.username</span><span class="si">}</span><span class="s2">@</span><span class="si">${</span><span class="nv">node</span><span class="p">.public_ip</span><span class="si">}</span><span class="s2"> || Provider: </span><span class="si">${</span><span class="nv">node</span><span class="p">.provider</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>% endfor
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="nb">echo</span> <span class="s2">&quot;&quot;</span>
 </code></pre></div>
 <p>The runtime environment is also available within the template context. In one example, we can export the following into our <code>.env</code> file and reference those in the templates:</p>
 <ul>
@@ -850,7 +870,7 @@
 <li><strong>OGC_FLEET_URL</strong></li>
 <li><strong>OGC_FLEET_ENROLLMENT_TOKEN</strong> </li>
 </ul>
-<p>See the below example for downloading elastic-agent and enrolling it into a fleet server. The variable exposed to all templates for accessing the environment variables is <code>env</code></p>
+<p>See the below example for downloading elastic-agent and enrolling it into a fleet server:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="ch">#!/bin/bash</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>&lt;%namespace <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;utils&quot;</span> <span class="nv">file</span><span class="o">=</span><span class="s2">&quot;/functions.mako&quot;</span>/&gt;
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -868,7 +888,10 @@
 </code></pre></div>
 <h2 id="reusable-helpers">Reusable helpers<a class="headerlink" href="#reusable-helpers" title="Permanent link">&para;</a></h2>
 <p>In the above example we reference a file called <code>/functions.mako</code> this is just another template file that sits just outside of our defined <code>scripts</code>, for example, if our <code>scripts</code> is defined to be in <code>scripts/my_ubuntu_deploy</code> then this <code>functions.mako</code> will live at <code>scripts/functions.mako</code>. </p>
+<div class="admonition alert">
+<p class="admonition-title">Alert</p>
 <p>This is good practice as you may have multiple layouts with different script directories for each and would like to store common functionality in a single place.</p>
+</div>
 <p>Defining helper functions is straight forward, lets look at <code>functions.mako</code> for an example:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">## Helper template functions downloading/extracting files</span>
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>&lt;%def <span class="nv">name</span><span class="o">=</span><span class="s2">&quot;setup_env()&quot;</span>&gt;

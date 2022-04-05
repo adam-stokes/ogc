@@ -1057,7 +1057,7 @@ script_deploy_results = actions.deploy_async(node_ids)
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.select(db.Node).first()
+node = db.query(db.Node).first()
 actions.exec(node, &quot;ls -l /&quot;)
 for action in node.actions:
     print(action.exit_code, action.out, action.error)
@@ -1129,7 +1129,7 @@ for action in node.actions:
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.select(db.Node).filter(db.Node.tags.contains([tag]))
+node = db.query(db.Node).filter(db.Node.tags.contains([tag]))
 results = actions.exec_async(node, &quot;ls -l /&quot;)
 all(result == True for result in results)
 </code></pre></div>
@@ -1206,7 +1206,7 @@ all(result == True for result in results)
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.select(db.Node).first()
+node = db.query(db.Node).first()
 result = actions.exec_scripts(node, &quot;templates/deploy/ubuntu&quot;)
 result == True
 </code></pre></div>
@@ -1277,7 +1277,7 @@ result == True
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
 <span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div class="codehilite" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-nodes = db.select(db.Node).all()
+nodes = db.query(db.Node).all()
 results = actions.exec_scripts_async(nodes, &quot;templates/deploy/ubuntu&quot;)
 all(result == True for result in results)
 </code></pre></div>
