@@ -194,6 +194,8 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
         for node in s.query(db.Node).all():
             node.ssh_public_key = str(public_ssh_key.absolute())
             node.ssh_private_key = str(private_ssh_key.absolute())
+            s.add(node)
+        s.commit()
 
     console = Console()
     console.print(Padding("Import complete", (2, 0, 0, 0)), justify="center")
