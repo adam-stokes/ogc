@@ -5,7 +5,7 @@ import click
 from ogc import db
 from ogc.log import Logger as log
 
-from .base import ogc as cli
+from .base import cli
 
 
 @click.command(help="Database migrations")

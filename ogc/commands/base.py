@@ -5,7 +5,7 @@ from ogc import db
 
 
 @click.group(cls=DYMGroup)
-def ogc():
+def cli():
     """Just a simple provisioner"""
     try:
         db.createtbl()
@@ -17,4 +17,4 @@ def start():
     """
     Starts app
     """
-    ogc()
+    cli()

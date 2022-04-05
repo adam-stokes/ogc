@@ -9,7 +9,7 @@ from ogc import db, state
 from ogc.log import Logger as log
 
 from ..provision import choose_provisioner
-from .base import ogc as cli
+from .base import cli
 
 console = Console(record=True)
 

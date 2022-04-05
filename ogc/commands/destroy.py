@@ -3,7 +3,7 @@ import click
 from ogc import actions, db, state
 
 from ..provision import choose_provisioner
-from .base import ogc as cli
+from .base import cli
 
 if not state.app.engine:
     state.app.engine = db.connect()

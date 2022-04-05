@@ -9,7 +9,7 @@ from ogc.log import Logger as log
 
 from ..spec import SpecLoader
 from ..state import app
-from .base import ogc as cli
+from .base import cli
 
 
 @click.command(help="Launches nodes from a provision specification")

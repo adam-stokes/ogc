@@ -9,7 +9,7 @@ from slugify import slugify
 from ogc import db, state
 from ogc.log import Logger as log
 
-from .base import ogc as cli
+from .base import cli
 
 if not state.app.engine:
     state.app.engine = db.connect()

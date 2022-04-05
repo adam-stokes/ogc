@@ -7,7 +7,7 @@ from rich.padding import Padding
 
 from ogc import db, state
 
-from .base import ogc as cli
+from .base import cli
 
 if not state.app.engine:
     state.app.engine = db.connect()
