@@ -81,7 +81,7 @@ def launch_async(layouts) -> list[int]:
     return results
 
 
-def deploy(node: db.Node) -> bool:
+def deploy(node_id: int) -> bool:
     """Execute the deployment
 
     Function for executing the deployment on a node.
@@ -97,7 +97,7 @@ def deploy(node: db.Node) -> bool:
         script_deploy_results = actions.deploy(node_id)
 
     Args:
-        node (ogc.db.Node): The node object from the launch
+        node (int): The node ID from the launch
 
     Returns:
         bool: True if successful, False otherwise.
@@ -105,13 +105,13 @@ def deploy(node: db.Node) -> bool:
 
     try:
         with state.app.session as session:
-            node_obj = session.query(db.Node).filter(db.Node.id == node).first() or None
+            node_obj = session.query(db.Node).filter(db.Node.id == node_id).first() or None
             if node_obj:
                 log.info(f"Deploying to: {node_obj.instance_name}")
                 result = Deployer(node_obj, state.app.env).run()
                 result.show()
             else:
-                log.warning(f"Could not find Node (id: {node})")
+                log.warning(f"Could not find Node (id: {node_id})")
                 return False
     except Exception as e:
         log.error(e)
@@ -119,7 +119,7 @@ def deploy(node: db.Node) -> bool:
     return True
 
 
-def deploy_async(nodes) -> list[bool]:
+def deploy_async(nodes: list[int]) -> list[bool]:
     """Execute the deployment
 
     Asynchronous function for executing the deployment on a node.
@@ -134,7 +134,7 @@ def deploy_async(nodes) -> list[bool]:
         script_deploy_results = actions.deploy_async(node_ids)
 
     Args:
-        nodes (list[ogc.db.Node]): The node objects from the launch
+        nodes (list[int]): The node id's from the launch
 
     Returns:
         list[bool]: A list of booleans from result of deployment.
@@ -149,11 +149,30 @@ def teardown(
     force: bool = False,
     only_db: bool = False,
 ) -> bool:
-    """Tear down node"""
+    """Teardown deployment
+
+    Function for tearing down a node.
+
+    **Synopsis:**
+
+        from ogc import actions
+        name = "ogc-234342-elastic-agent-ubuntu"
+        is_down = actions.teardown(name, force=True)
+
+    Args:
+        name (str): The node name to teardown
+        force (bool): Force
+        only_db (bool): Will remove from database regardless of cloud state. Use with
+            caution.
+
+    Returns:
+        bool: True if teardown is successful, False otherwise.
+    """
+
     result = True
     with state.app.session as session:
         node_data = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
+            session.select(db.Node).filter(db.Node.instance_name == name).first() or None
         )
         if node_data:
             log.info(f"Destroying: {node_data.instance_name}")
@@ -192,6 +211,26 @@ def teardown(
 def teardown_async(
     names: list[str], force: bool = False, only_db: bool = False
 ) -> list[bool]:
+    """Teardown deployment
+
+    Async function for tearing down a node.
+
+    **Synopsis:**
+
+        from ogc import actions
+        names = ["ogc-234342-elastic-agent-ubuntu", "ogc-abce34-kibana-ubuntu"]
+        is_down = actions.teardown_async(names, force=True)
+
+    Args:
+        name (list[str]): The node name to teardown
+        force (bool): Force
+        only_db (bool): Will remove from database regardless of cloud state. Use with
+            caution.
+
+    Returns:
+        list[bool]: True if teardown is successful, False otherwise.
+    """
+
     if not isinstance(names, list):
         names = list(names)
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -200,9 +239,28 @@ def teardown_async(
     return results
 
 
-def sync(layout, overrides: Dict[Any, Any]) -> None:
-    log.info(f"Starting deployment sync for {layout.name}...")
+def sync(layout, overrides: Dict[Any, Any]) -> bool:
+    """Sync a deployment
 
+    Function for syncing a deployment to correct scale.
+
+    **Synopsis:**
+
+        from ogc import actions, state
+        layout = app.spec.layouts[0]
+        result = actions.sync(layout, overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
+        result == True
+
+    Args:
+        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        overrides (dict): Override dictionary of what the new count of nodes should be
+
+    Returns:
+        bool: True if synced, False otherwise
+    """
+
+    log.info(f"Starting deployment sync for {layout.name}...")
+    result = False
     override = overrides[layout.name]
     if override["action"] == "add":
         node_id = launch(layout.as_dict())
@@ -218,10 +276,29 @@ def sync(layout, overrides: Dict[Any, Any]) -> None:
                 .order_by(db.Node.id.desc())
                 .limit(1)
             ):
-                teardown(data.instance_name, force=True)
-
+                result = teardown(data.instance_name, force=True)
+    return result
 
 def sync_async(layouts, overrides: Dict[Any, Any]) -> list[bool]:
+    """Sync a deployment
+
+    Async function for syncing a deployment to correct scale.
+
+    **Synopsis:**
+
+        from ogc import actions, state
+        results = actions.sync_async(app.spec.layouts, 
+            overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
+        all(result == True for result in results)
+
+    Args:
+        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        overrides (dict): Override dictionary of what the new count of nodes should be
+
+    Returns:
+        list[bool]: True if synced, False otherwise
+    """
+
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(sync, overrides=overrides)
         results = executor.map(
@@ -235,7 +312,27 @@ def sync_async(layouts, overrides: Dict[Any, Any]) -> list[bool]:
     return results
 
 
-def exec(node: db.Node, cmd: str) -> None:
+def exec(node: db.Node, cmd: str) -> bool:
+    """Execute command on Node
+
+    Function for executing a command on a node.
+
+    **Synopsis:**
+
+        from ogc import actions, state, db
+        node = db.select(db.Node).first()
+        actions.exec(node, "ls -l /")
+        for action in node.actions:
+            print(action.exit_code, action.out, action.error)
+
+    Args:
+        node (ogc.db.Node): The node to execute a command on
+        cmd (str): The command string
+
+    Returns:
+        bool: True if succesful, False otherwise
+    """
+
     result = None
     with state.app.session as session:
         cmd_opts = [
@@ -265,6 +362,25 @@ def exec(node: db.Node, cmd: str) -> None:
 
 
 def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
+    """Execute command on Nodes
+
+    Async function for executing a command on a node.
+
+    **Synopsis:**
+
+        from ogc import actions, state, db
+        node = db.select(db.Node).filter(db.Node.tags.contains([tag]))
+        results = actions.exec_async(node, "ls -l /")
+        all(result == True for result in results)
+
+    Args:
+        name (str): The node name to execute a command on
+        tag (str): The tag to query for nodes. Allows running commands across multiple nodes.
+        cmd (str): The command string
+
+    Returns:
+        list[bool]: True if all execs complete succesfully, False otherwise.
+    """
     rows = []
     with state.app.session as session:
         if tag:
@@ -284,7 +400,26 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
     return results
 
 
-def exec_scripts(node: db.Node, path: str) -> None:
+def exec_scripts(node: db.Node, path: str) -> bool:
+    """Execute a scripts/template directory on a Node
+
+    Function for executing scripts/templates on a node.
+
+    **Synopsis:**
+
+        from ogc import actions, state, db
+        node = db.select(db.Node).first()
+        result = actions.exec_scripts(node, "templates/deploy/ubuntu")
+        result == True
+
+    Args:
+        node (ogc.db.Node): The node to execute scripts on
+        path (str): The path where the scripts reside locally
+
+    Returns:
+        bool: True if succesful, False otherwise.
+    """
+
     choose_provisioner(node.provider, env=state.app.env)
     deploy = Deployer(node, env=state.app.env)
     result = deploy.exec_scripts(path)
@@ -293,6 +428,25 @@ def exec_scripts(node: db.Node, path: str) -> None:
 
 
 def exec_scripts_async(name: str, tag: str, path: str) -> list[bool]:
+    """Execute a scripts/template directory on a Node
+
+    Async function for executing scripts/templates on a node.
+
+    **Synopsis:**
+
+        from ogc import actions, state, db
+        nodes = db.select(db.Node).all()
+        results = actions.exec_scripts_async(nodes, "templates/deploy/ubuntu")
+        all(result == True for result in results)
+
+    Args:
+        name (str): The node name to execute scripts on
+        tag (str): The node tag to query, allows running across multiple nodes.
+        path (str): The path where the scripts reside locally
+
+    Returns:
+        list[bool]: True if succesful, False otherwise.
+    """
     rows = []
     with state.app.session as session:
         if tag:
