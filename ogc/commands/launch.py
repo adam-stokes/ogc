@@ -17,7 +17,7 @@ from .base import cli
 @click.option(
     "--with-deploy/--with-no-deploy",
     default=True,
-    help="Also performs script deployments (default: Yes)",
+    help="Also performs script deployments",
 )
 def launch(spec, with_deploy):
     # Db connection
