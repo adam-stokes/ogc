@@ -49,6 +49,7 @@ click-man = "^0.4.1"
 mkdocs-material = "^8.2.8"
 mkdocstrings = "^0.18.1"
 mkdocstrings-python-legacy = "^0.2.2"
+mkdocs-click = "^0.6.0"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start" 

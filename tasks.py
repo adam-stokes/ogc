@@ -42,7 +42,7 @@ def prep(c):
         c.run(f"pandoc -f man -t markdown {fname} -o {dst}")
 
 
-@task(pre=[clean, fix, prep, bump_rev])
+@task(pre=[clean, fix, bump_rev])
 def release(c):
     pypi_user = os.environ.get("PYPI_USER")
     pypi_pass = os.environ.get("PYPI_PASS")

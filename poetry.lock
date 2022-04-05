@@ -558,6 +558,18 @@ Markdown = ">=3.3"
 mkdocs = ">=1.1"
 
 [[package]]
+name = "mkdocs-click"
+version = "0.6.0"
+description = "An MkDocs extension to generate documentation for Click command line applications"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+click = ">=8.1,<9.0"
+markdown = ">=3.0.0,<4.0.0"
+
+[[package]]
 name = "mkdocs-material"
 version = "8.2.8"
 description = "A Material Design theme for MkDocs"
@@ -1184,7 +1196,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "83d485d2c6e7c58c439e751d7ff8374f349e8b6778bedfeba582434ca062ff68"
+content-hash = "eac715caaec9e7c9e92e535ea0d097a42639bc0f6ecab8e743796fbfb7e7178b"
 
 [metadata.files]
 alembic = [
@@ -1589,6 +1601,10 @@ mkdocs = [
 mkdocs-autorefs = [
     {file = "mkdocs-autorefs-0.4.1.tar.gz", hash = "sha256:70748a7bd025f9ecd6d6feeba8ba63f8e891a1af55f48e366d6d6e78493aba84"},
     {file = "mkdocs_autorefs-0.4.1-py3-none-any.whl", hash = "sha256:a2248a9501b29dc0cc8ba4c09f4f47ff121945f6ce33d760f145d6f89d313f5b"},
+]
+mkdocs-click = [
+    {file = "mkdocs_click-0.6.0-py3-none-any.whl", hash = "sha256:031fca7552c861f5ab54d244a6e35480b5393a93693b87a63973b9de6a67d662"},
+    {file = "mkdocs_click-0.6.0.tar.gz", hash = "sha256:f1c1a2ed0bd951dfbaf43e0289637645f9f91b491a2b9cec69359e17dc25b7dd"},
 ]
 mkdocs-material = [
     {file = "mkdocs-material-8.2.8.tar.gz", hash = "sha256:f0696538929b3778b064f650589eb2027e4a2c0b3ab37afa8900de7924100901"},
