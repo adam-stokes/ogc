@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ogc"
-version = "2.1.7"
+version = "2.1.8"
 description = "Provisioner, no more, no less."
 authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
 license = "MIT"
@@ -33,7 +33,7 @@ arrow = "^1.2.2"
 
 
 [tool.poetry.dev-dependencies]
-black = "^22.1.7"
+black = "^22.1.8"
 isort = "^5.10.1"
 invoke = "^1.6.0"
 python-frontmatter = "^1.0.0"
