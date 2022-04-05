@@ -105,7 +105,9 @@ def deploy(node_id: int) -> bool:
 
     try:
         with state.app.session as session:
-            node_obj = session.query(db.Node).filter(db.Node.id == node_id).first() or None
+            node_obj = (
+                session.query(db.Node).filter(db.Node.id == node_id).first() or None
+            )
             if node_obj:
                 log.info(f"Deploying to: {node_obj.instance_name}")
                 result = Deployer(node_obj, state.app.env).run()
@@ -279,6 +281,7 @@ def sync(layout, overrides: Dict[Any, Any]) -> bool:
                 result = teardown(data.instance_name, force=True)
     return result
 
+
 def sync_async(layouts, overrides: Dict[Any, Any]) -> list[bool]:
     """Sync a deployment
 
@@ -287,7 +290,7 @@ def sync_async(layouts, overrides: Dict[Any, Any]) -> list[bool]:
     **Synopsis:**
 
         from ogc import actions, state
-        results = actions.sync_async(app.spec.layouts, 
+        results = actions.sync_async(app.spec.layouts,
             overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
         all(result == True for result in results)
 

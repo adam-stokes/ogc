@@ -19,3 +19,12 @@ Get status of deployment
 **\--spec** TEXT
 
 :   
+
+```{=html}
+<!-- -->
+```
+
+**\--output-file** TEXT
+
+:   Stores the table output to svg or html. Determined by the file
+    extension.

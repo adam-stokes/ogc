@@ -19,3 +19,8 @@ List nodes in your inventory
 **\--by-name** TEXT
 
 :   List nodes by name, this can be a substring match
+
+**\--output-file** TEXT
+
+:   Stores the table output to svg or html. Determined by the file
+    extension.
