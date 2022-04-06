@@ -10,7 +10,7 @@ from rich.console import Console
 from rich.padding import Padding
 from rich.prompt import Prompt
 
-from ogc import actions, db, state
+from ogc import actions, db, enums, state
 from ogc.log import Logger as log
 from ogc.spec import SpecLoader
 
@@ -40,12 +40,7 @@ if not state.app.engine:
     default="ogc-env.json",
     help="Filename of where to store the OGC environment to be shared",
 )
-@click.option(
-    "--public-ssh-key",
-    required=False,
-    help="The public ssh key contents from the shared user",
-)
-def export_env(spec, db_file, env_file, public_ssh_key):
+def export_env(spec, db_file, env_file):
     """Exports the deployment to be shared with other users
 
     This exports the current database and imports the public ssh key of the
@@ -59,13 +54,31 @@ def export_env(spec, db_file, env_file, public_ssh_key):
         sys.exit(1)
 
     # begin setup
-    if not public_ssh_key:
+    ssh_key_type = Prompt.ask(
+        "How would you like to import the users public ssh key",
+        choices=["github", "manual"],
+        default="github",
+    )
+
+    cmd = None
+    if ssh_key_type.lower() == "manual":
         public_ssh_key = Prompt.ask(
             "Paste the public ssh key of the user you are sharing with"
         )
+        cmd = f"echo '{public_ssh_key}' >> ~/.ssh/authorized_keys"
+    elif ssh_key_type.lower() == "github":
+        public_ssh_key = Prompt.ask("Please enter your Github username")
+        cmd = (
+            f"wget -O get-pip.py https://bootstrap.pypa.io/get-pip.py && "
+            "sudo python3 get-pip.py && "
+            "sudo pip install ssh-import-id && "
+            f"ssh-import-id gh:{public_ssh_key}"
+        )
+    else:
+        log.error("Could not import a public ssh key")
+        sys.exit(1)
 
     log.info("Importing public key to all nodes")
-    cmd = f"echo '{public_ssh_key}' >> ~/.ssh/authorized_keys"
     results = actions.exec_async(None, None, cmd)
     passed = all(result == True for result in results)
     if passed:
@@ -75,7 +88,6 @@ def export_env(spec, db_file, env_file, public_ssh_key):
 
     log.info("Exporting database")
     sh.pg_dump(
-        "-Fc",
         "-h",
         db.DB_HOST,
         "-p",
@@ -88,7 +100,14 @@ def export_env(spec, db_file, env_file, public_ssh_key):
     )
 
     specs = SpecLoader.load(list(spec))
-    ogc_env_out = {"env": {**dotenv_values(".env")}, "spec": {**specs.as_dict()}}
+    ogc_env_out = {
+        "env": {
+            k: v
+            for k, v in dotenv_values(".env").items()
+            if not any(k.startswith(s) for s in enums.SUPPORTED_PROVIDERS)
+        },
+        "spec": {**specs.as_dict()},
+    }
     Path(env_file).write_text(json.dumps(ogc_env_out))
 
     console = Console()
@@ -180,12 +199,12 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
     env_file_out = Path(".env")
     with open(env_file_out, "w") as env_f:
         for k, v in env_data["env"].items():
-            env_f.write(f"{k.upper()}={v}")
+            env_f.write(f"{k.upper()}={v}\n")
 
     spec_file_out = Path("ogc.yml")
 
     with open(spec_file_out, "w") as spec_f:
-        spec_f.write(yaml.dumps(env_data["spec"]))
+        spec_f.write(yaml.dump(env_data["spec"]))
 
     private_ssh_key = Path(private_ssh_key)
     public_ssh_key = Path(public_ssh_key)

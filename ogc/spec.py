@@ -198,7 +198,7 @@ class SpecProvisionPlan:
     def as_dict(self):
         return {
             "name": self.name,
-            "layouts": [layout.as_dict() for layout in self.layouts],
+            "layouts": {layout.name: layout.as_dict() for layout in self.layouts},
         }
 
     def _sighandler(self, sig, frame):

@@ -397,7 +397,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
             rows = session.query(db.Node).all()
             count = len(rows)
 
-    log.info(f"Executing '{cmd}' across [green]{count}[/] nodes.")
+    log.info(f"Executing '{cmd}' across {count} nodes.")
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = executor.map(
