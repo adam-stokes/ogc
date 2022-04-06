@@ -46,8 +46,8 @@ def export_env(spec, db_file, env_file):
     This exports the current database and imports the public ssh key of the
     shared user.
 
-    **Note** on cloud credentials: The credentials must be exported in a `.env` in order
-    for the export command to include that information.
+    **Note** on cloud credentials: They are not exported and must be set on the shared
+    users environment.
     """
     if not sh.which("pg_dump"):
         log.error(f"The pg_dump utility is required to export the database.")

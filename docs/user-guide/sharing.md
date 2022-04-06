@@ -56,7 +56,7 @@ The `private-ssh-key` and `public-ssh-key` should be the locations of the keys a
 Once import is complete, you can access this environment:
 
 ``` sh
-$ POSTGRES_DB="ogccopydb" ogc ls
+$ POSTGRES_DB="ogcopydb" ogc ls
 ```
 
 ![Import copy](./assets/import-copy-ls.png)
