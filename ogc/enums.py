@@ -55,6 +55,7 @@ CLOUD_IMAGE_MAP = {
             "debian-11": "ami-04dd0542609808c50",
             "debian-10": "ami-0d90bed76900e679a",
             "oracle-8": "ami-00371eeb8fd8e0e16",
+            "windows-2019": "ami-0587bd602f1da2f1d",
         },
     },
     "google": {

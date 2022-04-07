@@ -4,7 +4,7 @@ dist
 build
 **__pycache__**
 pytest.log
-.env
+.env*
 site
 ogc*log*
 .tox

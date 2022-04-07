@@ -1,0 +1,1 @@
+powershell echo ${node.instance_name} > ${node.instance_name}.txt

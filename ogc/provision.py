@@ -245,7 +245,7 @@ class AWSProvisioner(BaseProvisioner):
             auth=auth,
             ex_securitygroup=layout["name"],
             # ex_spot=True,
-            ex_userdata=self._userdata(),
+            ex_userdata=self._userdata() if 'windows' not in layout['runs-on'] else '',
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
             ogc_env=env,
@@ -352,7 +352,7 @@ class GCEProvisioner(BaseProvisioner):
                 },
                 {
                     "key": "startup-script",
-                    "value": self._userdata(),
+                    "value": self._userdata() if 'windows' not in layout['runs-on'] else '',
                 },
             ]
         }
