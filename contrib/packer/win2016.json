@@ -10,7 +10,7 @@
 			"source_ami_filter": {
 				"filters": {
 					"virtualization-type": "hvm",
-					"name": "*Windows_Server-2019-English-Full-Base-*",
+					"name": "*Windows_Server-2016-English-Full-Base-*",
 					"root-device-type": "ebs"
 				},
 				"owners": [

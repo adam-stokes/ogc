@@ -10,7 +10,7 @@
 			"source_ami_filter": {
 				"filters": {
 					"virtualization-type": "hvm",
-					"name": "*Windows_Server-2019-English-Full-Base-*",
+					"name": "*Windows_Server-2022-English-Full-Base-*",
 					"root-device-type": "ebs"
 				},
 				"owners": [
@@ -20,7 +20,7 @@
 			},
 			"region": "{{user `region`}}",
 			"instance_type": "{{user `instance_type`}}",
-			"ami_name": "windows-2019-ogc-{{timestamp}}",
+			"ami_name": "windows-2022-ogc-{{timestamp}}",
 			"communicator": "winrm",
 			"winrm_insecure": "true",
 			"winrm_timeout": "6h",

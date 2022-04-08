@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from invoke import task
-from pathlib import Path
 import os
 
 load_dotenv()
@@ -27,19 +26,6 @@ def test(c):
 @task
 def bump_rev(c):
     c.run("punch --part patch")
-
-
-@task
-def celery(c):
-    c.run("ogc server")
-
-
-@task
-def prep(c):
-    c.run("click-man ogc -t man")
-    for fname in Path("man").glob("*.1"):
-        dst = Path("docs/commands") / f"{fname.stem}.md"
-        c.run(f"pandoc -f man -t markdown {fname} -o {dst}")
 
 
 @task(pre=[clean, fix, bump_rev])
