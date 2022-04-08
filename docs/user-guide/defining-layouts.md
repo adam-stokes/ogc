@@ -73,6 +73,7 @@ In the case of **Google**, any username can be given. In the case of **AWS**, th
 | oracle | ec2-user |
 | sles   | ec2-user |
 | ubuntu | ubuntu   |
+| windows[^1] | ogc     |
 
 !!! caution
     A lot of cloud machine images disable `root` login, try to avoid using that as a user and utilize `sudo` for anything requiring elevated permissions.
@@ -176,3 +177,5 @@ layouts:
 The merging of the specifications will remove any keys that exist if the value of the key is `{}` (signaling an empty stanza). The remaining keys that match up with the original spec will then be overridden and the rest of the specification is left untouched.
 
 Adding new layouts is just a matter of defining another section under `layouts` in the additional spec files passed to OGC.
+
+[^1]: This is the default user for our contributed [packer build for Windows](./windows.md)

@@ -67,6 +67,7 @@ nav:
     - 'Providers': 'user-guide/providers.md'
     - 'Upgrading': 'user-guide/upgrading.md'
     - 'Sharing': 'user-guide/sharing.md'
+    - 'Windows': 'user-guide/windows.md'
     - 'Cookbook':
         - 'Access node info': 'user-guide/cookbook/template-access-node-info.md'
   - 'Developer Guide':
