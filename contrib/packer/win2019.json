@@ -1,0 +1,75 @@
+{
+	"variables": {
+		"instance_type": "c5.4xlarge",
+		"region": "us-east-2",
+		"branch": ""
+	},
+	"builders": [
+		{
+			"type": "amazon-ebs",
+			"source_ami_filter": {
+				"filters": {
+					"virtualization-type": "hvm",
+					"name": "*Windows_Server-2019-English-Full-Base-*",
+					"root-device-type": "ebs"
+				},
+				"owners": [
+					"801119661308"
+				],
+				"most_recent": true
+			},
+			"region": "{{user `region`}}",
+			"instance_type": "{{user `instance_type`}}",
+			"ami_name": "windows-2019-ogc-{{timestamp}}",
+			"communicator": "winrm",
+			"winrm_insecure": "true",
+			"winrm_timeout": "6h",
+			"winrm_username": "Administrator",
+			"user_data_file": "common/winrm.cloud-init",
+			"launch_block_device_mappings": [
+				{
+					"device_name": "/dev/sda1",
+					"volume_size": 50,
+					"volume_type": "gp2",
+					"delete_on_termination": true
+				}
+			]
+		}
+	],
+	"provisioners": [
+		{
+			"type": "powershell",
+			"script": "common/chocolatey.ps1"
+		},
+		{
+			"type": "powershell",
+			"script": "common/install-ssh-server.ps1"
+		},
+		{
+			"type": "powershell",
+			"inline": [
+				"choco install rsync",
+				"choco install git",
+				"choco install vim"
+			]
+		},
+		{
+			"type":"file",
+			"source":"common/init-user-ogc.ps1",
+			"destination":"$Env:programdata/Amazon/EC2-Windows/Launch/Scripts/init-user-ogc.ps1"
+		},
+		{
+			"type": "powershell",
+			"script": "common/add-ogc-user.ps1"
+		},
+		{
+			"type": "powershell",
+			"inline": [
+				"C:/ProgramData/Amazon/EC2-Windows/Launch/Scripts/InitializeInstance.ps1 -Schedule"
+			],
+			"only": [
+				"amazon-ebs"
+			]
+		}
+	]
+}

@@ -14,3 +14,5 @@ ogc*log*
 venv
 .venv
 *.sql
+
+!contrib/packer/*.json
