@@ -1,0 +1,8 @@
+{
+  "source_directories": [
+    "ogc"
+  ],
+  "ignore_all_errors": [
+    ".venv"
+  ]
+}

@@ -30,12 +30,37 @@ SQLAlchemy = "^1.4.32"
 alembic = "^1.7.7"
 attrs = "^21.4.0"
 arrow = "^1.2.2"
+returns = "^0.19.0"
 
+[tool.mypy]
+allow_redefinition = false
+check_untyped_defs = true
+disallow_any_explicit = true
+disallow_untyped_calls = true
+ignore_errors = false
+ignore_missing_imports = true
+implicit_reexport = false
+local_partial_types = true
+strict_optional = true
+strict_equality = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unreachable = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_any_unimported = true
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true
+show_error_codes = true
+mypy_path = "ogc"
+plugins = ["sqlalchemy.ext.mypy.plugin", "returns.contrib.mypy.returns_plugin"]
 
 [tool.poetry.dev-dependencies]
 black = "^22.1.9"
 isort = "^5.10.1"
-invoke = "^1.6.0"
 python-frontmatter = "^1.0.0"
 pylint = "^2.12.2"
 Pygments = "^2.11.2"
@@ -50,9 +75,36 @@ mkdocs-material = "^8.2.8"
 mkdocstrings = "^0.18.1"
 mkdocstrings-python-legacy = "^0.2.2"
 mkdocs-click = "^0.6.0"
+pyre-check = "^0.9.10"
+poethepoet = "^0.13.1"
+SQLAlchemy = {extras = ["mypy"], version = "^1.4.35"}
+types-python-slugify = "^5.0.3"
+types-retry = "^0.9.5"
+types-PyYAML = "^6.0.5"
+types-click = "^7.1.8"
 
 [tool.poetry.scripts]
-ogc = "ogc.commands.base:start" 
+ogc = "ogc.commands.base:start"
+
+[tool.poe.tasks]
+clean = """
+rm -rf site build dist ogc.egg-info __pycache__ artifacts
+"""
+test   = "pytest --cov=ogc"
+lint   = "pylint ogc tests"
+format = "block ."
+isort   = "isort -m 3 ogc"
+pyre   = "pyre --search-path \"$(python -c 'import site; print(site.getsitepackages()[0])')\""
+mypy = "mypy ogc maint"
+bump-rev = "punch --part patch"
+serve-docs  = "mkdocs serve"
+publish-docs = "mkdocs gh-deploy"
+_git-commit = "git commit -asm 'Next Release'"
+_git-push-tags = "git push --tags"
+_git-push = "git push"
+_publish = "poetry publish --build -u ${PYPI_USER} -p ${PYPI_PASS}"
+release = ["clean", "isort", "format", "bump-rev", "publish-docs"]
+
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -5,6 +5,7 @@ Maintenance script for Google. Helps clean up instances and firewalls.
 
 from concurrent.futures import ProcessPoolExecutor
 import os
+from typing import Any, Iterator
 import click
 
 from click_didyoumean import DYMGroup
@@ -24,7 +25,7 @@ def _destroy_async(node):
     return True
 
 
-def teardown(nodes: list[int]) -> list[bool]:
+def teardown(nodes: list[int]) -> Iterator[Any]:
     with ProcessPoolExecutor() as executor:
         results = executor.map(_destroy_async, [node for node in nodes])
     return results

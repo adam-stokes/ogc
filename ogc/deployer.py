@@ -50,8 +50,8 @@ class Deployer:
                 str(template.parent.parent.absolute()),
             ]
         )
-        template = Template(filename=str(fpath), lookup=lookup)
-        return template.render(**context)
+        _template = Template(filename=str(fpath), lookup=lookup)
+        return _template.render(**context)
 
     def exec(self, cmd) -> "DeployerResult":
         """Runs a command on the node"""
