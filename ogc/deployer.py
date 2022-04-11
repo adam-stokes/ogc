@@ -4,10 +4,11 @@
 
 import tempfile
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 import sh
 from libcloud.compute.deployment import (
+    Deployment,
     FileDeployment,
     MultiStepDeployment,
     ScriptDeployment,
@@ -60,7 +61,7 @@ class Deployer:
         msd.run(self.node, self._ssh_client)
         return DeployerResult(self.deployment, msd)
 
-    def exec_scripts(self, script_dir) -> "DeployerResult":
+    def exec_scripts(self, script_dir: str) -> "DeployerResult":
         scripts = Path(script_dir)
         if not scripts.exists():
             log.info("No deployment scripts found, skipping.")
@@ -78,7 +79,7 @@ class Deployer:
         ]
         scripts_to_run.reverse()
 
-        steps = [
+        steps: list[Deployment] = [
             ScriptDeployment(self.render(s, context))
             for s in scripts_to_run
             if s.is_file()
@@ -102,7 +103,8 @@ class Deployer:
 
     def run(self) -> "DeployerResult":
         log.info(
-            f"Establishing connection ({self.deployment.public_ip}) ({self.deployment.username}) ({str(self.deployment.ssh_private_key)})"
+            f"Establishing connection ({self.deployment.public_ip}) "
+            f"({self.deployment.username}) ({str(self.deployment.ssh_private_key)})"
         )
 
         # Upload any files first
@@ -119,7 +121,7 @@ class Deployer:
 
         return self.exec_scripts(self.deployment.scripts)
 
-    def put(self, src: str, dst: str, excludes: List[str], includes: List[str] = []):
+    def put(self, src: str, dst: str, excludes: list[str], includes: list[str] = []):
         cmd_opts = [
             "-avz",
             "-e",
@@ -160,14 +162,14 @@ class DeployerResult:
         self.msd = msd
 
     @property
-    def passed(self):
+    def passed(self) -> bool:
         return all(
             step.exit_status == 0
             for step in self.msd.steps
             if hasattr(step, "exit_status")
         )
 
-    def save(self):
+    def save(self) -> None:
         for step in self.msd.steps:
             with state.app.session as session:
                 if hasattr(step, "exit_status"):

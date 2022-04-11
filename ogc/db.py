@@ -1,6 +1,7 @@
 import os
 import uuid
 from pathlib import Path
+from typing import Dict
 
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
@@ -98,21 +99,21 @@ def session(engine):
     return _session()
 
 
-def createtbl(engine):
+def createtbl(engine) -> None:
     """Create db tables"""
     Base.metadata.create_all(engine)
 
 
-def droptbl(engine):
+def droptbl(engine) -> None:
     """Create db tables"""
     Base.metadata.drop_all(engine)
 
 
-def model_as_dict(obj):
+def model_as_dict(obj) -> Dict[str, str]:
     return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
 
 
-def migrate():
+def migrate() -> None:
     # retrieves the directory that *this* file is in
     migrations_dir = Path(__file__).parent.parent / "alembic"
     # this assumes the alembic.ini is also contained in this same directory

@@ -12,5 +12,7 @@ disable=invalid-name,
         no-value-for-parameter,
         duplicate-code,
         arguments-differ,
-        abstract-method
+        abstract-method,
+        logging-not-lazy
 
+logging-format-style=fstr

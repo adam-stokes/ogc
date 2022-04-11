@@ -1,3 +1,5 @@
+import sys
+
 import click
 
 from ogc import actions, db, state
@@ -27,7 +29,10 @@ if not state.app.engine:
     help="Force removal of database records only",
 )
 def rm(by_name, force, only_db):
-    actions.teardown_async(by_name, force=force, only_db=only_db)
+    result = actions.teardown_async(by_name, force=force, only_db=only_db)
+    if result.is_err():
+        state.app.log.error(result.err())
+        sys.exit(1)
 
 
 @click.command(help="Destroys everything. Use with caution.")
@@ -44,7 +49,10 @@ def rm(by_name, force, only_db):
 def rm_all(force, only_db):
     with state.app.session as session:
         names = [node.instance_name for node in session.query(db.Node).all()]
-        actions.teardown_async(names, force=force, only_db=only_db)
+        result = actions.teardown_async(names, force=force, only_db=only_db)
+        if result.is_err():
+            state.app.log.error(result.err())
+            sys.exit(1)
 
 
 @click.option("--provider", default="aws", help="Provider to query")

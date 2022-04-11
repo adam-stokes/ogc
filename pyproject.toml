@@ -12,7 +12,6 @@ repository = "https://github.com/adam-stokes/ogc"
 python = "^3.9"
 sh = "^1.14.2"
 click = "^8.0.4"
-dict-deep = "^4.1.2"
 python-dotenv = "^0.19.2"
 apache-libcloud = "^3.5.0"
 PyYAML = "^6.0"
@@ -30,7 +29,9 @@ SQLAlchemy = "^1.4.32"
 alembic = "^1.7.7"
 attrs = "^21.4.0"
 arrow = "^1.2.2"
-returns = "^0.19.0"
+pampy = "^0.3.0"
+toolz = "^0.11.2"
+safetywrap = "^1.5.0"
 
 [tool.mypy]
 allow_redefinition = false
@@ -82,6 +83,7 @@ types-python-slugify = "^5.0.3"
 types-retry = "^0.9.5"
 types-PyYAML = "^6.0.5"
 types-click = "^7.1.8"
+flake8 = "^4.0.1"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start"
@@ -90,20 +92,22 @@ ogc = "ogc.commands.base:start"
 clean = """
 rm -rf site build dist ogc.egg-info __pycache__ artifacts
 """
-test   = "pytest --cov=ogc"
-lint   = "pylint ogc tests"
-format = "block ."
-isort   = "isort -m 3 ogc"
-pyre   = "pyre --search-path \"$(python -c 'import site; print(site.getsitepackages()[0])')\""
-mypy = "mypy ogc maint"
-bump-rev = "punch --part patch"
-serve-docs  = "mkdocs serve"
-publish-docs = "mkdocs gh-deploy"
 _git-commit = "git commit -asm 'Next Release'"
-_git-push-tags = "git push --tags"
 _git-push = "git push"
+_git-push-tags = "git push --tags"
 _publish = "poetry publish --build -u ${PYPI_USER} -p ${PYPI_PASS}"
+bump-rev = "punch --part patch"
+fix = ["isort", "format"]
+format = "black ."
+isort  = "isort -m 3 ogc"
+lint   = "pylint ogc tests"
+mypy   = "mypy ogc maint"
+publish-docs = "mkdocs gh-deploy"
+pyre   = "pyre --search-path \"$(python -c 'import site; print(site.getsitepackages()[0])')\""
+pytest = "pytest --cov=ogc"
 release = ["clean", "isort", "format", "bump-rev", "publish-docs"]
+serve-docs  = "mkdocs serve"
+test = ["pyre", "mypy", "lint", "pytest"]
 
 
 [build-system]

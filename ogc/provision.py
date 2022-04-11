@@ -5,10 +5,10 @@ import datetime
 import json
 import uuid
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Iterator, Optional, Type
 
 from libcloud.common.google import ResourceNotFoundError
-from libcloud.compute.base import NodeAuthSSHKey
+from libcloud.compute.base import NodeAuthSSHKey, KeyPair
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
@@ -76,13 +76,13 @@ class BaseProvisioner:
         self.provisioner = self.connect()
 
     @property
-    def options(self):
+    def options(self) -> None:
         raise NotImplementedError()
 
-    def connect(self):
+    def connect(self) -> "BaseProvisioner":
         raise NotImplementedError()
 
-    def create(self, layout, env, **kwargs):
+    def create(self, layout, env, **kwargs) -> None:
         raise NotImplementedError()
 
     def setup(self, layout, **kwargs):
@@ -155,13 +155,10 @@ class BaseProvisioner:
             self.provisioner.delete_key_pair, fargs=[key_pair], backoff=3, tries=15
         )
 
-    def list_key_pairs(self):
+    def list_key_pairs(self) -> Iterator[KeyPair]:
         return self.provisioner.list_key_pairs()
 
-    def __repr__(self):
-        raise NotImplementedError()
-
-    def _userdata(self):
+    def _userdata(self) -> str:
         """Some instances on AWS do not include rsync which is needed for file transfers"""
         return """#!/usr/bin/env bash
 if ! test -f "/usr/local/bin/pacapt"; then
@@ -183,7 +180,7 @@ class AWSProvisioner(BaseProvisioner):
     """
 
     @property
-    def options(self):
+    def options(self) -> Dict[str, str]:
         return {
             "key": self.env.get("AWS_ACCESS_KEY_ID", None),
             "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
@@ -245,7 +242,7 @@ class AWSProvisioner(BaseProvisioner):
             auth=auth,
             ex_securitygroup=layout["name"],
             # ex_spot=True,
-            ex_userdata=self._userdata() if 'windows' not in layout['runs-on'] else '',
+            ex_userdata=self._userdata() if "windows" not in layout["runs-on"] else "",
             ex_terminate_on_shutdown=True,
             ogc_layout=layout,
             ogc_env=env,
@@ -352,7 +349,9 @@ class GCEProvisioner(BaseProvisioner):
                 },
                 {
                     "key": "startup-script",
-                    "value": self._userdata() if 'windows' not in layout['runs-on'] else '',
+                    "value": self._userdata()
+                    if "windows" not in layout["runs-on"]
+                    else "",
                 },
             ]
         }
@@ -388,11 +387,13 @@ class GCEProvisioner(BaseProvisioner):
             return _node[0]
         raise ProvisionException("Unable to get node information")
 
-    def __repr__(self):
+    def __str__(self) -> str:
         return f"<GCEProvisioner [{self.options['datacenter']}]>"
 
 
-def choose_provisioner(name, env, **kwargs):
+def choose_provisioner(
+    name: str, env: dict[str, str], **kwargs: dict[str, str]
+) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
-    provisioner = choices[name]
+    provisioner: Type[BaseProvisioner] = choices[name]
     return provisioner(env, **kwargs)
