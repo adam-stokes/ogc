@@ -83,7 +83,7 @@ def launch_async(
             launch,
             [layout.as_dict() for layout in layouts for _ in range(layout.scale)],
         )
-        return (result.unwrap() for result in results)
+        return (result.unwrap() for result in results if result.is_ok())
 
 
 def deploy(node_id: int) -> Result[bool, str]:
