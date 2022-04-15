@@ -30,24 +30,29 @@ if not state.app.engine:
     help="Login to a node by its Name",
 )
 def ssh(by_id, by_name):
-    with state.app.session as session:
-        if by_name:
-            node = (
-                session.query(db.Node).filter(db.Node.instance_name == by_name).first()
-                or None
-            )
-        elif by_id:
-            node = session.query(db.Node).filter(db.Node.id == by_id).first() or None
-        else:
-            log.error(
-                "Unable to locate node in database, please double check spelling.",
-                style="bold red",
-            )
-            sys.exit(1)
-        if node:
-            cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
-            sh.ssh(cmd, _fg=True, _env=state.app.env)
-            sys.exit(0)
+    user = db.get_user().unwrap_or_else(log.error)
+    if not user:
+        sys.exit(1)
+
+    if by_name:
+        node = [node for node in user.nodes if node.instance_name == by_name]
+    elif by_id:
+        node = [node for node in user.nodes if node.instance_id == by_id]
+    else:
+        log.error(
+            "Unable to locate node in database, please double check spelling.",
+            style="bold red",
+        )
+        sys.exit(1)
+    if node:
+        node = node[0]
+        cmd = [
+            "-i",
+            str(node.layout.ssh_private_key.expanduser()),
+            f"{node.layout.username}@{node.public_ip}",
+        ]
+        sh.ssh(cmd, _fg=True, _env=state.app.env)
+        sys.exit(0)
 
 
 @click.command(help="Execute a command across node(s)")

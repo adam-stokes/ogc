@@ -1,35 +1,25 @@
-import json
 import os
 import sys
 
 import click
 from rich.prompt import Prompt
-from slugify import slugify
 
-from ogc import db, state
+from ogc import db, models
 from ogc.log import Logger as log
 
 from .base import cli
 
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
-
 
 @click.command(help="Initialize OGC")
 def init():
-    db.createtbl(state.app.engine)
-    with state.app.session as session:
-        has_user = session.query(db.User).first()
-        if has_user:
+    # begin setup
+    name = Prompt.ask("Enter your name", default=os.environ.get("USER", ""))
+    user = models.User(name=name)
+    with db.get().begin(write=True) as txn:
+        if txn.get(user.slug.encode("ascii")):
             log.warning("OGC already setup.")
             sys.exit(1)
-
-        # begin setup
-        name = Prompt.ask("Enter your name", default=os.environ.get("USER", ""))
-        user = db.User(name=name, slug=slugify(name))
-        session.add(user)
-        session.commit()
+        txn.put(user.slug.encode("ascii"), db.model_as_pickle(user))
     log.info("Setup complete.")
 
 

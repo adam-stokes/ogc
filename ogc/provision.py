@@ -2,160 +2,115 @@
 # pylint: disable=wrong-import-order
 
 import datetime
-import json
 import uuid
-from pathlib import Path
-from typing import Dict, Iterator, Optional, Type
+from typing import Iterator, Optional, Type
 
+import dill
 from libcloud.common.google import ResourceNotFoundError
-from libcloud.compute.base import NodeAuthSSHKey, KeyPair
+from libcloud.compute.base import KeyPair
+from libcloud.compute.base import Node as NodeType
+from libcloud.compute.base import (
+    NodeAuthSSHKey,
+    NodeDriver,
+    NodeImage,
+    NodeLocation,
+    NodeSize,
+)
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
 
-from ogc import db
+from ogc import db, models
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import Logger as log
-from ogc.state import app
 
 
-class ProvisionResult:
-    def __init__(self, node, layout, env):
-        self.node = node
-        self.layout = layout
-        self.node = node[0]
-        self.public_ip = node[1][0]
-        self.private_ip = self.node.private_ips[0]
-        self.env = env
-        self.username = self.layout["username"]
-        self.scripts = self.layout["scripts"]
-        self.provider = self.layout["provider"]
-        self.ssh_public_key = self.layout["ssh_public_key"]
-        self.ssh_private_key = self.layout["ssh_private_key"]
-        self.tags = self.layout["tags"]
-        self.remote_path = self.layout["remote-path"]
-        self.artifacts = self.layout["artifacts"]
-        self.include = self.layout["include"]
-        self.exclude = self.layout["exclude"]
-        self.ports = self.layout["ports"]
-
-    def save(self) -> db.Node:
-        with app.session as session:
-            user = session.query(db.User).first()
-            node_obj = db.Node(
-                instance_name=self.node.name,
-                instance_id=self.node.id,
-                instance_state=self.node.state,
-                username=self.username,
-                public_ip=self.public_ip,
-                private_ip=self.private_ip,
-                ssh_public_key=self.ssh_public_key,
-                ssh_private_key=self.ssh_private_key,
-                provider=self.provider,
-                scripts=self.scripts,
-                tags=self.tags,
-                remote_path=self.remote_path,
-                artifacts=self.artifacts,
-                include=self.include,
-                exclude=self.exclude,
-                ports=self.ports,
-                layout=json.dumps(self.layout),
-                extra=json.dumps({"env": self.env}),
-                user=user,
-            )
-            session.add(node_obj)
-            session.commit()
-            return node_obj
+def save_result(nodes: list[models.Node], config: models.User) -> None:
+    for node in nodes:
+        config.nodes.append(node)
+    with db.get().begin(write=True) as txn:
+        print(txn.get(config.slug.encode("ascii")))
+        txn.put(config.slug.encode("ascii"), db.model_as_pickle(config))
 
 
 class BaseProvisioner:
-    def __init__(self, env, **kwargs):
-        self._args = kwargs
-        self.env = env
-        self.provisioner = self.connect()
+    def __init__(self, layout: models.Layout, config: models.User):
+        self.layout = layout
+        self.config = config
+        self.env = config.env
+        self.provisioner: NodeDriver = self.connect()
 
     @property
     def options(self) -> None:
         raise NotImplementedError()
 
-    def connect(self) -> "BaseProvisioner":
+    def connect(self) -> NodeDriver:
         raise NotImplementedError()
 
-    def create(self, layout, env, **kwargs) -> None:
+    def create(self) -> models.Node:
         raise NotImplementedError()
 
-    def setup(self, layout, **kwargs):
+    def setup(self) -> None:
         """Perform some provider specific setup before launch"""
         raise NotImplementedError()
 
-    def cleanup(self, node, **kwargs):
+    def cleanup(self, node, **kwargs) -> bool:
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
-    def destroy(self, node):
+    def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node)
 
-    def sizes(self, instance_size):
+    def node(self, **kwargs) -> NodeType:
+        raise NotImplementedError()
+
+    def sizes(self, instance_size: str) -> list[NodeSize]:
         _sizes = self.provisioner.list_sizes()
         try:
             return [
                 size
                 for size in _sizes
                 if size.id == instance_size or size.name == instance_size
-            ][0]
+            ]
         except IndexError:
             raise ProvisionException(
                 f"Could not locate instance size for {instance_size}"
             )
 
-    def image(self, runs_on: str, arch: Optional[str] = None):
+    def image(self, runs_on: str) -> NodeImage:
         """Gets a single image from registry of provider"""
         return self.provisioner.get_image(runs_on)
 
-    def images(self, **kwargs):
-        return self.provisioner.list_images(**kwargs)
+    def images(self, location: Optional[NodeLocation] = None) -> list[NodeImage]:
+        return self.provisioner.list_images(location)
 
-    def _create_node(self, **kwargs) -> db.Node:
+    def _create_node(self, **kwargs: dict) -> models.Node:
         _opts = kwargs.copy()
-        layout = None
-        if "ogc_layout" in _opts:
-            layout = _opts["ogc_layout"]
-            del _opts["ogc_layout"]
-
-        env = None
-        if "ogc_env" in _opts:
-            env = _opts["ogc_env"]
-            del _opts["ogc_env"]
-
-        log.info(f"Spinning up {layout['name']}")
-        node = retry_call(
-            self.provisioner.create_node, fkwargs=_opts, backoff=3, tries=5
-        )
+        log.info(f"Spinning up {self.layout.name}")
+        node = self.provisioner.create_node(**_opts)  # type: ignore
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
-        )[0]
-        result = ProvisionResult(node, layout, env)
-        node_obj = result.save()
-        return node_obj
+        )[0][0]
+        return models.Node(node=node, layout=self.layout)
 
-    def node(self, **kwargs):
+    def list_nodes(self, **kwargs) -> list[NodeType]:
         return self.provisioner.list_nodes(**kwargs)
 
-    def create_keypair(self, name, ssh_public_key):
+    def create_keypair(self, name: str, ssh_public_key: str) -> KeyPair:
         return self.provisioner.import_key_pair_from_file(
             name=name, key_file_path=ssh_public_key
         )
 
-    def get_key_pair(self, name):
+    def get_key_pair(self, name: str) -> KeyPair:
         return self.provisioner.get_key_pair(name)
 
-    def delete_key_pair(self, key_pair):
-        retry_call(
+    def delete_key_pair(self, key_pair) -> bool:
+        return retry_call(
             self.provisioner.delete_key_pair, fargs=[key_pair], backoff=3, tries=15
         )
 
-    def list_key_pairs(self) -> Iterator[KeyPair]:
+    def list_key_pairs(self) -> list[KeyPair]:
         return self.provisioner.list_key_pairs()
 
     def _userdata(self) -> str:
@@ -180,42 +135,42 @@ class AWSProvisioner(BaseProvisioner):
     """
 
     @property
-    def options(self) -> Dict[str, str]:
+    def options(self) -> dict[str, str]:
         return {
             "key": self.env.get("AWS_ACCESS_KEY_ID", None),
             "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
-    def connect(self):
+    def connect(self) -> NodeDriver:
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
 
-    def setup(self, layout, **kwargs):
-        if layout["ports"]:
-            self.create_firewall(layout["name"], layout["ports"])
-        if not any(kp.name == layout["name"] for kp in self.list_key_pairs()):
-            self.create_keypair(layout["name"], layout["ssh_public_key"])
+    def setup(self) -> None:
+        if self.layout.ports:
+            self.create_firewall(self.layout.name, self.layout.ports)
+        if not any(kp.name == self.layout.name for kp in self.list_key_pairs()):
+            self.create_keypair(self.layout.name, str(self.layout.ssh_public_key))
 
-    def cleanup(self, node, **kwargs):
+    def cleanup(self, node, **kwargs) -> None:
         pass
 
-    def image(self, runs_on, arch):
+    def image(self, runs_on: str) -> NodeImage:
         if runs_on.startswith("ami-"):
             _runs_on = runs_on
         else:
             # FIXME: need proper architecture detection
-            _runs_on = CLOUD_IMAGE_MAP["aws"][arch].get(runs_on)
-        return super().image(_runs_on, arch)
+            _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on)
+        return super().image(_runs_on)
 
     def create_firewall(self, name, ports):
         """Creates the security group for enabling traffic between nodes"""
-        if not any(sg.name == name for sg in self.provisioner.ex_get_security_groups()):
-            self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)
+        if not any(sg.name == name for sg in self.provisioner.ex_get_security_groups()):  # type: ignore
+            self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)  # type: ignore
 
         for port in ports:
             ingress, egress = port.split(":")
-            self.provisioner.ex_authorize_security_group(
+            self.provisioner.ex_authorize_security_group(  # type: ignore
                 name, ingress, egress, "0.0.0.0/0", "tcp"
             )
             # udp
@@ -224,46 +179,45 @@ class AWSProvisioner(BaseProvisioner):
     def delete_firewall(self, name):
         pass
 
-    def create(self, layout, env, **kwargs) -> db.Node:
-        pub_key = Path(layout["ssh_public_key"]).read_text()
+    def create(self) -> models.Node:
+        pub_key = self.layout.ssh_public_key.expanduser().read_text()
         auth = NodeAuthSSHKey(pub_key)
-        image = self.image(layout["runs-on"], layout["arch"])
-        if not image and not layout["username"]:
+        image = self.image(self.layout.runs_on)
+        if not image and not self.layout.username:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout['runs-on']}/{layout['arch']}"
+                f"Could not locate AMI and/or username for: {self.layout.runs_on}"
             )
 
-        size = self.sizes(layout["instance-size"])
+        size = self.sizes(self.layout.instance_size)[0]
 
         opts = dict(
-            name=f"ogc-{str(uuid.uuid4())[:8]}-{layout['name']}",
+            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
             size=size,
             auth=auth,
-            ex_securitygroup=layout["name"],
+            ex_securitygroup=self.layout.name,
             # ex_spot=True,
-            ex_userdata=self._userdata() if "windows" not in layout["runs-on"] else "",
+            ex_userdata=self._userdata()
+            if "windows" not in self.layout.runs_on
+            else "",
             ex_terminate_on_shutdown=True,
-            ogc_layout=layout,
-            ogc_env=env,
         )
         tags = {}
-        with app.session as session:
-            user = session.query(db.User).first()
-            # Store some metadata for helping with cleanup
-            now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
-            layout["tags"].append(now)
-            layout["tags"].append(f"user-{user.slug}")
-            tags["Created"] = now
-            tags["UserTag"] = f"user-{user.slug}"
+
+        # Store some metadata for helping with cleanup
+        now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
+        self.layout.tags.append(now)
+        self.layout.tags.append(f"{self.config.slug}")
+        tags["Created"] = now
+        tags["UserTag"] = f"{self.config.slug}"
 
         node = self._create_node(**opts)
-        self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)
+        self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)  # type: ignore
         return node
 
-    def node(self, **kwargs):
+    def node(self, **kwargs) -> NodeType:
         instance_id = kwargs.get("instance_id", None)
-        _nodes = super().node(ex_node_ids=[instance_id])
+        _nodes = self.provisioner.list_nodes(ex_node_ids=[instance_id])
         if _nodes:
             return _nodes[0]
         raise ProvisionException("Unable to get node information")
@@ -293,21 +247,21 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def setup(self, layout, **kwargs):
-        self.create_firewall(layout["name"], layout["ports"], layout["tags"])
+    def setup(self, **kwargs):
+        self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
     def cleanup(self, node, **kwargs):
         pass
 
-    def image(self, runs_on, arch):
+    def image(self, runs_on) -> NodeImage:
         # Pull from partial first
         try:
-            partial_image = self.provisioner.ex_get_image(runs_on)
+            partial_image = self.provisioner.ex_get_image(runs_on)  # type: ignore
             if partial_image:
                 return partial_image
         except ResourceNotFoundError:
             log.debug(f"Could not find {runs_on}, falling back internal image map")
-        _runs_on = CLOUD_IMAGE_MAP["google"][arch].get(runs_on)
+        _runs_on = CLOUD_IMAGE_MAP["google"]["amd64"].get(runs_on)
         try:
             return [i for i in self.images() if i.name == _runs_on][0]
         except IndexError:
@@ -316,69 +270,65 @@ class GCEProvisioner(BaseProvisioner):
     def create_firewall(self, name, ports, tags):
         ports = [port.split(":")[0] for port in ports]
         try:
-            self.provisioner.ex_get_firewall(name)
+            self.provisioner.ex_get_firewall(name)  # type: ignore
         except ResourceNotFoundError:
             log.warning("No firewall found, will create one to attach nodes to.")
-            self.provisioner.ex_create_firewall(
+            self.provisioner.ex_create_firewall(  # type: ignore
                 name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
             )
 
     def delete_firewall(self, name):
         try:
-            self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))
+            self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))  # type: ignore
         except ResourceNotFoundError:
             log.error(f"Unable to delete firewall {name}")
 
     def list_firewalls(self):
-        return self.provisioner.ex_list_firewalls()
+        return self.provisioner.ex_list_firewalls()  # type: ignore
 
-    def create(self, layout, env, **kwargs) -> db.Node:
-        image = self.image(layout["runs-on"], layout["arch"])
-        if not image and not layout["username"]:
+    def create(self) -> models.Node:
+        image = self.image(self.layout.runs_on)
+        if not image and not self.layout.username:
             raise ProvisionException(
-                f"Could not locate AMI and/or username for: {layout['runs-on']}/{layout['arch']}"
+                f"Could not locate AMI and/or username for: {self.layout.runs_on}"
             )
-        size = self.sizes(layout["instance-size"])
+        size = self.sizes(self.layout.instance_size)[0]
 
         ex_metadata = {
             "items": [
                 {
                     "key": "ssh-keys",
                     "value": "%s: %s"
-                    % (layout["username"], Path(layout["ssh_public_key"]).read_text()),
+                    % (self.layout.username, self.layout.ssh_public_key.read_text()),
                 },
                 {
                     "key": "startup-script",
                     "value": self._userdata()
-                    if "windows" not in layout["runs-on"]
+                    if "windows" not in self.layout.runs_on
                     else "",
                 },
             ]
         }
 
-        if layout["ports"]:
-            self.create_firewall(layout["name"], layout["ports"], layout["tags"])
+        if self.layout.ports:
+            self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
-        with app.session as session:
-            user = session.query(db.User).first()
-            # Store some metadata for helping with cleanup
-            now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
-            layout["tags"].append(now)
-            layout["tags"].append(f"user-{user.slug}")
+        now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
+        self.layout.tags.append(now)
+        self.layout.tags.append(f"{self.config.slug}")
 
         opts = dict(
-            name=f"ogc-{str(uuid.uuid4())[:8]}-{layout['name']}",
+            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,
-            ex_tags=layout["tags"],
-            ogc_layout=layout,
-            ogc_env=env,
+            ex_tags=self.layout.tags,
         )
-        return self._create_node(**opts)
+        node = self._create_node(**opts)
+        return node
 
-    def node(self, **kwargs):
-        _nodes = super().node()
+    def node(self, **kwargs) -> NodeType:
+        _nodes = self.provisioner.list_nodes()
         instance_id = None
         if "instance_id" in kwargs:
             instance_id = kwargs["instance_id"]
@@ -392,8 +342,8 @@ class GCEProvisioner(BaseProvisioner):
 
 
 def choose_provisioner(
-    name: str, env: dict[str, str], **kwargs: dict[str, str]
+    name: str, layout: models.Layout, config: models.User
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
     provisioner: Type[BaseProvisioner] = choices[name]
-    return provisioner(env, **kwargs)
+    return provisioner(layout, config)

@@ -4,7 +4,8 @@ set -x
 <%namespace name="utils" file="/functions.mako"/>
 
 <%
-url = "https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz" % (env['OGC_ELASTIC_AGENT_VERSION'], env['OGC_ELASTIC_AGENT_SHA'], env['OGC_ELASTIC_AGENT_VERSION'])
+url = "https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz" % (
+    env['OGC_ELASTIC_AGENT_VERSION'], env['OGC_ELASTIC_AGENT_SHA'], env['OGC_ELASTIC_AGENT_VERSION'])
 %>
 ${utils.setup_env()}
 ${utils.install_pkgs(['rsync'])}

@@ -3,13 +3,10 @@ import sys
 import click
 
 from ogc import actions, db, state
+from ogc.log import Logger as log
 
 from ..provision import choose_provisioner
 from .base import cli
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
 
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
@@ -47,12 +44,24 @@ def rm(by_name, force, only_db):
     help="Force removal of database records only",
 )
 def rm_all(force, only_db):
-    with state.app.session as session:
-        names = [node.instance_name for node in session.query(db.Node).all()]
-        result = actions.teardown_async(names, force=force, only_db=only_db)
-        if result.is_err():
-            state.app.log.error(result.err())
-            sys.exit(1)
+    user = db.get_user().unwrap_or_else(log.critical)
+    if not user:
+        sys.exit(1)
+
+    results = actions.teardown_async(
+        nodes=user.nodes, config=user, force=force, only_db=only_db
+    )
+    log.error("Failed to teardown all nodes") if not results else log.info(
+        "Completed tearing down nodes."
+    )
+    log.info("Removing database entries")
+
+    for node in results:
+        if node in user.nodes:
+            print(node)
+
+    with db.get().begin(write=True) as txn:
+        txn.put(user.slug.encode("ascii"), db.model_as_pickle(user))
 
 
 @click.option("--provider", default="aws", help="Provider to query")

@@ -1,14 +1,17 @@
 #!/bin/bash
 
 echo "### ALL NODES"
-% for node in session.query(db.Node).filter(db.Node.tags.contains(['user-adam'])):
-echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
+% for obj in user.nodes:
+echo "${', '.join(obj.layout.tags)}" > $HOME/tags.txt
+% if "adam" in node.layout.tags:
+echo "[ID: ${obj.instance_id}] Name: ${obj.instance_name} || Connection: ${obj.layout.username}@${obj.public_ip} || Provider: ${obj.layout.provider}"
+% endif 
 % endfor
 echo "### ALL NODES"
 
 
 echo "### CURRENT NODE"
-echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
+echo "[ID: ${node.instance_id}] Name: ${node.instance_name} || Connection: ${node.layout.username}@${node.public_ip} || Provider: ${node.layout.provider}"
 echo "### CURRENT NODE"
 
 

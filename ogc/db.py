@@ -1,13 +1,17 @@
 import os
 import uuid
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
+import dill
+import lmdb
+from safetywrap import Err, Ok, Result
 from sqlalchemy import create_engine
 from sqlalchemy.sql import func
 
 import alembic.command
 import alembic.config
+from ogc import models
 
 DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
 DB_PORT = os.environ.get("POSTGRES_PORT", 5432)
@@ -124,3 +128,48 @@ def migrate() -> None:
 
     # upgrade the database to the latest revision
     alembic.command.upgrade(config, "head")
+
+
+def get():
+    """Get connection to underlying db"""
+    map_size = 1024 * 2000000 * 2
+    db_dir = Path(__file__).cwd() / ".ogc-cache"
+    if not db_dir.exists():
+        os.makedirs(str(db_dir))
+    return lmdb.open(str(db_dir / "ogcdb"), map_size=map_size)
+
+
+def get_user() -> Result[models.User, str]:
+    """Grabs the single user in the database"""
+    with get().begin() as txn:
+
+        def func(seq) -> models.User:
+            return (
+                pickle_to_model(seq[1]) if seq[0].decode().startswith("user") else None
+            )
+
+        result = filter(lambda fn: fn is not None, map(func, [k for k in txn.cursor()]))
+        result = list(result)
+        return (
+            Ok(result[0])
+            if result
+            else Err("Unable to find user, make sure you have run `ogc init` first.")
+        )
+
+
+def get_node(name: str) -> Result[models.Node, Exception]:
+    user = get_user()
+    return (
+        Result.of(lambda user: user, user)
+        .map(lambda n: [node for node in n.nodes if node.instance_name == name])
+        .and_then(lambda node: Result.of(node[0]))
+        .unwrap()
+    )
+
+
+def model_as_pickle(obj: Any) -> bytes:
+    return dill.dumps(obj)
+
+
+def pickle_to_model(obj: bytes) -> Any:
+    return dill.loads(obj)

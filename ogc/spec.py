@@ -7,7 +7,7 @@ import yaml
 from melddict import MeldDict
 from slugify import slugify
 
-from ogc import db
+from ogc import db, models
 from ogc.exceptions import SpecLoaderException
 
 from .state import app
@@ -207,25 +207,33 @@ class SpecProvisionPlan:
         sys.exit(1)
 
 
+def parse_layout(layout: dict, sshkeys: dict) -> models.Layout:
+    name, _layout = layout
+    _layout["name"] = name
+    _layout["ssh_public_key"] = sshkeys["public"]
+    _layout["ssh_private_key"] = sshkeys["private"]
+    return models.Layout(**{key.replace("-", "_"): val for key, val in _layout.items()})
+
+
 class SpecLoader(MeldDict):
     @classmethod
-    def load(cls, specs: list[str]) -> "SpecProvisionPlan":
+    def load(cls, specs: list[str]) -> models.Plan:
         if Path("ogc.yml").exists():
             specs.insert(0, "ogc.yml")
 
-        _specs = []
-        for sp in specs:
-            _path = Path(sp)
-            if not _path.exists():
-                raise SpecLoaderException(f"Could not find {_path}")
-            _specs.append(_path)
-
+        _specs = [Path(sp) for sp in specs if Path(sp).exists()]
         if not _specs:
             raise SpecLoaderException(
-                f"No provision specs found, please specify with `--spec <file.yml>`"
+                "No provision specs found, please specify with `--spec <file.yml>`"
             )
 
         cl = SpecLoader()
         for spec in _specs:
             cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
-        return SpecProvisionPlan(cl)
+
+        ssh_keys = {
+            "public": Path(cl["ssh-keys"]["public"]),
+            "private": Path(cl["ssh-keys"]["private"]),
+        }
+        layouts = [parse_layout(layout, ssh_keys) for layout in cl["layouts"].items()]
+        return models.Plan(name=cl["name"], ssh_keys=ssh_keys, layouts=layouts)
