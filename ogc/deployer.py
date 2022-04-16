@@ -210,6 +210,7 @@ def convert_msd_to_actions(results: list[models.DeployResult]) -> list[models.Ac
     for dp in results:
         for step in dp.msd.steps:
             if hasattr(step, "exit_status"):
+                log.info(f"{dp.node.instance_name} :: recording action result: {step}")
                 _results.append(
                     models.Actions(
                         exit_code=step.exit_status,
@@ -218,4 +219,5 @@ def convert_msd_to_actions(results: list[models.DeployResult]) -> list[models.Ac
                         node=dp.node,
                     )
                 )
+    log.info(f"Recorded {len(_results)} action results in database.")
     return _results

@@ -32,10 +32,6 @@ def ls(by_tag, by_name, output_file):
         )
         sys.exit(1)
 
-    user = db.get_user().unwrap_or_else(log.critical)
-    if not user:
-        sys.exit(1)
-
     rows = db.get_nodes().unwrap_or_else(log.critical)
     if not rows:
         sys.exit(1)
@@ -59,11 +55,13 @@ def ls(by_tag, by_name, output_file):
     for data in rows:
         completed_actions = []
         failed_actions = []
-        for action in db.get_actions(data).unwrap():
-            if action.exit_code != 0:
-                failed_actions.append(action)
-            else:
-                completed_actions.append(action)
+        actions = db.get_actions(data).unwrap_or_else(log.critical)
+        if actions:
+            for action in actions:
+                if action.exit_code != 0:
+                    failed_actions.append(action)
+                else:
+                    completed_actions.append(action)
         table.add_row(
             data.instance_id,
             data.instance_name,

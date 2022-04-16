@@ -75,48 +75,32 @@ def inspect(id, name, tag, action_id, extend):
                 )
             )
             for action in completed_actions:
-                if action.out.strip():
-                    console.print(
-                        Padding(
-                            f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
-                            (0, 0, 0, 2),
-                        )
+                console.print(
+                    Padding(
+                        f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
+                        (0, 0, 0, 2),
                     )
-                    if action_id or extend:
-                        console.print(Padding(action.out, (0, 0, 0, 2)))
-                if action.error:
-                    console.print(
-                        Padding(
-                            f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
-                            (0, 0, 0, 2),
-                        )
-                    )
-                    if action_id or extend:
-                        console.print(Padding(action.error, (0, 0, 0, 2)))
+                )
+                if action_id or extend:
+                    console.print(Padding(action.out + action.error, (0, 0, 0, 2)))
 
         if failed_actions:
             console.print(
                 Padding(f"[red]{len(failed_actions)}[/] failed actions:", (1, 0, 1, 0))
             )
             for action in failed_actions:
-                if action.out.strip():
-                    console.print(
-                        Padding(
-                            f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
-                            (0, 0, 0, 2),
-                        )
+                console.print(
+                    Padding(
+                        f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
+                        (0, 0, 0, 2),
                     )
-                    if action_id or extend:
-                        console.print(Padding(action.out, (0, 0, 0, 2)))
-                if action.error:
-                    console.print(
-                        Padding(
-                            f":: id: {action.id} :: timestamp: {arrow.get(action.created).humanize()}",
-                            (0, 0, 0, 2),
-                        )
-                    )
-                    if action_id or extend:
-                        console.print(Padding(action.error, (0, 0, 0, 2)))
+                )
+
+                if action_id or extend:
+                    if not action.out.strip() and action.error.strip():
+                        console.print(Padding("No output", (0, 0, 0, 2)))
+                    else:
+                        console.print(Padding(action.out + action.error, (0, 0, 0, 2)))
 
 
 cli.add_command(inspect)

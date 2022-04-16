@@ -2,7 +2,6 @@ import datetime
 import os
 import uuid
 from pathlib import Path
-from typing import Iterator
 
 import toolz
 from attr import define, field
@@ -10,6 +9,10 @@ from dotenv import dotenv_values
 from libcloud.compute.base import Node as NodeType
 from libcloud.compute.deployment import MultiStepDeployment
 from slugify import slugify
+
+
+def get_new_uuid() -> str:
+    return str(uuid.uuid1())
 
 
 @define
@@ -31,7 +34,7 @@ class Layout:
     exclude: list[str] = field(factory=list)
     extra: dict = field(init=False, factory=dict)
     include: list[str] = field(factory=list)
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)
 
     @tags.default
     def _get_tags(self) -> list[str]:
@@ -47,7 +50,7 @@ class Plan:
     layouts: list[Layout]
     name: str
     ssh_keys: dict[str, Path]
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)
 
     def get_layout(self, name: str) -> list[Layout]:
         return list(toolz.filter(lambda x: x.name == name, self.layouts))
@@ -57,7 +60,7 @@ class Plan:
 class User:
     name: str
     slug: str = field(init=False)
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     env: dict = field(init=False)
 
@@ -76,7 +79,7 @@ class Node:
     layout: Layout
     user: User
     spec: Plan = field(init=False, default=None)
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)
     instance_state: str = field(init=False)
@@ -113,7 +116,7 @@ class Actions:
     error: str
     node: Node
     command: str = field(init=False, default=str)
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     extra: dict = field(init=False, factory=dict)
 
@@ -122,4 +125,4 @@ class Actions:
 class DeployResult:
     node: Node
     msd: MultiStepDeployment
-    id: str = field(init=False, default=str(uuid.uuid4()))
+    id: str = field(init=False, factory=get_new_uuid)

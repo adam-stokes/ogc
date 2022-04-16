@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 import dill
 import lmdb
@@ -82,15 +82,18 @@ def get_node(name: str) -> Result[models.Node, str]:
 
 
 def get_actions(node: models.Node) -> Result[list[models.Actions], str]:
-    _actions: list[models.Actions] = []
+    results: list[models.Actions] = []
+    _actions_all = []
     with M.db.begin(db=M.actions) as txn:
         for _, v in txn.cursor():
             model = pickle_to_model(v)
-            if model.node.instance_name == node.instance_name:
-                _actions.append(model)
+            _actions_all.append(model)
+    results = list(
+        filter(lambda x: x.node.instance_name == node.instance_name, _actions_all)
+    )
     return (
-        Ok(_actions)
-        if _actions
+        Ok(results)
+        if results
         else Err(f"Unable to find node matching: {node.instance_name}")
     )
 
