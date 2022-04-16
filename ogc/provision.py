@@ -3,9 +3,8 @@
 
 import datetime
 import uuid
-from typing import Iterator, Optional, Type
+from typing import Optional, Type
 
-import dill
 from libcloud.common.google import ResourceNotFoundError
 from libcloud.compute.base import KeyPair
 from libcloud.compute.base import Node as NodeType
@@ -20,25 +19,17 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
 
-from ogc import db, models
+from ogc import models
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import Logger as log
 
 
-def save_result(nodes: list[models.Node], config: models.User) -> None:
-    for node in nodes:
-        config.nodes.append(node)
-    with db.get().begin(write=True) as txn:
-        print(txn.get(config.slug.encode("ascii")))
-        txn.put(config.slug.encode("ascii"), db.model_as_pickle(config))
-
-
 class BaseProvisioner:
-    def __init__(self, layout: models.Layout, config: models.User):
+    def __init__(self, layout: models.Layout, user: models.User):
         self.layout = layout
-        self.config = config
-        self.env = config.env
+        self.user = user
+        self.env = self.user.env
         self.provisioner: NodeDriver = self.connect()
 
     @property
@@ -92,7 +83,7 @@ class BaseProvisioner:
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0][0]
-        return models.Node(node=node, layout=self.layout)
+        return models.Node(node=node, layout=self.layout, user=self.user)
 
     def list_nodes(self, **kwargs) -> list[NodeType]:
         return self.provisioner.list_nodes(**kwargs)
@@ -173,8 +164,6 @@ class AWSProvisioner(BaseProvisioner):
             self.provisioner.ex_authorize_security_group(  # type: ignore
                 name, ingress, egress, "0.0.0.0/0", "tcp"
             )
-            # udp
-            # self.provisioner.ex_authorize_security_group(name, ingress, egress, "0.0.0.0/0", "udp")
 
     def delete_firewall(self, name):
         pass
@@ -207,9 +196,9 @@ class AWSProvisioner(BaseProvisioner):
         # Store some metadata for helping with cleanup
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
         self.layout.tags.append(now)
-        self.layout.tags.append(f"{self.config.slug}")
+        self.layout.tags.append(f"{self.user.slug}")
         tags["Created"] = now
-        tags["UserTag"] = f"{self.config.slug}"
+        tags["UserTag"] = f"{self.user.slug}"
 
         node = self._create_node(**opts)
         self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)  # type: ignore
@@ -315,7 +304,7 @@ class GCEProvisioner(BaseProvisioner):
 
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
         self.layout.tags.append(now)
-        self.layout.tags.append(f"{self.config.slug}")
+        self.layout.tags.append(f"{self.user.slug}")
 
         opts = dict(
             name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
@@ -342,8 +331,8 @@ class GCEProvisioner(BaseProvisioner):
 
 
 def choose_provisioner(
-    name: str, layout: models.Layout, config: models.User
+    name: str, layout: models.Layout, user: models.User
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
     provisioner: Type[BaseProvisioner] = choices[name]
-    return provisioner(layout, config)
+    return provisioner(layout=layout, user=user)

@@ -12,11 +12,6 @@ from ogc.log import Logger as log
 from ..deployer import Deployer
 from .base import cli
 
-# DB Connection
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
-
 
 @click.command(help="Login to a node")
 @click.option(
@@ -71,7 +66,6 @@ def exec(by_tag, by_name, cmd):
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
-            style="bold red",
         )
         sys.exit(1)
     results = actions.exec_async(by_name, by_tag, cmd)
@@ -79,7 +73,7 @@ def exec(by_tag, by_name, cmd):
         log.info("All commands completed.")
         sys.exit(0)
 
-    log.error("Some commands failed to complete.", style="bold red")
+    log.error("Some commands failed to complete.")
     sys.exit(1)
 
 
@@ -99,7 +93,6 @@ def exec_scripts(by_tag, by_name, path):
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
-            style="bold red",
         )
         sys.exit(1)
     results = actions.exec_scripts_async(by_name, by_tag, path)
@@ -139,40 +132,33 @@ def push_files(name, src, dst, exclude):
 @click.argument("dst")
 @click.argument("src")
 def pull_files(name, dst, src):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            deploy.get(dst, src)
-            sys.exit(0)
-        log.error(f"Unable to locate {name} to connect to", style="bold red")
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
+        log.error(f"Unable to locate {name} to connect to")
         sys.exit(1)
+    deploy = Deployer(node)
+    deploy.get(dst, src)
+    sys.exit(0)
 
 
 @click.command(help="Download artifacts from node")
 @click.argument("name")
 def pull_artifacts(name):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            if node.artifacts:
-                log.info("Downloading artifacts")
-                local_artifact_path = (
-                    Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
-                )
-                if not local_artifact_path.exists():
-                    os.makedirs(str(local_artifact_path), exist_ok=True)
-                deploy.get(node.artifacts, str(local_artifact_path))
-                sys.exit(0)
-            else:
-                log.error(f"No artifacts found at {node.remote_path}", style="bold red")
-                sys.exit(1)
-        log.error(f"Unable to locate {name} to connect to", style="bold red")
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
+        log.error(f"Unable to locate {name} to connect to")
+        sys.exit(1)
+    deploy = Deployer(node)
+
+    if node.layout.artifacts:
+        log.info("Downloading artifacts")
+        local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
+        if not local_artifact_path.exists():
+            os.makedirs(str(local_artifact_path), exist_ok=True)
+        deploy.get(node.layout.artifacts, str(local_artifact_path))
+        sys.exit(0)
+    else:
+        log.error(f"No artifacts found at {node.layout.remote_path}")
         sys.exit(1)
 
 

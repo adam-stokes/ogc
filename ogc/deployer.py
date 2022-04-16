@@ -4,7 +4,7 @@
 
 import tempfile
 from pathlib import Path
-from typing import TypedDict
+from typing import Any, TypedDict
 
 import sh
 import toolz
@@ -29,21 +29,20 @@ class Ctx(TypedDict):
     env: dict
     node: models.Node
     user: models.User
+    db: Any
 
 
 class Deployer:
-    def __init__(
-        self, deployment: models.Node, config: models.User, force: bool = False
-    ):
+    def __init__(self, deployment: models.Node, force: bool = False):
         self.deployment = deployment
-        self.config = config
-        self.env = config.env
+        self.user = self.deployment.user
+        self.env = self.user.env
         self.force = force
 
         engine = choose_provisioner(
             name=self.deployment.layout.provider,
             layout=self.deployment.layout,
-            config=self.config,
+            user=self.user,
         )
         self.node = engine.node(instance_id=self.deployment.instance_id)
         self._ssh_client = ParamikoSSHClient(
@@ -79,7 +78,6 @@ class Deployer:
             return Err(e)
 
         result = models.DeployResult(node=self.deployment, msd=msd)
-        store_action_result(result, config=self.config)
         return Ok(result)
 
     def exec_scripts(self, script_dir: str) -> Result[models.DeployResult, str]:
@@ -87,7 +85,9 @@ class Deployer:
         if not scripts.exists():
             return Err("No deployment scripts found, skipping.")
 
-        context = Ctx(env=self.env, node=self.deployment, user=db.get_user().unwrap())
+        context = Ctx(
+            env=self.env, node=self.deployment, user=db.get_user().unwrap(), db=db
+        )
 
         # teardown file is a special file that gets executed before node
         # destroy
@@ -204,15 +204,18 @@ def is_success(model: models.DeployResult) -> bool:
     )
 
 
-def store_action_result(model: models.DeployResult, config: models.User) -> None:
-    for step in model.msd.steps:
-        if hasattr(step, "exit_status"):
-            result = models.Actions(
-                exit_code=step.exit_status,
-                out=step.stdout,
-                error=step.stderr,
-            )
-            model.node.actions.append(result)
-
-    with db.get().begin(write=True) as txn:
-        txn.put(config.slug.encode("ascii"), db.model_as_pickle(config))
+def convert_msd_to_actions(results: list[models.DeployResult]) -> list[models.Actions]:
+    """Converts results from `MultistepDeployment` to `models.Actions`"""
+    _results = []
+    for dp in results:
+        for step in dp.msd.steps:
+            if hasattr(step, "exit_status"):
+                _results.append(
+                    models.Actions(
+                        exit_code=step.exit_status,
+                        out=step.stdout,
+                        error=step.stderr,
+                        node=dp.node,
+                    )
+                )
+    return _results

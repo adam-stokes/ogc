@@ -5,10 +5,9 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from ogc import db, state
+from ogc import db
 from ogc.log import Logger as log
 
-from ..provision import choose_provisioner
 from .base import cli
 
 console = Console(record=True)
@@ -33,17 +32,18 @@ def ls(by_tag, by_name, output_file):
         )
         sys.exit(1)
 
-    user = db.get_user().unwrap_or_else(log.fatal)
+    user = db.get_user().unwrap_or_else(log.critical)
     if not user:
         sys.exit(1)
 
-    rows = None
+    rows = db.get_nodes().unwrap_or_else(log.critical)
+    if not rows:
+        sys.exit(1)
+
     if by_tag:
-        rows = [node for node in user.nodes if by_tag in node.layout.tags]
+        rows = [node for node in rows if by_tag in node.layout.tags]
     elif by_name:
-        rows = [node for node in user.nodes if node.instance_name == by_name]
-    else:
-        rows = user.nodes
+        rows = [node for node in rows if node.instance_name == by_name]
     rows_count = len(rows)
 
     table = Table(title=f"Node Count: [green]{rows_count}[/]")
@@ -59,7 +59,7 @@ def ls(by_tag, by_name, output_file):
     for data in rows:
         completed_actions = []
         failed_actions = []
-        for action in data.actions:
+        for action in db.get_actions(data).unwrap():
             if action.exit_code != 0:
                 failed_actions.append(action)
             else:
@@ -96,20 +96,4 @@ def ls(by_tag, by_name, output_file):
             sys.exit(1)
 
 
-@click.option("--provider", default="aws", help="Provider to query")
-@click.option("--filter", required=False, help="Filter by keypair name")
-@click.command(help="List keypairs")
-def ls_key_pairs(provider, filter):
-    engine = choose_provisioner(provider, env=state.app.env)
-    kps = []
-    if filter:
-        kps = [kp for kp in engine.list_key_pairs() if filter in kp.name]
-    else:
-        kps = list(engine.list_key_pairs())
-
-    for kp in kps:
-        click.secho(kp.name, fg="green")
-
-
 cli.add_command(ls)
-cli.add_command(ls_key_pairs)

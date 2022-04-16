@@ -12,9 +12,6 @@ from libcloud.compute.deployment import MultiStepDeployment
 from slugify import slugify
 
 
-
-
-
 @define
 class Layout:
     instance_size: str
@@ -34,6 +31,7 @@ class Layout:
     exclude: list[str] = field(factory=list)
     extra: dict = field(init=False, factory=dict)
     include: list[str] = field(factory=list)
+    id: str = field(init=False, default=str(uuid.uuid4()))
 
     @tags.default
     def _get_tags(self) -> list[str]:
@@ -49,6 +47,7 @@ class Plan:
     layouts: list[Layout]
     name: str
     ssh_keys: dict[str, Path]
+    id: str = field(init=False, default=str(uuid.uuid4()))
 
     def get_layout(self, name: str) -> list[Layout]:
         return list(toolz.filter(lambda x: x.name == name, self.layouts))
@@ -58,7 +57,7 @@ class Plan:
 class User:
     name: str
     slug: str = field(init=False)
-    id: str = field(init=False, default=uuid.uuid4())
+    id: str = field(init=False, default=str(uuid.uuid4()))
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     env: dict = field(init=False)
 
@@ -77,6 +76,7 @@ class Node:
     layout: Layout
     user: User
     spec: Plan = field(init=False, default=None)
+    id: str = field(init=False, default=str(uuid.uuid4()))
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)
     instance_state: str = field(init=False)
@@ -105,6 +105,7 @@ class Node:
     def _get_private_ip(self) -> str:
         return self.node.private_ips[0]
 
+
 @define
 class Actions:
     exit_code: int
@@ -112,10 +113,13 @@ class Actions:
     error: str
     node: Node
     command: str = field(init=False, default=str)
+    id: str = field(init=False, default=str(uuid.uuid4()))
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     extra: dict = field(init=False, factory=dict)
+
 
 @define
 class DeployResult:
     node: Node
     msd: MultiStepDeployment
+    id: str = field(init=False, default=str(uuid.uuid4()))

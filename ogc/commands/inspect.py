@@ -5,13 +5,9 @@ import click
 from rich.console import Console
 from rich.padding import Padding
 
-from ogc import db, state
+from ogc import db, models
 
 from .base import cli
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
 
 
 @click.command(help="List nodes in your inventory")
@@ -46,14 +42,13 @@ def inspect(id, name, tag, action_id, extend):
         )
         sys.exit(1)
 
-    rows = []
-    with state.app.session as session:
-        if tag:
-            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-        elif name:
-            rows = session.query(db.Node).filter(db.Node.instance_name == name)
-        else:
-            rows = session.query(db.Node).filter(db.Node.id == id)
+    rows: list[models.Node] = db.get_nodes().unwrap()
+    if tag:
+        rows = [node for node in rows if tag in node.layout.tags]
+    elif name:
+        rows = [node for node in rows if node.instance_name == name]
+    else:
+        rows = [node for node in rows if node.instance_id == id]
 
     console = Console()
     for data in rows:
@@ -61,9 +56,11 @@ def inspect(id, name, tag, action_id, extend):
         completed_actions = []
         failed_actions = []
         if action_id:
-            actions = data.actions.filter(db.Actions.id == action_id)
+            actions = list(
+                filter(lambda x: x.id == action_id, db.get_actions(data).unwrap())
+            )
         else:
-            actions = data.actions.all()
+            actions = db.get_actions(data).unwrap()
         for action in actions:
             if action.exit_code != 0:
                 failed_actions.append(action)

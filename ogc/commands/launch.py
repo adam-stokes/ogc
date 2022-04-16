@@ -1,7 +1,7 @@
 import click
 
 from ogc import actions, db
-from ogc.provision import save_result
+from ogc.deployer import convert_msd_to_actions, is_success
 from ogc.log import Logger as log
 
 from ..spec import SpecLoader
@@ -18,20 +18,21 @@ from .base import cli
 def launch(spec: list[str], with_deploy: bool) -> None:
     # Application Config
     user = db.get_user().unwrap()
-    user.spec = SpecLoader.load(list(spec))
-    nodes = actions.launch_async(layouts=user.spec.layouts, config=user)
+    loaded_spec = SpecLoader.load(list(spec))
+    nodes = actions.launch_async(layouts=loaded_spec.layouts, user=user)
+    db.save_nodes_result(nodes)
+
     if with_deploy and nodes:
         log.info("Starting script deployments")
-        script_deploy_results = actions.deploy_async(nodes=nodes, config=user)
-        if all(
-            result
-            for result in script_deploy_results
-            if script_deploy_results and result.instance_state == "running"
-        ):
-            log.info("All deployments have been completed, recording results.")
-            save_result(list(script_deploy_results), config=user)
-            return
-        log.error("Some tasks could not be completed.")
+        script_deploy_results = actions.deploy_async(nodes=nodes)
+        log.info("All deployments have run, recording results.")
+        db.save_actions_result(convert_msd_to_actions(script_deploy_results))
+
+        for res in script_deploy_results:
+            if is_success(res):
+                log.info(f"{res.node.instance_name}: Deployed Successfully")
+            else:
+                log.error(f"{res.node.instance_name}: Failed Deployment")
 
 
 cli.add_command(launch)
