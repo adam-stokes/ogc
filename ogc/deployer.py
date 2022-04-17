@@ -158,7 +158,7 @@ class Deployer:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
         try:
-            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)
+            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)  # type: ignore
         except sh.ErrorReturnCode as e:
             log.error(f"Unable to upload files: {e.stderr}")
 
@@ -174,7 +174,7 @@ class Deployer:
             src,
         ]
         try:
-            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)
+            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)  # type: ignore
         except sh.ErrorReturnCode as e:
             log.error(f"Unable to download files: {e.stderr}")
 

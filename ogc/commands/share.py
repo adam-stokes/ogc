@@ -47,7 +47,7 @@ def export_env(spec, db_file, env_file):
     users environment.
     """
     if not sh.which("pg_dump"):
-        log.error(f"The pg_dump utility is required to export the database.")
+        log.error("The pg_dump utility is required to export the database.")
         sys.exit(1)
 
     # begin setup
@@ -106,7 +106,7 @@ def export_env(spec, db_file, env_file):
     )
     console.print(
         Padding(
-            f"Send these files to the user and have them run [green]`ogc import --env-file <file> --db-file <file>`[/]",
+            "Send these files to the user and have them run [green]`ogc import --env-file <file> --db-file <file>`[/]",
             (3, 0, 3, 0),
         ),
         justify="center",
@@ -140,7 +140,7 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
     """Imports a shared deployment"""
     if not sh.which("createdb") and not sh.which("psql"):
         log.error(
-            f"The `createdb` and `psql` utility is required to import the environment."
+            "The `createdb` and `psql` utility is required to import the environment."
         )
         sys.exit(1)
 
@@ -177,13 +177,16 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
 
     console = Console()
     console.print(Padding("Import complete", (2, 0, 0, 0)), justify="center")
-    console.print(f":: Database Loaded: [green]:heavy_check_mark:[/]", justify="center")
+    console.print(":: Database Loaded: [green]:heavy_check_mark:[/]", justify="center")
     console.print(
-        f":: Environment Loaded: [green]:heavy_check_mark:[/]", justify="center"
+        ":: Environment Loaded: [green]:heavy_check_mark:[/]", justify="center"
     )
     console.print(
         Padding(
-            f"Please reference the user guide for interacting with the deployment. [green]`https://adam-stokes.github.io/ogc/user-guide/managing-nodes`[/]",
+            (
+                "Please reference the user guide for interacting with the deployment. "
+                "[green]`https://adam-stokes.github.io/ogc/user-guide/managing-nodes`[/]"
+            ),
             (3, 0, 3, 0),
         ),
         justify="center",

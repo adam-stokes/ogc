@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import dill
 import lmdb
@@ -52,8 +52,9 @@ def get_user() -> Result[models.User, str]:
                 pickle_to_model(seq[1]) if seq[0].decode().startswith("user") else None
             )
 
-        result = filter(lambda fn: fn is not None, map(func, [k for k in txn.cursor()]))
-        result = list(result)
+        result = list(
+            filter(lambda fn: fn is not None, map(func, [k for k in txn.cursor()]))
+        )
         return (
             Ok(result[0])
             if result

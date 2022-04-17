@@ -1,0 +1,202 @@
+2022-04-16 21:44:38,707 [PID 58783] INFO Waiting for server...
+2022-04-16 21:44:38,715 [PID 58783] INFO Cannot find a running Pyre server. Starting a new one...
+2022-04-16 21:44:38,717 [PID 58783] INFO No binary specified, looking for `pyre.bin` in PATH
+2022-04-16 21:44:38,717 [PID 58783] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 12.
+2022-04-16 21:44:38,718 [PID 58783] WARNING '/Users/adam/Projects/ogc/$(python -c 'import site; print(site.getsitepackages()[0])')' does not match any paths.
+2022-04-16 21:44:38,719 [PID 58783] INFO No typeshed specified, looking for it...
+2022-04-16 21:44:38,720 [PID 58783] INFO Found: `/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed`
+2022-04-16 21:44:38,741 [PID 58783] WARNING Cannot find a watchman root. Incremental check will not be functional since no filesystem updates will be sent to the Pyre server.
+2022-04-16 21:44:38,742 [PID 58783] INFO Starting server at `ogc`...
+2022-04-16 21:44:38,742 [PID 58783] INFO Writing arguments into /var/folders/62/lfjcj9ss76n0wysh68vzf3800000gn/T/pyre_arguments_83gwdoju.json...
+2022-04-16 21:44:38,743 [PID 58783] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/adam/Projects/ogc/ogc"
+    ]
+  },
+  "search_paths": [
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stdlib",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/DateTimeRange",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Deprecated",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Flask",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/JACK-Client",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Jinja2",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Markdown",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/MarkupSafe",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Pillow",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Pygments",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Send2Trash",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/Werkzeug",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/annoy",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/appdirs",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/atomicwrites",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/aws-xray-sdk",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/babel",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/backports.ssl_match_hostname",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/backports_abc",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/beautifulsoup4",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/bleach",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/boto",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/braintree",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/cachetools",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/caldav",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/certifi",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/characteristic",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/chardet",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/click",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/click-spinner",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/commonmark",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/contextvars",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/croniter",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/cryptography",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/dataclasses",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/dateparser",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/decorator",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/docopt",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/docutils",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/editdistance",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/emoji",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/entrypoints",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/filelock",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/first",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/freezegun",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/frozendict",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/html5lib",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/httplib2",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/humanfriendly",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/itsdangerous",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/jmespath",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/jsonschema",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/mock",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/mypy-extensions",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/oauthlib",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/orjson",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/polib",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/prettytable",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/protobuf",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/psutil",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pyOpenSSL",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pyRFC3339",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pyaudio",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pyfarmhash",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pysftp",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pytest-lazy-fixture",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/python-gflags",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/python-nmap",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/python-slugify",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/pyvmomi",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/redis",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/selenium",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/setuptools",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/simplejson",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/singledispatch",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/six",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/slumber",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/stripe",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/tabulate",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/termcolor",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/toml",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/toposort",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/ttkthemes",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/typed-ast",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/tzlocal",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/ujson",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/vobject",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/waitress",
+    "/Users/adam/Projects/ogc/.venv/lib/pyre_check/typeshed/stubs/xxhash"
+  ],
+  "excludes": [],
+  "checked_directory_allowlist": [
+    "/Users/adam/Projects/ogc/ogc"
+  ],
+  "checked_directory_blocklist": [
+    "/Users/adam/Projects/ogc/.venv"
+  ],
+  "extensions": [],
+  "log_path": "/Users/adam/Projects/ogc/.pyre",
+  "global_root": "/Users/adam/Projects/ogc",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 9,
+    "micro": 12
+  },
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 12,
+  "strict": false,
+  "socket_path": "/var/folders/62/lfjcj9ss76n0wysh68vzf3800000gn/T/pyre_server_2e39185a21f25a04de5d73b9d3a58728.sock",
+  "show_error_traces": false,
+  "additional_logging_sections": [
+    "server"
+  ],
+  "taint_model_paths": [],
+  "store_type_check_resolution": false,
+  "critical_files": [
+    {
+      "full_path": "/Users/adam/Projects/ogc/.pyre_configuration"
+    }
+  ]
+}
+2022-04-16 21:44:38,747 [PID 58783] INFO Server is starting in the background.
+
+2022-04-16 21:44:39,038 [PID 58783] INFO  Server has started listening on socket `/var/folders/62/lfjcj9ss76n0wysh68vzf3800000gn/T/pyre_server_2e39185a21f25a04de5d73b9d3a58728.sock`
+2022-04-16 21:44:39,043 [PID 58783] INFO  Initializing shared memory [heap_size=8589934592, dep_table_pow=27, hash_table_pow=26]
+2022-04-16 21:44:39,043 [PID 58783] INFO  Initializing server state from scratch...
+2022-04-16 21:44:39,073 [PID 58783] INFO  Building module tracker...
+2022-04-16 21:44:39,329 [PID 58783] PERFORMANCE  Module tracker built: 0.26s
+2022-04-16 21:44:39,329 [PID 58783] INFO  Building type environment...
+2022-04-16 21:44:39,329 [PID 58783] INFO  Parsing 1956 stubs and sources...
+2022-04-16 21:44:39,813 [PID 58783] PERFORMANCE  Sources parsed: 0.48s
+2022-04-16 21:44:40,429 [PID 58783] PERFORMANCE  Full environment built: 1.10s
+2022-04-16 21:44:40,537 [PID 58783] INFO  Checking 158 functions...
+2022-04-16 21:44:41,301 [PID 58783] INFO  Processed 158 of 158 functions
+2022-04-16 21:44:41,302 [PID 58783] PERFORMANCE  Check_TypeCheck: 0.76s
+2022-04-16 21:44:41,302 [PID 58783] MEMORY  Shared memory size post-typecheck (size: 15)
+2022-04-16 21:44:41,302 [PID 58783] INFO  Postprocessing 1956 sources...
+2022-04-16 21:44:41,359 [PID 58783] INFO  Postprocessed 82 of 1956 sources
+2022-04-16 21:44:41,359 [PID 58783] INFO  Postprocessed 164 of 1956 sources
+2022-04-16 21:44:41,360 [PID 58783] INFO  Postprocessed 246 of 1956 sources
+2022-04-16 21:44:41,360 [PID 58783] INFO  Postprocessed 328 of 1956 sources
+2022-04-16 21:44:41,360 [PID 58783] INFO  Postprocessed 410 of 1956 sources
+2022-04-16 21:44:41,380 [PID 58783] INFO  Postprocessed 492 of 1956 sources
+2022-04-16 21:44:41,381 [PID 58783] INFO  Postprocessed 574 of 1956 sources
+2022-04-16 21:44:41,382 [PID 58783] INFO  Postprocessed 656 of 1956 sources
+2022-04-16 21:44:41,382 [PID 58783] INFO  Postprocessed 738 of 1956 sources
+2022-04-16 21:44:41,401 [PID 58783] INFO  Postprocessed 820 of 1956 sources
+2022-04-16 21:44:41,411 [PID 58783] INFO  Postprocessed 902 of 1956 sources
+2022-04-16 21:44:41,417 [PID 58783] INFO  Postprocessed 984 of 1956 sources
+2022-04-16 21:44:41,428 [PID 58783] INFO  Postprocessed 1066 of 1956 sources
+2022-04-16 21:44:41,440 [PID 58783] INFO  Postprocessed 1148 of 1956 sources
+2022-04-16 21:44:41,440 [PID 58783] INFO  Postprocessed 1230 of 1956 sources
+2022-04-16 21:44:41,455 [PID 58783] INFO  Postprocessed 1312 of 1956 sources
+2022-04-16 21:44:41,458 [PID 58783] INFO  Postprocessed 1394 of 1956 sources
+2022-04-16 21:44:41,458 [PID 58783] INFO  Postprocessed 1476 of 1956 sources
+2022-04-16 21:44:41,461 [PID 58783] INFO  Postprocessed 1558 of 1956 sources
+2022-04-16 21:44:41,462 [PID 58783] INFO  Postprocessed 1640 of 1956 sources
+2022-04-16 21:44:41,465 [PID 58783] INFO  Postprocessed 1710 of 1956 sources
+2022-04-16 21:44:41,466 [PID 58783] INFO  Postprocessed 1792 of 1956 sources
+2022-04-16 21:44:41,466 [PID 58783] INFO  Postprocessed 1874 of 1956 sources
+2022-04-16 21:44:41,475 [PID 58783] INFO  Postprocessed 1956 of 1956 sources
+2022-04-16 21:44:41,511 [PID 58783] PERFORMANCE  Initialization: 2.47s
+2022-04-16 21:44:41,513 [PID 58783] INFO Waiting for server...
+2022-04-16 21:44:41,518 [PID 58783] SERVER  Connection established
+2022-04-16 21:44:41,519 [PID 58783] SERVER  Processing request (DisplayTypeError())...
+2022-04-16 21:44:41,519 [PID 58783] PERFORMANCE  Server request: 0.00s
+2022-04-16 21:44:41,519 [PID 58783] SERVER  Request `(DisplayTypeError())` processed
+2022-04-16 21:44:41,522 [PID 58783] SERVER  Connection closed
+2022-04-16 21:44:41,532 [PID 58783] ERROR Found 153 type errors!

@@ -63,6 +63,7 @@ class User:
     id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     env: dict = field(init=False)
+    spec: Plan = field(init=False, factory=dict)
 
     @env.default
     def _get_env(self) -> dict:
@@ -78,7 +79,6 @@ class Node:
     node: NodeType
     layout: Layout
     user: User
-    spec: Plan = field(init=False, default=None)
     id: str = field(init=False, factory=get_new_uuid)
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)
@@ -94,7 +94,7 @@ class Node:
 
     @instance_id.default
     def _get_instance_id(self) -> str:
-        return self.node.id
+        return str(self.node.id)
 
     @instance_state.default
     def _get_instance_state(self) -> str:

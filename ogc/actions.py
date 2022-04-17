@@ -1,20 +1,19 @@
 import os
 from concurrent.futures import ProcessPoolExecutor
-from ctypes import Union
-from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Iterator
 
 import sh
 from pampy import match
-from safetywrap import Err, Ok, Result
-from toolz.functoolz import thread_last
+from safetywrap import Err
+from toolz.curried import filter
+from toolz.functoolz import partial, thread_last
 
 from ogc import db, enums, models, state
-from ogc.deployer import Deployer, convert_msd_to_actions
+from ogc.deployer import Deployer
 from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
+from ogc.spec import CountCtx
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
@@ -226,7 +225,7 @@ def teardown_async(
         return [db.pickle_to_model(node) for node in results]
 
 
-def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
+def sync(layout: bytes, user: bytes, overrides: dict[str, CountCtx]) -> bytes:
     """Sync a deployment
 
     Function for syncing a deployment to correct scale.
@@ -239,30 +238,33 @@ def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
         result == True
 
     Args:
-        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        layout (bytes): The Pickled `models.Layout`
+        user (bytes): The Pickled `models.User`
         overrides (dict[str, str]): Override dictionary of what the new count of nodes should be
 
     Returns:
-        Result[bool, str]: True if synced, False otherwise
+        bytes: True if synced, False otherwise
     """
+    _layout: models.Layout = db.pickle_to_model(layout)
+    override = overrides[_layout.name]
 
-    override = overrides[layout.name]
+    def _sync_add() -> bytes:
+        log.info(f"Adding deployments for {_layout.name}")
+        func = partial(launch, user=user)
+        return thread_last(layout, func, lambda x: x, deploy)
 
-    def _sync_add() -> Result[bool, str]:
-        log.info(f"Adding deployments for {layout.name}")
-        return thread_last(layout.as_dict(), launch, lambda x: x.unwrap(), deploy)
-
-    def _sync_remove() -> Result[bool, str]:
-        log.info(f"Removing deployments for {layout.name}")
-        with state.app.session as session:
-            data = (
-                session.query(db.Node)
-                .filter(db.Node.instance_name.endswith(layout.name))
-                .order_by(db.Node.id.desc())
-                .limit(1)
-            )
-            func = partial(teardown, force=True)
-            return thread_last(data, lambda x: x.first().instance_name, func)
+    def _sync_remove() -> bytes:
+        log.info(f"Removing deployments for {_layout.name}")
+        func = partial(teardown, force=True)
+        return thread_last(
+            db.get_nodes(),
+            lambda x: x.unwrap(),
+            filter(lambda x: x.instance_name.endswith(_layout.name)),
+            list,
+            lambda x: x[0],
+            db.model_as_pickle,
+            func,
+        )
 
     return match(
         override,
@@ -273,7 +275,9 @@ def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
     )
 
 
-def sync_async(layouts, overrides: dict[Any, Any]) -> Result[Iterator[bool], str]:
+def sync_async(
+    layouts: list[models.Layout], user: models.User, overrides: dict[str, CountCtx]
+) -> list[models.Node]:
     """Sync a deployment
 
     Async function for syncing a deployment to correct scale.
@@ -286,26 +290,24 @@ def sync_async(layouts, overrides: dict[Any, Any]) -> Result[Iterator[bool], str
         all(result == True for result in results)
 
     Args:
-        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        layouts (list[models.Layout]): The list of `models.Layout` of the deployment
         overrides (dict): Override dictionary of what the new count of nodes should be
 
     Returns:
-        Result[Iterator[bool], Error]: True if synced, False otherwise
+        bool: True if synced, False otherwise
     """
 
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        func = partial(sync, overrides=overrides)
+        func = partial(sync, user=db.model_as_pickle(user), overrides=overrides)
         results = executor.map(
             func,
             [
-                layout
+                db.model_as_pickle(layout)
                 for layout in layouts
                 for _ in range(abs(overrides[layout.name]["remaining"]))
             ],
         )
-        if any(result for result in results if result.is_err()):
-            return Err("Failed to teardown nodes")
-    return Ok((result.unwrap() for result in results if result.is_ok()))
+        return [db.pickle_to_model(node) for node in results]
 
 
 def exec(node: bytes, cmd: str) -> bool:

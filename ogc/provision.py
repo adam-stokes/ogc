@@ -76,7 +76,7 @@ class BaseProvisioner:
     def images(self, location: Optional[NodeLocation] = None) -> list[NodeImage]:
         return self.provisioner.list_images(location)
 
-    def _create_node(self, **kwargs: dict) -> models.Node:
+    def _create_node(self, **kwargs: dict[str, object]) -> models.Node:
         _opts = kwargs.copy()
         log.info(f"Spinning up {self.layout.name}")
         node = self.provisioner.create_node(**_opts)  # type: ignore
@@ -245,7 +245,7 @@ class GCEProvisioner(BaseProvisioner):
     def image(self, runs_on) -> NodeImage:
         # Pull from partial first
         try:
-            partial_image = self.provisioner.ex_get_image(runs_on)  # type: ignore
+            partial_image: NodeImage = self.provisioner.ex_get_image(runs_on)  # type: ignore
             if partial_image:
                 return partial_image
         except ResourceNotFoundError:

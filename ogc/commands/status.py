@@ -1,16 +1,19 @@
 import sys
-from pathlib import Path
 
 import click
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
+from toolz import thread_last
+from toolz.curried import filter
 
 from ogc import actions
+from ogc.db import M, get_user, save_actions_result, save_nodes_result
+from ogc.deployer import convert_msd_to_actions
 from ogc.log import Logger as log
 
-from ..spec import SpecLoader
-from ..state import app
+from ..spec import SpecLoader, deploy_status, is_degraded
+from ..spec import status as status_fn
 from .base import cli
 
 
@@ -26,18 +29,42 @@ from .base import cli
     required=False,
     help="Stores the table output to svg or html. Determined by the file extension.",
 )
-def status(reconcile, spec, output_file):
-    app.spec = SpecLoader.load(list(spec))
-    counts = app.spec.status
+def status(reconcile: bool, spec: list[str], output_file: str) -> None:
+    user = get_user().unwrap()
+    user.spec = SpecLoader.load(list(spec))
 
-    if reconcile and app.spec.is_degraded:
+    counts = status_fn(user.spec)
+
+    if reconcile and is_degraded(user.spec):
         log.info(
-            f"Reconciling: {', '.join([layout.name for layout in app.spec.layouts])}"
+            f"Reconciling: {', '.join([layout.name for layout in user.spec.layouts])}"
         )
-        actions.sync_async(app.spec.layouts, counts)
+        nodes = actions.sync_async(
+            layouts=user.spec.layouts, user=user, overrides=counts
+        )
+        added_nodes = [
+            node for node in nodes if counts[node.layout.name]["action"] == "add"
+        ]
+        deleted_nodes = [
+            node for node in nodes if counts[node.layout.name]["action"] == "remove"
+        ]
+        if added_nodes:
+            save_nodes_result(added_nodes)
+            script_deploy_results = actions.deploy_async(nodes=added_nodes)
+            if script_deploy_results:
+                save_actions_result(convert_msd_to_actions(script_deploy_results))
+
+        if deleted_nodes:
+            with M.db.begin(db=M.nodes, write=True) as txn:
+                thread_last(
+                    nodes,
+                    filter(lambda x: counts[x.layout.name]["action"] == "remove"),
+                    lambda x: x.id.encode("ascii"),
+                    txn.delete,
+                )
         return
 
-    table = Table(title=f"Deployment Status: {app.spec.deploy_status}")
+    table = Table(title=f"Deployment Status: {deploy_status(user.spec)}")
     table.add_column("Name")
     table.add_column("Deployed")
     table.add_column("Scale")

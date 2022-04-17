@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import sh
 
-from ogc import actions, db, enums, state
+from ogc import actions, db, enums
 from ogc.log import Logger as log
 
 from ..deployer import Deployer
@@ -24,30 +24,28 @@ from .base import cli
     required=False,
     help="Login to a node by its Name",
 )
-def ssh(by_id, by_name):
-    user = db.get_user().unwrap_or_else(log.error)
-    if not user:
+def ssh(by_id: str, by_name: str) -> None:
+    rows = db.get_nodes().unwrap_or_else(log.critical)
+    if not rows:
         sys.exit(1)
-
-    if by_name:
-        node = [node for node in user.nodes if node.instance_name == by_name]
-    elif by_id:
-        node = [node for node in user.nodes if node.instance_id == by_id]
+    if by_id:
+        rows = [node for node in rows if node.instance_id == by_id]
+    elif by_name:
+        rows = [node for node in rows if node.instance_name == by_name]
     else:
         log.error(
             "Unable to locate node in database, please double check spelling.",
-            style="bold red",
         )
         sys.exit(1)
-    if node:
-        node = node[0]
-        cmd = [
-            "-i",
-            str(node.layout.ssh_private_key.expanduser()),
-            f"{node.layout.username}@{node.public_ip}",
-        ]
-        sh.ssh(cmd, _fg=True, _env=state.app.env)
-        sys.exit(0)
+
+    node = rows[0]
+    cmd = [
+        "-i",
+        str(node.layout.ssh_private_key.expanduser()),
+        f"{node.layout.username}@{node.public_ip}",
+    ]
+    sh.ssh(cmd, _fg=True, _env=node.user.env)  # type: ignore
+    sys.exit(0)
 
 
 @click.command(help="Execute a command across node(s)")
@@ -62,7 +60,7 @@ def ssh(by_id, by_name):
     help="Only run on nodes matching name",
 )
 @click.argument("cmd")
-def exec(by_tag, by_name, cmd):
+def exec(by_tag: str, by_name: str, cmd: str) -> None:
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
@@ -89,7 +87,7 @@ def exec(by_tag, by_name, cmd):
     help="Only run on nodes matching name",
 )
 @click.argument("path")
-def exec_scripts(by_tag, by_name, path):
+def exec_scripts(by_tag: str, by_name: str, path: str) -> None:
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
@@ -114,24 +112,21 @@ def exec_scripts(by_tag, by_name, path):
     multiple=True,
     help="Exclude files/directories when uploading",
 )
-def push_files(name, src, dst, exclude):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            deploy.put(src, dst, excludes=exclude)
-            sys.exit(0)
+def push_files(name: str, src: str, dst: str, exclude: list[str]) -> None:
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
         log.error(f"Unable to locate {name} to connect to")
         sys.exit(1)
+    deploy = Deployer(node)
+    deploy.put(src, dst, excludes=exclude)
+    sys.exit(0)
 
 
 @click.command(help="Scp files or directories from node")
 @click.argument("name")
 @click.argument("dst")
 @click.argument("src")
-def pull_files(name, dst, src):
+def pull_files(name: str, dst: str, src: str) -> None:
     node = db.get_node(name).unwrap_or_else(log.error)
     if not node:
         log.error(f"Unable to locate {name} to connect to")
@@ -143,7 +138,7 @@ def pull_files(name, dst, src):
 
 @click.command(help="Download artifacts from node")
 @click.argument("name")
-def pull_artifacts(name):
+def pull_artifacts(name: str):
     node = db.get_node(name).unwrap_or_else(log.error)
     if not node:
         log.error(f"Unable to locate {name} to connect to")

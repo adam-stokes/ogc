@@ -1,0 +1,45 @@
+2022-04-16 21:44:39 INFO Server has started listening on socket `/var/folders/62/lfjcj9ss76n0wysh68vzf3800000gn/T/pyre_server_2e39185a21f25a04de5d73b9d3a58728.sock`
+2022-04-16 21:44:39 INFO Initializing shared memory [heap_size=8589934592, dep_table_pow=27, hash_table_pow=26]
+2022-04-16 21:44:39 INFO Initializing server state from scratch...
+2022-04-16 21:44:39 INFO Building module tracker...
+2022-04-16 21:44:39 PERFORMANCE Module tracker built: 0.26s
+2022-04-16 21:44:39 INFO Building type environment...
+2022-04-16 21:44:39 INFO Parsing 1956 stubs and sources...
+2022-04-16 21:44:39 PERFORMANCE Sources parsed: 0.48s
+2022-04-16 21:44:40 PERFORMANCE Full environment built: 1.10s
+2022-04-16 21:44:40 INFO Checking 158 functions...
+2022-04-16 21:44:41 PROGRESS Processed 158 of 158 functions
+2022-04-16 21:44:41 PERFORMANCE Check_TypeCheck: 0.76s
+2022-04-16 21:44:41 MEMORY Shared memory size post-typecheck (size: 15)
+2022-04-16 21:44:41 PROGRESS Postprocessing 1956 sources...
+2022-04-16 21:44:41 PROGRESS Postprocessed 82 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 164 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 246 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 328 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 410 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 492 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 574 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 656 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 738 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 820 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 902 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 984 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1066 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1148 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1230 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1312 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1394 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1476 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1558 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1640 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1710 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1792 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1874 of 1956 sources
+2022-04-16 21:44:41 PROGRESS Postprocessed 1956 of 1956 sources
+2022-04-16 21:44:41 PERFORMANCE Initialization: 2.47s
+2022-04-16 21:44:41 INFO Server state initialized.
+2022-04-16 21:44:41 SERVER Connection established
+2022-04-16 21:44:41 SERVER Processing request (DisplayTypeError())...
+2022-04-16 21:44:41 PERFORMANCE Server request: 0.00s
+2022-04-16 21:44:41 SERVER Request `(DisplayTypeError())` processed
+2022-04-16 21:44:41 SERVER Connection closed
