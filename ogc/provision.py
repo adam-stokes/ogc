@@ -256,6 +256,11 @@ class AWSProvisioner(BaseProvisioner):
             layout["tags"].append(f"user-{user.slug}")
             tags["created"] = now
             tags["user_tag"] = f"user-{user.slug}"
+            # Store some extra metadata similar to what other projects use
+            epoch = datetime.datetime.now().timestamp()
+            tags["created_date"] = epoch
+            tags["environment"] = "ogc"
+            tags["repo"] = "ogc"
 
         node = self._create_node(**opts)
         self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)
