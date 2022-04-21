@@ -254,8 +254,8 @@ class AWSProvisioner(BaseProvisioner):
             now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
             layout["tags"].append(now)
             layout["tags"].append(f"user-{user.slug}")
-            tags["Created"] = now
-            tags["UserTag"] = f"user-{user.slug}"
+            tags["created"] = now
+            tags["user_tag"] = f"user-{user.slug}"
 
         node = self._create_node(**opts)
         self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)
