@@ -198,8 +198,13 @@ class AWSProvisioner(BaseProvisioner):
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
         self.layout.tags.append(now)
         self.layout.tags.append(f"{self.user.slug}")
-        tags["Created"] = now
-        tags["UserTag"] = f"{self.user.slug}"
+        tags["created"] = now
+        tags["user_tag"] = f"user-{self.user.slug}"
+        # Store some extra metadata similar to what other projects use
+        epoch = datetime.datetime.now().timestamp()
+        tags["created_date"] = epoch
+        tags["environment"] = "ogc"
+        tags["repo"] = "ogc"
 
         node = self._create_node(**opts)
         self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)  # type: ignore
