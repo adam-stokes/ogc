@@ -6,16 +6,11 @@ from pathlib import Path
 import click
 import sh
 
-from ogc import actions, db, enums, state
+from ogc import actions, db, enums
 from ogc.log import Logger as log
 
 from ..deployer import Deployer
 from .base import cli
-
-# DB Connection
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
 
 
 @click.command(help="Login to a node")
@@ -29,25 +24,28 @@ if not state.app.engine:
     required=False,
     help="Login to a node by its Name",
 )
-def ssh(by_id, by_name):
-    with state.app.session as session:
-        if by_name:
-            node = (
-                session.query(db.Node).filter(db.Node.instance_name == by_name).first()
-                or None
-            )
-        elif by_id:
-            node = session.query(db.Node).filter(db.Node.id == by_id).first() or None
-        else:
-            log.error(
-                "Unable to locate node in database, please double check spelling.",
-                style="bold red",
-            )
-            sys.exit(1)
-        if node:
-            cmd = ["-i", str(node.ssh_private_key), f"{node.username}@{node.public_ip}"]
-            sh.ssh(cmd, _fg=True, _env=state.app.env)
-            sys.exit(0)
+def ssh(by_id: str, by_name: str) -> None:
+    rows = db.get_nodes().unwrap_or_else(log.critical)
+    if not rows:
+        sys.exit(1)
+    if by_id:
+        rows = [node for node in rows if node.instance_id == by_id]
+    elif by_name:
+        rows = [node for node in rows if node.instance_name == by_name]
+    else:
+        log.error(
+            "Unable to locate node in database, please double check spelling.",
+        )
+        sys.exit(1)
+
+    node = rows[0]
+    cmd = [
+        "-i",
+        str(node.layout.ssh_private_key.expanduser()),
+        f"{node.layout.username}@{node.public_ip}",
+    ]
+    sh.ssh(cmd, _fg=True, _env=node.user.env)  # type: ignore
+    sys.exit(0)
 
 
 @click.command(help="Execute a command across node(s)")
@@ -62,11 +60,10 @@ def ssh(by_id, by_name):
     help="Only run on nodes matching name",
 )
 @click.argument("cmd")
-def exec(by_tag, by_name, cmd):
+def exec(by_tag: str, by_name: str, cmd: str) -> None:
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
-            style="bold red",
         )
         sys.exit(1)
     results = actions.exec_async(by_name, by_tag, cmd)
@@ -74,7 +71,7 @@ def exec(by_tag, by_name, cmd):
         log.info("All commands completed.")
         sys.exit(0)
 
-    log.error("Some commands failed to complete.", style="bold red")
+    log.error("Some commands failed to complete.")
     sys.exit(1)
 
 
@@ -90,11 +87,10 @@ def exec(by_tag, by_name, cmd):
     help="Only run on nodes matching name",
 )
 @click.argument("path")
-def exec_scripts(by_tag, by_name, path):
+def exec_scripts(by_tag: str, by_name: str, path: str) -> None:
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",
-            style="bold red",
         )
         sys.exit(1)
     results = actions.exec_scripts_async(by_name, by_tag, path)
@@ -116,58 +112,48 @@ def exec_scripts(by_tag, by_name, path):
     multiple=True,
     help="Exclude files/directories when uploading",
 )
-def push_files(name, src, dst, exclude):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            deploy.put(src, dst, excludes=exclude)
-            sys.exit(0)
+def push_files(name: str, src: str, dst: str, exclude: list[str]) -> None:
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
         log.error(f"Unable to locate {name} to connect to")
         sys.exit(1)
+    deploy = Deployer(node)
+    deploy.put(src, dst, excludes=exclude)
+    sys.exit(0)
 
 
 @click.command(help="Scp files or directories from node")
 @click.argument("name")
 @click.argument("dst")
 @click.argument("src")
-def pull_files(name, dst, src):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            deploy.get(dst, src)
-            sys.exit(0)
-        log.error(f"Unable to locate {name} to connect to", style="bold red")
+def pull_files(name: str, dst: str, src: str) -> None:
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
+        log.error(f"Unable to locate {name} to connect to")
         sys.exit(1)
+    deploy = Deployer(node)
+    deploy.get(dst, src)
+    sys.exit(0)
 
 
 @click.command(help="Download artifacts from node")
 @click.argument("name")
-def pull_artifacts(name):
-    with state.app.session as session:
-        node = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node:
-            deploy = Deployer(node, state.app.env)
-            if node.artifacts:
-                log.info("Downloading artifacts")
-                local_artifact_path = (
-                    Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
-                )
-                if not local_artifact_path.exists():
-                    os.makedirs(str(local_artifact_path), exist_ok=True)
-                deploy.get(node.artifacts, str(local_artifact_path))
-                sys.exit(0)
-            else:
-                log.error(f"No artifacts found at {node.remote_path}", style="bold red")
-                sys.exit(1)
-        log.error(f"Unable to locate {name} to connect to", style="bold red")
+def pull_artifacts(name: str):
+    node = db.get_node(name).unwrap_or_else(log.error)
+    if not node:
+        log.error(f"Unable to locate {name} to connect to")
+        sys.exit(1)
+    deploy = Deployer(node)
+
+    if node.layout.artifacts:
+        log.info("Downloading artifacts")
+        local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
+        if not local_artifact_path.exists():
+            os.makedirs(str(local_artifact_path), exist_ok=True)
+        deploy.get(node.layout.artifacts, str(local_artifact_path))
+        sys.exit(0)
+    else:
+        log.error(f"No artifacts found at {node.layout.remote_path}")
         sys.exit(1)
 
 

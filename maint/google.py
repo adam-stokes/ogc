@@ -3,15 +3,16 @@
 Maintenance script for Google. Helps clean up instances and firewalls.
 """
 
-from concurrent.futures import ProcessPoolExecutor
 import os
+from concurrent.futures import ProcessPoolExecutor
 from typing import Any, Iterator
-import click
 
+import click
 from click_didyoumean import DYMGroup
+
+from ogc import db
 from ogc.provision import choose_provisioner
 from ogc.state import app
-from ogc import db
 
 if not app.engine:
     app.engine = db.connect()

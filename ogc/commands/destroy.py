@@ -2,14 +2,10 @@ import sys
 
 import click
 
-from ogc import actions, db, state
+from ogc import actions, db
+from ogc.log import Logger as log
 
-from ..provision import choose_provisioner
 from .base import cli
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
 
 
 @click.command(help="Destroys a node and its associated keys, storage, etc.")
@@ -28,11 +24,14 @@ if not state.app.engine:
     default=False,
     help="Force removal of database records only",
 )
-def rm(by_name, force, only_db):
-    result = actions.teardown_async(by_name, force=force, only_db=only_db)
-    if result.is_err():
-        state.app.log.error(result.err())
+def rm(by_name: str, force: bool, only_db: bool) -> None:
+    node = db.get_node(by_name).unwrap_or_else(log.warning)
+    if not node:
         sys.exit(1)
+    nodes = actions.teardown_async(nodes=[node], force=force, only_db=only_db)
+    with db.M.db.begin(db=db.M.nodes, write=True) as txn:
+        for node in nodes:
+            txn.delete(node.id.encode("ascii"))
 
 
 @click.command(help="Destroys everything. Use with caution.")
@@ -47,30 +46,19 @@ def rm(by_name, force, only_db):
     help="Force removal of database records only",
 )
 def rm_all(force, only_db):
-    with state.app.session as session:
-        names = [node.instance_name for node in session.query(db.Node).all()]
-        result = actions.teardown_async(names, force=force, only_db=only_db)
-        if result.is_err():
-            state.app.log.error(result.err())
-            sys.exit(1)
+    nodes = db.get_nodes().unwrap_or_else(log.warning)
+    if not nodes:
+        sys.exit(1)
 
+    results = actions.teardown_async(nodes=nodes, force=force, only_db=only_db)
+    log.error("Failed to teardown all nodes") if not results else log.info(
+        "Completed tearing down nodes, removing database entries."
+    )
 
-@click.option("--provider", default="aws", help="Provider to query")
-@click.option("--filter", required=False, help="Filter by keypair name")
-@click.command(help="Remove keypairs")
-def rm_key_pairs(provider, filter):
-    engine = choose_provisioner(provider, env=state.app.env)
-    kps = []
-    if filter:
-        kps = [kp for kp in engine.list_key_pairs() if filter in kp.name]
-    else:
-        kps = list(engine.list_key_pairs())
-
-    for kp in kps:
-        click.secho(f"Removing keypair: {kp.name}", fg="green")
-        engine.delete_key_pair(kp)
+    with db.M.db.begin(db=db.M.nodes, write=True) as txn:
+        for node in nodes:
+            txn.delete(node.id.encode("ascii"))
 
 
 cli.add_command(rm)
 cli.add_command(rm_all)
-cli.add_command(rm_key_pairs)

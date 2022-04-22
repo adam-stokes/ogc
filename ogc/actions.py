@@ -1,29 +1,25 @@
 import os
 from concurrent.futures import ProcessPoolExecutor
-from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Iterator
 
 import sh
 from pampy import match
-from safetywrap import Err, Ok, Result
-from toolz.functoolz import thread_last
+from safetywrap import Err
+from toolz.curried import filter
+from toolz.functoolz import partial, thread_last
 
-from ogc import db, enums, spec, state
+from ogc import db, enums, models, state
 from ogc.deployer import Deployer
 from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
+from ogc.spec import CountCtx
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 
 
-def launch(layout: dict[str, str]) -> Result[int, str]:
+def launch(layout: bytes, user: bytes) -> bytes:
     """Launch a node.
 
     Synchronous function for launching a node in a cloud environment.
@@ -31,33 +27,32 @@ def launch(layout: dict[str, str]) -> Result[int, str]:
     **Synopsis:**
 
         from ogc.spec import SpecLoader
-        from ogc import actions
+        from ogc import actions, db
 
-        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        node_ids_created = [actions.launch(layout.as_dict())
-                            for layout in app.spec.layouts]
+        usr = db.get_user().unwrap()
+        spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        node_ids_created = [actions.launch(layout)
+                            for layout in spec.layouts]
 
     Args:
-        layout (dict[str, str]): The layout specification used
+        layout (bytes): `models.Layout` specification used
             when launching a node.
+        user (bytes): `models.User` model
 
     Returns:
-        Result[int, str]: DB Row ID if successful, Error otherwise.
+        bytes: Pickled `models.Node` Instance if successful, None otherwise.
     """
-    try:
-        log.info(f"Provisioning: {layout['name']}")
-        engine = choose_provisioner(layout["provider"], env=state.app.env)
-        engine.setup(layout)
-        model = engine.create(layout=layout, env=state.app.env)
-        log.info(f"Saved {model.instance_name} to database")
-        return Ok(int(model.id))
-    except Exception as e:
-        return Err(f"Failed to launch node: {e}")
+    _layout: models.Layout = db.pickle_to_model(layout)
+    _user: models.User = db.pickle_to_model(user)
+
+    log.info(f"Provisioning: {_layout.name}")
+    engine = choose_provisioner(name=_layout.provider, layout=_layout, user=_user)
+    engine.setup()
+    model = engine.create()
+    return db.model_as_pickle(model)
 
 
-def launch_async(
-    layouts: list[spec.SpecProvisionLayout],
-) -> Iterator[int]:
+def launch_async(layouts: list[models.Layout], user: models.User) -> list[models.Node]:
     """Launch a node asynchronously.
 
     Asynchronous function for launching a node in a cloud environment.
@@ -65,28 +60,35 @@ def launch_async(
     **Synopsis:**
 
         from ogc.spec import SpecLoader
-        from ogc import actions
+        from ogc import actions, db, models
 
-        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        node_ids_created = actions.launch_async(app.spec.layouts)
+        user = db.get_user().unwrap()
+        user.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
+        node_ids_created = actions.launch_async(layouts=user.spec.layouts, config=user)
 
     Args:
-        layouts (list[ogc.spec.SpecProvisionLayout]): The layout specification used
+        layouts (list[models.Layout]): The layout specification used
             when launching a node.
+        user (models.User): `models.User` Application user object
 
     Returns:
-        ids (Iterator[int]): The database row ID's of the node(s) that were deployed.
+        list[models.Node]: List of launched node instances
     """
 
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        func = partial(launch, user=db.model_as_pickle(user))
         results = executor.map(
-            launch,
-            [layout.as_dict() for layout in layouts for _ in range(layout.scale)],
+            func,
+            [
+                db.model_as_pickle(layout)
+                for layout in layouts
+                for _ in range(layout.scale)
+            ],
         )
-        return (result.unwrap() for result in results if result.is_ok())
+        return [db.pickle_to_model(layout) for layout in results]
 
 
-def deploy(node_id: int) -> Result[bool, str]:
+def deploy(node: bytes) -> bytes:
     """Execute the deployment
 
     Function for executing the deployment on a node.
@@ -94,37 +96,26 @@ def deploy(node_id: int) -> Result[bool, str]:
     **Synopsis:**
 
         from ogc.spec import SpecLoader
-        from ogc import actions
+        from ogc import actions, db, models
 
-        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        layout = app.spec.layouts[0]
-        node_ids = actions.launch(layout.as_dict())
-        script_deploy_results = actions.deploy(node_id)
+        node = db.get_node('ogc-abc-node-name')
+        actions.deploy(db.model_as_pickle(node))
 
     Args:
-        node (int): The node ID from the launch
+        node (bytes): Picked `models.Node` object
 
     Returns:
-        Result[bool, str]: `Result` with True if successful, False otherwise.
+        bytes: Pickled `models.DeployResult` deployed to, Error otherwise.
     """
-
-    try:
-        with state.app.session as session:
-            node_obj = (
-                session.query(db.Node).filter(db.Node.id == node_id).first() or None
-            )
-            if not node_obj:
-                return Err("Failed to query node")
-            log.info(f"Deploying to: {node_obj.instance_name}")
-            result = Deployer(node_obj, state.app.env).run()
-            result.show()
-    except Exception as e:
-        log.error(e)
-        return Err(str(e))
-    return Ok(True)
+    _node: models.Node = db.pickle_to_model(node)
+    log.info(f"Deploying to: {_node.instance_name}")
+    dep = Deployer(_node).run().unwrap()
+    if dep:
+        return db.model_as_pickle(dep)
+    return Err(f"Failed to deploy: {dep}").unwrap()
 
 
-def deploy_async(nodes: Iterator[int]) -> Result[Iterator[bool], str]:
+def deploy_async(nodes: list[models.Node]) -> list[models.DeployResult]:
     """Execute the deployment
 
     Asynchronous function for executing the deployment on a node.
@@ -132,31 +123,30 @@ def deploy_async(nodes: Iterator[int]) -> Result[Iterator[bool], str]:
     **Synopsis:**
 
         from ogc.spec import SpecLoader
-        from ogc import actions
+        from ogc import actions, db, models
 
-        app.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        node_ids = actions.launch_async(app.spec.layouts)
-        script_deploy_results = actions.deploy_async(node_ids)
+        nodes = db.get_nodes()
+        names = actions.deploy_async(nodes)
 
     Args:
-        nodes (Iterator[Result[int, Error]]): The `Result` from the launch
+        nodes (list[models.Node]): The nodes to deploy to
 
     Returns:
-        Result[Iterator[bool], Error]: A `Result` containing Iterator of
-            booleans on success, Failure otherwise.
+        list[models.DeployResult]: A list of node deployed results.
     """
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        results = executor.map(deploy, [node for node in nodes if node > 0])
-        if any(result for result in results if result.is_ok()):
-            return Err("Some nodes failed to deploy scripts")
-    return Ok((result.unwrap() for result in results if result.is_ok()))
+        results = executor.map(
+            deploy,
+            [db.model_as_pickle(node) for node in nodes],
+        )
+        return [db.pickle_to_model(node) for node in results]
 
 
 def teardown(
-    name: str,
+    node: bytes,
     force: bool = False,
     only_db: bool = False,
-) -> Result[bool, str]:
+) -> bytes:
     """Teardown deployment
 
     Function for tearing down a node.
@@ -168,87 +158,74 @@ def teardown(
         is_down = actions.teardown(name, force=True)
 
     Args:
-        name (str): The node name to teardown
+        node (bytes): Pickled `models.Node` instance
         force (bool): Force
         only_db (bool): Will remove from database regardless of cloud state. Use with
             caution.
 
     Returns:
-        bool: True if teardown is successful, False otherwise.
+        bytes: Pickled `models.Node` that was removed, None otherwise.
     """
-    result = True
-    with state.app.session as session:
-        node_data = (
-            session.query(db.Node).filter(db.Node.instance_name == name).first() or None
-        )
-        if node_data:
-            log.info(f"Destroying: {node_data.instance_name}")
-            if not only_db:
-                try:
-                    deploy = Deployer(node_data, env=state.app.env, force=force)
-                    if not force:
-                        # Pull down artifacts if set
-                        if node_data.artifacts:
-                            log.info("Downloading artifacts")
-                            local_artifact_path = (
-                                Path(enums.LOCAL_ARTIFACT_PATH)
-                                / node_data.instance_name
-                            )
-                            if not local_artifact_path.exists():
-                                os.makedirs(str(local_artifact_path), exist_ok=True)
-                            deploy.get(node_data.artifacts, str(local_artifact_path))
+    _node: models.Node = db.pickle_to_model(node)
+    log.info(f"Destroying: {_node.instance_name}")
+    if not only_db:
+        deploy = Deployer(_node, force=force)
+        if not force:
+            # Pull down artifacts if set
+            if _node.layout.artifacts:
+                log.info("Downloading artifacts")
+                local_artifact_path = (
+                    Path(enums.LOCAL_ARTIFACT_PATH) / _node.instance_name
+                )
+                if not local_artifact_path.exists():
+                    os.makedirs(str(local_artifact_path), exist_ok=True)
+                deploy.get(_node.layout.artifacts, str(local_artifact_path))
 
-                        exec_result = deploy.exec("./teardown")
-                        if not exec_result.passed:
-                            log.error(
-                                f"Unable to run teardown script on {node_data.instance_name}"
-                            )
-                    is_destroyed = deploy.node.destroy()
-                    if not is_destroyed:
-                        result = False
-                        log.error(f"Unable to destroy {deploy.node.id}")
-                except:
-                    result = False
-                    log.warning(f"Couldn't destroy {node_data.instance_name}")
-            session.delete(node_data)
-            session.commit()
-    return Ok(result) if result else Err("Failed to teardown node")
+            if not deploy.exec("./teardown").ok():
+                log.error(f"Unable to run teardown script on {_node.instance_name}")
+        is_destroyed = deploy.node.destroy()
+        if not is_destroyed:
+            log.critical(f"Unable to destroy {_node.instance_id}")
+
+    return db.model_as_pickle(_node)
 
 
 def teardown_async(
-    names: list[str], force: bool = False, only_db: bool = False
-) -> Result[Iterator[bool], str]:
+    nodes: list[models.Node],
+    force: bool = False,
+    only_db: bool = False,
+) -> list[models.Node]:
     """Teardown deployment
 
     Async function for tearing down a node.
 
     **Synopsis:**
 
-        from ogc import actions
-        names = ["ogc-234342-elastic-agent-ubuntu", "ogc-abce34-kibana-ubuntu"]
-        is_down = actions.teardown_async(names, force=True)
+        from ogc import actions, db
+        user = db.get_user().unwrap_or_else(log.fatal)
+        if not user:
+            sys.exit(1)
+
+        result = actions.teardown_async(user.nodes, force=True)
+        assert(result == True)
 
     Args:
-        name (list[str]): The node name to teardown
+        nodes (list[models.Node]): The node name to teardown
+        config (models.User): configuration object
         force (bool): Force
         only_db (bool): Will remove from database regardless of cloud state. Use with
             caution.
 
     Returns:
-        Result[Iterator[bool], Error]: `Result` of Iterator[bool] if successfull, Error otherwise.
+        list[models.Node]: List of nodes removed, empty otherwise
     """
-
-    if not isinstance(names, list):
-        names = list(names)
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(teardown, only_db=only_db, force=force)
-        results = executor.map(func, names)
-        if any(result for result in results if result.is_err()):
-            return Err("Failed to teardown node")
-    return Ok((result.unwrap() for result in results if result.is_ok()))
+        results = executor.map(func, [db.model_as_pickle(node) for node in nodes])
+        return [db.pickle_to_model(node) for node in results]
 
 
-def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
+def sync(layout: bytes, user: bytes, overrides: dict[str, CountCtx]) -> bytes:
     """Sync a deployment
 
     Function for syncing a deployment to correct scale.
@@ -261,30 +238,33 @@ def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
         result == True
 
     Args:
-        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        layout (bytes): The Pickled `models.Layout`
+        user (bytes): The Pickled `models.User`
         overrides (dict[str, str]): Override dictionary of what the new count of nodes should be
 
     Returns:
-        Result[bool, str]: True if synced, False otherwise
+        bytes: True if synced, False otherwise
     """
+    _layout: models.Layout = db.pickle_to_model(layout)
+    override = overrides[_layout.name]
 
-    override = overrides[layout.name]
+    def _sync_add() -> bytes:
+        log.info(f"Adding deployments for {_layout.name}")
+        func = partial(launch, user=user)
+        return thread_last(layout, func, lambda x: x, deploy)
 
-    def _sync_add() -> Result[bool, str]:
-        log.info(f"Adding deployments for {layout.name}")
-        return thread_last(layout.as_dict(), launch, lambda x: x.unwrap(), deploy)
-
-    def _sync_remove() -> Result[bool, str]:
-        log.info(f"Removing deployments for {layout.name}")
-        with state.app.session as session:
-            data = (
-                session.query(db.Node)
-                .filter(db.Node.instance_name.endswith(layout.name))
-                .order_by(db.Node.id.desc())
-                .limit(1)
-            )
-            func = partial(teardown, force=True)
-            return thread_last(data, lambda x: x.first().instance_name, func)
+    def _sync_remove() -> bytes:
+        log.info(f"Removing deployments for {_layout.name}")
+        func = partial(teardown, force=True)
+        return thread_last(
+            db.get_nodes(),
+            lambda x: x.unwrap(),
+            filter(lambda x: x.instance_name.endswith(_layout.name)),
+            list,
+            lambda x: x[0],
+            db.model_as_pickle,
+            func,
+        )
 
     return match(
         override,
@@ -295,7 +275,9 @@ def sync(layout, overrides: dict[str, str]) -> Result[bool, str]:
     )
 
 
-def sync_async(layouts, overrides: dict[Any, Any]) -> Result[Iterator[bool], str]:
+def sync_async(
+    layouts: list[models.Layout], user: models.User, overrides: dict[str, CountCtx]
+) -> list[models.Node]:
     """Sync a deployment
 
     Async function for syncing a deployment to correct scale.
@@ -308,29 +290,27 @@ def sync_async(layouts, overrides: dict[Any, Any]) -> Result[Iterator[bool], str
         all(result == True for result in results)
 
     Args:
-        layout (ogc.spec.SpecProvisionLayout): The layout of the deployment
+        layouts (list[models.Layout]): The list of `models.Layout` of the deployment
         overrides (dict): Override dictionary of what the new count of nodes should be
 
     Returns:
-        Result[Iterator[bool], Error]: True if synced, False otherwise
+        bool: True if synced, False otherwise
     """
 
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        func = partial(sync, overrides=overrides)
+        func = partial(sync, user=db.model_as_pickle(user), overrides=overrides)
         results = executor.map(
             func,
             [
-                layout
+                db.model_as_pickle(layout)
                 for layout in layouts
                 for _ in range(abs(overrides[layout.name]["remaining"]))
             ],
         )
-        if any(result for result in results if result.is_err()):
-            return Err("Failed to teardown nodes")
-    return Ok((result.unwrap() for result in results if result.is_ok()))
+        return [db.pickle_to_model(node).node for node in results]
 
 
-def exec(node: db.Node, cmd: str) -> bool:
+def exec(node: bytes, cmd: str) -> bool:
     """Execute command on Node
 
     Function for executing a command on a node.
@@ -344,42 +324,40 @@ def exec(node: db.Node, cmd: str) -> bool:
             print(action.exit_code, action.out, action.error)
 
     Args:
-        node (ogc.db.Node): The node to execute a command on
+        node (models.Node): The `models.Node` to execute a command on
         cmd (str): The command string
 
     Returns:
         bool: True if succesful, False otherwise
     """
-
+    _node: models.Node = db.pickle_to_model(node)
     result = None
-    with state.app.session as session:
-        cmd_opts = [
-            "-i",
-            str(node.ssh_private_key),
-            f"{node.username}@{node.public_ip}",
-        ]
-        cmd_opts.append(cmd)
-        try:
-            out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)
-            result = db.Actions(
-                node=node,
-                exit_code=out.exit_code,
-                out=out.stdout.decode(),
-                error=out.stderr.decode(),
-            )
-        except sh.ErrorReturnCode as e:
-            result = db.Actions(
-                node=node,
-                exit_code=e.exit_code,
-                out=e.stdout.decode(),
-                error=e.stderr.decode(),
-            )
-        session.add(result)
-        session.commit()
+    cmd_opts = [
+        "-i",
+        str(_node.layout.ssh_private_key),
+        f"{_node.layout.username}@{_node.public_ip}",
+    ]
+    cmd_opts.append(cmd)
+    try:
+        out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)  # type: ignore
+        result = models.Actions(
+            node=_node,
+            exit_code=out.exit_code,
+            out=out.stdout.decode(),
+            error=out.stderr.decode(),
+        )
+    except sh.ErrorReturnCode as e:
+        result = models.Actions(
+            node=_node,
+            exit_code=e.exit_code,  # type: ignore
+            out=e.stdout.decode(),
+            error=e.stderr.decode(),
+        )
+    db.save_actions_result([result])
     return bool(result.exit_code == 0)
 
 
-def exec_async(name: str, tag: str, cmd: str) -> Iterator[bool]:
+def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
     """Execute command on Nodes
 
     Async function for executing a command on a node.
@@ -399,30 +377,25 @@ def exec_async(name: str, tag: str, cmd: str) -> Iterator[bool]:
     Returns:
         list[bool]: True if all execs complete succesfully, False otherwise.
     """
-    rows = []
-    count = 0
-    with state.app.session as session:
-        if tag:
-            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-            count = rows.count()
-        elif name:
-            rows = session.query(db.Node).filter(db.Node.instance_name == name)
-            count = rows.count()
-        else:
-            rows = session.query(db.Node).all()
-            count = len(rows)
+
+    rows: list[models.Node] = db.get_nodes().unwrap()
+    if tag:
+        rows = [node for node in rows if tag in node.layout.tags]
+    elif name:
+        rows = [node for node in rows if node.instance_name == name]
+    count = len(rows)
 
     log.info(f"Executing '{cmd}' across {count} nodes.")
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = executor.map(
             func,
-            [node for node in rows],
+            [db.model_as_pickle(node) for node in rows],
         )
-    return results
+    return list(results)
 
 
-def exec_scripts(node: db.Node, path: str) -> bool:
+def exec_scripts(node: bytes, path: str) -> bytes:
     """Execute a scripts/template directory on a Node
 
     Function for executing scripts/templates on a node.
@@ -435,21 +408,19 @@ def exec_scripts(node: db.Node, path: str) -> bool:
         result == True
 
     Args:
-        node (ogc.db.Node): The node to execute scripts on
+        node (bytes): The Pickled `models.Node` to execute scripts on
         path (str): The path where the scripts reside locally
 
     Returns:
-        bool: True if succesful, False otherwise.
+        bytes: Pickled `models.DeployResult` if succesful, False otherwise.
     """
-
-    choose_provisioner(node.provider, env=state.app.env)
-    deploy = Deployer(node, env=state.app.env)
-    result = deploy.exec_scripts(path)
-    result.save()
-    return result.passed
+    _node: models.Node = db.pickle_to_model(node)
+    choose_provisioner(_node.layout.provider, _node.layout, _node.user)
+    deploy = Deployer(_node)
+    return db.model_as_pickle(deploy.exec_scripts(path).unwrap())
 
 
-def exec_scripts_async(name: str, tag: str, path: str) -> Iterator[bool]:
+def exec_scripts_async(name: str, tag: str, path: str) -> list[models.DeployResult]:
     """Execute a scripts/template directory on a Node
 
     Async function for executing scripts/templates on a node.
@@ -467,22 +438,20 @@ def exec_scripts_async(name: str, tag: str, path: str) -> Iterator[bool]:
         path (str): The path where the scripts reside locally
 
     Returns:
-        list[bool]: True if succesful, False otherwise.
+        list[models.DeployResult]: `models.DeployResult` if succesful, False otherwise.
     """
-    rows = []
-    with state.app.session as session:
-        if tag:
-            rows = session.query(db.Node).filter(db.Node.tags.contains([tag]))
-        elif name:
-            rows = session.query(db.Node).filter(db.Node.instance_name == name)
-        else:
-            rows = session.query(db.Node).all()
+    rows: list[models.Node] = db.get_nodes().unwrap()
+    if tag:
+        rows = [node for node in rows if tag in node.layout.tags]
+    elif name:
+        rows = [node for node in rows if node.instance_name == name]
+    count = len(rows)
 
-    log.info("Executing scripts from '%s' across {%s} nodes." % path, rows.count())
+    log.info("Executing scripts from '%s' across {%s} nodes." % path, count)
     with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec_scripts, path=path)
         results = executor.map(
             func,
-            [node for node in rows],
+            [db.model_as_pickle(node) for node in rows],
         )
-    return results
+    return [db.pickle_to_model(model) for model in results]

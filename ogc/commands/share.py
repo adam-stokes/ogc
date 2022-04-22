@@ -5,20 +5,17 @@ from pathlib import Path
 import click
 import sh
 import yaml
+from attr import asdict
 from dotenv import dotenv_values
 from rich.console import Console
 from rich.padding import Padding
 from rich.prompt import Prompt
 
-from ogc import actions, db, enums, state
+from ogc import actions, enums
 from ogc.log import Logger as log
 from ogc.spec import SpecLoader
 
 from .base import cli
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
 
 
 @click.command()
@@ -50,7 +47,7 @@ def export_env(spec, db_file, env_file):
     users environment.
     """
     if not sh.which("pg_dump"):
-        log.error(f"The pg_dump utility is required to export the database.")
+        log.error("The pg_dump utility is required to export the database.")
         sys.exit(1)
 
     # begin setup
@@ -79,34 +76,23 @@ def export_env(spec, db_file, env_file):
         sys.exit(1)
 
     log.info("Importing public key to all nodes")
-    results = actions.exec_async(None, None, cmd)
-    passed = all(result == True for result in results)
+    results = actions.exec_async(None, None, cmd)  # type: ignore
+    passed = all(result is True for result in results)
     if passed:
         log.info("Successfully added ssh keys to nodes")
     else:
         log.error("There was an issue importing the ssh keys on some/all nodes.")
 
-    log.info("Exporting database")
-    sh.pg_dump(
-        "-h",
-        db.DB_HOST,
-        "-p",
-        db.DB_PORT,
-        "-U",
-        db.DB_USER,
-        db.DB_NAME,
-        _out=db_file,
-        _env={"PGPASSWORD": db.DB_PASSWORD},
-    )
+    log.info(f"Copying database to: {db_file}")
 
-    specs = SpecLoader.load(list(spec))
+    _spec = SpecLoader.load(list(spec))
     ogc_env_out = {
         "env": {
             k: v
             for k, v in dotenv_values(".env").items()
             if not any(k.startswith(s) for s in enums.SUPPORTED_PROVIDERS)
         },
-        "spec": {**specs.as_dict()},
+        "spec": {**asdict(_spec)},
     }
     Path(env_file).write_text(json.dumps(ogc_env_out))
 
@@ -120,7 +106,7 @@ def export_env(spec, db_file, env_file):
     )
     console.print(
         Padding(
-            f"Send these files to the user and have them run [green]`ogc import --env-file <file> --db-file <file>`[/]",
+            "Send these files to the user and have them run [green]`ogc import --env-file <file> --db-file <file>`[/]",
             (3, 0, 3, 0),
         ),
         justify="center",
@@ -154,53 +140,26 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
     """Imports a shared deployment"""
     if not sh.which("createdb") and not sh.which("psql"):
         log.error(
-            f"The `createdb` and `psql` utility is required to import the environment."
+            "The `createdb` and `psql` utility is required to import the environment."
         )
         sys.exit(1)
 
     # begin setup
-    log.info("Creating database")
-    try:
-        sh.createdb(
-            "-h",
-            db.DB_HOST,
-            "-p",
-            db.DB_PORT,
-            "-U",
-            db.DB_USER,
-            db.DB_NAME,
-            _env={"PGPASSWORD": db.DB_PASSWORD},
-        )
-    except sh.ErrorReturnCode as e:
-        log.error(e)
-        sys.exit(1)
-
     log.info("Importing data")
-    try:
-        sh.psql(
-            "-h",
-            db.DB_HOST,
-            "-p",
-            db.DB_PORT,
-            "-U",
-            db.DB_USER,
-            "-d",
-            db.DB_NAME,
-            "-f",
-            db_file,
-            _env={"PGPASSWORD": db.DB_PASSWORD},
-        )
-    except sh.ErrorReturnCode as e:
-        log.error(e)
-        sys.exit(1)
 
     env_data = json.loads(Path(env_file).read_text())
-    log.info("Writing spec file")
+    log.info("Writing environment file")
     env_file_out = Path(".env")
+    if env_file_out.exists():
+        log.error(
+            "The `.env` file exists already, please make a backup and remove that file before importing."
+        )
+        sys.exit(1)
     with open(env_file_out, "w") as env_f:
         for k, v in env_data["env"].items():
             env_f.write(f"{k.upper()}={v}\n")
 
+    log.info("Writing spec file")
     spec_file_out = Path("ogc.yml")
 
     with open(spec_file_out, "w") as spec_f:
@@ -209,22 +168,25 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
     private_ssh_key = Path(private_ssh_key)
     public_ssh_key = Path(public_ssh_key)
 
-    with state.app.session as s:
-        for node in s.query(db.Node).all():
-            node.ssh_public_key = str(public_ssh_key.absolute())
-            node.ssh_private_key = str(private_ssh_key.absolute())
-            s.add(node)
-        s.commit()
+    # with state.app.session as s:
+    #     for node in s.query(db.Node).all():
+    #         node.ssh_public_key = str(public_ssh_key.absolute())
+    #         node.ssh_private_key = str(private_ssh_key.absolute())
+    #         s.add(node)
+    #     s.commit()
 
     console = Console()
     console.print(Padding("Import complete", (2, 0, 0, 0)), justify="center")
-    console.print(f":: Database Loaded: [green]:heavy_check_mark:[/]", justify="center")
+    console.print(":: Database Loaded: [green]:heavy_check_mark:[/]", justify="center")
     console.print(
-        f":: Environment Loaded: [green]:heavy_check_mark:[/]", justify="center"
+        ":: Environment Loaded: [green]:heavy_check_mark:[/]", justify="center"
     )
     console.print(
         Padding(
-            f"Please reference the user guide for interacting with the deployment. [green]`https://adam-stokes.github.io/ogc/user-guide/managing-nodes`[/]",
+            (
+                "Please reference the user guide for interacting with the deployment. "
+                "[green]`https://adam-stokes.github.io/ogc/user-guide/managing-nodes`[/]"
+            ),
             (3, 0, 3, 0),
         ),
         justify="center",

@@ -6,13 +6,13 @@ ssh-keys:
   private: ~/.ssh/id_rsa_libcloud
 
 layouts:
-  elastic-agent-debian: 
+  elastic-agent-ubuntu: 
     runs-on: ubuntu-2004
     instance-size: c5.2xlarge
     username: ubuntu
     scripts: fixtures/ex_deploy_ubuntu
     provider: aws
-    scale: 10
+    scale: 5
     remote-path: /home/ubuntu/ogc
     exclude:
       - .git

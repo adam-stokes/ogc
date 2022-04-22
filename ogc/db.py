@@ -1,126 +1,119 @@
 import os
-import uuid
 from pathlib import Path
-from typing import Dict
+from typing import Any
 
-from sqlalchemy import create_engine
-from sqlalchemy.sql import func
+import dill
+import lmdb
+from attr import define, field
+from safetywrap import Err, Ok, Result
 
-import alembic.command
-import alembic.config
-
-DB_HOST = os.environ.get("POSTGRES_HOST", "localhost")
-DB_PORT = os.environ.get("POSTGRES_PORT", 5432)
-DB_NAME = os.environ.get("POSTGRES_DB", "ogc")
-DB_USER = os.environ.get("POSTGRES_USER", "postgres")
-DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD", "postgres")
-
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, inspect
-from sqlalchemy.dialects.postgresql import ARRAY, JSON, UUID
-from sqlalchemy.orm import declarative_base, relationship, scoped_session, sessionmaker
-
-Base = declarative_base()
+from ogc import models
 
 
-class User(Base):
-    __tablename__ = "user"
-    id = Column(Integer, primary_key=True)
-    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4)
-    name = Column(String(255))
-    slug = Column(String(255), unique=True)
-    created = Column(DateTime(), server_default=func.now())
+@define
+class Manager:
+    name: str
+    db_dir: Path = field(default=Path(__file__).cwd() / ".ogc-cache")
+    map_size: int = field(default=1099511627776)
+    db: Any = field(init=False)
+    users: Any = field(init=False)
+    nodes: Any = field(init=False)
+    actions: Any = field(init=False)
 
-    extra = Column(JSON(), nullable=True)
-    nodes = relationship("Node", back_populates="user", cascade="all, delete-orphan")
+    @db.default
+    def _get_db(self) -> bytes:
+        if not self.db_dir.exists():
+            os.makedirs(str(self.db_dir))
+        return lmdb.open(str(self.db_dir / "ogcdb"), map_size=self.map_size, max_dbs=3)
 
+    @users.default
+    def _get_users_db(self) -> bytes:
+        return self.db
 
-class Node(Base):
-    __tablename__ = "node"
-    id = Column(Integer, primary_key=True)
-    instance_name = Column(Text())
-    instance_id = Column(Text())
-    instance_state = Column(Text())
-    username = Column(Text())
-    public_ip = Column(Text())
-    private_ip = Column(Text())
-    ssh_public_key = Column(Text())
-    ssh_private_key = Column(Text())
-    provider = Column(Text())
-    scripts = Column(Text())
-    tags = Column(ARRAY(String), nullable=True)
-    artifacts = Column(Text(), nullable=True)
-    remote_path = Column(Text(), nullable=True)
-    include = Column(ARRAY(String), nullable=True)
-    exclude = Column(ARRAY(String), nullable=True)
-    ports = Column(ARRAY(String), nullable=True)
-    created = Column(DateTime(), server_default=func.now())
+    @nodes.default
+    def _get_nodes_db(self) -> bytes:
+        return self.db.open_db("nodes".encode())
 
-    # Store layout config here for easier reference
-    layout = Column(JSON())
-    extra = Column(JSON(), nullable=True)
-
-    actions = relationship(
-        "Actions", back_populates="node", cascade="all, delete-orphan", lazy="dynamic"
-    )
-
-    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    user = relationship("User", back_populates="nodes")
-
-    def __repr__(self):
-        return f"Node(id={self.id!r}, user={self.user.name!r})"
+    @actions.default
+    def _get_actions_db(self) -> bytes:
+        return self.db.open_db("actions".encode())
 
 
-class Actions(Base):
-    __tablename__ = "actions"
-
-    id = Column(Integer, primary_key=True)
-    exit_code = Column(Integer())
-    out = Column(Text())
-    error = Column(Text(), nullable=True)
-    command = Column(Text(), nullable=True)
-    node_id = Column(Integer, ForeignKey("node.id"), nullable=False)
-    node = relationship("Node", back_populates="actions")
-    created = Column(DateTime(), server_default=func.now())
-    extra = Column(JSON(), nullable=True)
+DBNAME = os.environ.get("DB_NAME", "ogcdb")
+M = Manager(DBNAME)
 
 
-def connect():
-    """Return a db connection"""
-    db_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    return create_engine(db_string, echo=False, future=True)
+def get_user() -> Result[models.User, str]:
+    """Grabs the single user in the database"""
+    with M.db.begin() as txn:
 
+        def func(seq) -> models.User:
+            return (
+                pickle_to_model(seq[1]) if seq[0].decode().startswith("user") else None
+            )
 
-def session(engine):
-    _session = scoped_session(
-        sessionmaker(
-            bind=engine, autocommit=False, autoflush=True, expire_on_commit=False
+        result = list(
+            filter(lambda fn: fn is not None, map(func, [k for k in txn.cursor()]))
         )
+        return (
+            Ok(result[0])
+            if result
+            else Err("Unable to find user, make sure you have run `ogc init` first.")
+        )
+
+
+def get_nodes() -> Result[list[models.Node], str]:
+    user = get_user().unwrap()
+    _nodes: list[models.Node] = []
+    with M.db.begin(db=M.nodes) as txn:
+        for _, v in txn.cursor():
+            model = pickle_to_model(v)
+            if model.user.slug == user.slug:
+                _nodes.append(model)
+    return Ok(_nodes) if _nodes else Err("No nodes available")
+
+
+def get_node(name: str) -> Result[models.Node, str]:
+    with M.db.begin(db=M.nodes) as txn:
+        for _, v in txn.cursor():
+            model = pickle_to_model(v)
+            if model.instance_name == name:
+                return Ok(model)
+    return Err(f"Unable to find node matching: {name}")
+
+
+def get_actions(node: models.Node) -> Result[list[models.Actions], str]:
+    results: list[models.Actions] = []
+    _actions_all = []
+    with M.db.begin(db=M.actions) as txn:
+        for _, v in txn.cursor():
+            model = pickle_to_model(v)
+            _actions_all.append(model)
+    results = list(
+        filter(lambda x: x.node.instance_name == node.instance_name, _actions_all)
     )
-    return _session()
+    return (
+        Ok(results)
+        if results
+        else Err(f"Unable to find node matching: {node.instance_name}")
+    )
 
 
-def createtbl(engine) -> None:
-    """Create db tables"""
-    Base.metadata.create_all(engine)
+def save_nodes_result(nodes: list[models.Node]) -> None:
+    with M.db.begin(db=M.nodes, write=True) as txn:
+        for node in nodes:
+            txn.put(node.id.encode("ascii"), model_as_pickle(node))
 
 
-def droptbl(engine) -> None:
-    """Create db tables"""
-    Base.metadata.drop_all(engine)
+def save_actions_result(actions: list[models.Actions]) -> None:
+    with M.db.begin(db=M.actions, write=True) as txn:
+        for action in actions:
+            txn.put(action.id.encode("ascii"), model_as_pickle(action))
 
 
-def model_as_dict(obj) -> Dict[str, str]:
-    return {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs}
+def model_as_pickle(obj: Any) -> bytes:
+    return dill.dumps(obj)
 
 
-def migrate() -> None:
-    # retrieves the directory that *this* file is in
-    migrations_dir = Path(__file__).parent.parent / "alembic"
-    # this assumes the alembic.ini is also contained in this same directory
-    config_file = migrations_dir.parent / "alembic.ini"
-
-    config = alembic.config.Config(file_=str(config_file))
-    config.set_main_option("script_location", str(migrations_dir))
-
-    # upgrade the database to the latest revision
-    alembic.command.upgrade(config, "head")
+def pickle_to_model(obj: bytes) -> Any:
+    return dill.loads(obj)

@@ -1,6 +1,8 @@
 """ Enums
 """
 
+from typing import Mapping
+
 PID_FILE = "ogc-server.pid"
 LOCAL_ARTIFACT_PATH = "artifacts"
 
@@ -38,7 +40,7 @@ SPEC_CORE_LAYOUT_LIST = [
     SpecCoreLayout.PROVIDER,
 ]
 
-CLOUD_IMAGE_MAP = {
+CLOUD_IMAGE_MAP: dict[str, dict[str, dict[str, str]]] = {
     "aws": {
         "arm64": {
             "ubuntu-2004": "ami-075c8e2e1712231db",
