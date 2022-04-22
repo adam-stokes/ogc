@@ -12,7 +12,7 @@ layouts:
     username: ubuntu
     scripts: fixtures/ex_deploy_ubuntu
     provider: aws
-    scale: 15
+    scale: 5
     remote-path: /home/ubuntu/ogc
     exclude:
       - .git

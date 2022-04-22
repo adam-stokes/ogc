@@ -17,7 +17,7 @@ from libcloud.compute.deployment import (
 from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
 from mako.template import Template
-from retry.api import retry_call
+from retry import retry
 from safetywrap import Err, Ok, Result
 
 from ogc import db, models
@@ -45,18 +45,20 @@ class Deployer:
             user=self.user,
         )
         self.node = engine.node(instance_id=self.deployment.instance_id)
-        self._ssh_client = ParamikoSSHClient(
+        self._ssh_client = self._connect()
+
+    @retry(tries=5, delay=5, backoff=1)
+    def _connect(self) -> ParamikoSSHClient:
+        _client = ParamikoSSHClient(
             self.deployment.public_ip,
             username=self.deployment.layout.username,
             key=str(self.deployment.layout.ssh_private_key.expanduser()),
             timeout=300,
         )
-        tries = 10
-        if self.force:
-            tries = 1
-        retry_call(self._ssh_client.connect, tries=tries, delay=5, backoff=1)
+        _client.connect()
+        return _client
 
-    def render(self, template: Path, context):
+    def render(self, template: Path, context: dict[str, str]) -> str:
         """Returns the correct deployment based on type of step"""
         fpath = template.absolute()
         lookup = TemplateLookup(
@@ -68,7 +70,7 @@ class Deployer:
         _template = Template(filename=str(fpath), lookup=lookup)
         return str(_template.render(**context))
 
-    def exec(self, cmd) -> Result[models.DeployResult, Exception]:
+    def exec(self, cmd: str) -> Result[models.DeployResult, Exception]:
         """Runs a command on the node"""
         script = ScriptDeployment(cmd)
         msd = MultiStepDeployment([script])

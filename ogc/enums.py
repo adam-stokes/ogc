@@ -3,7 +3,6 @@
 
 from typing import Mapping
 
-
 PID_FILE = "ogc-server.pid"
 LOCAL_ARTIFACT_PATH = "artifacts"
 

@@ -17,7 +17,6 @@ from libcloud.compute.base import (
 )
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
-from retry.api import retry_call
 from retry import retry
 
 from ogc import models
@@ -144,15 +143,15 @@ class AWSProvisioner(BaseProvisioner):
         if not any(kp.name == self.layout.name for kp in self.list_key_pairs()):
             self.create_keypair(self.layout.name, str(self.layout.ssh_public_key))
 
-    def cleanup(self, node, **kwargs) -> None:
+    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
         pass
 
     def image(self, runs_on: str) -> NodeImage:
         if runs_on.startswith("ami-"):
-            _runs_on = runs_on
+            _runs_on: str = runs_on
         else:
             # FIXME: need proper architecture detection
-            _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on)
+            _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on, "")
         return super().image(_runs_on)
 
     def create_firewall(self, name: str, ports: list[str]) -> None:
@@ -166,7 +165,7 @@ class AWSProvisioner(BaseProvisioner):
                 name, ingress, egress, "0.0.0.0/0", "tcp"
             )
 
-    def delete_firewall(self, name: str):
+    def delete_firewall(self, name: str) -> None:
         pass
 
     def create(self) -> models.Node:
@@ -195,13 +194,13 @@ class AWSProvisioner(BaseProvisioner):
         tags = {}
 
         # Store some metadata for helping with cleanup
-        now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
+        now = datetime.datetime.utcnow().strftime("%Y-%m-%d")
         self.layout.tags.append(now)
         self.layout.tags.append(f"{self.user.slug}")
         tags["created"] = now
-        tags["user_tag"] = f"user-{self.user.slug}"
+        tags["user_tag"] = f"{self.user.slug}"
         # Store some extra metadata similar to what other projects use
-        epoch = datetime.datetime.now().timestamp()
+        epoch = str(datetime.datetime.now().timestamp())
         tags["created_date"] = epoch
         tags["environment"] = "ogc"
         tags["repo"] = "ogc"
@@ -210,14 +209,14 @@ class AWSProvisioner(BaseProvisioner):
         self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)  # type: ignore
         return node
 
-    def node(self, **kwargs) -> NodeType:
+    def node(self, **kwargs: dict[str, object]) -> NodeType:
         instance_id = kwargs.get("instance_id", None)
         _nodes = self.provisioner.list_nodes(ex_node_ids=[instance_id])
         if _nodes:
             return _nodes[0]
         raise ProvisionException("Unable to get node information")
 
-    def __repr__(self):
+    def __str__(self) -> str:
         return f"<AWSProvisioner [{self.options['region']}]>"
 
 
@@ -230,7 +229,7 @@ class GCEProvisioner(BaseProvisioner):
     """
 
     @property
-    def options(self):
+    def options(self) -> dict[str, str]:
         return {
             "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", None),
             "key": self.env.get("GOOGLE_APPLICATION_CREDENTIALS", None),
@@ -238,17 +237,17 @@ class GCEProvisioner(BaseProvisioner):
             "datacenter": self.env.get("GOOGLE_DATACENTER", None),
         }
 
-    def connect(self):
+    def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def setup(self, **kwargs):
+    def setup(self) -> None:
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
-    def cleanup(self, node, **kwargs):
-        pass
+    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
+        ...
 
-    def image(self, runs_on) -> NodeImage:
+    def image(self, runs_on: str) -> NodeImage:
         # Pull from partial first
         try:
             partial_image: NodeImage = self.provisioner.ex_get_image(runs_on)  # type: ignore
@@ -262,7 +261,7 @@ class GCEProvisioner(BaseProvisioner):
         except IndexError:
             raise ProvisionException(f"Could not determine image for {_runs_on}")
 
-    def create_firewall(self, name, ports, tags):
+    def create_firewall(self, name: str, ports: list[str], tags: list[str]) -> None:
         ports = [port.split(":")[0] for port in ports]
         try:
             self.provisioner.ex_get_firewall(name)  # type: ignore
@@ -272,7 +271,7 @@ class GCEProvisioner(BaseProvisioner):
                 name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
             )
 
-    def delete_firewall(self, name):
+    def delete_firewall(self, name: str) -> None:
         try:
             self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))  # type: ignore
         except ResourceNotFoundError:
@@ -311,6 +310,11 @@ class GCEProvisioner(BaseProvisioner):
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
         self.layout.tags.append(now)
         self.layout.tags.append(f"{self.user.slug}")
+        # Store some extra metadata similar to what other projects use
+        epoch = datetime.datetime.now().timestamp()
+        self.layout.tags.append(f"created_date-{epoch}")
+        self.layout.tags.append("environment-ogc")
+        self.layout.tags.append("repo-ogc")
 
         opts = dict(
             name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
@@ -322,7 +326,7 @@ class GCEProvisioner(BaseProvisioner):
         node = self._create_node(**opts)
         return node
 
-    def node(self, **kwargs) -> NodeType:
+    def node(self, **kwargs: dict[str, object]) -> NodeType:
         _nodes = self.provisioner.list_nodes()
         instance_id = None
         if "instance_id" in kwargs:

@@ -187,7 +187,7 @@ def teardown(
         if not is_destroyed:
             log.critical(f"Unable to destroy {_node.instance_id}")
 
-    return node
+    return db.model_as_pickle(_node)
 
 
 def teardown_async(
