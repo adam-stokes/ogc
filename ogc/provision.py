@@ -18,6 +18,7 @@ from libcloud.compute.base import (
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry.api import retry_call
+from retry import retry
 
 from ogc import models
 from ogc.enums import CLOUD_IMAGE_MAP
@@ -33,7 +34,7 @@ class BaseProvisioner:
         self.provisioner: NodeDriver = self.connect()
 
     @property
-    def options(self) -> None:
+    def options(self) -> dict[str, str]:
         raise NotImplementedError()
 
     def connect(self) -> NodeDriver:
@@ -46,14 +47,14 @@ class BaseProvisioner:
         """Perform some provider specific setup before launch"""
         raise NotImplementedError()
 
-    def cleanup(self, node, **kwargs) -> bool:
+    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
     def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node)
 
-    def node(self, **kwargs) -> NodeType:
+    def node(self, **kwargs: dict[str, object]) -> NodeType:
         raise NotImplementedError()
 
     def sizes(self, instance_size: str) -> list[NodeSize]:
@@ -76,6 +77,7 @@ class BaseProvisioner:
     def images(self, location: Optional[NodeLocation] = None) -> list[NodeImage]:
         return self.provisioner.list_images(location)
 
+    @retry(delay=5, backoff=2, tries=5)
     def _create_node(self, **kwargs: dict[str, object]) -> models.Node:
         _opts = kwargs.copy()
         log.info(f"Spinning up {self.layout.name}")
@@ -85,7 +87,7 @@ class BaseProvisioner:
         )[0][0]
         return models.Node(node=node, layout=self.layout, user=self.user)
 
-    def list_nodes(self, **kwargs) -> list[NodeType]:
+    def list_nodes(self, **kwargs: dict[str, object]) -> list[NodeType]:
         return self.provisioner.list_nodes(**kwargs)
 
     def create_keypair(self, name: str, ssh_public_key: str) -> KeyPair:
@@ -96,10 +98,9 @@ class BaseProvisioner:
     def get_key_pair(self, name: str) -> KeyPair:
         return self.provisioner.get_key_pair(name)
 
-    def delete_key_pair(self, key_pair) -> bool:
-        return retry_call(
-            self.provisioner.delete_key_pair, fargs=[key_pair], backoff=3, tries=15
-        )
+    @retry(backoff=3, tries=15)
+    def delete_key_pair(self, key_pair: KeyPair) -> bool:
+        return self.provisioner.delete_key_pair(key_pair)
 
     def list_key_pairs(self) -> list[KeyPair]:
         return self.provisioner.list_key_pairs()
@@ -154,7 +155,7 @@ class AWSProvisioner(BaseProvisioner):
             _runs_on = CLOUD_IMAGE_MAP["aws"]["amd64"].get(runs_on)
         return super().image(_runs_on)
 
-    def create_firewall(self, name, ports):
+    def create_firewall(self, name: str, ports: list[str]) -> None:
         """Creates the security group for enabling traffic between nodes"""
         if not any(sg.name == name for sg in self.provisioner.ex_get_security_groups()):  # type: ignore
             self.provisioner.ex_create_security_group(name, "ogc sg", vpc_id=None)  # type: ignore
@@ -165,7 +166,7 @@ class AWSProvisioner(BaseProvisioner):
                 name, ingress, egress, "0.0.0.0/0", "tcp"
             )
 
-    def delete_firewall(self, name):
+    def delete_firewall(self, name: str):
         pass
 
     def create(self) -> models.Node:
