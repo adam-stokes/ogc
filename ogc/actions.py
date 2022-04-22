@@ -307,7 +307,7 @@ def sync_async(
                 for _ in range(abs(overrides[layout.name]["remaining"]))
             ],
         )
-        return [db.pickle_to_model(node) for node in results]
+        return [db.pickle_to_model(node).node for node in results]
 
 
 def exec(node: bytes, cmd: str) -> bool:
@@ -390,7 +390,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
         func = partial(exec, cmd=cmd)
         results = executor.map(
             func,
-            [node for node in rows],
+            [db.model_as_pickle(node) for node in rows],
         )
     return list(results)
 

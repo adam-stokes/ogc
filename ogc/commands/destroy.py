@@ -24,8 +24,11 @@ from .base import cli
     default=False,
     help="Force removal of database records only",
 )
-def rm(by_name, force, only_db):
-    nodes = actions.teardown_async(by_name, force=force, only_db=only_db)
+def rm(by_name: str, force: bool, only_db: bool) -> None:
+    node = db.get_node(by_name).unwrap_or_else(log.warning)
+    if not node:
+        sys.exit(1)
+    nodes = actions.teardown_async(nodes=[node], force=force, only_db=only_db)
     with db.M.db.begin(db=db.M.nodes, write=True) as txn:
         for node in nodes:
             txn.delete(node.id.encode("ascii"))
