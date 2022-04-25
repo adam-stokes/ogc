@@ -90,9 +90,10 @@ class SpecLoader(MeldDict):
         for spec in _specs:
             cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
 
+        ssh_field: dict[str, Path] = cl.get("ssh-keys", "ssh_keys")
         ssh_keys = {
-            "public": Path(cl["ssh-keys"]["public"]),
-            "private": Path(cl["ssh-keys"]["private"]),
+            "public": Path(ssh_field["public"]),
+            "private": Path(ssh_field["private"]),
         }
         layouts = [parse_layout(layout, ssh_keys) for layout in cl["layouts"].items()]
         return models.Plan(name=cl["name"], ssh_keys=ssh_keys, layouts=layouts)

@@ -16,3 +16,4 @@ venv
 *.sql
 
 !contrib/packer/*.json
+.pyre

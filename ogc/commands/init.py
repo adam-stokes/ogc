@@ -12,7 +12,7 @@ from .base import cli
 
 
 @click.command(help="Initialize OGC")
-def init():
+def init() -> None:
     # begin setup
     name = Prompt.ask("Enter your name", default=os.environ.get("USER", ""))
     user = models.User(name=name)

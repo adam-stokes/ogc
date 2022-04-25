@@ -140,6 +140,7 @@ class Deployer:
 
         return self.exec_scripts(self.deployment.layout.scripts)
 
+    @retry(tries=5, delay=5, backoff=1)
     def put(self, src: str, dst: str, excludes: list[str], includes: list[str] = []):
         cmd_opts = [
             "-avz",
@@ -159,11 +160,9 @@ class Deployer:
         if excludes:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
-        try:
-            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)  # type: ignore
-        except sh.ErrorReturnCode as e:
-            log.error(f"Unable to upload files: {e.stderr}")
+        sh.rsync(cmd_opts)
 
+    @retry(tries=5, delay=5, backoff=1)
     def get(self, dst: str, src: str):
         cmd_opts = [
             "-avz",
@@ -175,10 +174,7 @@ class Deployer:
             f"{self.deployment.layout.username}@{self.deployment.public_ip}:{dst}",
             src,
         ]
-        try:
-            retry_call(sh.rsync, fargs=cmd_opts, tries=3, delay=5, backoff=1)  # type: ignore
-        except sh.ErrorReturnCode as e:
-            log.error(f"Unable to download files: {e.stderr}")
+        sh.rsync(cmd_opts)
 
 
 def show_result(model: models.DeployResult) -> None:

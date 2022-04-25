@@ -15,6 +15,14 @@ def get_new_uuid() -> str:
     return str(uuid.uuid1())
 
 
+def serialize(inst, field, value):
+    if isinstance(value, datetime.datetime):
+        return value.isoformat()
+    if isinstance(value, Path):
+        return str(value)
+    return value
+
+
 @define
 class Layout:
     instance_size: str

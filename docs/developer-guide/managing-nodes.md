@@ -15,83 +15,24 @@ GOOGLE_APPLICATION_CREDENTIALS="mycreds.json"
 GOOGLE_APPLICATION_SERVICE_ACCOUNT="bob@whodunit.iam.gserviceaccount.com"
 GOOGLE_PROJECT="my-awesome-project"
 GOOGLE_DATACENTER="us-central1-a"
-
-POSTGRES_HOST="localhost"
-POSTGRES_PORT=5432
-POSTGRES_DB="ogc"
-POSTGRES_USER="postgres"
-POSTGRES_PASSWORD="postgres"
 ```
 
-## Database 
-
-### Connect
-
-Everything is tracked in the database, first thing to do is setup that database connection.
-
-``` python
-from ogc import db, state
-
-if not state.app.engine:
-    state.app.engine = db.connect()
-    state.app.session = db.session(state.app.engine)
-```
-
-### Initialize Tables
-
-Next, create the database tables, OGC provides a helper for this:
-
-``` python
-db.createtbl(state.app.engine)
-```
-
-Additionally, dropping the tables can be achieved this way:
-
-``` python
-db.droptbl(state.app.engine)
-```
-
-!!! caution
-    If altering the database models make sure to perform migrations for users who upgrade OGC versions.
-
-    First create the migration:
-
-    ``` sh
-    $ alembic revision --autogenerate -m "A new modification made"
-    ```
-
-    Next perform the migration
-
-    ``` sh
-    $ alembic upgrade head
-    ```
-
-    Or programatically:
-
-    ``` python
-    from ogc import db
-    db.migrate()
-    ```
-
-    See [Alembic auto generating migrations](https://alembic.sqlalchemy.org/en/latest/autogenerate.html) for more info.
-
-### Create User
+## Create User
 
 A single user record is required in the database, this allows OGC to track cloud resources by certain tags associated with the OGC user.
 
 To create an initial user:
 
 ``` python
-from slugify import slugify
+from ogc import models
+from ogc.db import M, model_as_pickle
 
-with session as s:
-    has_user = s.select(db.User).first() or None
-    if not has_user:
-        user = db.User(name="adam", slug=slugify(name))
-        s.add(user)
-        s.commit()
-        return
-    print("User exists, nothing to do here")
+user = models.User(name=name)
+with M.db.begin(write=True) as txn:
+    if txn.get(user.slug.encode("ascii")):
+        log.warning("OGC already setup.")
+        sys.exit(1)
+    txn.put(user.slug.encode("ascii"), model_as_pickle(user))
 ```
 
 Querying the database uses standard [SQLAlchemy](https://sqlalchemy.org), please reference that site for additional information.

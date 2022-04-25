@@ -11,14 +11,14 @@ from .base import cli
 
 
 @click.command(help="List nodes in your inventory")
-@click.option("--id", required=False, help="Inspect node by DB ID")
+@click.option("--by-id", required=False, help="Inspect node by DB ID")
 @click.option(
-    "--name",
+    "--by-name",
     required=False,
     help="Inspect nodes by name, this can be a substring match",
 )
 @click.option(
-    "--tag",
+    "--by-tag",
     required=False,
     help="Inspect nodes by tag",
 )
@@ -32,8 +32,8 @@ from .base import cli
     default=False,
     help="Show extended action output at once",
 )
-def inspect(id, name, tag, action_id, extend):
-    if tag and name and id:
+def inspect(by_id, by_name, by_tag, action_id, extend):
+    if by_tag and by_name and id:
         click.echo(
             click.style(
                 "Combined filtered options are not supported, please choose one.",
@@ -43,12 +43,12 @@ def inspect(id, name, tag, action_id, extend):
         sys.exit(1)
 
     rows: list[models.Node] = db.get_nodes().unwrap()
-    if tag:
-        rows = [node for node in rows if tag in node.layout.tags]
-    elif name:
-        rows = [node for node in rows if node.instance_name == name]
+    if by_tag:
+        rows = [node for node in rows if by_tag in node.layout.tags]
+    elif by_name:
+        rows = [node for node in rows if node.instance_name == by_name]
     else:
-        rows = [node for node in rows if node.instance_id == id]
+        rows = [node for node in rows if node.id.split("-")[0] == by_id]
 
     console = Console()
     for data in rows:

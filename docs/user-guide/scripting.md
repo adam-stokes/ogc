@@ -50,16 +50,17 @@ With templating, you have the ability to query the underlying database to gather
 
 | Var | Description |
 | ----| ---- |
-| db  | Exposes access to the database models such as `db.Node` and `db.Actions`
-| session | Database session manager that allows querying the database, for example, `session.query(db.Node).all()`
-| env | Environment variables are made available through this key, `env['USER']`
+| db  | Exposes access to the database |
+| node | Current deployed node metadata |
+| env | Environment variables are made available through this key, `env['USER']` |
+| user | Current user metadata |
 
 
 ```bash
 #!/bin/bash
 echo ""
-% for node in session.query(db.Node).filter(db.Node.tags.contains(['sles'])):
-echo "[ID: ${node.id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.provider}"
+% for node in db.get_nodes().unwrap():
+echo "[ID: ${node.instance_id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.layout.provider}"
 % endfor
 echo ""
 ```

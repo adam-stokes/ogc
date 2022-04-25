@@ -180,7 +180,7 @@ class AWSProvisioner(BaseProvisioner):
         size = self.sizes(self.layout.instance_size)[0]
 
         opts = dict(
-            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
+            name=f"{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
             size=size,
             auth=auth,
@@ -277,7 +277,7 @@ class GCEProvisioner(BaseProvisioner):
         except ResourceNotFoundError:
             log.error(f"Unable to delete firewall {name}")
 
-    def list_firewalls(self):
+    def list_firewalls(self) -> list[str]:
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
     def create(self) -> models.Node:
@@ -317,7 +317,7 @@ class GCEProvisioner(BaseProvisioner):
         self.layout.tags.append("repo-ogc")
 
         opts = dict(
-            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
+            name=f"{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,

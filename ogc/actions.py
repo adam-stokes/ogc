@@ -1,5 +1,5 @@
 import os
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from multiprocessing import cpu_count
 from pathlib import Path
 
@@ -75,7 +75,7 @@ def launch_async(layouts: list[models.Layout], user: models.User) -> list[models
         list[models.Node]: List of launched node instances
     """
 
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         func = partial(launch, user=db.model_as_pickle(user))
         results = executor.map(
             func,
@@ -134,7 +134,7 @@ def deploy_async(nodes: list[models.Node]) -> list[models.DeployResult]:
     Returns:
         list[models.DeployResult]: A list of node deployed results.
     """
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         results = executor.map(
             deploy,
             [db.model_as_pickle(node) for node in nodes],
@@ -219,7 +219,7 @@ def teardown_async(
     Returns:
         list[models.Node]: List of nodes removed, empty otherwise
     """
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         func = partial(teardown, only_db=only_db, force=force)
         results = executor.map(func, [db.model_as_pickle(node) for node in nodes])
         return [db.pickle_to_model(node) for node in results]
@@ -297,7 +297,7 @@ def sync_async(
         bool: True if synced, False otherwise
     """
 
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor() as executor:
         func = partial(sync, user=db.model_as_pickle(user), overrides=overrides)
         results = executor.map(
             func,
@@ -386,7 +386,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
     count = len(rows)
 
     log.info(f"Executing '{cmd}' across {count} nodes.")
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = executor.map(
             func,
@@ -448,7 +448,7 @@ def exec_scripts_async(name: str, tag: str, path: str) -> list[models.DeployResu
     count = len(rows)
 
     log.info("Executing scripts from '%s' across {%s} nodes." % path, count)
-    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec_scripts, path=path)
         results = executor.map(
             func,

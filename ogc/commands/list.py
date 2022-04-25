@@ -63,7 +63,7 @@ def ls(by_tag, by_name, output_file):
                 else:
                     completed_actions.append(action)
         table.add_row(
-            data.instance_id,
+            data.id.split("-")[0],
             data.instance_name,
             data.layout.provider,
             arrow.get(data.created).humanize(),

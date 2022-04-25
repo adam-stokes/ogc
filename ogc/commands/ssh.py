@@ -29,7 +29,7 @@ def ssh(by_id: str, by_name: str) -> None:
     if not rows:
         sys.exit(1)
     if by_id:
-        rows = [node for node in rows if node.instance_id == by_id]
+        rows = [node for node in rows if node.id.split("-")[0] == by_id]
     elif by_name:
         rows = [node for node in rows if node.instance_name == by_name]
     else:

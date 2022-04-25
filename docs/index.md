@@ -6,42 +6,9 @@ ogc - provisioning, that's it.
 
 Welcome to the getting started guide! This should be a quick introduction to get up and running with OGC. More information on customizing and extending OGC can be found in the user documentation.
 
-## Setup
+## Install
 
-OGC requires Postgres to function. The easiest way to fulfill this requirement is with **docker-compose**:
-
-```yaml
-version: "3.9"
-
-services:
-  postgres:
-    image: postgres:11
-    environment:
-      - POSTGRES_DB=ogc
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      retries: 300
-      interval: 1s
-    ports:
-      - '5432:5432'
-```
-
-Bring up the services
-
- `$ docker-compose up`
-
-!!! info
-    To connect to a remote postgres database export the following environment variables
-
-    - **POSTGRES_HOST**
-    - **POSTGRES_PORT**
-    - **POSTGRES_DB**
-    - **POSTGRES_USER**
-    - **POSTGRES_PASSWORD**
-
-**Next**, is installation of OGC. We use **[Poetry](https://python-poetry.org/)**:
+We use and recommend the use of **[Poetry](https://python-poetry.org/)**:
 
 ```shell
 $ pip install poetry
