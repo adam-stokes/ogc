@@ -1,5 +1,6 @@
 import datetime
 import os
+import typing as t
 import uuid
 from pathlib import Path
 
@@ -35,13 +36,13 @@ class Layout:
     username: str
     ssh_private_key: Path
     ssh_public_key: Path
-    tags: list[str] = field()
-    ports: list[str] = field()
-    arch: str = field(init=False, default="amd64")
-    artifacts: str = field(default=None)
-    exclude: list[str] = field(factory=list)
-    extra: dict = field(init=False, factory=dict)
-    include: list[str] = field(factory=list)
+    tags: t.Optional[list[str]] = field()
+    ports: t.Optional[list[str]] = field()
+    arch: t.Optional[str] = "amd64"
+    artifacts: t.Optional[str] = None
+    exclude: t.Optional[list[str]] = None
+    extra: t.Optional[t.Mapping[str, str]] = {}
+    include: t.Optional[list[str]] = None
     id: str = field(init=False, factory=get_new_uuid)
 
     @tags.default
@@ -71,7 +72,7 @@ class User:
     id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     env: dict = field(init=False)
-    spec: Plan = field(init=False, factory=dict)
+    spec: t.Optional[Plan] = None
 
     @env.default
     def _get_env(self) -> dict:
@@ -83,10 +84,29 @@ class User:
 
 
 @define
+class Actions:
+    exit_code: int
+    out: str
+    error: str
+    command: str = field(init=False, default=str)
+    id: str = field(init=False, factory=get_new_uuid)
+    created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
+    extra: dict = field(init=False, factory=dict)
+
+
+@define
+class DeployResult:
+    msd: MultiStepDeployment
+    id: str = field(init=False, factory=get_new_uuid)
+
+
+@define
 class Node:
     node: NodeType
     layout: Layout
     user: User
+    actions: t.Optional[list[Actions]] = None
+    deploy_result: t.Optional[DeployResult] = None
     id: str = field(init=False, factory=get_new_uuid)
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)
@@ -115,22 +135,3 @@ class Node:
     @private_ip.default
     def _get_private_ip(self) -> str:
         return self.node.private_ips[0]
-
-
-@define
-class Actions:
-    exit_code: int
-    out: str
-    error: str
-    node: Node
-    command: str = field(init=False, default=str)
-    id: str = field(init=False, factory=get_new_uuid)
-    created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
-    extra: dict = field(init=False, factory=dict)
-
-
-@define
-class DeployResult:
-    node: Node
-    msd: MultiStepDeployment
-    id: str = field(init=False, factory=get_new_uuid)

@@ -55,12 +55,14 @@ def inspect(by_id, by_name, by_tag, action_id, extend):
         console.print(f"Deploy Details: [green]{data.instance_name}[/]")
         completed_actions = []
         failed_actions = []
+
+        if not data.actions:
+            console.print("[bold red]No actions found[/]")
+            sys.exit(1)
         if action_id:
-            actions = list(
-                filter(lambda x: x.id == action_id, db.get_actions(data).unwrap())
-            )
+            actions = list(filter(lambda x: x.id == action_id, data.actions))
         else:
-            actions = db.get_actions(data).unwrap()
+            actions = data.actions
         for action in actions:
             if action.exit_code != 0:
                 failed_actions.append(action)

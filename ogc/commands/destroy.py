@@ -55,9 +55,8 @@ def rm_all(force, only_db):
         "Completed tearing down nodes, removing database entries."
     )
 
-    with db.M.db.begin(db=db.M.nodes, write=True) as txn:
-        for node in nodes:
-            txn.delete(node.id.encode("ascii"))
+    for node in nodes:
+        db.M.delete(node.instance_name)
 
 
 cli.add_command(rm)

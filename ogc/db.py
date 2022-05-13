@@ -1,119 +1,85 @@
-import os
+import typing as t
 from pathlib import Path
-from typing import Any
 
 import dill
-import lmdb
 from attr import define, field
 from safetywrap import Err, Ok, Result
 
 from ogc import models
 
 
+def model_as_pickle(obj: object) -> bytes:
+    output: bytes = dill.dumps(obj)
+    return output
+
+
+def pickle_to_model(obj: bytes) -> t.Any:
+    return dill.loads(obj)
+
+
 @define
 class Manager:
-    name: str
-    db_dir: Path = field(default=Path(__file__).cwd() / ".ogc-cache")
-    map_size: int = field(default=1099511627776)
-    db: Any = field(init=False)
-    users: Any = field(init=False)
-    nodes: Any = field(init=False)
-    actions: Any = field(init=False)
+    db_dir: Path = field(init=False)
 
-    @db.default
-    def _get_db(self) -> bytes:
-        if not self.db_dir.exists():
-            os.makedirs(str(self.db_dir))
-        return lmdb.open(str(self.db_dir / "ogcdb"), map_size=self.map_size, max_dbs=3)
+    @db_dir.default
+    def _get_db_dir(self) -> Path:
+        p = Path(__file__).cwd() / ".ogc-cache"
+        p.mkdir(parents=True, exist_ok=True)
+        return p
 
-    @users.default
-    def _get_users_db(self) -> bytes:
-        return self.db
+    def users(self) -> list[t.Any]:
+        return [
+            pickle_to_model(user.read_bytes()) for user in self.db_dir.glob("user-*")
+        ]
 
-    @nodes.default
-    def _get_nodes_db(self) -> bytes:
-        return self.db.open_db("nodes".encode())
+    def nodes(self) -> list[t.Any]:
+        return [
+            pickle_to_model(node.read_bytes()) for node in self.db_dir.glob("ogc-*")
+        ]
 
-    @actions.default
-    def _get_actions_db(self) -> bytes:
-        return self.db.open_db("actions".encode())
+    def save(self, fname: str, obj: object) -> bool:
+        """Store the object to a pickled fname"""
+        save_path = self.db_dir / fname
+        return bool(save_path.write_bytes(model_as_pickle(obj)))
+
+    def load(self, fname: str) -> object:
+        """Load pickled obj"""
+        load_path = self.db_dir / fname
+        return pickle_to_model(load_path.read_bytes())
+
+    def delete(self, fname: str) -> bool:
+        delete_path = self.db_dir / fname
+        delete_path.unlink(missing_ok=True)
+        return delete_path.exists()
 
 
-DBNAME = os.environ.get("DB_NAME", "ogcdb")
-M = Manager(DBNAME)
+M = Manager()
 
 
 def get_user() -> Result[models.User, str]:
     """Grabs the single user in the database"""
-    with M.db.begin() as txn:
-
-        def func(seq) -> models.User:
-            return (
-                pickle_to_model(seq[1]) if seq[0].decode().startswith("user") else None
-            )
-
-        result = list(
-            filter(lambda fn: fn is not None, map(func, [k for k in txn.cursor()]))
-        )
-        return (
-            Ok(result[0])
-            if result
-            else Err("Unable to find user, make sure you have run `ogc init` first.")
-        )
+    if not len(M.users()) > 0:
+        return Err("Unable to find user, make sure you have run `ogc init` first.")
+    return Ok(M.users()[0])
 
 
 def get_nodes() -> Result[list[models.Node], str]:
     user = get_user().unwrap()
     _nodes: list[models.Node] = []
-    with M.db.begin(db=M.nodes) as txn:
-        for _, v in txn.cursor():
-            model = pickle_to_model(v)
-            if model.user.slug == user.slug:
-                _nodes.append(model)
+    for node in M.nodes():
+        if node.user.slug == user.slug:
+            _nodes.append(node)
     return Ok(_nodes) if _nodes else Err("No nodes available")
 
 
 def get_node(name: str) -> Result[models.Node, str]:
-    with M.db.begin(db=M.nodes) as txn:
-        for _, v in txn.cursor():
-            model = pickle_to_model(v)
-            if model.instance_name == name:
-                return Ok(model)
+    for node in get_nodes().unwrap():
+        if node.instance_name == name:
+            return Ok(node)
     return Err(f"Unable to find node matching: {name}")
 
 
 def get_actions(node: models.Node) -> Result[list[models.Actions], str]:
-    results: list[models.Actions] = []
-    _actions_all = []
-    with M.db.begin(db=M.actions) as txn:
-        for _, v in txn.cursor():
-            model = pickle_to_model(v)
-            _actions_all.append(model)
-    results = list(
-        filter(lambda x: x.node.instance_name == node.instance_name, _actions_all)
-    )
-    return (
-        Ok(results)
-        if results
-        else Err(f"Unable to find node matching: {node.instance_name}")
-    )
-
-
-def save_nodes_result(nodes: list[models.Node]) -> None:
-    with M.db.begin(db=M.nodes, write=True) as txn:
-        for node in nodes:
-            txn.put(node.id.encode("ascii"), model_as_pickle(node))
-
-
-def save_actions_result(actions: list[models.Actions]) -> None:
-    with M.db.begin(db=M.actions, write=True) as txn:
-        for action in actions:
-            txn.put(action.id.encode("ascii"), model_as_pickle(action))
-
-
-def model_as_pickle(obj: Any) -> bytes:
-    return dill.dumps(obj)
-
-
-def pickle_to_model(obj: bytes) -> Any:
-    return dill.loads(obj)
+    if not node.actions:
+        return Err(f"Unable to find node matching: {node.instance_name}")
+    return Ok(node.actions)

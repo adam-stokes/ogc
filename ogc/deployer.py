@@ -58,7 +58,7 @@ class Deployer:
         _client.connect()
         return _client
 
-    def render(self, template: Path, context: dict[str, str]) -> str:
+    def render(self, template: Path, context: Ctx) -> str:
         """Returns the correct deployment based on type of step"""
         fpath = template.absolute()
         lookup = TemplateLookup(
@@ -70,7 +70,7 @@ class Deployer:
         _template = Template(filename=str(fpath), lookup=lookup)
         return str(_template.render(**context))
 
-    def exec(self, cmd: str) -> Result[models.DeployResult, Exception]:
+    def exec(self, cmd: str) -> Result[models.Node, Exception]:
         """Runs a command on the node"""
         script = ScriptDeployment(cmd)
         msd = MultiStepDeployment([script])
@@ -79,10 +79,13 @@ class Deployer:
         except Exception as e:
             return Err(e)
 
-        result = models.DeployResult(node=self.deployment, msd=msd)
-        return Ok(result)
+        self.deployment.deploy_result = models.DeployResult(msd=msd)
+        db.M.save(
+            self.deployment.instance_name, convert_msd_to_actions(self.deployment)
+        )
+        return Ok(self.deployment)
 
-    def exec_scripts(self, script_dir: str) -> Result[models.DeployResult, str]:
+    def exec_scripts(self, script_dir: str) -> Result[models.Node, str]:
         scripts = Path(script_dir)
         if not scripts.exists():
             return Err("No deployment scripts found, skipping.")
@@ -117,10 +120,14 @@ class Deployer:
             log.info(f"({self.deployment.instance_name}) Executing {len(steps)} steps")
             msd = MultiStepDeployment(steps)
             msd.run(self.node, self._ssh_client)
-            return Ok(models.DeployResult(self.deployment, msd))
+            self.deployment.deploy_result = models.DeployResult(msd=msd)
+            db.M.save(
+                self.deployment.instance_name, convert_msd_to_actions(self.deployment)
+            )
+            return Ok(self.deployment)
         return Err("Unable to initiate deployment result")
 
-    def run(self) -> Result[models.DeployResult, str]:
+    def run(self) -> Result[models.Node, str]:
         log.info(
             f"Establishing connection ({self.deployment.public_ip}) "
             f"({self.deployment.layout.username}) ({str(self.deployment.layout.ssh_private_key)})"
@@ -141,7 +148,9 @@ class Deployer:
         return self.exec_scripts(self.deployment.layout.scripts)
 
     @retry(tries=5, delay=5, backoff=1)
-    def put(self, src: str, dst: str, excludes: list[str], includes: list[str] = []):
+    def put(
+        self, src: str, dst: str, excludes: list[str], includes: list[str] = []
+    ) -> None:
         cmd_opts = [
             "-avz",
             "-e",
@@ -163,7 +172,7 @@ class Deployer:
         sh.rsync(cmd_opts)
 
     @retry(tries=5, delay=5, backoff=1)
-    def get(self, dst: str, src: str):
+    def get(self, dst: str, src: str) -> None:
         cmd_opts = [
             "-avz",
             "-e",
@@ -177,45 +186,55 @@ class Deployer:
         sh.rsync(cmd_opts)
 
 
-def show_result(model: models.DeployResult) -> None:
+def show_result(model: models.Node) -> None:
     log.info("Deployment Result: ")
     toolz.thread_last(
-        toolz.filter(lambda step: hasattr(step, "exit_status"), model.msd.steps),
+        toolz.filter(
+            lambda step: hasattr(step, "exit_status"), model.deploy_result.msd.steps
+        ),
         lambda step: log.info(f"  - ({step.exit_status}): {step}"),
     )
 
     log.info("Connection Information: ")
-    log.info(f"  - Node: {model.node.instance_name} {model.node.instance_state}")
+    log.info(f"  - Node: {model.instance_name} {model.instance_state}")
     log.info(
         (
-            f"  - ssh -i {model.node.layout.ssh_private_key.expanduser()} "
-            f"{model.node.layout.username}@{model.node.public_ip}"
+            f"  - ssh -i {model.layout.ssh_private_key.expanduser()} "
+            f"{model.layout.username}@{model.public_ip}"
         )
     )
 
 
-def is_success(model: models.DeployResult) -> bool:
+def is_success(node: models.Node) -> bool:
     return all(
         step.exit_status == 0
-        for step in model.msd.steps
+        for step in node.deploy_result.msd.steps
         if hasattr(step, "exit_status")
     )
 
 
-def convert_msd_to_actions(results: list[models.DeployResult]) -> list[models.Actions]:
+def convert_msd_to_actions(node: models.Node) -> models.Node:
     """Converts results from `MultistepDeployment` to `models.Actions`"""
-    _results = []
-    for dp in results:
-        for step in dp.msd.steps:
-            if hasattr(step, "exit_status"):
-                log.info(f"{dp.node.instance_name} :: recording action result: {step}")
-                _results.append(
+    assert node.deploy_result is not None
+    for step in node.deploy_result.msd.steps:
+        if hasattr(step, "exit_status"):
+            log.info(f"{node.instance_name} :: recording action result: {step}")
+            if node.actions:
+                node.actions.append(
                     models.Actions(
                         exit_code=step.exit_status,
                         out=step.stdout,
                         error=step.stderr,
-                        node=dp.node,
                     )
                 )
-    log.info(f"Recorded {len(_results)} action results in database.")
-    return _results
+            else:
+                node.actions = [
+                    models.Actions(
+                        exit_code=step.exit_status,
+                        out=step.stdout,
+                        error=step.stderr,
+                    )
+                ]
+    assert node.actions is not None
+    log.info(f"Recorded {len(node.actions)} action results.")
+    return node

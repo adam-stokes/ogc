@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from typing import TypedDict
 
+import tomli
 import yaml
 from melddict import MeldDict
 from toolz import thread_last
@@ -77,18 +78,18 @@ def parse_layout(layout: dict, sshkeys: dict) -> models.Layout:
 class SpecLoader(MeldDict):
     @classmethod
     def load(cls, specs: list[str]) -> models.Plan:
-        if Path("ogc.yml").exists():
-            specs.insert(0, "ogc.yml")
+        if Path("ogc.toml").exists():
+            specs.insert(0, "ogc.toml")
 
         _specs = [Path(sp) for sp in specs if Path(sp).exists()]
         if not _specs:
             raise SpecLoaderException(
-                "No provision specs found, please specify with `--spec <file.yml>`"
+                "No provision specs found, please specify with `--spec <file.toml>`"
             )
 
         cl = SpecLoader()
         for spec in _specs:
-            cl += yaml.load(spec.read_text(), Loader=yaml.FullLoader)
+            cl += tomli.loads(spec.read_text())
 
         ssh_field: dict[str, Path] = cl.get("ssh-keys", "ssh_keys")
         ssh_keys = {

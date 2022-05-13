@@ -2,8 +2,8 @@
 # pylint: disable=wrong-import-order
 
 import datetime
+import typing as t
 import uuid
-from typing import Optional, Type
 
 from libcloud.common.google import ResourceNotFoundError
 from libcloud.compute.base import KeyPair
@@ -33,7 +33,7 @@ class BaseProvisioner:
         self.provisioner: NodeDriver = self.connect()
 
     @property
-    def options(self) -> dict[str, str]:
+    def options(self) -> t.Mapping[str, str]:
         raise NotImplementedError()
 
     def connect(self) -> NodeDriver:
@@ -53,7 +53,7 @@ class BaseProvisioner:
     def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node)
 
-    def node(self, **kwargs: dict[str, object]) -> NodeType:
+    def node(self, **kwargs: dict[str, t.Union[str, object]]) -> NodeType:
         raise NotImplementedError()
 
     def sizes(self, instance_size: str) -> list[NodeSize]:
@@ -73,7 +73,7 @@ class BaseProvisioner:
         """Gets a single image from registry of provider"""
         return self.provisioner.get_image(runs_on)
 
-    def images(self, location: Optional[NodeLocation] = None) -> list[NodeImage]:
+    def images(self, location: t.Optional[NodeLocation] = None) -> list[NodeImage]:
         return self.provisioner.list_images(location)
 
     @retry(delay=5, backoff=2, tries=5)
@@ -126,7 +126,7 @@ class AWSProvisioner(BaseProvisioner):
     """
 
     @property
-    def options(self) -> dict[str, str]:
+    def options(self) -> t.Mapping[str, str]:
         return {
             "key": self.env.get("AWS_ACCESS_KEY_ID", None),
             "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
@@ -195,6 +195,7 @@ class AWSProvisioner(BaseProvisioner):
 
         # Store some metadata for helping with cleanup
         now = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        assert self.layout.tags is not None
         self.layout.tags.append(now)
         self.layout.tags.append(f"{self.user.slug}")
         tags["created"] = now
@@ -229,7 +230,7 @@ class GCEProvisioner(BaseProvisioner):
     """
 
     @property
-    def options(self) -> dict[str, str]:
+    def options(self) -> t.Mapping[str, str]:
         return {
             "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", None),
             "key": self.env.get("GOOGLE_APPLICATION_CREDENTIALS", None),
@@ -242,6 +243,8 @@ class GCEProvisioner(BaseProvisioner):
         return gce(**self.options)
 
     def setup(self) -> None:
+        assert self.layout.ports is not None
+        assert self.layout.tags is not None
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
     def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
@@ -287,13 +290,15 @@ class GCEProvisioner(BaseProvisioner):
                 f"Could not locate AMI and/or username for: {self.layout.runs_on}"
             )
         size = self.sizes(self.layout.instance_size)[0]
-
         ex_metadata = {
             "items": [
                 {
                     "key": "ssh-keys",
                     "value": "%s: %s"
-                    % (self.layout.username, self.layout.ssh_public_key.read_text()),
+                    % (
+                        self.layout.username,
+                        self.layout.ssh_public_key.expanduser().read_text(),
+                    ),
                 },
                 {
                     "key": "startup-script",
@@ -304,6 +309,7 @@ class GCEProvisioner(BaseProvisioner):
             ]
         }
 
+        assert self.layout.tags is not None
         if self.layout.ports:
             self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
@@ -311,17 +317,16 @@ class GCEProvisioner(BaseProvisioner):
         self.layout.tags.append(now)
         self.layout.tags.append(f"{self.user.slug}")
         # Store some extra metadata similar to what other projects use
-        epoch = datetime.datetime.now().timestamp()
-        self.layout.tags.append(f"created_date-{epoch}")
         self.layout.tags.append("environment-ogc")
         self.layout.tags.append("repo-ogc")
 
         opts = dict(
-            name=f"{str(uuid.uuid4())[:8]}-{self.layout.name}",
+            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
             size=size,
             ex_metadata=ex_metadata,
             ex_tags=self.layout.tags,
+            ex_disk_type="pd-ssd",
         )
         node = self._create_node(**opts)
         return node
@@ -344,5 +349,5 @@ def choose_provisioner(
     name: str, layout: models.Layout, user: models.User
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
-    provisioner: Type[BaseProvisioner] = choices[name]
+    provisioner: t.Type[BaseProvisioner] = choices[name]
     return provisioner(layout=layout, user=user)

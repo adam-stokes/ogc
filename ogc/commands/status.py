@@ -8,7 +8,7 @@ from toolz import thread_last
 from toolz.curried import filter
 
 from ogc import actions
-from ogc.db import M, get_user, save_actions_result, save_nodes_result
+from ogc.db import M, get_user
 from ogc.deployer import convert_msd_to_actions
 from ogc.log import Logger as log
 
@@ -49,19 +49,15 @@ def status(reconcile: bool, spec: list[str], output_file: str) -> None:
             node for node in nodes if counts[node.layout.name]["action"] == "remove"
         ]
         if added_nodes:
-            save_nodes_result(added_nodes)
-            script_deploy_results = actions.deploy_async(nodes=added_nodes)
-            if script_deploy_results:
-                save_actions_result(convert_msd_to_actions(script_deploy_results))
+            actions.deploy_async(nodes=added_nodes)
 
         if deleted_nodes:
-            with M.db.begin(db=M.nodes, write=True) as txn:
-                thread_last(
-                    nodes,
-                    filter(lambda x: counts[x.layout.name]["action"] == "remove"),
-                    lambda x: x.id.encode("ascii"),
-                    txn.delete,
-                )
+            thread_last(
+                nodes,
+                filter(lambda x: counts[x.layout.name]["action"] == "remove"),
+                lambda x: x.instance_name,
+                M.delete,
+            )
         return
 
     table = Table(title=f"Deployment Status: {deploy_status(user.spec)}")

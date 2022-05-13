@@ -50,7 +50,8 @@
 			"inline": [
 				"choco install rsync",
 				"choco install git",
-				"choco install vim"
+				"choco install vim",
+				"choco install python3"
 			]
 		},
 		{

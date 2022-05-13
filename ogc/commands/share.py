@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 import sh
-import yaml
+import tomli_w
 from attr import asdict
 from dotenv import dotenv_values
 from rich.console import Console
@@ -23,7 +23,7 @@ from .base import cli
     "--spec",
     required=False,
     multiple=True,
-    help="Location of the ogc.yml or other spec files to include in export",
+    help="Location of the ogc.toml or other spec files to include in export",
 )
 @click.option(
     "--db-file",
@@ -160,10 +160,10 @@ def import_env(db_file, env_file, private_ssh_key, public_ssh_key):
             env_f.write(f"{k.upper()}={v}\n")
 
     log.info("Writing spec file")
-    spec_file_out = Path("ogc.yml")
+    spec_file_out = Path("ogc.toml")
 
     with open(spec_file_out, "w") as spec_f:
-        spec_f.write(yaml.dump(env_data["spec"]))
+        spec_f.write(tomli_w.dumps(env_data["spec"]))
 
     private_ssh_key = Path(private_ssh_key)
     public_ssh_key = Path(public_ssh_key)

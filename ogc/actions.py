@@ -30,9 +30,9 @@ def launch(layout: bytes, user: bytes) -> bytes:
         from ogc import actions, db
 
         usr = db.get_user().unwrap()
-        spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        node_ids_created = [actions.launch(layout)
-                            for layout in spec.layouts]
+        spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
+        nodes = [actions.launch(layout)
+                 for layout in spec.layouts]
 
     Args:
         layout (bytes): `models.Layout` specification used
@@ -63,8 +63,8 @@ def launch_async(layouts: list[models.Layout], user: models.User) -> list[models
         from ogc import actions, db, models
 
         user = db.get_user().unwrap()
-        user.spec = SpecLoader.load(["/Users/adam/specs/ogc.yml"])
-        node_ids_created = actions.launch_async(layouts=user.spec.layouts, config=user)
+        user.spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
+        nodes = actions.launch_async(layouts=user.spec.layouts, config=user)
 
     Args:
         layouts (list[models.Layout]): The layout specification used
@@ -75,7 +75,7 @@ def launch_async(layouts: list[models.Layout], user: models.User) -> list[models
         list[models.Node]: List of launched node instances
     """
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(launch, user=db.model_as_pickle(user))
         results = executor.map(
             func,
@@ -85,7 +85,9 @@ def launch_async(layouts: list[models.Layout], user: models.User) -> list[models
                 for _ in range(layout.scale)
             ],
         )
-        return [db.pickle_to_model(layout) for layout in results]
+        for node in results:
+            db.M.save(node.instance_name, node)
+        return [db.pickle_to_model(node) for node in results]
 
 
 def deploy(node: bytes) -> bytes:
@@ -115,7 +117,7 @@ def deploy(node: bytes) -> bytes:
     return Err(f"Failed to deploy: {dep}").unwrap()
 
 
-def deploy_async(nodes: list[models.Node]) -> list[models.DeployResult]:
+def deploy_async(nodes: list[models.Node]) -> list[models.Node]:
     """Execute the deployment
 
     Asynchronous function for executing the deployment on a node.
@@ -132,9 +134,9 @@ def deploy_async(nodes: list[models.Node]) -> list[models.DeployResult]:
         nodes (list[models.Node]): The nodes to deploy to
 
     Returns:
-        list[models.DeployResult]: A list of node deployed results.
+        list[models.Node]: A list of node deployed results.
     """
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         results = executor.map(
             deploy,
             [db.model_as_pickle(node) for node in nodes],
@@ -219,7 +221,7 @@ def teardown_async(
     Returns:
         list[models.Node]: List of nodes removed, empty otherwise
     """
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(teardown, only_db=only_db, force=force)
         results = executor.map(func, [db.model_as_pickle(node) for node in nodes])
         return [db.pickle_to_model(node) for node in results]
@@ -257,8 +259,7 @@ def sync(layout: bytes, user: bytes, overrides: dict[str, CountCtx]) -> bytes:
         log.info(f"Removing deployments for {_layout.name}")
         func = partial(teardown, force=True)
         return thread_last(
-            db.get_nodes(),
-            lambda x: x.unwrap(),
+            db.get_nodes().unwrap(),
             filter(lambda x: x.instance_name.endswith(_layout.name)),
             list,
             lambda x: x[0],
@@ -297,7 +298,7 @@ def sync_async(
         bool: True if synced, False otherwise
     """
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(sync, user=db.model_as_pickle(user), overrides=overrides)
         results = executor.map(
             func,
@@ -307,7 +308,7 @@ def sync_async(
                 for _ in range(abs(overrides[layout.name]["remaining"]))
             ],
         )
-        return [db.pickle_to_model(node).node for node in results]
+        return [db.pickle_to_model(node) for node in results]
 
 
 def exec(node: bytes, cmd: str) -> bool:
@@ -331,30 +332,34 @@ def exec(node: bytes, cmd: str) -> bool:
         bool: True if succesful, False otherwise
     """
     _node: models.Node = db.pickle_to_model(node)
-    result = None
     cmd_opts = [
         "-i",
         str(_node.layout.ssh_private_key),
         f"{_node.layout.username}@{_node.public_ip}",
     ]
     cmd_opts.append(cmd)
+    assert _node.actions
+    error_code = 0
     try:
         out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)  # type: ignore
-        result = models.Actions(
-            node=_node,
-            exit_code=out.exit_code,
-            out=out.stdout.decode(),
-            error=out.stderr.decode(),
+        _node.actions.append(
+            models.Actions(
+                exit_code=out.exit_code,
+                out=out.stdout.decode(),
+                error=out.stderr.decode(),
+            )
         )
     except sh.ErrorReturnCode as e:
-        result = models.Actions(
-            node=_node,
-            exit_code=e.exit_code,  # type: ignore
-            out=e.stdout.decode(),
-            error=e.stderr.decode(),
+        error_code = e.exit_code
+        _node.actions.append(
+            models.Actions(
+                exit_code=e.exit_code,  # type: ignore
+                out=e.stdout.decode(),
+                error=e.stderr.decode(),
+            )
         )
-    db.save_actions_result([result])
-    return bool(result.exit_code == 0)
+    db.M.save(_node.instance_name, _node)
+    return bool(error_code == 0)
 
 
 def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
