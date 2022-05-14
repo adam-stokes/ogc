@@ -92,7 +92,10 @@ def launch_async(
                     Deployer(db.pickle_to_model(node)).run().unwrap()
                 )
 
-            results = [executor.submit(partial(run), db.model_as_pickle(node)) for node in nodes]
+            results = [
+                executor.submit(partial(run), db.model_as_pickle(node))
+                for node in nodes
+            ]
             wait(results)
             return [db.pickle_to_model(node.result()) for node in results]
         return nodes
@@ -133,15 +136,18 @@ def teardown(
                 local_artifact_path = (
                     Path(enums.LOCAL_ARTIFACT_PATH) / _node.instance_name
                 )
-                if not local_artifact_path.exists():
-                    os.makedirs(str(local_artifact_path), exist_ok=True)
+                local_artifact_path.mkdir(parents=True, exist_ok=True)
                 deploy.get(_node.layout.artifacts, str(local_artifact_path))
 
             if not deploy.exec("./teardown").ok():
                 log.error(f"Unable to run teardown script on {_node.instance_name}")
-        is_destroyed = deploy.node.destroy()
+
+        is_destroyed = False
+        if deploy.node:
+            is_destroyed = deploy.node.destroy()
         if not is_destroyed:
-            log.critical(f"Unable to destroy {_node.instance_id}")
+            log.critical(f"Unable to destroy {_node.instance_name}")
+        db.M.delete(_node.instance_name)
 
     return db.model_as_pickle(_node)
 
@@ -172,8 +178,9 @@ def teardown_async(
     """
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(teardown, only_db=only_db, force=force)
-        results = executor.map(func, [db.model_as_pickle(node) for node in nodes])
-        return [db.pickle_to_model(node) for node in results]
+        results = [executor.submit(func, db.model_as_pickle(node)) for node in nodes]
+        wait(results)
+        return [db.pickle_to_model(node.result()) for node in results]
 
 
 def sync(layout: bytes, overrides: dict[str, CountCtx]) -> bytes:
@@ -244,25 +251,23 @@ def sync_async(
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(sync, overrides=overrides)
-        results = executor.map(
-            func,
-            [
-                db.model_as_pickle(layout)
-                for layout in layouts
-                for _ in range(abs(overrides[layout.name]["remaining"]))
-            ],
-        )
-        nodes = [db.pickle_to_model(node) for node in results]
+        results = [
+            executor.submit(func, db.model_as_pickle(layout))
+            for layout in layouts
+            for _ in range(abs(overrides[layout.name]["remaining"]))
+        ]
+        wait(results)
+        nodes = [db.pickle_to_model(node.result()) for node in results]
         log.info(f"Running deployment scripts on {len(nodes)} nodes")
 
         def run(node: bytes) -> bytes:
             return db.model_as_pickle(Deployer(db.pickle_to_model(node)).run().unwrap())
 
-        results = executor.map(
-            partial(run),
-            [db.model_as_pickle(node) for node in nodes],
-        )
-        return [db.pickle_to_model(node) for node in results]
+        results = [
+            executor.submit(partial(run), db.model_as_pickle(node)) for node in nodes
+        ]
+        wait(results)
+        return [db.pickle_to_model(node.result()) for node in results]
 
 
 def exec(node: bytes, cmd: str) -> bool:
@@ -347,11 +352,9 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
     log.info(f"Executing '{cmd}' across {count} nodes.")
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
-        results = executor.map(
-            func,
-            [db.model_as_pickle(node) for node in rows],
-        )
-    return list(results)
+        results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
+        wait(results)
+        return list(node.result() for node in results)
 
 
 def exec_scripts(node: bytes, path: str) -> bytes:
@@ -409,8 +412,6 @@ def exec_scripts_async(name: str, tag: str, path: str) -> list[models.Node]:
     log.info("Executing scripts from '%s' across {%s} nodes." % path, count)
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec_scripts, path=path)
-        results = executor.map(
-            func,
-            [db.model_as_pickle(node) for node in rows],
-        )
-    return [db.pickle_to_model(model) for model in results]
+        results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
+        wait(results)
+        return [db.pickle_to_model(node.result()) for node in results]

@@ -42,9 +42,11 @@ class Deployer:
             layout=self.deployment.layout,
         )
         self.node = engine.node(instance_id=self.deployment.instance_id)
+        if not self.node:
+            return
         self._ssh_client = self._connect()
 
-    @retry(tries=5, delay=5, backoff=1)
+    @retry(tries=5, delay=5, backoff=5)
     def _connect(self) -> ParamikoSSHClient:
         _client = ParamikoSSHClient(
             self.deployment.public_ip,
@@ -142,7 +144,7 @@ class Deployer:
 
         return self.exec_scripts(self.deployment.layout.scripts)
 
-    @retry(tries=5, delay=5, backoff=1)
+    @retry(tries=3, delay=5, backoff=5)
     def put(
         self, src: str, dst: str, excludes: list[str], includes: list[str] = []
     ) -> None:
@@ -164,9 +166,13 @@ class Deployer:
         if excludes:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
-        sh.rsync(cmd_opts)
+        try:
+            sh.rsync(cmd_opts)
+        except sh.ErrorReturnCode as e:
+            log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
+            return None
 
-    @retry(tries=5, delay=5, backoff=1)
+    @retry(tries=3, delay=5, backoff=5)
     def get(self, dst: str, src: str) -> None:
         cmd_opts = [
             "-avz",
@@ -178,7 +184,11 @@ class Deployer:
             f"{self.deployment.layout.username}@{self.deployment.public_ip}:{dst}",
             src,
         ]
-        sh.rsync(cmd_opts)
+        try:
+            sh.rsync(cmd_opts)
+        except sh.ErrorReturnCode as e:
+            log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
+            return None
 
 
 def show_result(model: models.Node) -> None:

@@ -1,5 +1,4 @@
 # pylint: disable=unexpected-keyword-arg
-import os
 import sys
 from pathlib import Path
 
@@ -138,7 +137,7 @@ def pull_files(name: str, dst: str, src: str) -> None:
 
 @click.command(help="Download artifacts from node")
 @click.argument("name")
-def pull_artifacts(name: str):
+def pull_artifacts(name: str) -> None:
     node = db.get_node(name).unwrap_or_else(log.error)
     if not node:
         log.error(f"Unable to locate {name} to connect to")
@@ -148,8 +147,7 @@ def pull_artifacts(name: str):
     if node.layout.artifacts:
         log.info("Downloading artifacts")
         local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
-        if not local_artifact_path.exists():
-            os.makedirs(str(local_artifact_path), exist_ok=True)
+        local_artifact_path.mkdir(parents=True, exist_ok=True)
         deploy.get(node.layout.artifacts, str(local_artifact_path))
         sys.exit(0)
     else:

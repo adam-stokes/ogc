@@ -28,10 +28,7 @@ def rm(by_name: str, force: bool, only_db: bool) -> None:
     node = db.get_node(by_name).unwrap_or_else(log.warning)
     if not node:
         sys.exit(1)
-    nodes = actions.teardown_async(nodes=[node], force=force, only_db=only_db)
-    with db.M.db.begin(db=db.M.nodes, write=True) as txn:
-        for node in nodes:
-            txn.delete(node.id.encode("ascii"))
+    actions.teardown_async(nodes=[node], force=force, only_db=only_db)
 
 
 @click.command(help="Destroys everything. Use with caution.")
@@ -45,18 +42,15 @@ def rm(by_name: str, force: bool, only_db: bool) -> None:
     default=False,
     help="Force removal of database records only",
 )
-def rm_all(force, only_db):
+def rm_all(force: bool, only_db: bool) -> None:
     nodes = db.get_nodes().unwrap_or_else(log.warning)
     if not nodes:
         sys.exit(1)
 
     results = actions.teardown_async(nodes=nodes, force=force, only_db=only_db)
     log.error("Failed to teardown all nodes") if not results else log.info(
-        "Completed tearing down nodes, removing database entries."
+        "Completed tearing down nodes"
     )
-
-    for node in nodes:
-        db.M.delete(node.instance_name)
 
 
 cli.add_command(rm)

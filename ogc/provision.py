@@ -2,6 +2,7 @@
 # pylint: disable=wrong-import-order
 
 import datetime
+import functools
 import os
 import typing as t
 import uuid
@@ -53,7 +54,7 @@ class BaseProvisioner:
     def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node)
 
-    def node(self, **kwargs: dict[str, t.Union[str, object]]) -> NodeType:
+    def node(self, **kwargs: dict[str, t.Union[str, object]]) -> t.Optional[NodeType]:
         raise NotImplementedError()
 
     def sizes(self, instance_size: str) -> list[NodeSize]:
@@ -134,6 +135,7 @@ class AWSProvisioner(BaseProvisioner):
         }
 
     @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
+    @functools.cache
     def connect(self) -> NodeDriver:
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
@@ -240,6 +242,7 @@ class GCEProvisioner(BaseProvisioner):
         }
 
     @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
+    @functools.cache
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
@@ -333,7 +336,7 @@ class GCEProvisioner(BaseProvisioner):
         node = self._create_node(**opts)
         return node
 
-    def node(self, **kwargs: dict[str, object]) -> NodeType:
+    def node(self, **kwargs: dict[str, object]) -> t.Optional[NodeType]:
         _nodes = self.provisioner.list_nodes()
         instance_id = None
         if "instance_id" in kwargs:
@@ -341,7 +344,7 @@ class GCEProvisioner(BaseProvisioner):
         _node = [n for n in _nodes if n.id == instance_id]
         if _node:
             return _node[0]
-        raise ProvisionException("Unable to get node information")
+        return None
 
     def __str__(self) -> str:
         return f"<GCEProvisioner [{self.options['datacenter']}]>"
