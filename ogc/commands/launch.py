@@ -1,8 +1,6 @@
 import click
 
-from ogc import actions, db
-from ogc.deployer import convert_msd_to_actions, is_success
-from ogc.log import Logger as log
+from ogc import actions
 
 from ..spec import SpecLoader
 from .base import cli
