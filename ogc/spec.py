@@ -1,9 +1,9 @@
 import sys
+import typing as t
 from pathlib import Path
 from typing import TypedDict
 
 import tomli
-import yaml
 from melddict import MeldDict
 from toolz import thread_last
 from toolz.curried import filter
@@ -77,6 +77,19 @@ def parse_layout(layout: dict, sshkeys: dict) -> models.Layout:
 
 class SpecLoader(MeldDict):
     @classmethod
+    def loads(cls, spec: t.Mapping[str, t.Any]) -> models.Plan:
+        """loads a spec from a mapping"""
+        cl = SpecLoader()
+        cl += spec
+        ssh_field: dict[str, Path] = cl.get("ssh-keys", cl.get("ssh_keys"))
+        ssh_keys = {
+            "public": Path(ssh_field["public"]),
+            "private": Path(ssh_field["private"]),
+        }
+        layouts = [parse_layout(layout, ssh_keys) for layout in cl["layouts"].items()]
+        return models.Plan(name=cl["name"], ssh_keys=ssh_keys, layouts=layouts)
+
+    @classmethod
     def load(cls, specs: list[str]) -> models.Plan:
         if Path("ogc.toml").exists():
             specs.insert(0, "ogc.toml")
@@ -91,7 +104,7 @@ class SpecLoader(MeldDict):
         for spec in _specs:
             cl += tomli.loads(spec.read_text())
 
-        ssh_field: dict[str, Path] = cl.get("ssh-keys", "ssh_keys")
+        ssh_field: dict[str, Path] = cl.get("ssh-keys", cl.get("ssh_keys"))
         ssh_keys = {
             "public": Path(ssh_field["public"]),
             "private": Path(ssh_field["private"]),

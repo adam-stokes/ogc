@@ -28,21 +28,18 @@ from ogc.provision import choose_provisioner
 class Ctx(TypedDict):
     env: dict
     node: models.Node
-    user: models.User
     db: Any
 
 
 class Deployer:
     def __init__(self, deployment: models.Node, force: bool = False):
         self.deployment = deployment
-        self.user = self.deployment.user
-        self.env = self.user.env
+        self.env = self.deployment.layout.env()
         self.force = force
 
         engine = choose_provisioner(
             name=self.deployment.layout.provider,
             layout=self.deployment.layout,
-            user=self.user,
         )
         self.node = engine.node(instance_id=self.deployment.instance_id)
         self._ssh_client = self._connect()
@@ -79,9 +76,9 @@ class Deployer:
         except Exception as e:
             return Err(e)
 
-        self.deployment.deploy_result = models.DeployResult(msd=msd)
         db.M.save(
-            self.deployment.instance_name, convert_msd_to_actions(self.deployment)
+            self.deployment.instance_name,
+            convert_msd_to_actions(self.deployment, msd=msd),
         )
         return Ok(self.deployment)
 
@@ -90,9 +87,7 @@ class Deployer:
         if not scripts.exists():
             return Err("No deployment scripts found, skipping.")
 
-        context = Ctx(
-            env=self.env, node=self.deployment, user=db.get_user().unwrap(), db=db
-        )
+        context = Ctx(env=self.env, node=self.deployment, db=db)
 
         # teardown file is a special file that gets executed before node
         # destroy
@@ -120,9 +115,9 @@ class Deployer:
             log.info(f"({self.deployment.instance_name}) Executing {len(steps)} steps")
             msd = MultiStepDeployment(steps)
             msd.run(self.node, self._ssh_client)
-            self.deployment.deploy_result = models.DeployResult(msd=msd)
             db.M.save(
-                self.deployment.instance_name, convert_msd_to_actions(self.deployment)
+                self.deployment.instance_name,
+                convert_msd_to_actions(self.deployment, msd=msd),
             )
             return Ok(self.deployment)
         return Err("Unable to initiate deployment result")
@@ -188,11 +183,13 @@ class Deployer:
 
 def show_result(model: models.Node) -> None:
     log.info("Deployment Result: ")
+    if not model.actions:
+        log.error("No action results found.")
+        return None
+
     toolz.thread_last(
-        toolz.filter(
-            lambda step: hasattr(step, "exit_status"), model.deploy_result.msd.steps
-        ),
-        lambda step: log.info(f"  - ({step.exit_status}): {step}"),
+        toolz.filter(lambda step: hasattr(step, "exit_code"), model.actions),
+        lambda step: log.info(f"  - ({step.exit_code}): {step}"),
     )
 
     log.info("Connection Information: ")
@@ -206,17 +203,17 @@ def show_result(model: models.Node) -> None:
 
 
 def is_success(node: models.Node) -> bool:
+    if not node.actions:
+        return False
+
     return all(
-        step.exit_status == 0
-        for step in node.deploy_result.msd.steps
-        if hasattr(step, "exit_status")
+        step.exit_code == 0 for step in node.actions if hasattr(step, "exit_code")
     )
 
 
-def convert_msd_to_actions(node: models.Node) -> models.Node:
+def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> models.Node:
     """Converts results from `MultistepDeployment` to `models.Actions`"""
-    assert node.deploy_result is not None
-    for step in node.deploy_result.msd.steps:
+    for step in msd.steps:
         if hasattr(step, "exit_status"):
             log.info(f"{node.instance_name} :: recording action result: {step}")
             if node.actions:
@@ -236,5 +233,5 @@ def convert_msd_to_actions(node: models.Node) -> models.Node:
                     )
                 ]
     assert node.actions is not None
-    log.info(f"Recorded {len(node.actions)} action results.")
+    log.info(f"Recorded {len(msd.steps)} action results.")
     return node

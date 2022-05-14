@@ -2,6 +2,7 @@
 # pylint: disable=wrong-import-order
 
 import datetime
+import os
 import typing as t
 import uuid
 
@@ -26,10 +27,9 @@ from ogc.log import Logger as log
 
 
 class BaseProvisioner:
-    def __init__(self, layout: models.Layout, user: models.User):
+    def __init__(self, layout: models.Layout):
         self.layout = layout
-        self.user = user
-        self.env = self.user.env
+        self.env = self.layout.env()
         self.provisioner: NodeDriver = self.connect()
 
     @property
@@ -84,7 +84,7 @@ class BaseProvisioner:
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0][0]
-        return models.Node(node=node, layout=self.layout, user=self.user)
+        return models.Node(node=node, layout=self.layout)
 
     def list_nodes(self, **kwargs: dict[str, object]) -> list[NodeType]:
         return self.provisioner.list_nodes(**kwargs)
@@ -128,11 +128,12 @@ class AWSProvisioner(BaseProvisioner):
     @property
     def options(self) -> t.Mapping[str, str]:
         return {
-            "key": self.env.get("AWS_ACCESS_KEY_ID", None),
-            "secret": self.env.get("AWS_SECRET_ACCESS_KEY", None),
+            "key": self.env.get("AWS_ACCESS_KEY_ID", ""),
+            "secret": self.env.get("AWS_SECRET_ACCESS_KEY", ""),
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
+    @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
     def connect(self) -> NodeDriver:
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
@@ -197,9 +198,9 @@ class AWSProvisioner(BaseProvisioner):
         now = datetime.datetime.utcnow().strftime("%Y-%m-%d")
         assert self.layout.tags is not None
         self.layout.tags.append(now)
-        self.layout.tags.append(f"{self.user.slug}")
+        self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
         tags["created"] = now
-        tags["user_tag"] = f"{self.user.slug}"
+        tags["user_tag"] = f"user-{os.environ.get('USER', 'ogc')}"
         # Store some extra metadata similar to what other projects use
         epoch = str(datetime.datetime.now().timestamp())
         tags["created_date"] = epoch
@@ -232,12 +233,13 @@ class GCEProvisioner(BaseProvisioner):
     @property
     def options(self) -> t.Mapping[str, str]:
         return {
-            "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", None),
-            "key": self.env.get("GOOGLE_APPLICATION_CREDENTIALS", None),
-            "project": self.env.get("GOOGLE_PROJECT", None),
-            "datacenter": self.env.get("GOOGLE_DATACENTER", None),
+            "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", ""),
+            "key": self.env.get("GOOGLE_APPLICATION_CREDENTIALS", ""),
+            "project": self.env.get("GOOGLE_PROJECT", ""),
+            "datacenter": self.env.get("GOOGLE_DATACENTER", ""),
         }
 
+    @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
@@ -315,7 +317,7 @@ class GCEProvisioner(BaseProvisioner):
 
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
         self.layout.tags.append(now)
-        self.layout.tags.append(f"{self.user.slug}")
+        self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
         # Store some extra metadata similar to what other projects use
         self.layout.tags.append("environment-ogc")
         self.layout.tags.append("repo-ogc")
@@ -346,8 +348,9 @@ class GCEProvisioner(BaseProvisioner):
 
 
 def choose_provisioner(
-    name: str, layout: models.Layout, user: models.User
+    name: str,
+    layout: models.Layout,
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
     provisioner: t.Type[BaseProvisioner] = choices[name]
-    return provisioner(layout=layout, user=user)
+    return provisioner(layout=layout)

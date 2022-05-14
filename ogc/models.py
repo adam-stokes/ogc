@@ -8,7 +8,6 @@ import toolz
 from attr import define, field
 from dotenv import dotenv_values
 from libcloud.compute.base import Node as NodeType
-from libcloud.compute.deployment import MultiStepDeployment
 from slugify import slugify
 
 
@@ -53,6 +52,9 @@ class Layout:
     def _get_ports(self) -> list[str]:
         return self.ports or list()
 
+    def env(self) -> dict[str, str]:
+        return {**dotenv_values(".env"), **os.environ}
+
 
 @define
 class Plan:
@@ -66,47 +68,21 @@ class Plan:
 
 
 @define
-class User:
-    name: str
-    slug: str = field(init=False)
-    id: str = field(init=False, factory=get_new_uuid)
-    created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
-    env: dict = field(init=False)
-    spec: t.Optional[Plan] = None
-
-    @env.default
-    def _get_env(self) -> dict:
-        return {**dotenv_values(".env"), **os.environ}
-
-    @slug.default
-    def _get_slug(self) -> str:
-        return f"user-{slugify(self.name)}"
-
-
-@define
 class Actions:
     exit_code: int
     out: str
     error: str
-    command: str = field(init=False, default=str)
+    command: t.Optional[str] = None
     id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     extra: dict = field(init=False, factory=dict)
 
 
 @define
-class DeployResult:
-    msd: MultiStepDeployment
-    id: str = field(init=False, factory=get_new_uuid)
-
-
-@define
 class Node:
     node: NodeType
     layout: Layout
-    user: User
     actions: t.Optional[list[Actions]] = None
-    deploy_result: t.Optional[DeployResult] = None
     id: str = field(init=False, factory=get_new_uuid)
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)

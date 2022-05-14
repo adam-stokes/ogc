@@ -4,12 +4,8 @@ import click
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
-from toolz import thread_last
-from toolz.curried import filter
 
 from ogc import actions
-from ogc.db import M, get_user
-from ogc.deployer import convert_msd_to_actions
 from ogc.log import Logger as log
 
 from ..spec import SpecLoader, deploy_status, is_degraded
@@ -30,37 +26,16 @@ from .base import cli
     help="Stores the table output to svg or html. Determined by the file extension.",
 )
 def status(reconcile: bool, spec: list[str], output_file: str) -> None:
-    user = get_user().unwrap()
-    user.spec = SpecLoader.load(list(spec))
+    _spec = SpecLoader.load(list(spec))
 
-    counts = status_fn(user.spec)
+    counts = status_fn(_spec)
 
-    if reconcile and is_degraded(user.spec):
-        log.info(
-            f"Reconciling: {', '.join([layout.name for layout in user.spec.layouts])}"
-        )
-        nodes = actions.sync_async(
-            layouts=user.spec.layouts, user=user, overrides=counts
-        )
-        added_nodes = [
-            node for node in nodes if counts[node.layout.name]["action"] == "add"
-        ]
-        deleted_nodes = [
-            node for node in nodes if counts[node.layout.name]["action"] == "remove"
-        ]
-        if added_nodes:
-            actions.deploy_async(nodes=added_nodes)
-
-        if deleted_nodes:
-            thread_last(
-                nodes,
-                filter(lambda x: counts[x.layout.name]["action"] == "remove"),
-                lambda x: x.instance_name,
-                M.delete,
-            )
+    if reconcile and is_degraded(_spec):
+        log.info(f"Reconciling: {', '.join([layout.name for layout in _spec.layouts])}")
+        actions.sync_async(layouts=_spec.layouts, overrides=counts)
         return
 
-    table = Table(title=f"Deployment Status: {deploy_status(user.spec)}")
+    table = Table(title=f"Deployment Status: {deploy_status(_spec)}")
     table.add_column("Name")
     table.add_column("Deployed")
     table.add_column("Scale")

@@ -6,6 +6,7 @@ from attr import define, field
 from safetywrap import Err, Ok, Result
 
 from ogc import models
+from ogc.log import Logger as log
 
 
 def model_as_pickle(obj: object) -> bytes:
@@ -27,12 +28,8 @@ class Manager:
         p.mkdir(parents=True, exist_ok=True)
         return p
 
-    def users(self) -> list[t.Any]:
-        return [
-            pickle_to_model(user.read_bytes()) for user in self.db_dir.glob("user-*")
-        ]
-
-    def nodes(self) -> list[t.Any]:
+    def nodes(self) -> list[models.Node]:
+        """Return a list of nodes deployed"""
         return [
             pickle_to_model(node.read_bytes()) for node in self.db_dir.glob("ogc-*")
         ]
@@ -56,27 +53,16 @@ class Manager:
 M = Manager()
 
 
-def get_user() -> Result[models.User, str]:
-    """Grabs the single user in the database"""
-    if not len(M.users()) > 0:
-        return Err("Unable to find user, make sure you have run `ogc init` first.")
-    return Ok(M.users()[0])
-
-
 def get_nodes() -> Result[list[models.Node], str]:
-    user = get_user().unwrap()
-    _nodes: list[models.Node] = []
-    for node in M.nodes():
-        if node.user.slug == user.slug:
-            _nodes.append(node)
-    return Ok(_nodes) if _nodes else Err("No nodes available")
+    return Ok(M.nodes()) if len(M.nodes()) > 0 else Err("No nodes found")
 
 
 def get_node(name: str) -> Result[models.Node, str]:
-    for node in get_nodes().unwrap():
-        if node.instance_name == name:
-            return Ok(node)
-    return Err(f"Unable to find node matching: {name}")
+    nodes = get_nodes().unwrap_or_else(log.error)
+    if not nodes:
+        return Err("Failed to find nodes.")
+    node = [node for node in nodes if node.instance_name == name]
+    return Ok(node[0]) if node else Err(f"Could not find node: {name}")
 
 
 def get_actions(node: models.Node) -> Result[list[models.Actions], str]:

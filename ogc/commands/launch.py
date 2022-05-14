@@ -17,18 +17,8 @@ from .base import cli
 )
 def launch(spec: list[str], with_deploy: bool) -> None:
     # Application Config
-    user = db.get_user().unwrap()
     loaded_spec = SpecLoader.load(list(spec))
-    nodes = actions.launch_async(layouts=loaded_spec.layouts, user=user)
-
-    if with_deploy and nodes:
-        log.info("Starting script deployments")
-        script_deploy_results = actions.deploy_async(nodes=nodes)
-        for node in script_deploy_results:
-            if is_success(node):
-                log.info(f"{node.instance_name}: Deployed Successfully")
-            else:
-                log.error(f"{node.instance_name}: Failed Deployment")
+    actions.launch_async(layouts=loaded_spec.layouts, with_deploy=with_deploy)
 
 
 cli.add_command(launch)
