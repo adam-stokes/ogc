@@ -242,6 +242,5 @@ def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> model
                         error=step.stderr,
                     )
                 ]
-    assert node.actions is not None
     log.info(f"Recorded {len(msd.steps)} action results.")
     return node

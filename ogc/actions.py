@@ -297,7 +297,6 @@ def exec(node: bytes, cmd: str) -> bool:
         f"{_node.layout.username}@{_node.public_ip}",
     ]
     cmd_opts.append(cmd)
-    assert _node.actions
     error_code = 0
     try:
         out = sh.ssh(cmd_opts, _env=state.app.env, _err_to_out=True)  # type: ignore

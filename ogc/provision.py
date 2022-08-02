@@ -198,7 +198,6 @@ class AWSProvisioner(BaseProvisioner):
 
         # Store some metadata for helping with cleanup
         now = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        assert self.layout.tags is not None
         self.layout.tags.append(now)
         self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
         tags["created"] = now
@@ -248,8 +247,6 @@ class GCEProvisioner(BaseProvisioner):
         return gce(**self.options)
 
     def setup(self) -> None:
-        assert self.layout.ports is not None
-        assert self.layout.tags is not None
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
     def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
@@ -258,7 +255,7 @@ class GCEProvisioner(BaseProvisioner):
     def image(self, runs_on: str) -> NodeImage:
         # Pull from partial first
         try:
-            partial_image: NodeImage = self.provisioner.ex_get_image(runs_on)  # type: ignore
+            partial_image: NodeImage = self.provisioner.ex_get_image_from_family(runs_on)  # type: ignore
             if partial_image:
                 return partial_image
         except ResourceNotFoundError:
@@ -302,7 +299,7 @@ class GCEProvisioner(BaseProvisioner):
                     "value": "%s: %s"
                     % (
                         self.layout.username,
-                        self.layout.ssh_public_key.expanduser().read_text(),
+                        self.layout.ssh_public_key.expanduser().read_text().strip(),
                     ),
                 },
                 {
@@ -314,7 +311,6 @@ class GCEProvisioner(BaseProvisioner):
             ]
         }
 
-        assert self.layout.tags is not None
         if self.layout.ports:
             self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
