@@ -67,6 +67,7 @@ class Deployer:
             ]
         )
         _template = Template(filename=str(fpath), lookup=lookup)
+        log.info(f"Rendering script: {fpath} :: {context}")
         return str(_template.render(**context))
 
     def exec(self, cmd: str) -> Result[models.Node, Exception]:
