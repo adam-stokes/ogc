@@ -322,7 +322,7 @@ class GCEProvisioner(BaseProvisioner):
         self.layout.tags.append("repo-ogc")
 
         boot_volume = self.provisioner.create_volume(
-            size=100, name=f"ogc-boot-{str(uuid.uuid4())[:8]}"
+            size=100, name=f"ogc-boot-{str(uuid.uuid4())[:8]}", image=image
         )
 
         opts = dict(
