@@ -321,6 +321,10 @@ class GCEProvisioner(BaseProvisioner):
         self.layout.tags.append("environment-ogc")
         self.layout.tags.append("repo-ogc")
 
+        boot_volume = self.provisioner.create_volume(
+            size=100, name=f"ogc-boot-{str(uuid.uuid4())[:8]}"
+        )
+
         opts = dict(
             name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
             image=image,
@@ -328,6 +332,7 @@ class GCEProvisioner(BaseProvisioner):
             ex_metadata=ex_metadata,
             ex_tags=self.layout.tags,
             ex_disk_type="pd-ssd",
+            ex_boot_disk=boot_volume,
         )
         node = self._create_node(**opts)
         return node
