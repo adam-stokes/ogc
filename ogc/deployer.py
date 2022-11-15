@@ -159,10 +159,12 @@ class Deployer:
             f"{self.deployment.layout.username}@{self.deployment.public_ip}:{dst}",
         ]
 
+        cmd_opts.append("--include=*/")
         if includes:
             for include in includes:
                 cmd_opts.append(f"--include={include}")
 
+        cmd_opts.append("--exclude=*")
         if excludes:
             for exclude in excludes:
                 cmd_opts.append(f"--exclude={exclude}")
