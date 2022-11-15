@@ -1,9 +1,14 @@
+import os
 import sys
 import typing as t
 from pathlib import Path
 from typing import TypedDict
 
 import tomli
+from dotenv import dotenv_values
+from dotty_dict import dotty
+from jinja2 import BaseLoader
+from jinja2.sandbox import SandboxedEnvironment
 from melddict import MeldDict
 from toolz import thread_last
 from toolz.curried import filter
@@ -90,7 +95,7 @@ class SpecLoader(MeldDict):
         return models.Plan(name=cl["name"], ssh_keys=ssh_keys, layouts=layouts)
 
     @classmethod
-    def load(cls, specs: list[str]) -> models.Plan:
+    def load(cls, specs: list[str | Path]) -> models.Plan:
         if Path("ogc.toml").exists():
             specs.insert(0, "ogc.toml")
 
@@ -102,7 +107,17 @@ class SpecLoader(MeldDict):
 
         cl = SpecLoader()
         for spec in _specs:
-            cl += tomli.loads(spec.read_text())
+            spec_dict = tomli.loads(spec.read_text())
+
+            try:
+                env = SandboxedEnvironment(loader=BaseLoader())
+                env.globals["cwd"] = str(Path.cwd())
+                env.globals["env"] = dotty({**dotenv_values(".env"), **os.environ})
+                env.globals["var"] = dotty(spec_dict)
+                temp = env.from_string(spec.read_text())
+                cl += tomli.loads(temp.render())
+            except Exception as e:
+                log.error(f"Could not parse config: {e}")
 
         ssh_field: dict[str, Path] = cl.get("ssh-keys", cl.get("ssh_keys"))
         ssh_keys = {

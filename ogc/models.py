@@ -7,6 +7,7 @@ from pathlib import Path
 import toolz
 from attr import define, field
 from dotenv import dotenv_values
+from dotty_dict import Dotty, dotty
 from libcloud.compute.base import Node as NodeType
 from slugify import slugify
 
@@ -52,8 +53,8 @@ class Layout:
     def _get_ports(self) -> list[str]:
         return self.ports or list()
 
-    def env(self) -> dict[str, str]:
-        return {**dotenv_values(".env"), **os.environ}
+    def env(self) -> Dotty:
+        return dotty({**dotenv_values(".env"), **os.environ})
 
 
 @define
