@@ -92,7 +92,12 @@ def exec_scripts(by_tag: str, by_name: str, path: str) -> None:
             "Combined filtered options are not supported, please choose one.",
         )
         sys.exit(1)
-    results = actions.exec_scripts_async(by_name, by_tag, path)
+    filters = {}
+    if by_tag:
+        filters.update({"tag": by_tag})
+    if by_name:
+        filters.update({"name": by_name})
+    results = actions.exec_scripts_async(path, filters)
     if all(res for res in results):
         log.info("All commands completed successfully ...")
         sys.exit(0)

@@ -1,4 +1,5 @@
 import os
+import typing as t
 from concurrent.futures import ThreadPoolExecutor, wait
 from multiprocessing import cpu_count
 from pathlib import Path
@@ -381,7 +382,9 @@ def exec_scripts(node: bytes, path: str) -> bytes:
     return db.model_as_pickle(deploy.exec_scripts(path).unwrap())
 
 
-def exec_scripts_async(name: str, tag: str, path: str) -> list[models.Node]:
+def exec_scripts_async(
+    path: str, filters: t.Mapping[str, str] | None = None
+) -> list[models.Node]:
     """Execute a scripts/template directory on a Node
 
     Async function for executing scripts/templates on a node.
@@ -402,10 +405,14 @@ def exec_scripts_async(name: str, tag: str, path: str) -> list[models.Node]:
         list[models.Node]: `models.Node` if succesful, False otherwise.
     """
     rows: list[models.Node] = db.get_nodes().unwrap()
-    if tag:
-        rows = [node for node in rows if tag in node.layout.tags]
-    elif name:
-        rows = [node for node in rows if node.instance_name == name]
+    if filters and "tag" in filters:
+        rows = [
+            node
+            for node in rows
+            if node.layout.tags and filters["tag"] in node.layout.tags
+        ]
+    elif filters and "name" in filters:
+        rows = [node for node in rows if node.instance_name == filters["name"]]
     count = len(rows)
 
     log.info("Executing scripts from '%s' across {%s} nodes." % path, count)
