@@ -414,8 +414,7 @@ def exec_scripts_async(
     elif filters and "name" in filters:
         rows = [node for node in rows if node.instance_name == filters["name"]]
     count = len(rows)
-
-    log.info("Executing scripts from '%s' across {%s} nodes." % path, count)
+    log.info(f"Executing scripts from '{path}' across {count} nodes.")
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec_scripts, path=path)
         results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
