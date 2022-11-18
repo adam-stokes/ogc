@@ -9,7 +9,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.1, mkdocs-material-8.5.7">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
     
     
       
@@ -17,10 +17,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.20d9efc8.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.472b142f.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.cbb835fc.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.08040f6c.min.css">
         
           
           
@@ -310,34 +310,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../user-guide/upgrading/" class="md-nav__link">
-        Upgrading
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../user-guide/sharing/" class="md-nav__link">
-        Sharing
-      </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../../../user-guide/windows/" class="md-nav__link">
         Windows
       </a>
@@ -355,18 +327,18 @@
     <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_8" type="checkbox" id="__nav_2_8" checked>
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_6" type="checkbox" id="__nav_2_6" checked>
       
       
       
       
-        <label class="md-nav__link" for="__nav_2_8">
+        <label class="md-nav__link" for="__nav_2_6">
           Cookbook
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <nav class="md-nav" aria-label="Cookbook" data-md-level="2">
-        <label class="md-nav__title" for="__nav_2_8">
+        <label class="md-nav__title" for="__nav_2_6">
           <span class="md-nav__icon md-icon"></span>
           Cookbook
         </label>
@@ -693,16 +665,12 @@
       <p>Execute command on Node</p>
 <p>Function for executing a command on a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.get_nodes().unwrap()[0]
-actions.exec(node, &quot;ls -l /&quot;)
-for action in node.actions:
-    print(action.exit_code, action.out, action.error)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">node</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">()</span><span class="o">.</span><span class="n">unwrap</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">actions</span><span class="o">.</span><span class="n">exec</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;ls -l /&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">actions</span><span class="p">:</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">exit_code</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">error</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -765,14 +733,11 @@ for action in node.actions:
       <p>Execute command on Nodes</p>
 <p>Async function for executing a command on a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.query(db.Node).filter(db.Node.tags.contains([tag]))
-results = actions.exec_async(node, &quot;ls -l /&quot;)
-all(result == True for result in results)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">node</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Node</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Node</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">contains</span><span class="p">([</span><span class="n">tag</span><span class="p">]))</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">exec_async</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;ls -l /&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -841,14 +806,11 @@ all(result == True for result in results)
       <p>Execute a scripts/template directory on a Node</p>
 <p>Function for executing scripts/templates on a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-node = db.query(db.Node).first()
-result = actions.exec_scripts(node, &quot;templates/deploy/ubuntu&quot;)
-result == True
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">node</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Node</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">exec_scripts</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;templates/deploy/ubuntu&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -911,14 +873,10 @@ result == True
       <p>Execute a scripts/template directory on a Node</p>
 <p>Async function for executing scripts/templates on a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state, db
-nodes = db.query(db.Node).all()
-results = actions.exec_scripts_async(nodes, &quot;templates/deploy/ubuntu&quot;)
-all(result == True for result in results)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">exec_scripts_async</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;templates/deploy/ubuntu&quot;</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ogc-1&quot;</span><span class="p">})</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -932,22 +890,16 @@ all(result == True for result in results)
   </thead>
   <tbody>
       <tr>
-        <td><code>name</code></td>
-        <td><code>str</code></td>
-        <td><p>The node name to execute scripts on</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>tag</code></td>
-        <td><code>str</code></td>
-        <td><p>The node tag to query, allows running across multiple nodes.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
         <td><code>path</code></td>
         <td><code>str</code></td>
         <td><p>The path where the scripts reside locally</p></td>
         <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>filters</code></td>
+        <td><code>Mapping[str, str]</code></td>
+        <td><p>Filters to pass into exec, currently <code>name</code> and <code>tag</code> are supported.</p></td>
+        <td><code>None</code></td>
       </tr>
   </tbody>
 </table>
@@ -987,18 +939,13 @@ all(result == True for result in results)
       <p>Launch a node.</p>
 <p>Synchronous function for launching a node in a cloud environment.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">6</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
-from ogc import actions, db
-
-spec = SpecLoader.load([&quot;/Users/adam/specs/ogc.toml&quot;])
-nodes = [actions.launch(layout)
-         for layout in spec.layouts]
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc.spec</span> <span class="kn">import</span> <span class="n">SpecLoader</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">SpecLoader</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="s2">&quot;/Users/adam/specs/ogc.toml&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">actions</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>         <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">]</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1056,16 +1003,12 @@ when launching a node.</p></td>
       <p>Launch a node asynchronously.</p>
 <p>Asynchronous function for launching a node in a cloud environment.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">5</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc.spec import SpecLoader
-from ogc import actions, db, models
-
-spec = SpecLoader.load([&quot;/Users/adam/specs/ogc.toml&quot;])
-nodes = actions.launch_async(layouts=spec.layouts)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc.spec</span> <span class="kn">import</span> <span class="n">SpecLoader</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">models</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">spec</span> <span class="o">=</span> <span class="n">SpecLoader</span><span class="o">.</span><span class="n">load</span><span class="p">([</span><span class="s2">&quot;/Users/adam/specs/ogc.toml&quot;</span><span class="p">])</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">nodes</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">launch_async</span><span class="p">(</span><span class="n">layouts</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1129,14 +1072,11 @@ when launching a node.</p></td>
       <p>Sync a deployment</p>
 <p>Function for syncing a deployment to correct scale.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state
-layout = app.spec.layouts[0]
-result = actions.sync(layout, overrides={&#39;elastic-agent-ubuntu&#39;: {&#39;action&#39;: &#39;add&#39;, remaining: 5}})
-result == True
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">layout</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">result</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">sync</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;elastic-agent-ubuntu&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">remaining</span><span class="p">:</span> <span class="mi">5</span><span class="p">}})</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1199,14 +1139,11 @@ result == True
       <p>Sync a deployment</p>
 <p>Async function for syncing a deployment to correct scale.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">4</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, state
-results = actions.sync_async(app.spec.layouts,
-    overrides={&#39;elastic-agent-ubuntu&#39;: {&#39;action&#39;: &#39;add&#39;, remaining: 5}})
-all(result == True for result in results)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">state</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">sync_async</span><span class="p">(</span><span class="n">app</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">layouts</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">overrides</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;elastic-agent-ubuntu&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;action&#39;</span><span class="p">:</span> <span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">remaining</span><span class="p">:</span> <span class="mi">5</span><span class="p">}})</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nb">all</span><span class="p">(</span><span class="n">result</span> <span class="o">==</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1269,12 +1206,10 @@ all(result == True for result in results)
       <p>Teardown deployment</p>
 <p>Function for tearing down a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions
-name = &quot;ogc-234342-elastic-agent-ubuntu&quot;
-is_down = actions.teardown(name, force=True)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ogc-234342-elastic-agent-ubuntu&quot;</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">is_down</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1344,12 +1279,10 @@ caution.</p></td>
       <p>Teardown deployment</p>
 <p>Async function for tearing down a node.</p>
 <p><strong>Synopsis:</strong></p>
-<div class="codehilite" style="background: #272822"><table class="codehilitetable"><tr><td class="linenos"><div class="linenodiv"><pre><span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">1</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">2</span>
-<span style="color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px;">3</span></pre></div></td><td class="code"><div><pre style="line-height: 125%;"><span></span><code>from ogc import actions, db
-result = actions.teardown_async(db.M.get_nodes().unwrap(), force=True)
-assert(len(result) &gt; 0)
-</code></pre></div></td></tr></table></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">actions</span><span class="p">,</span> <span class="n">db</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">teardown_async</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">M</span><span class="o">.</span><span class="n">get_nodes</span><span class="p">()</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -1493,7 +1426,7 @@ caution.</p></td>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.integrate", "toc.follow"], "search": "../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.8492ddcf.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d6c3db9e.min.js"></script>
       
     
   </body>
