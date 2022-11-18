@@ -1,44 +1,14 @@
 """ Enums
 """
 
-PID_FILE = "ogc-server.pid"
-LOCAL_ARTIFACT_PATH = "artifacts"
+from __future__ import annotations
 
+import typing as t
+
+LOCAL_ARTIFACT_PATH = "artifacts"
 SUPPORTED_PROVIDERS = ["AWS", "GOOGLE"]
 
-
-class SpecCore:
-    NAME = "name"
-    IMPORT_SSH_KEYS = "import-ssh-keys"
-    PROVIDERS = "providers"
-    LAYOUTS = "layouts"
-
-
-SPEC_CORE_LIST = [
-    SpecCore.NAME,
-    SpecCore.IMPORT_SSH_KEYS,
-    SpecCore.PROVIDERS,
-    SpecCore.LAYOUTS,
-]
-
-
-class SpecCoreLayout:
-    RUNS_ON = "runs-on"
-    USERNAME = "username"
-    SCRIPTS = "scripts"
-    PROVIDER = "provider"
-    ARCH = "arch"
-
-
-SPEC_CORE_LAYOUT_LIST = [
-    SpecCoreLayout.RUNS_ON,
-    SpecCoreLayout.ARCH,
-    SpecCoreLayout.USERNAME,
-    SpecCoreLayout.SCRIPTS,
-    SpecCoreLayout.PROVIDER,
-]
-
-CLOUD_IMAGE_MAP: dict[str, dict[str, dict[str, str]]] = {
+CLOUD_IMAGE_MAP: t.Mapping[str, t.Mapping[str, t.Mapping[str, str]]] = {
     "aws": {
         "arm64": {
             "ubuntu-2004": "ami-075c8e2e1712231db",

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 
 import arrow
@@ -25,7 +27,8 @@ console = Console(record=True)
     required=False,
     help="Stores the table output to svg or html. Determined by the file extension.",
 )
-def ls(by_tag, by_name, output_file):
+def ls(by_tag: str, by_name: str, output_file: str):
+    """List current nodes"""
     if by_tag and by_name:
         log.error(
             "Combined filtered options are not supported, please choose one.",

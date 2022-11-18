@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import os
 import typing as t
@@ -91,6 +93,7 @@ class Node:
     private_ip: str | None = field(init=False)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     extra: t.Mapping | None = None
+    tainted: bool = False
 
     @instance_name.default
     def _get_instance_name(self) -> str:

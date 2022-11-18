@@ -1,6 +1,8 @@
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 
+from __future__ import annotations
+
 import datetime
 import functools
 import os
@@ -77,10 +79,9 @@ class BaseProvisioner:
     def images(self, location: t.Optional[NodeLocation] = None) -> list[NodeImage]:
         return self.provisioner.list_images(location)
 
-    @retry(delay=5, jitter=(1, 5), tries=5)
+    @retry(delay=5, jitter=(1, 5), tries=5, logger=None)
     def _create_node(self, **kwargs: dict[str, object]) -> models.Node:
         _opts = kwargs.copy()
-        log.info(f"Spinning up {self.layout.name}")
         node = self.provisioner.create_node(**_opts)  # type: ignore
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
@@ -98,7 +99,7 @@ class BaseProvisioner:
     def get_key_pair(self, name: str) -> KeyPair:
         return self.provisioner.get_key_pair(name)
 
-    @retry(delay=5, jitter=(1, 5), tries=15)
+    @retry(delay=5, jitter=(1, 5), tries=15, logger=None)
     def delete_key_pair(self, key_pair: KeyPair) -> bool:
         return self.provisioner.delete_key_pair(key_pair)
 
@@ -134,7 +135,7 @@ class AWSProvisioner(BaseProvisioner):
             "region": self.env.get("AWS_REGION", "us-east-2"),
         }
 
-    @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
+    @retry(delay=5, tries=10, jitter=(5, 25), logger=None)
     def connect(self) -> NodeDriver:
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
@@ -239,7 +240,7 @@ class GCEProvisioner(BaseProvisioner):
             "datacenter": self.env.get("GOOGLE_DATACENTER", ""),
         }
 
-    @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
+    @retry(delay=5, tries=10, jitter=(5, 25), logger=None)
     @functools.lru_cache()
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
@@ -249,7 +250,7 @@ class GCEProvisioner(BaseProvisioner):
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
     def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
-        ...
+        return True
 
     def image(self, runs_on: str) -> NodeImage:
         # Pull from partial first
@@ -336,15 +337,13 @@ class GCEProvisioner(BaseProvisioner):
         node = self._create_node(**opts)
         return node
 
-    def node(self, **kwargs: dict[str, object]) -> t.Optional[NodeType]:
+    def node(self, **kwargs: dict[str, object]) -> NodeType | None:
         _nodes = self.provisioner.list_nodes()
         instance_id = None
         if "instance_id" in kwargs:
             instance_id = kwargs["instance_id"]
         _node = [n for n in _nodes if n.id == instance_id]
-        if _node:
-            return _node[0]
-        return None
+        return _node[0] if len(_node) > 0 else None
 
     def __str__(self) -> str:
         return f"<GCEProvisioner [{self.options['datacenter']}]>"

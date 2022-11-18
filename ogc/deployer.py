@@ -2,6 +2,9 @@
 # pylint: disable=wrong-import-order
 
 
+from __future__ import annotations
+
+import logging
 import tempfile
 import typing as t
 from pathlib import Path
@@ -18,11 +21,17 @@ from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry import retry
+from rich.padding import Padding
 from safetywrap import Err, Ok, Result
 
 from ogc import db, models
+from ogc.console import con
 from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
+
+# Disable paramiko info
+logging.getLogger("paramiko").setLevel(logging.WARNING)
+logging.getLogger("sh").setLevel(logging.WARNING)
 
 
 class Ctx(t.TypedDict):
@@ -46,13 +55,14 @@ class Deployer:
             return
         self._ssh_client = self._connect()
 
-    @retry(tries=5, delay=5, backoff=5)
+    @retry(tries=5, delay=5, jitter=(1, 5), logger=None)
     def _connect(self) -> ParamikoSSHClient:
         _client = ParamikoSSHClient(
             self.deployment.public_ip,
             username=self.deployment.layout.username,
             key=str(self.deployment.layout.ssh_private_key.expanduser()),
             timeout=300,
+            use_compression=True,
         )
         _client.connect()
         return _client
@@ -114,7 +124,6 @@ class Deployer:
                 steps.append(ScriptDeployment("chmod +x teardown"))
 
         if steps:
-            log.info(f"({self.deployment.instance_name}) Executing {len(steps)} steps")
             msd = MultiStepDeployment(steps)
             msd.run(self.node, self._ssh_client)
             db.M.save(
@@ -125,15 +134,18 @@ class Deployer:
         return Err("Unable to initiate deployment result")
 
     def run(self) -> Result[models.Node, str]:
-        log.info(
+        con.log(
             f"Establishing connection ({self.deployment.public_ip}) "
             f"({self.deployment.layout.username}) ({str(self.deployment.layout.ssh_private_key)})"
         )
 
         # Upload any files first
         if self.deployment.layout.remote_path:
-            log.info(
-                f"Uploading file/directory contents to {self.deployment.instance_name}"
+            con.log(
+                Padding(
+                    f"Uploading file/directory contents to [purple]{self.deployment.instance_name}[/purple]",
+                    (0, 0, 0, 1),
+                )
             )
             self.put(
                 ".",
@@ -144,7 +156,7 @@ class Deployer:
 
         return self.exec_scripts(self.deployment.layout.scripts)
 
-    @retry(tries=3, delay=5, backoff=5)
+    @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def put(
         self, src: str, dst: str, excludes: list[str], includes: list[str] = []
     ) -> None:
@@ -172,7 +184,7 @@ class Deployer:
             log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
             return None
 
-    @retry(tries=3, delay=5, backoff=5)
+    @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def get(self, dst: str, src: str) -> None:
         cmd_opts = [
             "-avz",
@@ -192,19 +204,19 @@ class Deployer:
 
 
 def show_result(model: models.Node) -> None:
-    log.info("Deployment Result: ")
+    con.log("Deployment Result: ")
     if not model.actions:
         log.error("No action results found.")
         return None
 
     toolz.thread_last(
         toolz.filter(lambda step: hasattr(step, "exit_code"), model.actions),
-        lambda step: log.info(f"  - ({step.exit_code}): {step}"),
+        lambda step: con.log(f"  - ({step.exit_code}): {step}"),
     )
 
-    log.info("Connection Information: ")
-    log.info(f"  - Node: {model.instance_name} {model.instance_state}")
-    log.info(
+    con.log("Connection Information: ")
+    con.log(f"  - Node: {model.instance_name} {model.instance_state}")
+    con.log(
         (
             f"  - ssh -i {model.layout.ssh_private_key.expanduser()} "
             f"{model.layout.username}@{model.public_ip}"
@@ -225,7 +237,10 @@ def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> model
     """Converts results from `MultistepDeployment` to `models.Actions`"""
     for step in msd.steps:
         if hasattr(step, "exit_status"):
-            log.info(f"{node.instance_name} :: recording action result: {step}")
+            con.log(
+                f"[purple]{node.instance_name}[/purple] :: "
+                f"{'[green]Success[/green]' if step.exit_status == 0 else '[red]Fail[/red]'}"
+            )
             if node.actions:
                 node.actions.append(
                     models.Actions(
@@ -242,5 +257,4 @@ def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> model
                         error=step.stderr,
                     )
                 ]
-    log.info(f"Recorded {len(msd.steps)} action results.")
     return node

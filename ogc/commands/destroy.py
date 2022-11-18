@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import sys
 
 import click
 
 from ogc import actions, db
+from ogc.console import con
 from ogc.log import Logger as log
 
 from .base import cli
@@ -48,7 +51,7 @@ def rm_all(force: bool, only_db: bool) -> None:
         sys.exit(1)
 
     results = actions.teardown_async(nodes=nodes, force=force, only_db=only_db)
-    log.error("Failed to teardown all nodes") if not results else log.info(
+    log.error("Failed to teardown all nodes") if not results else con.log(
         "Completed tearing down nodes"
     )
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __config_version__ = 1
 
 GLOBALS = {"serializer": "{{major}}.{{minor}}.{{patch}}"}

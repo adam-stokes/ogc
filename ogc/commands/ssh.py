@@ -1,4 +1,7 @@
 # pylint: disable=unexpected-keyword-arg
+from __future__ import annotations
+
+import logging
 import sys
 from pathlib import Path
 
@@ -6,10 +9,13 @@ import click
 import sh
 
 from ogc import actions, db, enums
+from ogc.console import con
 from ogc.log import Logger as log
 
 from ..deployer import Deployer
 from .base import cli
+
+logging.getLogger("sh").setLevel(logging.WARNING)
 
 
 @click.command(help="Login to a node")
@@ -67,7 +73,7 @@ def exec(by_tag: str, by_name: str, cmd: str) -> None:
         sys.exit(1)
     results = actions.exec_async(by_name, by_tag, cmd)
     if all(res for res in results):
-        log.info("All commands completed.")
+        con.log("All commands completed.")
         sys.exit(0)
 
     log.error("Some commands failed to complete.")
@@ -99,7 +105,7 @@ def exec_scripts(by_tag: str, by_name: str, path: str) -> None:
         filters.update({"name": by_name})
     results = actions.exec_scripts_async(path, filters)
     if all(res for res in results):
-        log.info("All commands completed successfully ...")
+        con.log("All commands completed successfully ...")
         sys.exit(0)
 
     log.error("Some commands [bold red]failed[/] to complete.")

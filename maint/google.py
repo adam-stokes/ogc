@@ -2,6 +2,7 @@
 """
 Maintenance script for Google. Helps clean up instances and firewalls.
 """
+from __future__ import annotations
 
 import os
 from concurrent.futures import ProcessPoolExecutor
@@ -9,6 +10,7 @@ from typing import Any, Iterator
 
 import click
 from click_didyoumean import DYMGroup
+from libcloud.compute.base import Node as NodeType
 
 from ogc import db
 from ogc.provision import choose_provisioner
@@ -16,11 +18,15 @@ from ogc.state import app
 
 nodes = db.get_nodes().unwrap_err()
 
-def _destroy_async(node):
+
+def _destroy_async(node: str) -> None:
+    """Destroys nodes"""
     engine = choose_provisioner("google", app.env)
     app.log.info(f"Removing :: {node}")
-    engine.node(instance_id=node).destroy()
-    return True
+    node_res: NodeType = engine.node(instance_id=node)  # type: ignore
+    if node_res:
+        node_res.destroy()
+    return None
 
 
 def teardown(nodes: list[int]) -> Iterator[Any]:

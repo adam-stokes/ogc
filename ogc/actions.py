@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import logging
 import os
 import typing as t
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -6,13 +9,17 @@ from pathlib import Path
 
 import sh
 from pampy import match
+from rich.padding import Padding
 from toolz.functoolz import partial
+from wrapt_timeout_decorator.wrapt_timeout_decorator import timeout
 
 from ogc import db, enums, models, state
+from ogc.console import con
 from ogc.deployer import Deployer
-from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
 from ogc.spec import CountCtx
+
+logging.getLogger("sh").setLevel(logging.WARNING)
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
@@ -42,10 +49,15 @@ def launch(layout: bytes) -> bytes:
         bytes: Pickled `models.Node` Instance if successful, None otherwise.
     """
     _layout: models.Layout = db.pickle_to_model(layout)
-    log.info(f"Provisioning: {_layout.name}")
     engine = choose_provisioner(name=_layout.provider, layout=_layout)
     engine.setup()
     model = engine.create()
+    con.log(
+        Padding(
+            f"{model.instance_name} [green]launched[/green]",
+            (0, 0, 0, 1),
+        )
+    )
 
     return db.model_as_pickle(model)
 
@@ -77,33 +89,34 @@ def launch_async(
     """
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        results = [
-            executor.submit(launch, db.model_as_pickle(layout))
-            for layout in layouts
-            for _ in range(layout.scale)
-        ]
-        wait(results)
-        nodes: list[models.Node] = [
-            db.pickle_to_model(node.result()) for node in results
-        ]
-        for node in nodes:
-            db.M.save(node.instance_name, node)
-
-        if with_deploy:
-            log.info(f"Running deployment scripts on {len(nodes)} nodes")
-
-            def run(node: bytes) -> bytes:
-                return db.model_as_pickle(
-                    Deployer(db.pickle_to_model(node)).run().unwrap()
-                )
-
+        with con.status("Waiting for nodes to start"):
             results = [
-                executor.submit(partial(run), db.model_as_pickle(node))
-                for node in nodes
+                executor.submit(launch, db.model_as_pickle(layout))
+                for layout in layouts
+                for _ in range(layout.scale)
             ]
             wait(results)
-            return [db.pickle_to_model(node.result()) for node in results]
-        return nodes
+            nodes: list[models.Node] = [
+                db.pickle_to_model(node.result()) for node in results
+            ]
+            for node in nodes:
+                db.M.save(node.instance_name, node)
+
+            if with_deploy:
+
+                def run(node: bytes) -> bytes:
+                    return db.model_as_pickle(
+                        Deployer(db.pickle_to_model(node)).run().unwrap()
+                    )
+
+                results = [
+                    executor.submit(partial(run), db.model_as_pickle(node))
+                    for node in nodes
+                ]
+                con.log(f"Running deployment scripts on {len(nodes)} nodes")
+                wait(results)
+                return [db.pickle_to_model(node.result()) for node in results]
+            return nodes
 
 
 def teardown(
@@ -133,13 +146,15 @@ def teardown(
         bytes: Pickled `models.Node` that was removed, None otherwise.
     """
     _node: models.Node = db.pickle_to_model(node)
-    log.info(f"Destroying: {_node.instance_name}")
     if not only_db:
         deploy = Deployer(_node, force=force)
         if not force:
             # Pull down artifacts if set
-            if _node.layout.artifacts:
-                log.info("Downloading artifacts")
+            if (
+                _node.layout.artifacts
+                and _node.instance_name
+                and _node.instance_state == "running"
+            ):
                 local_artifact_path = (
                     Path(enums.LOCAL_ARTIFACT_PATH) / _node.instance_name
                 )
@@ -147,14 +162,13 @@ def teardown(
                 deploy.get(_node.layout.artifacts, str(local_artifact_path))
 
             if not deploy.exec("./teardown").ok():
-                log.error(f"Unable to run teardown script on {_node.instance_name}")
+                con.log(
+                    f"[red]Unable to run teardown script on {_node.instance_name}[/red]"
+                )
 
-        is_destroyed = False
         if deploy.node:
-            is_destroyed = deploy.node.destroy()
-        if not is_destroyed:
-            log.critical(f"Unable to destroy {_node.instance_name}")
-        db.M.delete(_node.instance_name)
+            timeout(5)(deploy.node.destroy())
+    db.M.delete(_node.instance_name)
 
     return db.model_as_pickle(_node)
 
@@ -186,10 +200,13 @@ def teardown_async(
         list[models.Node]: List of instances destroyed
     """
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        func = partial(teardown, only_db=only_db, force=force)
-        results = [executor.submit(func, db.model_as_pickle(node)) for node in nodes]
-        wait(results)
-        return [db.pickle_to_model(node.result()) for node in results]
+        with con.status(f"Destroying {len(nodes)} nodes"):
+            func = partial(teardown, only_db=only_db, force=force)
+            results = [
+                executor.submit(func, db.model_as_pickle(node)) for node in nodes
+            ]
+            wait(results, timeout=5)
+            return [db.pickle_to_model(node.result()) for node in results]
 
 
 def sync(layout: bytes, overrides: dict[str, CountCtx]) -> bytes:
@@ -217,11 +234,11 @@ def sync(layout: bytes, overrides: dict[str, CountCtx]) -> bytes:
     override = overrides[_layout.name]
 
     def _sync_add() -> bytes:
-        log.info(f"Adding deployments for {_layout.name}")
+        con.log(f"Adding deployments for {_layout.name}")
         return launch(layout)
 
     def _sync_remove() -> bytes:
-        log.info(f"Removing deployments for {_layout.name}")
+        con.log(f"Removing deployments for {_layout.name}")
         for node in db.get_nodes().unwrap():
             if node.instance_name.endswith(_layout.name):
                 return teardown(db.model_as_pickle(node), force=True)
@@ -271,7 +288,7 @@ def sync_async(
         ]
         wait(results)
         nodes = [db.pickle_to_model(node.result()) for node in results]
-        log.info(f"Running deployment scripts on {len(nodes)} nodes")
+        con.log(f"Running deployment scripts on {len(nodes)} nodes")
 
         def run(node: bytes) -> bytes:
             return db.model_as_pickle(Deployer(db.pickle_to_model(node)).run().unwrap())
@@ -365,7 +382,7 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
         rows = [node for node in rows if node.instance_name == name]
     count = len(rows)
 
-    log.info(f"Executing '{cmd}' across {count} nodes.")
+    con.log(f"Executing '{cmd}' across {count} nodes.")
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(exec, cmd=cmd)
         results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
@@ -432,9 +449,10 @@ def exec_scripts_async(
     elif filters and "name" in filters:
         rows = [node for node in rows if node.instance_name == filters["name"]]
     count = len(rows)
-    log.info(f"Executing scripts from '{path}' across {count} nodes.")
+
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        func = partial(exec_scripts, path=path)
-        results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
-        wait(results)
-        return [db.pickle_to_model(node.result()) for node in results]
+        with con.status(f"Executing scripts from '{path}' across {count} nodes."):
+            func = partial(exec_scripts, path=path)
+            results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
+            wait(results)
+            return [db.pickle_to_model(node.result()) for node in results]
