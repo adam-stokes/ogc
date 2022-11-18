@@ -14,10 +14,7 @@ from ogc import db
 from ogc.provision import choose_provisioner
 from ogc.state import app
 
-if not app.engine:
-    app.engine = db.connect()
-    app.session = db.session(app.engine)
-
+nodes = db.get_nodes().unwrap_err()
 
 def _destroy_async(node):
     engine = choose_provisioner("google", app.env)
