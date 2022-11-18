@@ -5,38 +5,33 @@ ogc - provisioning, that's it.
 # Get started
 
 Read the [Getting Started Guide](https://adam-stokes.github.io/ogc/)
-## Quickstart
 
-OGC requires Postgres to function. The easiest way to fulfill this requirement is with **docker-compose**:
+## Prerequisites
 
-```yaml
-version: "3.9"
-
-services:
-  postgres:
-    image: postgres:11
-    environment:
-      - POSTGRES_DB=ogc
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      retries: 300
-      interval: 1s
-    ports:
-      - '5432:5432'
-```
-
-Bring up the services
-
- `$ docker-compose up`
+- Python 3.11+
+- [Poetry](https://python-poetry.org/)
 
 ## Install
+
+We use and recommend the use of **[Poetry](https://python-poetry.org/)**:
 
 ```shell
 $ pip install poetry
 $ poetry install
 ```
+
+!!! caution
+    If using poetry make sure to prefix running of `ogc` with the following:
+
+    ```
+    $ poetry run ogc
+    ```
+
+    Optionally, load up the virtualenv beforehand:
+
+    ```
+    $ poetry shell
+    ```
 
 Or install from [pypi](https://pypi.org):
 
@@ -71,39 +66,41 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
+!!! note
+    More information can be found in our [Providers](user-guide/providers.md) documentation.
+
 ## Define Provisioning
 
 Once setup is complete, a provision specification is needed. This defines `ssh-keys` and one or more `layouts` to be provisioned. 
 
-Create a file `ogc.yml` and place in the top level directory where `ogc` is run:
+Create a file `ogc.toml` and place in the top level directory where `ogc` is run:
 
-```yaml
-name: ci
+```toml
+name = "ci"
 
-# SSH Keys must be passwordless
-ssh-keys:
-  public: ~/.ssh/id_rsa_libcloud.pub
-  private: ~/.ssh/id_rsa_libcloud
+[ssh-keys]
+private = "~/.ssh/id_rsa_libcloud"
+public = "~/.ssh/id_rsa_libcloud.pub"
 
-layouts:
-  elastic-agent-sles: 
-    runs-on: sles-15
-    instance-size: e2-standard-8
-    username: ogc
-    scripts: fixtures/ex_deploy_sles
-    provider: google
-    scale: 5
-    remote-path: /home/ogc/ogc
-    include:
-      - .ogc-cache
-    exclude:
-      - .git
-      - .venv
-    artifacts: /home/ogc/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - sles-gcp
+[layouts.elastic-agent-ubuntu]
+artifacts = "/home/ubuntu/output/*.xml"
+exclude = [ ".git", ".venv", "artifacts" ]
+extra = { }
+include = [ ]
+instance-size = "e2-standard-4"
+ports = [ "22:22", "80:80", "443:443", "5601:5601" ]
+provider = "google"
+remote-path = "/home/ubuntu/ogc"
+runs-on = "ubuntu-2004-lts"
+scale = 1
+scripts = "fixtures/ex_deploy_ubuntu"
+tags = [ "elastic-agent-8-1-x", "ubuntu-gcp" ]
+username = "ubuntu"
 ```
+
+This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-8** with Ubuntu OS. 
+The `scripts` section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.
+
 ## Provision and Deploy
 
 Once the specification is set, environment variables configured and a postgres database is accessible, execute a deployment in a new terminal:
@@ -111,6 +108,17 @@ Once the specification is set, environment variables configured and a postgres d
 ```shell
 $ ogc launch
 ```
+
+!!! note
+    If the file is something other than `ogc.toml` append the `--spec` option to the launch command:
+
+```shell
+$ ogc launch --spec my-custom-provision.toml
+```
+
+# Next steps
+
+Learn how to manage your deployments in our [User Guide - Managing a deployment](user-guide/managing-nodes.md)
 
 # License
 

@@ -16,12 +16,19 @@ def get_new_uuid() -> str:
     return str(uuid.uuid1())
 
 
-def serialize(inst, field, value):
+def serialize(inst: str, field: str, value: str | datetime.datetime | Path) -> str:
     if isinstance(value, datetime.datetime):
         return value.isoformat()
     if isinstance(value, Path):
         return str(value)
     return value
+
+
+def convert_tags_to_slug_tags(tags: list[str] | None) -> list[str] | None:
+    """Converts tags to their slugged equivalent"""
+    if tags:
+        return [slugify(tag) for tag in tags]
+    return None
 
 
 @define
@@ -36,22 +43,14 @@ class Layout:
     username: str
     ssh_private_key: Path
     ssh_public_key: Path
-    tags: t.Optional[list[str]] = field()
-    ports: t.Optional[list[str]] = field()
-    arch: t.Optional[str] = "amd64"
-    artifacts: t.Optional[str] = None
-    exclude: t.Optional[list[str]] = None
-    extra: t.Optional[t.Mapping[str, str]] = {}
-    include: t.Optional[list[str]] = None
+    tags: list[str] | None = field(converter=convert_tags_to_slug_tags)
+    ports: list[str] | None = None
+    arch: str | None = "amd64"
+    artifacts: str | None = None
+    exclude: list[str] | None = None
+    extra: t.Mapping[str, str] | None = None
+    include: list[str] | None = None
     id: str = field(init=False, factory=get_new_uuid)
-
-    @tags.default
-    def _get_tags(self) -> list[str]:
-        return [slugify(tag) for tag in self.tags]
-
-    @ports.default
-    def _get_ports(self) -> list[str]:
-        return self.ports or list()
 
     def env(self) -> Dotty:
         return dotty({**dotenv_values(".env"), **os.environ})
@@ -61,7 +60,7 @@ class Layout:
 class Plan:
     layouts: list[Layout]
     name: str
-    ssh_keys: dict[str, Path]
+    ssh_keys: t.Mapping[str, Path]
     id: str = field(init=False, factory=get_new_uuid)
 
     def get_layout(self, name: str) -> list[Layout]:
@@ -73,25 +72,25 @@ class Actions:
     exit_code: int
     out: str
     error: str
-    command: t.Optional[str] = None
+    command: str | None = None
     id: str = field(init=False, factory=get_new_uuid)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
-    extra: dict = field(init=False, factory=dict)
+    extra: t.Mapping | None = None
 
 
 @define
 class Node:
     node: NodeType
     layout: Layout
-    actions: t.Optional[list[Actions]] = None
+    actions: list[Actions] | None = None
     id: str = field(init=False, factory=get_new_uuid)
-    instance_name: str = field(init=False)
-    instance_id: str = field(init=False)
-    instance_state: str = field(init=False)
-    public_ip: str = field(init=False)
-    private_ip: str = field(init=False)
+    instance_name: str | None = field(init=False)
+    instance_id: str | None = field(init=False)
+    instance_state: str | None = field(init=False)
+    public_ip: str | None = field(init=False)
+    private_ip: str | None = field(init=False)
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
-    extra: dict = field(init=False, factory=dict)
+    extra: t.Mapping | None = None
 
     @instance_name.default
     def _get_instance_name(self) -> str:

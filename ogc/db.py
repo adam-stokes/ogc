@@ -8,13 +8,17 @@ from safetywrap import Err, Ok, Result
 from ogc import models
 from ogc.log import Logger as log
 
+dill.settings["recurse"] = True
+
 
 def model_as_pickle(obj: object) -> bytes:
+    """Converts model object to bytes"""
     output: bytes = dill.dumps(obj)
     return output
 
 
 def pickle_to_model(obj: bytes) -> t.Any:
+    """Converts pickled bytes to object"""
     return dill.loads(obj)
 
 

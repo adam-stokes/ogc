@@ -38,34 +38,25 @@ Once complete, grab the AMI ID, as this will be used in the `layout` specificati
 
 To provision and deploy a Windows machine, the following example spec will work:
 
-``` yaml
+```toml
+name = "ci"
 
-name: ci
+[ssh-keys]
+public = "~/.ssh/id_rsa_libcloud.pub"
+private = "~/.ssh/id_rsa_libcloud"
 
-# SSH Keys must be passwordless
-ssh-keys:
-  public: ~/.ssh/id_rsa_libcloud.pub
-  private: ~/.ssh/id_rsa_libcloud
-
-layouts:
-  elastic-agent-windows: 
-    runs-on: ami-0587bd602f1da2f1d
-    instance-size: c5.2xlarge
-    username: ogc
-    scripts: fixtures/ex_deploy_windows
-    provider: aws
-    scale: 1
-    remote-path: ogc-src
-    exclude:
-      - .git
-      - .venv
-      - artifacts
-    artifacts: output\*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - windows-aws
-    ports:
-      - "22:22"
+[layouts.elastic-agent-windows]
+runs-on = "ami-0587bd602f1da2f1d"
+instance-size = "c5.2xlarge"
+username = "ogc"
+scripts = "fixtures/ex_deploy_windows"
+provider = "aws"
+scale = 1
+remote-path = "ogc-src"
+exclude = [ ".git", ".venv", "artifacts" ]
+artifacts = "output\\*.xml"
+tags = [ "elastic-agent-8.1.x", "windows-aws" ]
+ports = [ "22:22" ]
 ```
 
 Once defined, simply running:

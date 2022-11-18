@@ -1,3 +1,4 @@
 #!/bin/bash
-sudo elastic-agent uninstall -f
+
+echo "Im tore down!"
 exit $?

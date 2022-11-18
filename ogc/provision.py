@@ -77,7 +77,7 @@ class BaseProvisioner:
     def images(self, location: t.Optional[NodeLocation] = None) -> list[NodeImage]:
         return self.provisioner.list_images(location)
 
-    @retry(delay=5, backoff=2, tries=5)
+    @retry(delay=5, jitter=(1, 5), tries=5)
     def _create_node(self, **kwargs: dict[str, object]) -> models.Node:
         _opts = kwargs.copy()
         log.info(f"Spinning up {self.layout.name}")
@@ -98,7 +98,7 @@ class BaseProvisioner:
     def get_key_pair(self, name: str) -> KeyPair:
         return self.provisioner.get_key_pair(name)
 
-    @retry(backoff=3, tries=15)
+    @retry(delay=5, jitter=(1, 5), tries=15)
     def delete_key_pair(self, key_pair: KeyPair) -> bool:
         return self.provisioner.delete_key_pair(key_pair)
 
@@ -135,7 +135,6 @@ class AWSProvisioner(BaseProvisioner):
         }
 
     @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
-    @functools.cache
     def connect(self) -> NodeDriver:
         aws = get_driver(Provider.EC2)
         return aws(**self.options)
@@ -241,7 +240,7 @@ class GCEProvisioner(BaseProvisioner):
         }
 
     @retry(delay=5, backoff=5, tries=10, jitter=(5, 25))
-    @functools.cache
+    @functools.lru_cache()
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
         return gce(**self.options)

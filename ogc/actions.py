@@ -25,12 +25,14 @@ def launch(layout: bytes) -> bytes:
 
     **Synopsis:**
 
-        from ogc.spec import SpecLoader
-        from ogc import actions, db
+    ```python
+    from ogc.spec import SpecLoader
+    from ogc import actions, db
 
-        spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
-        nodes = [actions.launch(layout)
-                 for layout in spec.layouts]
+    spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
+    nodes = [actions.launch(layout)
+             for layout in spec.layouts]
+    ```
 
     Args:
         layout (bytes): `models.Layout` specification used
@@ -57,11 +59,13 @@ def launch_async(
 
     **Synopsis:**
 
-        from ogc.spec import SpecLoader
-        from ogc import actions, db, models
+    ```python
+    from ogc.spec import SpecLoader
+    from ogc import actions, db, models
 
-        spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
-        nodes = actions.launch_async(layouts=spec.layouts)
+    spec = SpecLoader.load(["/Users/adam/specs/ogc.toml"])
+    nodes = actions.launch_async(layouts=spec.layouts)
+    ```
 
     Args:
         layouts (list[models.Layout]): The layout specification used
@@ -113,9 +117,11 @@ def teardown(
 
     **Synopsis:**
 
-        from ogc import actions
-        name = "ogc-234342-elastic-agent-ubuntu"
-        is_down = actions.teardown(name, force=True)
+    ```python
+    from ogc import actions
+    name = "ogc-234342-elastic-agent-ubuntu"
+    is_down = actions.teardown(name, force=True)
+    ```
 
     Args:
         node (bytes): Pickled `models.Node` instance
@@ -164,9 +170,11 @@ def teardown_async(
 
     **Synopsis:**
 
-        from ogc import actions, db
-        result = actions.teardown_async(db.M.get_nodes().unwrap(), force=True)
-        assert(len(result) > 0)
+    ```python
+    from ogc import actions, db
+    result = actions.teardown_async(db.M.get_nodes().unwrap(), force=True)
+    assert(len(result) > 0)
+    ```
 
     Args:
         nodes (list[models.Node]): The node name to teardown
@@ -191,10 +199,12 @@ def sync(layout: bytes, overrides: dict[str, CountCtx]) -> bytes:
 
     **Synopsis:**
 
-        from ogc import actions, state
-        layout = app.spec.layouts[0]
-        result = actions.sync(layout, overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
-        result == True
+    ```python
+    from ogc import actions, state
+    layout = app.spec.layouts[0]
+    result = actions.sync(layout, overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
+    result == True
+    ```
 
     Args:
         layout (bytes): The Pickled `models.Layout`
@@ -237,10 +247,12 @@ def sync_async(
 
     **Synopsis:**
 
-        from ogc import actions, state
-        results = actions.sync_async(app.spec.layouts,
-            overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
-        all(result == True for result in results)
+    ```python
+    from ogc import actions, state
+    results = actions.sync_async(app.spec.layouts,
+        overrides={'elastic-agent-ubuntu': {'action': 'add', remaining: 5}})
+    all(result == True for result in results)
+    ```
 
     Args:
         layouts (list[models.Layout]): The list of `models.Layout` of the deployment
@@ -278,11 +290,13 @@ def exec(node: bytes, cmd: str) -> bool:
 
     **Synopsis:**
 
-        from ogc import actions, state, db
-        node = db.get_nodes().unwrap()[0]
-        actions.exec(node, "ls -l /")
-        for action in node.actions:
-            print(action.exit_code, action.out, action.error)
+    ```python
+    from ogc import actions, state, db
+    node = db.get_nodes().unwrap()[0]
+    actions.exec(node, "ls -l /")
+    for action in node.actions:
+        print(action.exit_code, action.out, action.error)
+    ```
 
     Args:
         node (models.Node): The `models.Node` to execute a command on
@@ -328,10 +342,12 @@ def exec_async(name: str, tag: str, cmd: str) -> list[bool]:
 
     **Synopsis:**
 
-        from ogc import actions, state, db
-        node = db.query(db.Node).filter(db.Node.tags.contains([tag]))
-        results = actions.exec_async(node, "ls -l /")
-        all(result == True for result in results)
+    ```python
+    from ogc import actions, state, db
+    node = db.query(db.Node).filter(db.Node.tags.contains([tag]))
+    results = actions.exec_async(node, "ls -l /")
+    all(result == True for result in results)
+    ```
 
     Args:
         name (str): The node name to execute a command on
@@ -364,10 +380,12 @@ def exec_scripts(node: bytes, path: str) -> bytes:
 
     **Synopsis:**
 
-        from ogc import actions, state, db
-        node = db.query(db.Node).first()
-        result = actions.exec_scripts(node, "templates/deploy/ubuntu")
-        result == True
+    ```python
+    from ogc import actions, state, db
+    node = db.query(db.Node).first()
+    result = actions.exec_scripts(node, "templates/deploy/ubuntu")
+    result == True
+    ```
 
     Args:
         node (bytes): The Pickled `models.Node` to execute scripts on
@@ -391,15 +409,15 @@ def exec_scripts_async(
 
     **Synopsis:**
 
-        from ogc import actions, state, db
-        nodes = db.query(db.Node).all()
-        results = actions.exec_scripts_async(nodes, "templates/deploy/ubuntu")
-        all(result == True for result in results)
+    ```python
+    from ogc import actions, state, db
+    results = actions.exec_scripts_async(path="templates/deploy/ubuntu", filters={"name": "ogc-1"})
+    all(result == True for result in results)
+    ```
 
     Args:
-        name (str): The node name to execute scripts on
-        tag (str): The node tag to query, allows running across multiple nodes.
         path (str): The path where the scripts reside locally
+        filters (Mapping[str, str]): Filters to pass into exec, currently `name` and `tag` are supported.
 
     Returns:
         list[models.Node]: `models.Node` if succesful, False otherwise.

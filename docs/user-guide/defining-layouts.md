@@ -4,31 +4,24 @@ Learn the layout specification and how to create your own provisioning layouts.
 
 All layouts reside under the `layouts` key in the provision specification:
 
-```yaml
-layouts:
-  elastic-agent-sles: 
-    runs-on: sles-15
-    instance-size: e2-standard-8
-    username: ogc
-    scripts: fixtures/ex_deploy_sles
-    provider: google
-    scale: 5
-    remote-path: /home/ogc/ogc
-    include:
-      - .ogc-cache
-    exclude:
-      - .git
-      - .venv
-    artifacts: /home/ogc/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - sles-gcp
-    ports:
-      - "80:80"
-      - "443:443"
+```toml
+[layouts.elastic-agent-ubuntu]
+artifacts = "/home/ubuntu/output/*.xml"
+exclude = [ ".git", ".venv", "artifacts" ]
+extra = { }
+include = [ ]
+instance-size = "e2-standard-4"
+ports = [ "22:22", "80:80", "443:443", "5601:5601" ]
+provider = "google"
+remote-path = "/home/ubuntu/ogc"
+runs-on = "ubuntu-2004-lts"
+scale = 1
+scripts = "fixtures/ex_deploy_ubuntu"
+tags = [ "elastic-agent-8-1-x", "ubuntu-gcp" ]
+username = "ubuntu"
 ```
 
-Each layout has a friendly name associated as seen by `elastic-agent-sles`. The next section is going to go over each option and describe its meaning.
+Each layout has a friendly name associated as seen by `elastic-agent-ubuntu`. The next section is going to go over each option and describe its meaning.
 
 **provider**
 
@@ -58,7 +51,7 @@ Define the base OS image to be deployed on to the nodes. The current supported l
 
 Define the machine size, this is dependent on which **provider** is chosen. The **instance-size** correlates with the instance size naming for each cloud. 
 
-For example, on AWS you would use `instance-size: c5.4xlarge` and in Google's case, `instance-size: e2-standard-8`.
+For example, on AWS you would use `instance-size = "c5.4xlarge"` and in Google's case, `instance-size = "e2-standard-4"`.
 
 **username**
 
@@ -119,59 +112,53 @@ OGC supports the concept of variants. In OGC's case, variants are handled by mul
 
 What this means is that we can take a base spec file such as:
 
-```yaml
-name: ci
-ssh-keys:
-  public: id_rsa.pub
-  private: id_rsa
+```toml
+name = "ci"
 
-layouts:
-  elastic-agent-sles: 
-    runs-on: sles-15
-    instance-size: e2-standard-8
-    username: ogc
-    scripts: fixtures/ex_deploy_sles
-    provider: google
-    scale: 5
-    remote-path: /home/ogc/ogc
-    include:
-      - .ogc-cache
-    exclude:
-      - .git
-      - .venv
-    artifacts: /home/ogc/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - sles-gcp
-  elastic-agent-ubuntu: 
-    runs-on: ubuntu-latest
-    instance-size: e2-standard-8
-    username: ogc
-    scripts: fixtures/ex_deploy_ubuntu
-    provider: google
-    scale: 5
-    remote-path: /home/ogc/ogc
-    exclude:
-      - .git
-      - .venv
-    artifacts: /home/ogc/output/*.xml
-    tags:
-      - elastic-agent-8.1.x
-      - ubuntu-gcp
+[ssh-keys]
+public = "id_rsa.pub"
+private = "id_rsa"
+
+[layouts.elastic-agent-sles]
+runs-on = "sles-15"
+instance-size = "e2-standard-8"
+username = "ogc"
+scripts = "fixtures/ex_deploy_sles"
+provider = "google"
+scale = 5
+remote-path = "/home/ogc/ogc"
+include = [ ".ogc-cache" ]
+exclude = [ ".git", ".venv" ]
+artifacts = "/home/ogc/output/*.xml"
+tags = [ "elastic-agent-8.1.x", "sles-gcp" ]
+
+[layouts.elastic-agent-ubuntu]
+runs-on = "ubuntu-latest"
+instance-size = "e2-standard-8"
+username = "ogc"
+scripts = "fixtures/ex_deploy_ubuntu"
+provider = "google"
+scale = 5
+remote-path = "/home/ogc/ogc"
+exclude = [ ".git", ".venv" ]
+artifacts = "/home/ogc/output/*.xml"
+tags = [ "elastic-agent-8.1.x", "ubuntu-gcp" ]
+
 ```
 
-The name of the file doesn't matter, we'll call this file `base-spec.yml`.
+The name of the file doesn't matter, we'll call this file `base-spec.toml`.
 
-Now if we need to change certain aspects of this base deploy specification we can define a second YAML file, we'll call it `ubuntu-1804-no-sles.yml`. 
+Now if we need to change certain aspects of this base deploy specification we can define a second YAML file, we'll call it `ubuntu-1804-no-sles.toml`. 
 
 In this example, let's change the `username` and `runs-on` for the **ubuntu** layout, and let's also remove the **sles** layout:
 
-```yaml
-layouts:
-  elastic-agent-sles: {}
-  elastic-agent-ubuntu: 
-    runs-on: ubuntu-1804
-    username: ubuntu
+```toml
+[layouts]
+elastic-agent-sles = { }
+
+  [layouts.elastic-agent-ubuntu]
+  runs-on = "ubuntu-1804"
+  username = "ubuntu"
 ```
 
 The merging of the specifications will remove any keys that exist if the value of the key is `{}` (signaling an empty stanza). The remaining keys that match up with the original spec will then be overridden and the rest of the specification is left untouched.

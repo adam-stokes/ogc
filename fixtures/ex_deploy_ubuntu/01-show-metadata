@@ -13,5 +13,4 @@ echo "[ID: ${node.instance_id}] Name: ${node.instance_name} || Connection: ${nod
 echo "### CURRENT NODE"
 
 
-mkdir -p $HOME/output
-touch $HOME/output/test.xml
+mkdir -p $HOME/output && touch $HOME/output/test.xml

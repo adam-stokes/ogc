@@ -3,8 +3,8 @@
 
 
 import tempfile
+import typing as t
 from pathlib import Path
-from typing import Any, TypedDict
 
 import sh
 import toolz
@@ -25,10 +25,10 @@ from ogc.log import Logger as log
 from ogc.provision import choose_provisioner
 
 
-class Ctx(TypedDict):
-    env: dict
-    node: models.Node
-    db: Any
+class Ctx(t.TypedDict):
+    env: t.Required[dict]
+    node: t.Required[models.Node]
+    db: t.Required[t.Any]
 
 
 class Deployer:
