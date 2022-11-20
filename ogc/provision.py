@@ -26,7 +26,9 @@ from retry import retry
 from ogc import models
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
-from ogc.log import Logger as log
+from ogc.log import get_logger
+
+log = get_logger(__name__)
 
 
 class BaseProvisioner:

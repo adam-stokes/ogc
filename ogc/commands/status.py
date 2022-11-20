@@ -8,11 +8,13 @@ from rich.table import Table
 from rich.text import Text
 
 from ogc import actions
-from ogc.log import Logger as log
+from ogc.log import get_logger
 
 from ..spec import SpecLoader, deploy_status, is_degraded
 from ..spec import status as status_fn
 from .base import cli
+
+log = get_logger(__name__)
 
 
 @click.command(help="Get status of deployment")

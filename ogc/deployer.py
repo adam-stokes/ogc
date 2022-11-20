@@ -25,13 +25,11 @@ from rich.padding import Padding
 from safetywrap import Err, Ok, Result
 
 from ogc import db, models
-from ogc.console import con
-from ogc.log import Logger as log
+from ogc.log import CONSOLE as con
+from ogc.log import get_logger
 from ogc.provision import choose_provisioner
 
-# Disable paramiko info
-logging.getLogger("paramiko").setLevel(logging.WARNING)
-logging.getLogger("sh").setLevel(logging.WARNING)
+log = get_logger(__name__)
 
 
 class Ctx(t.TypedDict):
@@ -142,10 +140,7 @@ class Deployer:
         # Upload any files first
         if self.deployment.layout.remote_path:
             con.log(
-                Padding(
-                    f"Uploading file/directory contents to [purple]{self.deployment.instance_name}[/purple]",
-                    (0, 0, 0, 1),
-                )
+                f"Uploading file/directory contents to [purple]{self.deployment.instance_name}[/purple]",
             )
             self.put(
                 ".",

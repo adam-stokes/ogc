@@ -8,7 +8,9 @@ from attr import define, field
 from safetywrap import Err, Ok, Result
 
 from ogc import models
-from ogc.log import Logger as log
+from ogc.log import get_logger
+
+log = get_logger(__name__)
 
 dill.settings["recurse"] = True
 

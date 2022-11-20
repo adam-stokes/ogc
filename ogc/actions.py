@@ -14,8 +14,8 @@ from toolz.functoolz import partial
 from wrapt_timeout_decorator.wrapt_timeout_decorator import timeout
 
 from ogc import db, enums, models, state
-from ogc.console import con
 from ogc.deployer import Deployer
+from ogc.log import CONSOLE as con
 from ogc.provision import choose_provisioner
 from ogc.spec import CountCtx
 
@@ -63,7 +63,8 @@ def launch(layout: bytes) -> bytes:
 
 
 def launch_async(
-    layouts: list[models.Layout], with_deploy: bool = True
+    layouts: list[models.Layout],
+    with_deploy: bool = True,
 ) -> list[models.Node]:
     """Launch a node asynchronously.
 

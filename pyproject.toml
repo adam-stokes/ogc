@@ -42,7 +42,7 @@ pytest-cov = "^4.0.0"
 [tool.mypy]
 allow_redefinition = false
 check_untyped_defs = true
-disallow_any_explicit = true
+disallow_any_explicit = false
 disallow_untyped_calls = true
 ignore_errors = false
 ignore_missing_imports = true

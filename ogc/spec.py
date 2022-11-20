@@ -17,7 +17,9 @@ from toolz.curried import filter
 
 from ogc import db, models
 from ogc.exceptions import SpecLoaderException
-from ogc.log import Logger as log
+from ogc.log import get_logger
+
+log = get_logger(__name__)
 
 
 class CountCtx(TypedDict):

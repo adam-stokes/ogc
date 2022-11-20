@@ -7,7 +7,9 @@ from types import SimpleNamespace
 
 from dotenv import dotenv_values
 
-from ogc.log import Logger as log
+from ogc.log import get_logger
+
+log = get_logger(__name__)
 
 
 def load_env():

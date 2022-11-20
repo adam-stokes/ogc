@@ -8,10 +8,11 @@ from rich.console import Console
 from rich.table import Table
 
 from ogc import db
-from ogc.log import Logger as log
+from ogc.log import get_logger
 
 from .base import cli
 
+log = get_logger(__name__)
 console = Console(record=True)
 
 
@@ -27,7 +28,7 @@ console = Console(record=True)
     required=False,
     help="Stores the table output to svg or html. Determined by the file extension.",
 )
-def ls(by_tag: str, by_name: str, output_file: str):
+def ls(by_tag: str, by_name: str, output_file: str) -> None:
     """List current nodes"""
     if by_tag and by_name:
         log.error(

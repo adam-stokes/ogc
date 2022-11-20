@@ -1,7 +1,6 @@
 # pylint: disable=unexpected-keyword-arg
 from __future__ import annotations
 
-import logging
 import sys
 from pathlib import Path
 
@@ -9,13 +8,13 @@ import click
 import sh
 
 from ogc import actions, db, enums
-from ogc.console import con
-from ogc.log import Logger as log
+from ogc.log import CONSOLE as con
+from ogc.log import get_logger
 
 from ..deployer import Deployer
 from .base import cli
 
-logging.getLogger("sh").setLevel(logging.WARNING)
+log = get_logger(__name__)
 
 
 @click.command(help="Login to a node")

@@ -4,9 +4,11 @@ import sys
 
 import click
 
-from ogc.log import Logger as log
+from ogc.log import get_logger
 
 from .base import cli
+
+log = get_logger(__name__)
 
 
 @click.command(help="Launches IPython REPL")
