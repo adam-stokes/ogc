@@ -248,6 +248,9 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
+    def destroy(self, node: NodeType) -> bool:
+        return self.provisioner.destroy_node(node, ex_sync=False)
+
     def setup(self) -> None:
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 

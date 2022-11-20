@@ -11,7 +11,6 @@ import sh
 from pampy import match
 from rich.padding import Padding
 from toolz.functoolz import partial
-from wrapt_timeout_decorator.wrapt_timeout_decorator import timeout
 
 from ogc import db, enums, models, state
 from ogc.deployer import Deployer
@@ -168,7 +167,7 @@ def teardown(
                 )
 
         if deploy.node:
-            timeout(5)(deploy.node.destroy())
+            deploy.engine.provisioner.destroy_node(_node.node, ex_sync=False)
     db.M.delete(_node.instance_name)
 
     return db.model_as_pickle(_node)

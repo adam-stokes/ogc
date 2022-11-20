@@ -44,11 +44,11 @@ class Deployer:
         self.env = self.deployment.layout.env()
         self.force = force
 
-        engine = choose_provisioner(
+        self.engine = choose_provisioner(
             name=self.deployment.layout.provider,
             layout=self.deployment.layout,
         )
-        self.node = engine.node(instance_id=self.deployment.instance_id)
+        self.node = self.engine.node(instance_id=self.deployment.instance_id)
         if not self.node:
             return
         self._ssh_client = self._connect()
