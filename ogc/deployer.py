@@ -4,7 +4,6 @@
 
 from __future__ import annotations
 
-import logging
 import tempfile
 import typing as t
 from pathlib import Path
@@ -21,7 +20,6 @@ from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry import retry
-from rich.padding import Padding
 from safetywrap import Err, Ok, Result
 
 from ogc import db, models
@@ -232,7 +230,7 @@ def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> model
     """Converts results from `MultistepDeployment` to `models.Actions`"""
     for step in msd.steps:
         if hasattr(step, "exit_status"):
-            con.log(
+            con.print(
                 f"[purple]{node.instance_name}[/purple] :: "
                 f"{'[green]Success[/green]' if step.exit_status == 0 else '[red]Fail[/red]'}"
             )

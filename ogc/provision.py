@@ -44,7 +44,7 @@ class BaseProvisioner:
     def connect(self) -> NodeDriver:
         raise NotImplementedError()
 
-    def create(self) -> models.Node:
+    def create(self) -> list[models.Node]:
         raise NotImplementedError()
 
     def setup(self) -> None:
@@ -57,6 +57,10 @@ class BaseProvisioner:
 
     def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node)
+
+    def destroy_all_nodes(self, nodes: list[NodeType]) -> bool:
+        """Perform destroying of all nodes if provisioner supported"""
+        raise NotImplementedError()
 
     def node(self, **kwargs: dict[str, t.Union[str, object]]) -> t.Optional[NodeType]:
         raise NotImplementedError()
@@ -173,7 +177,7 @@ class AWSProvisioner(BaseProvisioner):
     def delete_firewall(self, name: str) -> None:
         pass
 
-    def create(self) -> models.Node:
+    def create(self) -> list[models.Node]:
         pub_key = self.layout.ssh_public_key.expanduser().read_text()
         auth = NodeAuthSSHKey(pub_key)
         image = self.image(self.layout.runs_on)
@@ -190,7 +194,8 @@ class AWSProvisioner(BaseProvisioner):
             size=size,
             auth=auth,
             ex_securitygroup=self.layout.name,
-            # ex_spot=True,
+            ex_spot=True,
+            ex_maxcount=self.layout.scale,
             ex_userdata=self._userdata()
             if "windows" not in self.layout.runs_on
             else "",
@@ -200,19 +205,20 @@ class AWSProvisioner(BaseProvisioner):
 
         # Store some metadata for helping with cleanup
         now = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        self.layout.tags.append(now)
-        self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
-        tags["created"] = now
-        tags["user_tag"] = f"user-{os.environ.get('USER', 'ogc')}"
-        # Store some extra metadata similar to what other projects use
-        epoch = str(datetime.datetime.now().timestamp())
-        tags["created_date"] = epoch
-        tags["environment"] = "ogc"
-        tags["repo"] = "ogc"
+        if self.layout.tags:
+            self.layout.tags.append(now)
+            self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
+            tags["created"] = now
+            tags["user_tag"] = f"user-{os.environ.get('USER', 'ogc')}"
+            # Store some extra metadata similar to what other projects use
+            epoch = str(datetime.datetime.now().timestamp())
+            tags["created_date"] = epoch
+            tags["environment"] = "ogc"
+            tags["repo"] = "ogc"
 
-        node = self._create_node(**opts)
-        self.provisioner.ex_create_tags(self.node(instance_id=node.instance_id), tags)  # type: ignore
-        return node
+        _nodes = self.provisioner.create_node(**_opts)  # type: ignore
+        _nodes_models = [models.Node(node=node, layout=self.layout) for node in _nodes]
+        return _nodes_models
 
     def node(self, **kwargs: dict[str, object]) -> NodeType:
         instance_id = kwargs.get("instance_id", None)
@@ -250,6 +256,10 @@ class GCEProvisioner(BaseProvisioner):
 
     def destroy(self, node: NodeType) -> bool:
         return self.provisioner.destroy_node(node, ex_sync=False)
+
+    def destroy_all_nodes(self, nodes: list[NodeType]) -> bool:
+        _nodes = self.provisioner.ex_destroy_multiple_nodes(node_list=nodes, destroy_boot_disk=True)  # type: ignore
+        return all([node is True for node in _nodes])
 
     def setup(self) -> None:
         self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
@@ -290,7 +300,7 @@ class GCEProvisioner(BaseProvisioner):
     def list_firewalls(self) -> list[str]:
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
-    def create(self) -> models.Node:
+    def create(self) -> list[models.Node]:
         image = self.image(self.layout.runs_on)
         if not image and not self.layout.username:
             raise ProvisionException(
@@ -320,27 +330,29 @@ class GCEProvisioner(BaseProvisioner):
             self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
 
         now = datetime.datetime.utcnow().strftime("created-%Y-%m-%d")
-        self.layout.tags.append(now)
-        self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
-        # Store some extra metadata similar to what other projects use
-        self.layout.tags.append("environment-ogc")
-        self.layout.tags.append("repo-ogc")
+        if self.layout.tags:
+            self.layout.tags.append(now)
+            self.layout.tags.append(f"user-{os.environ.get('USER', 'ogc')}")
+            # Store some extra metadata similar to what other projects use
+            self.layout.tags.append("environment-ogc")
+            self.layout.tags.append("repo-ogc")
 
-        boot_volume = self.provisioner.create_volume(
-            size=100, name=f"ogc-boot-{str(uuid.uuid4())[:8]}", image=image
-        )
-
+        suffix = str(uuid.uuid4())[:4]
         opts = dict(
-            name=f"ogc-{str(uuid.uuid4())[:8]}-{self.layout.name}",
+            base_name=f"ogc-{self.layout.name}-{suffix}",
             image=image,
             size=size,
+            number=self.layout.scale,
             ex_metadata=ex_metadata,
             ex_tags=self.layout.tags,
+            ex_labels=self.layout.labels,
             ex_disk_type="pd-ssd",
-            ex_boot_disk=boot_volume,
+            ex_disk_size=100,
+            ex_preemptible=True,
         )
-        node = self._create_node(**opts)
-        return node
+        _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
+        _nodes_models = [models.Node(node=node, layout=self.layout) for node in _nodes]
+        return _nodes_models
 
     def node(self, **kwargs: dict[str, object]) -> NodeType | None:
         _nodes = self.provisioner.list_nodes()

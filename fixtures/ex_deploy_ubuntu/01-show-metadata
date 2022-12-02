@@ -2,7 +2,9 @@
 
 echo "### ALL NODES"
 % for obj in db.get_nodes().unwrap():
+% if obj.layout.tags:
 echo "${', '.join(obj.layout.tags)}" > $HOME/tags.txt
+% endif
 echo "[ID: ${obj.instance_id}] Name: ${obj.instance_name} || Connection: ${obj.layout.username}@${obj.public_ip} || Provider: ${obj.layout.provider}"
 % endfor
 echo "### ALL NODES"

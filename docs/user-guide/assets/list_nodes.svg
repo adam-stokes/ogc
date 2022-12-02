@@ -1,147 +1,100 @@
-<svg width="3832.2000000000003" height="912" viewBox="0 0 3832.2000000000003 912"
-     xmlns="http://www.w3.org/2000/svg">
+<svg class="rich-terminal" viewBox="0 0 3691 294.0" xmlns="http://www.w3.org/2000/svg">
+    <!-- Generated with Rich https://www.textualize.io -->
     <style>
-        @font-face {
-            font-family: "Fira Code";
-            src: local("FiraCode-Regular"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
-            font-style: normal;
-            font-weight: 400;
-        }
-        @font-face {
-            font-family: "Fira Code";
-            src: local("FiraCode-Bold"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
-                 url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
-            font-style: bold;
-            font-weight: 700;
-        }
-        span {
-            display: inline-block;
-            white-space: pre;
-            vertical-align: top;
-            font-size: 18px;
-            font-family:'Fira Code','Cascadia Code',Monaco,Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        .blink {
-           animation: blinker 1s infinite;
-        }
-        @keyframes blinker {
-            from { opacity: 1.0; }
-            50% { opacity: 0.3; }
-            to { opacity: 1.0; }
-        }
-        #wrapper {
-            padding: 140px;
-            padding-top: 100px;
-        }
-        #terminal {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #0c0c0c;
-            border-radius: 14px;
-            outline: 1px solid #484848;
-        }
-        #terminal:after {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            content: '';
-            border-radius: 14px;
-            background: rgb(71,77,102);
-            background: linear-gradient(90deg, #804D69 0%, #4E4B89 100%);
-            transform: rotate(-4.5deg);
-            z-index: -1;
-        }
-        #terminal-header {
-            position: relative;
-            width: 100%;
-            background-color: #2e2e2e;
-            margin-bottom: 12px;
-            font-weight: bold;
-            border-radius: 14px 14px 0 0;
-            color: #f2f2f2;
-            font-size: 18px;
-            box-shadow: inset 0px -1px 0px 0px #4e4e4e,
-                        inset 0px -4px 8px 0px #1a1a1a;
-        }
-        #terminal-title-tab {
-            display: inline-block;
-            margin-top: 14px;
-            margin-left: 124px;
-            font-family: sans-serif;
-            padding: 14px 28px;
-            border-radius: 6px 6px 0 0;
-            background-color: #0c0c0c;
-            box-shadow: inset 0px 1px 0px 0px #4e4e4e,
-                        0px -4px 4px 0px #1e1e1e,
-                        inset 1px 0px 0px 0px #4e4e4e,
-                        inset -1px 0px 0px 0px #4e4e4e;
-        }
-        #terminal-traffic-lights {
-            position: absolute;
-            top: 24px;
-            left: 20px;
-        }
-        #terminal-body {
-            line-height: 22px;
-            padding: 14px;
-        }
-        .r1 {color: #f2f2f2; text-decoration-color: #f2f2f2;background-color: #0c0c0c;}
-.r2 {font-style: italic;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
-.r3 {color: #0dbc79; text-decoration-color: #0dbc79; font-style: italic;background-color: #0c0c0c;}
-.r4 {font-weight: bold;color: #f2f2f2; text-decoration-color: #f2f2f2;;background-color: #0c0c0c;}
-.r5 {color: #cd3131; text-decoration-color: #cd3131;background-color: #0c0c0c;}
+
+    @font-face {
+        font-family: "Fira Code";
+        src: local("FiraCode-Regular"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Regular.woff2") format("woff2"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Regular.woff") format("woff");
+        font-style: normal;
+        font-weight: 400;
+    }
+    @font-face {
+        font-family: "Fira Code";
+        src: local("FiraCode-Bold"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff2/FiraCode-Bold.woff2") format("woff2"),
+                url("https://cdnjs.cloudflare.com/ajax/libs/firacode/6.2.0/woff/FiraCode-Bold.woff") format("woff");
+        font-style: bold;
+        font-weight: 700;
+    }
+
+    .terminal-2594011904-matrix {
+        font-family: Fira Code, monospace;
+        font-size: 20px;
+        line-height: 24.4px;
+        font-variant-east-asian: full-width;
+    }
+
+    .terminal-2594011904-title {
+        font-size: 18px;
+        font-weight: bold;
+        font-family: arial;
+    }
+
+    .terminal-2594011904-r1 { fill: #c5c8c6 }
+.terminal-2594011904-r2 { fill: #c5c8c6;font-style: italic; }
+.terminal-2594011904-r3 { fill: #98a84b;font-style: italic; }
+.terminal-2594011904-r4 { fill: #d0b344 }
+.terminal-2594011904-r5 { fill: #af00ff }
+.terminal-2594011904-r6 { fill: #98a84b }
+.terminal-2594011904-r7 { fill: #cc555a }
     </style>
-    <foreignObject x="0" y="0" width="100%" height="100%">
-        <body xmlns="http://www.w3.org/1999/xhtml">
-            <div id="wrapper">
-                <div id="terminal">
-                    <div id='terminal-header'>
-                        <svg id="terminal-traffic-lights" width="90" height="21" viewBox="0 0 90 21" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="14" cy="8" r="8" fill="#ff6159"/>
-                            <circle cx="38" cy="8" r="8" fill="#ffbd2e"/>
-                            <circle cx="62" cy="8" r="8" fill="#28c941"/>
-                        </svg>
-                        <div id="terminal-title-tab">Node List Output</div>
-                    </div>
-                    <div id='terminal-body'>
-                        <div><span class="r1">                                                         </span><span class="r2">                                                                                      Node Count: </span><span class="r3">5</span><span class="r2">                                                                                      </span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">┏━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">┃</span><span class="r4"> ID  </span><span class="r1">┃</span><span class="r4"> Name                              </span><span class="r1">┃</span><span class="r4"> Provider </span><span class="r1">┃</span><span class="r4"> Created        </span><span class="r1">┃</span><span class="r4"> Status  </span><span class="r1">┃</span><span class="r4"> Connection                                                   </span><span class="r1">┃</span><span class="r4"> Tags                 </span><span class="r1">┃</span><span class="r4"> Actions         </span><span class="r1">┃</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">┡━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│ </span><span class="r1">193</span><span class="r1"> │ </span><span class="r1">ogc-4d4e5028-elastic-agent-debian</span><span class="r1"> │ </span><span class="r1">aws     </span><span class="r1"> │ </span><span class="r1">14 minutes ago</span><span class="r1"> │ </span><span class="r1">running</span><span class="r1"> │ </span><span class="r1">ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@52.15.220.228</span><span class="r1"> │ </span><span class="r1">elastic-agent-8-1-x,</span><span class="r1"> │ pass: 2 fail: </span><span class="r5">1</span><span class="r1"> │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">ubuntu-aws,         </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">created-2022-04-04, </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">user-adam           </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│ </span><span class="r1">192</span><span class="r1"> │ </span><span class="r1">ogc-69a61359-elastic-agent-debian</span><span class="r1"> │ </span><span class="r1">aws     </span><span class="r1"> │ </span><span class="r1">14 minutes ago</span><span class="r1"> │ </span><span class="r1">running</span><span class="r1"> │ </span><span class="r1">ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@3.23.128.228 </span><span class="r1"> │ </span><span class="r1">elastic-agent-8-1-x,</span><span class="r1"> │ pass: 2 fail: </span><span class="r5">1</span><span class="r1"> │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">ubuntu-aws,         </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">created-2022-04-04, </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">user-adam           </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│ </span><span class="r1">194</span><span class="r1"> │ </span><span class="r1">ogc-f8e5cfa2-elastic-agent-debian</span><span class="r1"> │ </span><span class="r1">aws     </span><span class="r1"> │ </span><span class="r1">14 minutes ago</span><span class="r1"> │ </span><span class="r1">running</span><span class="r1"> │ </span><span class="r1">ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@18.221.25.100</span><span class="r1"> │ </span><span class="r1">elastic-agent-8-1-x,</span><span class="r1"> │ pass: 2 fail: </span><span class="r5">1</span><span class="r1"> │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">ubuntu-aws,         </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">created-2022-04-04, </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">user-adam           </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│ </span><span class="r1">195</span><span class="r1"> │ </span><span class="r1">ogc-11ebffa0-elastic-agent-debian</span><span class="r1"> │ </span><span class="r1">aws     </span><span class="r1"> │ </span><span class="r1">14 minutes ago</span><span class="r1"> │ </span><span class="r1">running</span><span class="r1"> │ </span><span class="r1">ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@3.19.185.104 </span><span class="r1"> │ </span><span class="r1">elastic-agent-8-1-x,</span><span class="r1"> │ pass: 2 fail: </span><span class="r5">1</span><span class="r1"> │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">ubuntu-aws,         </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">created-2022-04-04, </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">user-adam           </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│ </span><span class="r1">196</span><span class="r1"> │ </span><span class="r1">ogc-8d56fa08-elastic-agent-debian</span><span class="r1"> │ </span><span class="r1">aws     </span><span class="r1"> │ </span><span class="r1">14 minutes ago</span><span class="r1"> │ </span><span class="r1">running</span><span class="r1"> │ </span><span class="r1">ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@18.219.142.16</span><span class="r1"> │ </span><span class="r1">elastic-agent-8-1-x,</span><span class="r1"> │ pass: 2 fail: </span><span class="r5">1</span><span class="r1"> │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">ubuntu-aws,         </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">created-2022-04-04, </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">│     │                                   │          │                │         │                                                              │ </span><span class="r1">user-adam           </span><span class="r1"> │                 │</span><span class="r1">                                                         </span></div>
-<div><span class="r1">                                                         </span><span class="r1">└─────┴───────────────────────────────────┴──────────┴────────────────┴─────────┴──────────────────────────────────────────────────────────────┴──────────────────────┴─────────────────┘</span><span class="r1">                                                         </span></div>
-<div><span class="r1"></span><span class="r1">                                                                                                                                                                                                                                                                                                           </span></div>
-                    </div>
-                </div>
-            </div>
-        </body>
-    </foreignObject>
+
+    <defs>
+    <clipPath id="terminal-2594011904-clip-terminal">
+      <rect x="0" y="0" width="3671.2" height="243.0" />
+    </clipPath>
+    <clipPath id="terminal-2594011904-line-0">
+    <rect x="0" y="1.5" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-1">
+    <rect x="0" y="25.9" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-2">
+    <rect x="0" y="50.3" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-3">
+    <rect x="0" y="74.7" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-4">
+    <rect x="0" y="99.1" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-5">
+    <rect x="0" y="123.5" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-6">
+    <rect x="0" y="147.9" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-7">
+    <rect x="0" y="172.3" width="3672.2" height="24.65"/>
+            </clipPath>
+<clipPath id="terminal-2594011904-line-8">
+    <rect x="0" y="196.7" width="3672.2" height="24.65"/>
+            </clipPath>
+    </defs>
+
+    <rect fill="#292929" stroke="rgba(255,255,255,0.35)" stroke-width="1" x="1" y="1" width="3689" height="292" rx="8"/><text class="terminal-2594011904-title" fill="#c5c8c6" text-anchor="middle" x="1844" y="27">Node&#160;List&#160;Output</text>
+            <g transform="translate(26,22)">
+            <circle cx="0" cy="0" r="7" fill="#ff5f57"/>
+            <circle cx="22" cy="0" r="7" fill="#febc2e"/>
+            <circle cx="44" cy="0" r="7" fill="#28c840"/>
+            </g>
+        
+    <g transform="translate(9, 41)" clip-path="url(#terminal-2594011904-clip-terminal)">
+    <rect fill="#4b4e55" x="500.2" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="512.4" y="50.3" width="97.6" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="610" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="634.4" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="646.6" y="50.3" width="402.6" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1049.2" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1073.6" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1085.8" y="50.3" width="97.6" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1183.4" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1207.8" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1220" y="50.3" width="170.8" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1390.8" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1415.2" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1427.4" y="50.3" width="85.4" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1512.8" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="50.3" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2196" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2208.2" y="50.3" width="732" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2940.2" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2964.6" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2976.8" y="50.3" width="183" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="3159.8" y="50.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="99.1" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="99.1" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="99.1" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="123.5" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="123.5" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="123.5" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="147.9" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="147.9" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="147.9" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="172.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="172.3" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="172.3" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1537.2" y="196.7" width="12.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="1549.4" y="196.7" width="622.2" height="24.65" shape-rendering="crispEdges"/><rect fill="#4b4e55" x="2171.6" y="196.7" width="12.2" height="24.65" shape-rendering="crispEdges"/>
+    <g class="terminal-2594011904-matrix">
+    <text class="terminal-2594011904-r2" x="488" y="20" textLength="146.4" clip-path="url(#terminal-2594011904-line-0)">Node&#160;Count:&#160;</text><text class="terminal-2594011904-r3" x="634.4" y="20" textLength="12.2" clip-path="url(#terminal-2594011904-line-0)">5</text><text class="terminal-2594011904-r1" x="3672.2" y="20" textLength="12.2" clip-path="url(#terminal-2594011904-line-0)">
+</text><text class="terminal-2594011904-r1" x="488" y="44.4" textLength="2696.2" clip-path="url(#terminal-2594011904-line-1)">┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓</text><text class="terminal-2594011904-r1" x="3672.2" y="44.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-1)">
+</text><text class="terminal-2594011904-r1" x="488" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="512.4" y="68.8" textLength="97.6" clip-path="url(#terminal-2594011904-line-2)">ID&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="622.2" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="646.6" y="68.8" textLength="402.6" clip-path="url(#terminal-2594011904-line-2)">Name&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="1061.4" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="1085.8" y="68.8" textLength="97.6" clip-path="url(#terminal-2594011904-line-2)">Provider</text><text class="terminal-2594011904-r1" x="1195.6" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="1220" y="68.8" textLength="170.8" clip-path="url(#terminal-2594011904-line-2)">Created&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="1403" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="1427.4" y="68.8" textLength="85.4" clip-path="url(#terminal-2594011904-line-2)">Status&#160;</text><text class="terminal-2594011904-r1" x="1525" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="1549.4" y="68.8" textLength="622.2" clip-path="url(#terminal-2594011904-line-2)">Connection&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="2183.8" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="2208.2" y="68.8" textLength="732" clip-path="url(#terminal-2594011904-line-2)">Labels&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="2952.4" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r4" x="2976.8" y="68.8" textLength="183" clip-path="url(#terminal-2594011904-line-2)">Actions&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</text><text class="terminal-2594011904-r1" x="3172" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">┃</text><text class="terminal-2594011904-r1" x="3672.2" y="68.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-2)">
+</text><text class="terminal-2594011904-r1" x="488" y="93.2" textLength="2696.2" clip-path="url(#terminal-2594011904-line-3)">┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩</text><text class="terminal-2594011904-r1" x="3672.2" y="93.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-3)">
+</text><text class="terminal-2594011904-r1" x="488" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="512.4" y="117.6" textLength="97.6" clip-path="url(#terminal-2594011904-line-4)">7656a082</text><text class="terminal-2594011904-r1" x="622.2" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="646.6" y="117.6" textLength="402.6" clip-path="url(#terminal-2594011904-line-4)">ogc-elastic-agent-ubuntu-6af6-002</text><text class="terminal-2594011904-r1" x="1061.4" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="1085.8" y="117.6" textLength="97.6" clip-path="url(#terminal-2594011904-line-4)">google&#160;&#160;</text><text class="terminal-2594011904-r1" x="1195.6" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="1220" y="117.6" textLength="170.8" clip-path="url(#terminal-2594011904-line-4)">14&#160;minutes&#160;ago</text><text class="terminal-2594011904-r1" x="1403" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="1427.4" y="117.6" textLength="85.4" clip-path="url(#terminal-2594011904-line-4)">running</text><text class="terminal-2594011904-r1" x="1525" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r4" x="1549.4" y="117.6" textLength="622.2" clip-path="url(#terminal-2594011904-line-4)">ssh&#160;-i&#160;~/.ssh/id_rsa_libcloud&#160;ubuntu@35.226.181.205</text><text class="terminal-2594011904-r1" x="2183.8" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="2208.2" y="117.6" textLength="732" clip-path="url(#terminal-2594011904-line-4)">division=engineering,org=obs,team=observability,project=perf</text><text class="terminal-2594011904-r1" x="2952.4" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r5" x="2976.8" y="117.6" textLength="73.2" clip-path="url(#terminal-2594011904-line-4)">pass:&#160;</text><text class="terminal-2594011904-r6" x="3050" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">✔</text><text class="terminal-2594011904-r5" x="3062.2" y="117.6" textLength="85.4" clip-path="url(#terminal-2594011904-line-4)">&#160;fail:&#160;</text><text class="terminal-2594011904-r7" x="3147.6" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">0</text><text class="terminal-2594011904-r1" x="3172" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">│</text><text class="terminal-2594011904-r1" x="3672.2" y="117.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-4)">
+</text><text class="terminal-2594011904-r1" x="488" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="512.4" y="142" textLength="97.6" clip-path="url(#terminal-2594011904-line-5)">7656a10e</text><text class="terminal-2594011904-r1" x="622.2" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="646.6" y="142" textLength="402.6" clip-path="url(#terminal-2594011904-line-5)">ogc-elastic-agent-ubuntu-6af6-004</text><text class="terminal-2594011904-r1" x="1061.4" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="1085.8" y="142" textLength="97.6" clip-path="url(#terminal-2594011904-line-5)">google&#160;&#160;</text><text class="terminal-2594011904-r1" x="1195.6" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="1220" y="142" textLength="170.8" clip-path="url(#terminal-2594011904-line-5)">14&#160;minutes&#160;ago</text><text class="terminal-2594011904-r1" x="1403" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="1427.4" y="142" textLength="85.4" clip-path="url(#terminal-2594011904-line-5)">running</text><text class="terminal-2594011904-r1" x="1525" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r4" x="1549.4" y="142" textLength="622.2" clip-path="url(#terminal-2594011904-line-5)">ssh&#160;-i&#160;~/.ssh/id_rsa_libcloud&#160;ubuntu@34.27.211.26&#160;&#160;</text><text class="terminal-2594011904-r1" x="2183.8" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="2208.2" y="142" textLength="732" clip-path="url(#terminal-2594011904-line-5)">division=engineering,org=obs,team=observability,project=perf</text><text class="terminal-2594011904-r1" x="2952.4" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r5" x="2976.8" y="142" textLength="73.2" clip-path="url(#terminal-2594011904-line-5)">pass:&#160;</text><text class="terminal-2594011904-r6" x="3050" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">✔</text><text class="terminal-2594011904-r5" x="3062.2" y="142" textLength="85.4" clip-path="url(#terminal-2594011904-line-5)">&#160;fail:&#160;</text><text class="terminal-2594011904-r7" x="3147.6" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">0</text><text class="terminal-2594011904-r1" x="3172" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">│</text><text class="terminal-2594011904-r1" x="3672.2" y="142" textLength="12.2" clip-path="url(#terminal-2594011904-line-5)">
+</text><text class="terminal-2594011904-r1" x="488" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="512.4" y="166.4" textLength="97.6" clip-path="url(#terminal-2594011904-line-6)">7656a0be</text><text class="terminal-2594011904-r1" x="622.2" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="646.6" y="166.4" textLength="402.6" clip-path="url(#terminal-2594011904-line-6)">ogc-elastic-agent-ubuntu-6af6-003</text><text class="terminal-2594011904-r1" x="1061.4" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="1085.8" y="166.4" textLength="97.6" clip-path="url(#terminal-2594011904-line-6)">google&#160;&#160;</text><text class="terminal-2594011904-r1" x="1195.6" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="1220" y="166.4" textLength="170.8" clip-path="url(#terminal-2594011904-line-6)">14&#160;minutes&#160;ago</text><text class="terminal-2594011904-r1" x="1403" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="1427.4" y="166.4" textLength="85.4" clip-path="url(#terminal-2594011904-line-6)">running</text><text class="terminal-2594011904-r1" x="1525" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r4" x="1549.4" y="166.4" textLength="622.2" clip-path="url(#terminal-2594011904-line-6)">ssh&#160;-i&#160;~/.ssh/id_rsa_libcloud&#160;ubuntu@34.172.121.162</text><text class="terminal-2594011904-r1" x="2183.8" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="2208.2" y="166.4" textLength="732" clip-path="url(#terminal-2594011904-line-6)">division=engineering,org=obs,team=observability,project=perf</text><text class="terminal-2594011904-r1" x="2952.4" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r5" x="2976.8" y="166.4" textLength="73.2" clip-path="url(#terminal-2594011904-line-6)">pass:&#160;</text><text class="terminal-2594011904-r6" x="3050" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">✔</text><text class="terminal-2594011904-r5" x="3062.2" y="166.4" textLength="85.4" clip-path="url(#terminal-2594011904-line-6)">&#160;fail:&#160;</text><text class="terminal-2594011904-r7" x="3147.6" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">0</text><text class="terminal-2594011904-r1" x="3172" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">│</text><text class="terminal-2594011904-r1" x="3672.2" y="166.4" textLength="12.2" clip-path="url(#terminal-2594011904-line-6)">
+</text><text class="terminal-2594011904-r1" x="488" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="512.4" y="190.8" textLength="97.6" clip-path="url(#terminal-2594011904-line-7)">7656a03c</text><text class="terminal-2594011904-r1" x="622.2" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="646.6" y="190.8" textLength="402.6" clip-path="url(#terminal-2594011904-line-7)">ogc-elastic-agent-ubuntu-6af6-001</text><text class="terminal-2594011904-r1" x="1061.4" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="1085.8" y="190.8" textLength="97.6" clip-path="url(#terminal-2594011904-line-7)">google&#160;&#160;</text><text class="terminal-2594011904-r1" x="1195.6" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="1220" y="190.8" textLength="170.8" clip-path="url(#terminal-2594011904-line-7)">14&#160;minutes&#160;ago</text><text class="terminal-2594011904-r1" x="1403" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="1427.4" y="190.8" textLength="85.4" clip-path="url(#terminal-2594011904-line-7)">running</text><text class="terminal-2594011904-r1" x="1525" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r4" x="1549.4" y="190.8" textLength="622.2" clip-path="url(#terminal-2594011904-line-7)">ssh&#160;-i&#160;~/.ssh/id_rsa_libcloud&#160;ubuntu@35.193.97.106&#160;</text><text class="terminal-2594011904-r1" x="2183.8" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="2208.2" y="190.8" textLength="732" clip-path="url(#terminal-2594011904-line-7)">division=engineering,org=obs,team=observability,project=perf</text><text class="terminal-2594011904-r1" x="2952.4" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r5" x="2976.8" y="190.8" textLength="73.2" clip-path="url(#terminal-2594011904-line-7)">pass:&#160;</text><text class="terminal-2594011904-r6" x="3050" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">✔</text><text class="terminal-2594011904-r5" x="3062.2" y="190.8" textLength="85.4" clip-path="url(#terminal-2594011904-line-7)">&#160;fail:&#160;</text><text class="terminal-2594011904-r7" x="3147.6" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">0</text><text class="terminal-2594011904-r1" x="3172" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">│</text><text class="terminal-2594011904-r1" x="3672.2" y="190.8" textLength="12.2" clip-path="url(#terminal-2594011904-line-7)">
+</text><text class="terminal-2594011904-r1" x="488" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="512.4" y="215.2" textLength="97.6" clip-path="url(#terminal-2594011904-line-8)">76569f56</text><text class="terminal-2594011904-r1" x="622.2" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="646.6" y="215.2" textLength="402.6" clip-path="url(#terminal-2594011904-line-8)">ogc-elastic-agent-ubuntu-6af6-000</text><text class="terminal-2594011904-r1" x="1061.4" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="1085.8" y="215.2" textLength="97.6" clip-path="url(#terminal-2594011904-line-8)">google&#160;&#160;</text><text class="terminal-2594011904-r1" x="1195.6" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="1220" y="215.2" textLength="170.8" clip-path="url(#terminal-2594011904-line-8)">14&#160;minutes&#160;ago</text><text class="terminal-2594011904-r1" x="1403" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="1427.4" y="215.2" textLength="85.4" clip-path="url(#terminal-2594011904-line-8)">running</text><text class="terminal-2594011904-r1" x="1525" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r4" x="1549.4" y="215.2" textLength="622.2" clip-path="url(#terminal-2594011904-line-8)">ssh&#160;-i&#160;~/.ssh/id_rsa_libcloud&#160;ubuntu@34.122.78.183&#160;</text><text class="terminal-2594011904-r1" x="2183.8" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="2208.2" y="215.2" textLength="732" clip-path="url(#terminal-2594011904-line-8)">division=engineering,org=obs,team=observability,project=perf</text><text class="terminal-2594011904-r1" x="2952.4" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r5" x="2976.8" y="215.2" textLength="73.2" clip-path="url(#terminal-2594011904-line-8)">pass:&#160;</text><text class="terminal-2594011904-r6" x="3050" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">✔</text><text class="terminal-2594011904-r5" x="3062.2" y="215.2" textLength="85.4" clip-path="url(#terminal-2594011904-line-8)">&#160;fail:&#160;</text><text class="terminal-2594011904-r7" x="3147.6" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">0</text><text class="terminal-2594011904-r1" x="3172" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">│</text><text class="terminal-2594011904-r1" x="3672.2" y="215.2" textLength="12.2" clip-path="url(#terminal-2594011904-line-8)">
+</text><text class="terminal-2594011904-r1" x="488" y="239.6" textLength="2696.2" clip-path="url(#terminal-2594011904-line-9)">└──────────┴───────────────────────────────────┴──────────┴────────────────┴─────────┴─────────────────────────────────────────────────────┴──────────────────────────────────────────────────────────────┴─────────────────┘</text><text class="terminal-2594011904-r1" x="3672.2" y="239.6" textLength="12.2" clip-path="url(#terminal-2594011904-line-9)">
+</text>
+    </g>
+    </g>
 </svg>

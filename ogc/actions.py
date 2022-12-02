@@ -8,20 +8,24 @@ from multiprocessing import cpu_count
 from pathlib import Path
 
 import sh
+from libcloud.compute.base import Node as CloudNode
 from pampy import match
 from rich.padding import Padding
+from rich.status import Status
 from toolz.functoolz import partial
 
 from ogc import db, enums, models, state
 from ogc.deployer import Deployer
 from ogc.log import CONSOLE as con
-from ogc.provision import choose_provisioner
+from ogc.provision import BaseProvisioner, choose_provisioner
 from ogc.spec import CountCtx
 
 logging.getLogger("sh").setLevel(logging.WARNING)
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
+
+STATUS = Status("Starting", console=con)
 
 
 def launch(layout: bytes) -> bytes:
@@ -87,6 +91,20 @@ def launch_async(
     Returns:
         list[models.Node]: List of instance names launched
     """
+    for layout in layouts:
+        if layout.provider == "google":
+            STATUS.start()
+            STATUS.update("Launching nodes")
+            engine = choose_provisioner(name=layout.provider, layout=layout)
+            engine.setup()
+            nodes = engine.create()
+            for node in nodes:
+                db.M.save(node.instance_name, node)
+
+            if with_deploy:
+                exec_scripts_async(layout.scripts)
+            STATUS.stop()
+            return nodes
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         with con.status("Waiting for nodes to start"):
@@ -165,11 +183,7 @@ def teardown(
                 con.log(
                     f"[red]Unable to run teardown script on {_node.instance_name}[/red]"
                 )
-
-        if deploy.node:
-            deploy.engine.provisioner.destroy_node(_node.node, ex_sync=False)
     db.M.delete(_node.instance_name)
-
     return db.model_as_pickle(_node)
 
 
@@ -199,14 +213,28 @@ def teardown_async(
     Returns:
         list[models.Node]: List of instances destroyed
     """
+    STATUS.start()
+    STATUS.update(f"Destroying {len(nodes)} nodes")
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        with con.status(f"Destroying {len(nodes)} nodes"):
-            func = partial(teardown, only_db=only_db, force=force)
-            results = [
-                executor.submit(func, db.model_as_pickle(node)) for node in nodes
-            ]
-            wait(results, timeout=5)
-            return [db.pickle_to_model(node.result()) for node in results]
+        func = partial(teardown, only_db=only_db, force=force)
+        results = [executor.submit(func, db.model_as_pickle(node)) for node in nodes]
+        wait(results, timeout=5)
+
+    google_nodes: list[CloudNode] = [
+        node.node for node in nodes if node.layout.provider == "google"
+    ]
+    google_layout = list(
+        [node.layout for node in nodes if node.layout.provider == "google"]
+    )[0]
+    if google_nodes:
+        STATUS.update("Destroying nodes")
+        engine: BaseProvisioner = choose_provisioner(
+            name="google", layout=google_layout
+        )
+        engine.destroy_all_nodes(nodes=google_nodes)
+
+    STATUS.stop()
+    return nodes
 
 
 def sync(layout: bytes, overrides: dict[str, CountCtx]) -> bytes:
@@ -451,8 +479,10 @@ def exec_scripts_async(
     count = len(rows)
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        with con.status(f"Executing scripts from '{path}' across {count} nodes."):
-            func = partial(exec_scripts, path=path)
-            results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
-            wait(results)
-            return [db.pickle_to_model(node.result()) for node in results]
+        STATUS.start()
+        STATUS.update(f"Executing scripts from '{path}' across {count} nodes.")
+        func = partial(exec_scripts, path=path)
+        results = [executor.submit(func, db.model_as_pickle(node)) for node in rows]
+        wait(results)
+        STATUS.stop()
+        return [db.pickle_to_model(node.result()) for node in results]

@@ -46,6 +46,7 @@ class Layout:
     ssh_private_key: Path
     ssh_public_key: Path
     tags: list[str] | None = field(converter=convert_tags_to_slug_tags)
+    labels: t.Mapping[str, str] | None = None
     ports: list[str] | None = None
     arch: str | None = "amd64"
     artifacts: str | None = None
