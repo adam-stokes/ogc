@@ -5,12 +5,12 @@ from pathlib import Path
 
 import dill
 from attr import define, field
-from safetywrap import Err, Ok, Result
+from sqlitedict import SqliteDict
 
 from ogc import models
 from ogc.log import get_logger
 
-log = get_logger(__name__)
+log = get_logger("ogc")
 
 dill.settings["recurse"] = True
 
@@ -29,6 +29,7 @@ def pickle_to_model(obj: bytes) -> t.Any:
 @define
 class Manager:
     db_dir: Path = field(init=False)
+    db: t.Any = field(init=False)
 
     @db_dir.default
     def _get_db_dir(self) -> Path:
@@ -36,44 +37,32 @@ class Manager:
         p.mkdir(parents=True, exist_ok=True)
         return p
 
-    def nodes(self) -> list[models.Node]:
+    @db.default
+    def _get_db(self) -> t.Any:
+        return SqliteDict(
+            str(self.db_dir / "data.db"),
+            encode=dill.dumps,
+            decode=dill.loads,
+            outer_stack=False,
+        )
+
+    def nodes(self) -> t.Mapping[str, t.Any]:
         """Return a list of nodes deployed"""
-        return [
-            pickle_to_model(node.read_bytes()) for node in self.db_dir.glob("ogc-*")
-        ]
+        return dict(self.db)
 
-    def save(self, fname: str, obj: object) -> bool:
-        """Store the object to a pickled fname"""
-        save_path = self.db_dir / fname
-        return bool(save_path.write_bytes(model_as_pickle(obj)))
+    def add(self, node_key: str, node: models.Machine) -> None:
+        """Add node to db"""
+        self.db[node_key] = node
 
-    def load(self, fname: str) -> object:
-        """Load pickled obj"""
-        load_path = self.db_dir / fname
-        return pickle_to_model(load_path.read_bytes())
+    def remove(self, node_key: str) -> None:
+        """Remove node to db"""
+        if node_key in dict(self.db):
+            del self.db[node_key]
 
-    def delete(self, fname: str) -> bool:
-        delete_path = self.db_dir / fname
-        delete_path.unlink(missing_ok=True)
-        return delete_path.exists()
+    def commit(self) -> None:
+        """Save to db"""
+        self.db.commit()
 
-
-M = Manager()
-
-
-def get_nodes() -> Result[list[models.Node], str]:
-    return Ok(M.nodes()) if len(M.nodes()) > 0 else Err("No nodes found")
-
-
-def get_node(name: str) -> Result[models.Node, str]:
-    nodes = get_nodes().unwrap_or_else(log.error)
-    if not nodes:
-        return Err("Failed to find nodes.")
-    node = [node for node in nodes if node.instance_name == name]
-    return Ok(node[0]) if node else Err(f"Could not find node: {name}")
-
-
-def get_actions(node: models.Node) -> Result[list[models.Actions], str]:
-    if not node.actions:
-        return Err(f"Unable to find node matching: {node.instance_name}")
-    return Ok(node.actions)
+    def close(self) -> None:
+        """Close db connection"""
+        self.db.close()

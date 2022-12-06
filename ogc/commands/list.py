@@ -12,7 +12,7 @@ from ogc.log import get_logger
 
 from .base import cli
 
-log = get_logger(__name__)
+log = get_logger("ogc")
 
 
 @click.command(help="List nodes in your inventory")
@@ -35,35 +35,36 @@ def ls(by_tag: str, by_name: str, output_file: str) -> None:
             "Combined filtered options are not supported, please choose one.",
         )
         sys.exit(1)
+    _db = db.Manager()
+    _dbrows = _db.nodes()
 
-    rows = db.get_nodes().unwrap_or_else(log.critical)
-    if not rows:
-        sys.exit(1)
-
+    rows = _dbrows.values()
     if by_tag:
-        rows = [node for node in rows if by_tag in node.layout.tags]
+        rows = [node for node in _dbrows.values() if by_tag in node.layout.tags]
     elif by_name:
-        rows = [node for node in rows if node.instance_name == by_name]
+        rows = [node for node in _dbrows.values() if node.instance_name == by_name]
     rows_count = len(rows)
 
     table = Table(
-        title=f"Node Count: [green]{rows_count}[/]",
+        caption=f"Node Count: [green]{rows_count}[/]",
         header_style="yellow on black",
-        title_justify="left",
+        caption_justify="left",
+        expand=True,
+        width=con.width,
+        show_lines=True,
     )
     table.add_column("ID")
     table.add_column("Name")
-    table.add_column("Provider")
     table.add_column("Created")
     table.add_column("Status")
-    table.add_column("Connection", style="yellow on black")
+    table.add_column("Connection", style="bold red on black")
     table.add_column("Labels")
     table.add_column("Actions", style="purple")
 
     for data in rows:
         completed_actions = []
         failed_actions = []
-        actions = db.get_actions(data).unwrap_or_else(log.critical)
+        actions = []
         if actions:
             for action in actions:
                 if action.exit_code != 0:
@@ -73,10 +74,9 @@ def ls(by_tag: str, by_name: str, output_file: str) -> None:
         table.add_row(
             data.id.split("-")[0],
             data.instance_name,
-            data.layout.provider,
             arrow.get(data.created).humanize(),
             data.instance_state,
-            f"ssh -i {data.layout.ssh_private_key} {data.layout.username}@{data.public_ip}",
+            f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
             ",".join([f"{k}={v}" for k, v in data.layout.labels.items()]),
             (
                 f"pass: {'[green]:heavy_check_mark:[/]' if not failed_actions else len(completed_actions)} "

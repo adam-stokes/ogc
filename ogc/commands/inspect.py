@@ -34,8 +34,11 @@ from .base import cli
     default=False,
     help="Show extended action output at once",
 )
-def inspect(by_id, by_name, by_tag, action_id, extend):
-    if by_tag and by_name and id:
+def inspect(
+    by_id: str, by_name: str, by_tag: str, action_id: str, extend: bool
+) -> None:
+    _db = db.Manager()
+    if by_tag and by_name and by_id:
         click.echo(
             click.style(
                 "Combined filtered options are not supported, please choose one.",
@@ -44,7 +47,7 @@ def inspect(by_id, by_name, by_tag, action_id, extend):
         )
         sys.exit(1)
 
-    rows: list[models.Node] = db.get_nodes().unwrap()
+    rows: list[models.Machine] = list(_db.nodes().values())
     if by_tag:
         rows = [node for node in rows if by_tag in node.layout.tags]
     elif by_name:

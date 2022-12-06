@@ -1,173 +1,65 @@
 # pylint: disable=unexpected-keyword-arg
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 import click
 import sh
+from dotenv import load_dotenv
 
-from ogc import actions, db, enums
-from ogc.log import CONSOLE as con
+import ogc.loader
+from ogc import db
 from ogc.log import get_logger
+from ogc.signals import after_provision
 
-from ..deployer import Deployer
 from .base import cli
 
-log = get_logger(__name__)
+log = get_logger("ogc")
 
 
 @click.command(help="Login to a node")
-@click.option(
-    "--by-id",
-    required=False,
-    help="Login to a node by its ID",
-)
-@click.option(
-    "--by-name",
-    required=False,
-    help="Login to a node by its Name",
-)
-def ssh(by_id: str, by_name: str) -> None:
-    rows = db.get_nodes().unwrap_or_else(log.critical)
-    if not rows:
-        sys.exit(1)
-    if by_id:
-        rows = [node for node in rows if node.id.split("-")[0] == by_id]
-    elif by_name:
-        rows = [node for node in rows if node.instance_name == by_name]
-    else:
-        log.error(
-            "Unable to locate node in database, please double check spelling.",
-        )
-        sys.exit(1)
+@click.argument("instance")
+def ssh(instance: str) -> None:
+    load_dotenv()
+    _db = db.Manager()
+    instance_names = _db.nodes().keys()
+    node = None
+    if instance in instance_names:
+        node = _db.nodes()[instance]
 
-    node = rows[0]
-    cmd = [
-        "-i",
-        str(node.layout.ssh_private_key.expanduser()),
-        f"{node.layout.username}@{node.public_ip}",
-    ]
-    sh.ssh(cmd, _fg=True, _env=node.user.env)  # type: ignore
-    sys.exit(0)
+    if node:
+        cmd = [
+            "-i",
+            str(node.ssh_private_key.expanduser()),
+            f"{node.username}@{node.public_ip}",
+        ]
+        sh.ssh(cmd, _fg=True, _env=os.environ.copy())  # type: ignore
+        sys.exit(0)
 
 
 @click.command(help="Execute a command across node(s)")
-@click.option(
-    "--by-tag",
-    required=False,
-    help="Only run on nodes matching tag",
-)
-@click.option(
-    "--by-name",
-    required=False,
-    help="Only run on nodes matching name",
-)
-@click.argument("cmd")
-def exec(by_tag: str, by_name: str, cmd: str) -> None:
-    if by_tag and by_name:
-        log.error(
-            "Combined filtered options are not supported, please choose one.",
-        )
+@click.argument("spec", type=Path)
+@click.argument("cmd", type=str)
+def exec(spec: Path, cmd: str) -> None:
+    deploy = ogc.loader.from_path(spec)
+    if not deploy:
+        log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    results = actions.exec_async(by_name, by_tag, cmd)
-    if all(res for res in results):
-        con.log("All commands completed.")
-        sys.exit(0)
-
-    log.error("Some commands failed to complete.")
-    sys.exit(1)
+    after_provision.send({"cmd": cmd})
 
 
 @click.command(help="(R)Execute a set of scripts")
-@click.option(
-    "--by-tag",
-    required=False,
-    help="Only run on nodes matching tag",
-)
-@click.option(
-    "--by-name",
-    required=False,
-    help="Only run on nodes matching name",
-)
+@click.argument("spec", type=Path)
 @click.argument("path")
-def exec_scripts(by_tag: str, by_name: str, path: str) -> None:
-    if by_tag and by_name:
-        log.error(
-            "Combined filtered options are not supported, please choose one.",
-        )
+def exec_scripts(spec: Path, path: str) -> None:
+    if not ogc.loader.from_path(spec):
+        log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    filters = {}
-    if by_tag:
-        filters.update({"tag": by_tag})
-    if by_name:
-        filters.update({"name": by_name})
-    results = actions.exec_scripts_async(path, filters)
-    if all(res for res in results):
-        con.log("All commands completed successfully ...")
-        sys.exit(0)
-
-    log.error("Some commands [bold red]failed[/] to complete.")
-    sys.exit(1)
-
-
-@click.command(help="Scp files or directories to node")
-@click.argument("name")
-@click.argument("src")
-@click.argument("dst")
-@click.option(
-    "--exclude",
-    required=False,
-    multiple=True,
-    help="Exclude files/directories when uploading",
-)
-def push_files(name: str, src: str, dst: str, exclude: list[str]) -> None:
-    node = db.get_node(name).unwrap_or_else(log.error)
-    if not node:
-        log.error(f"Unable to locate {name} to connect to")
-        sys.exit(1)
-    deploy = Deployer(node)
-    deploy.put(src, dst, excludes=exclude)
-    sys.exit(0)
-
-
-@click.command(help="Scp files or directories from node")
-@click.argument("name")
-@click.argument("dst")
-@click.argument("src")
-def pull_files(name: str, dst: str, src: str) -> None:
-    node = db.get_node(name).unwrap_or_else(log.error)
-    if not node:
-        log.error(f"Unable to locate {name} to connect to")
-        sys.exit(1)
-    deploy = Deployer(node)
-    deploy.get(dst, src)
-    sys.exit(0)
-
-
-@click.command(help="Download artifacts from node")
-@click.argument("name")
-def pull_artifacts(name: str) -> None:
-    node = db.get_node(name).unwrap_or_else(log.error)
-    if not node:
-        log.error(f"Unable to locate {name} to connect to")
-        sys.exit(1)
-    deploy = Deployer(node)
-
-    if node.layout.artifacts:
-        log.info("Downloading artifacts")
-        local_artifact_path = Path(enums.LOCAL_ARTIFACT_PATH) / node.instance_name
-        local_artifact_path.mkdir(parents=True, exist_ok=True)
-        deploy.get(node.layout.artifacts, str(local_artifact_path))
-        sys.exit(0)
-    else:
-        log.error(f"No artifacts found at {node.layout.remote_path}")
-        sys.exit(1)
+    after_provision.send({"path": path})
 
 
 cli.add_command(ssh)
-cli.add_command(push_files)
-cli.add_command(pull_files)
-cli.add_command(pull_artifacts)
 cli.add_command(exec)
 cli.add_command(exec_scripts)

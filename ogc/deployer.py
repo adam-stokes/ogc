@@ -4,19 +4,23 @@
 
 from __future__ import annotations
 
+import os
 import tempfile
 import typing as t
+from concurrent.futures import ThreadPoolExecutor, wait
+from functools import partial
+from multiprocessing import cpu_count
 from pathlib import Path
 
 import sh
 import toolz
+from attr import define, field
 from libcloud.compute.deployment import (
     Deployment,
     FileDeployment,
     MultiStepDeployment,
     ScriptDeployment,
 )
-from libcloud.compute.ssh import ParamikoSSHClient
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry import retry
@@ -25,194 +29,272 @@ from safetywrap import Err, Ok, Result
 from ogc import db, models
 from ogc.log import CONSOLE as con
 from ogc.log import get_logger
-from ogc.provision import choose_provisioner
+from ogc.provision import BaseProvisioner
 
-log = get_logger(__name__)
+# Not advertised, but available for those who seek moar power.
+MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
+
+log = get_logger("ogc")
 
 
 class Ctx(t.TypedDict):
     env: t.Required[dict]
-    node: t.Required[models.Node]
+    node: t.Required[models.Machine]
     db: t.Required[t.Any]
 
 
+def render(template: Path, context: Ctx) -> str:
+    """Returns the correct deployment based on type of step"""
+    fpath = template.absolute()
+    lookup = TemplateLookup(
+        directories=[
+            str(template.parent.absolute()),
+            str(template.parent.parent.absolute()),
+        ]
+    )
+    _template = Template(filename=str(fpath), lookup=lookup)
+    return str(_template.render(**context))
+
+
+@define
 class Deployer:
-    def __init__(self, deployment: models.Node, force: bool = False):
-        self.deployment = deployment
-        self.env = self.deployment.layout.env()
-        self.force = force
+    provisioner: BaseProvisioner
+    db: t.Any
+    force: bool = False
+    _nodes: list[models.Machine] = field(init=False)
 
-        self.engine = choose_provisioner(
-            name=self.deployment.layout.provider,
-            layout=self.deployment.layout,
-        )
-        self.node = self.engine.node(instance_id=self.deployment.instance_id)
-        if not self.node:
-            return
-        self._ssh_client = self._connect()
+    @classmethod
+    def from_provisioner(
+        cls, provisioner: BaseProvisioner, force: bool = False
+    ) -> Deployer:
+        return Deployer(provisioner=provisioner, force=force, db=db.Manager())
 
-    @retry(tries=5, delay=5, jitter=(1, 5), logger=None)
-    def _connect(self) -> ParamikoSSHClient:
-        _client = ParamikoSSHClient(
-            self.deployment.public_ip,
-            username=self.deployment.layout.username,
-            key=str(self.deployment.layout.ssh_private_key.expanduser()),
-            timeout=300,
-            use_compression=True,
-        )
-        _client.connect()
-        return _client
+    def up(self) -> bool:
+        """Bring up machines"""
+        self.provisioner.setup()
+        self._nodes = t.cast(list[models.Machine], self.provisioner.create())
+        return True
 
-    def render(self, template: Path, context: Ctx) -> str:
-        """Returns the correct deployment based on type of step"""
-        fpath = template.absolute()
-        lookup = TemplateLookup(
-            directories=[
-                str(template.parent.absolute()),
-                str(template.parent.parent.absolute()),
+    def down(self) -> bool:
+        """Tear down machines"""
+        self.provisioner.destroy(nodes=self.db.nodes().values())
+        for node_name in self.db.nodes().keys():
+            self.db.remove(node_name)
+        self.db.commit()
+        return True
+
+    def exec(self, cmd: str) -> Result[bool, Exception]:
+        """Runs a command on the node(s)"""
+
+        def _exec(node: bytes, cmd: str) -> bool:
+            _node: models.Machine = db.pickle_to_model(node)
+            cmd_opts = [
+                "-i",
+                str(_node.layout.ssh_private_key),
+                f"{_node.layout.username}@{_node.public_ip}",
             ]
+            cmd_opts.append(cmd)
+            error_code = 0
+            try:
+                out = sh.ssh(cmd_opts, _env=os.environ.copy(), _err_to_out=True)  # type: ignore
+                _node.actions.append(
+                    models.Actions(
+                        exit_code=out.exit_code,
+                        out=out.stdout.decode(),
+                        error=out.stderr.decode(),
+                    )
+                )
+            except sh.ErrorReturnCode as e:
+                error_code = e.exit_code  # type: ignore
+                _node.actions.append(
+                    models.Actions(
+                        exit_code=e.exit_code,  # type: ignore
+                        out=e.stdout.decode(),
+                        error=e.stderr.decode(),
+                    )
+                )
+            return bool(error_code == 0)
+
+        nodes = self.db.nodes().values()
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            func = partial(_exec, cmd=cmd)
+            results = [
+                executor.submit(func, db.model_as_pickle(node)) for node in nodes
+            ]
+            wait(results, timeout=5)
+        self.db.commit()
+        return Ok(True)
+
+    def exec_scripts(
+        self, scripts: str | None = None, filters: t.Mapping[str, str] | None = None
+    ) -> Result[bool, str]:
+        """Execute scripts
+
+        Async function for executing scripts/templates on a node.
+
+        **Synopsis:**
+
+        ```python
+        from ogc import actions, state, db
+        results = actions.exec_scripts_async(path="templates/deploy/ubuntu", filters={"name": "ogc-1"})
+        all(result == True for result in results)
+        ```
+
+        Args:
+            scripts (str): The full path or directory where the scripts reside locally.
+                           Supports single file and directory.
+            filters (Mapping[str, str]): Filters to pass into exec, currently `name` and `tag` are supported.
+
+        Returns:
+            bool: True if succesful, False otherwise.
+        """
+
+        def _exec_scripts(node: bytes, scripts: str | None = None) -> bool:
+            _node: models.Machine = db.pickle_to_model(node)
+            if not scripts:
+                scripts = _node.layout.scripts
+            _scripts = Path(scripts)
+            if not _scripts.exists():
+                return False
+
+            if not _scripts.is_dir():
+                scripts_to_run = [_scripts.resolve()]
+            else:
+                # teardown file is a special file that gets executed before node
+                # destroy
+                scripts_to_run = [
+                    fname for fname in _scripts.glob("**/*") if fname.stem != "teardown"
+                ]
+
+            scripts_to_run.reverse()
+
+            context = Ctx(env=os.environ.copy(), node=_node, db=self.db)
+            steps: list[Deployment] = [
+                ScriptDeployment(script=render(s, context), name=s.name)
+                for s in scripts_to_run
+                if s.is_file()
+            ]
+
+            # Add teardown script as just a filedeployment
+            teardown_script = _scripts / "teardown"
+            if teardown_script.exists():
+                with tempfile.NamedTemporaryFile(delete=False) as fp:
+                    temp_contents = render(teardown_script, context)
+                    fp.write(temp_contents.encode())
+                    steps.append(FileDeployment(fp.name, "teardown"))
+                    steps.append(ScriptDeployment("chmod +x teardown"))
+
+            if steps:
+                msd = MultiStepDeployment(steps)
+                ssh_client = _node.ssh()
+                if ssh_client:
+                    msd.run(_node.remote, ssh_client)
+                    convert_msd_to_actions(_node, msd=msd)
+                    self.db.add(_node.instance_name, _node)
+            return True
+
+        nodes = self.db.nodes().values()
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            func = partial(_exec_scripts, scripts=scripts)
+            results = [
+                executor.submit(func, db.model_as_pickle(node)) for node in nodes
+            ]
+            wait(results, timeout=5)
+        self.db.commit()
+        return Ok(all([res.result() is True for res in results])) or Err(
+            "Unable execute scripts"
         )
-        _template = Template(filename=str(fpath), lookup=lookup)
-        return str(_template.render(**context))
-
-    def exec(self, cmd: str) -> Result[models.Node, Exception]:
-        """Runs a command on the node"""
-        script = ScriptDeployment(cmd)
-        msd = MultiStepDeployment([script])
-        try:
-            msd.run(self.node, self._ssh_client)
-        except Exception as e:
-            return Err(e)
-
-        db.M.save(
-            self.deployment.instance_name,
-            convert_msd_to_actions(self.deployment, msd=msd),
-        )
-        return Ok(self.deployment)
-
-    def exec_scripts(self, script_dir: str) -> Result[models.Node, str]:
-        scripts = Path(script_dir)
-        if not scripts.exists():
-            return Err("No deployment scripts found, skipping.")
-
-        context = Ctx(env=self.env, node=self.deployment, db=db)
-
-        # teardown file is a special file that gets executed before node
-        # destroy
-        scripts_to_run = [
-            fname for fname in scripts.glob("**/*") if fname.stem != "teardown"
-        ]
-        scripts_to_run.reverse()
-
-        steps: list[Deployment] = [
-            ScriptDeployment(self.render(s, context))
-            for s in scripts_to_run
-            if s.is_file()
-        ]
-
-        # Add teardown script as just a filedeployment
-        teardown_script = scripts / "teardown"
-        if teardown_script.exists():
-            with tempfile.NamedTemporaryFile(delete=False) as fp:
-                temp_contents = self.render(teardown_script, context)
-                fp.write(temp_contents.encode())
-                steps.append(FileDeployment(fp.name, "teardown"))
-                steps.append(ScriptDeployment("chmod +x teardown"))
-
-        if steps:
-            msd = MultiStepDeployment(steps)
-            msd.run(self.node, self._ssh_client)
-            db.M.save(
-                self.deployment.instance_name,
-                convert_msd_to_actions(self.deployment, msd=msd),
-            )
-            return Ok(self.deployment)
-        return Err("Unable to initiate deployment result")
-
-    def run(self) -> Result[models.Node, str]:
-        con.log(
-            f"Establishing connection ({self.deployment.public_ip}) "
-            f"({self.deployment.layout.username}) ({str(self.deployment.layout.ssh_private_key)})"
-        )
-
-        # Upload any files first
-        if self.deployment.layout.remote_path:
-            con.log(
-                f"Uploading file/directory contents to [purple]{self.deployment.instance_name}[/purple]",
-            )
-            self.put(
-                ".",
-                self.deployment.layout.remote_path,
-                self.deployment.layout.exclude,
-                self.deployment.layout.include,
-            )
-
-        return self.exec_scripts(self.deployment.layout.scripts)
 
     @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def put(
         self, src: str, dst: str, excludes: list[str], includes: list[str] = []
     ) -> None:
-        cmd_opts = [
-            "-avz",
-            "-e",
-            (
-                f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
-                f"-i {self.deployment.layout.ssh_private_key.expanduser()}"
-            ),
-            src,
-            f"{self.deployment.layout.username}@{self.deployment.public_ip}:{dst}",
-        ]
+        def _put(
+            node: bytes,
+            src: str,
+            dst: str,
+            excludes: list[str],
+            includes: list[str] = [],
+        ) -> None:
+            _node: models.Machine = db.pickle_to_model(node)
+            cmd_opts = [
+                "-avz",
+                "-e",
+                (
+                    f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
+                    f"-i {_node.ssh_private_key.expanduser()}"
+                ),
+                src,
+                f"{_node.username}@{_node.public_ip}:{dst}",
+            ]
 
-        if includes:
-            for include in includes:
-                cmd_opts.append(f"--include={include}")
+            if includes:
+                for include in includes:
+                    cmd_opts.append(f"--include={include}")
 
-        if excludes:
-            for exclude in excludes:
-                cmd_opts.append(f"--exclude={exclude}")
-        try:
-            sh.rsync(cmd_opts)
-        except sh.ErrorReturnCode as e:
-            log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
-            return None
+            if excludes:
+                for exclude in excludes:
+                    cmd_opts.append(f"--exclude={exclude}")
+            try:
+                sh.rsync(cmd_opts)
+            except sh.ErrorReturnCode as e:
+                log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
+                return None
+
+        nodes = self.db.nodes().values()
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            func = partial(_put, src=src, dst=dst, excludes=excludes, includes=includes)
+            results = [
+                executor.submit(func, db.model_as_pickle(node)) for node in nodes
+            ]
+            wait(results, timeout=5)
 
     @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def get(self, dst: str, src: str) -> None:
-        cmd_opts = [
-            "-avz",
-            "-e",
-            (
-                f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
-                f"-i {self.deployment.layout.ssh_private_key.expanduser()}"
-            ),
-            f"{self.deployment.layout.username}@{self.deployment.public_ip}:{dst}",
-            src,
-        ]
-        try:
-            sh.rsync(cmd_opts)
-        except sh.ErrorReturnCode as e:
-            log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
-            return None
+        def _get(node: bytes, dst: str, src: str) -> None:
+            _node: models.Machine = db.pickle_to_model(node)
+            cmd_opts = [
+                "-avz",
+                "-e",
+                (
+                    f"ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "
+                    f"-i {_node.ssh_private_key.expanduser()}"
+                ),
+                f"{_node.username}@{_node.public_ip}:{dst}",
+                src,
+            ]
+            try:
+                sh.rsync(cmd_opts)
+            except sh.ErrorReturnCode as e:
+                log.error(f"Unable to rsync: (out) {e.stdout} (err) {e.stderr}")
+                return None
+
+        nodes = self.db.nodes().values()
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            func = partial(_get, dst=dst, src=src)
+            results = [
+                executor.submit(func, db.model_as_pickle(node)) for node in nodes
+            ]
+            wait(results, timeout=5)
 
 
-def show_result(model: models.Node) -> None:
-    con.log("Deployment Result: ")
+def show_result(model: models.Machine) -> None:
+    log.info("Deployment Result: ")
     if not model.actions:
         log.error("No action results found.")
         return None
 
     toolz.thread_last(
         toolz.filter(lambda step: hasattr(step, "exit_code"), model.actions),
-        lambda step: con.log(f"  - ({step.exit_code}): {step}"),
+        lambda step: log.info(f"  - ({step.exit_code}): {step}"),
     )
 
-    con.log("Connection Information: ")
-    con.log(f"  - Node: {model.instance_name} {model.instance_state}")
-    con.log(
+    log.info("Connection Information: ")
+    log.info(f"  - Node: {model.instance_name} {model.instance_state}")
+    log.info(
         (
-            f"  - ssh -i {model.layout.ssh_private_key.expanduser()} "
-            f"{model.layout.username}@{model.public_ip}"
+            f"  - ssh -i {model.ssh_private_key.expanduser()} "
+            f"{model.username}@{model.public_ip}"
         )
     )
 
@@ -226,14 +308,13 @@ def is_success(node: models.Node) -> bool:
     )
 
 
-def convert_msd_to_actions(node: models.Node, msd: MultiStepDeployment) -> models.Node:
+def convert_msd_to_actions(
+    node: models.Machine, msd: MultiStepDeployment
+) -> models.Machine:
     """Converts results from `MultistepDeployment` to `models.Actions`"""
     for step in msd.steps:
+        log.debug(msd.steps)
         if hasattr(step, "exit_status"):
-            con.print(
-                f"[purple]{node.instance_name}[/purple] :: "
-                f"{'[green]Success[/green]' if step.exit_status == 0 else '[red]Fail[/red]'}"
-            )
             if node.actions:
                 node.actions.append(
                     models.Actions(

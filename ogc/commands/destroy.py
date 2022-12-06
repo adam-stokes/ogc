@@ -1,39 +1,18 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import click
+from dotenv import load_dotenv
 
-from ogc import actions, db
-from ogc.log import CONSOLE as con
-from ogc.log import get_logger
+import ogc.loader
+from ogc.log import CONSOLE, get_logger
+from ogc.signals import ready_teardown
 
 from .base import cli
 
-log = get_logger(__name__)
-
-
-@click.command(help="Destroys a node and its associated keys, storage, etc.")
-@click.option(
-    "--by-name",
-    required=False,
-    help="Remove node by its Name",
-)
-@click.option(
-    "--force/--no-force",
-    default=False,
-    help="Force removal regardless of connectivity",
-)
-@click.option(
-    "--only-db/--no-only-db",
-    default=False,
-    help="Force removal of database records only",
-)
-def rm(by_name: str, force: bool, only_db: bool) -> None:
-    node = db.get_node(by_name).unwrap_or_else(log.warning)
-    if not node:
-        sys.exit(1)
-    actions.teardown_async(nodes=[node], force=force, only_db=only_db)
+log = get_logger("ogc")
 
 
 @click.command(help="Destroys everything. Use with caution.")
@@ -47,16 +26,15 @@ def rm(by_name: str, force: bool, only_db: bool) -> None:
     default=False,
     help="Force removal of database records only",
 )
-def rm_all(force: bool, only_db: bool) -> None:
-    nodes = db.get_nodes().unwrap_or_else(log.warning)
-    if not nodes:
+@click.argument("spec", type=Path)
+def rm_all(force: bool, only_db: bool, spec: Path) -> None:
+    """Destroy all nodes"""
+    load_dotenv()
+    if not ogc.loader.from_path(spec):
+        log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-
-    results = actions.teardown_async(nodes=nodes, force=force, only_db=only_db)
-    log.error("Failed to teardown all nodes") if not results else con.log(
-        "Completed tearing down nodes"
-    )
+    with CONSOLE.status("Destroy machines", spinner="aesthetic"):
+        ready_teardown.send(dict(force=force, only_db=only_db))
 
 
-cli.add_command(rm)
 cli.add_command(rm_all)

@@ -23,18 +23,20 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry import retry
 
-from ogc import models
+from ogc import db, models
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import get_logger
 
-log = get_logger(__name__)
+log = get_logger("ogc")
 
 
 class BaseProvisioner:
+    """Base provisioner"""
+
     def __init__(self, layout: models.Layout):
-        self.layout = layout
-        self.env = self.layout.env()
+        self.layout: models.Layout = layout
+        self.env: t.Mapping[str, str] = os.environ.copy()
         self.provisioner: NodeDriver = self.connect()
 
     @property
@@ -44,23 +46,21 @@ class BaseProvisioner:
     def connect(self) -> NodeDriver:
         raise NotImplementedError()
 
-    def create(self) -> list[models.Node]:
+    def create(self) -> list[models.Machine] | None:
         raise NotImplementedError()
 
     def setup(self) -> None:
         """Perform some provider specific setup before launch"""
         raise NotImplementedError()
 
-    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
-    def destroy(self, node: NodeType) -> bool:
-        return self.provisioner.destroy_node(node)
-
-    def destroy_all_nodes(self, nodes: list[NodeType]) -> bool:
-        """Perform destroying of all nodes if provisioner supported"""
-        raise NotImplementedError()
+    def destroy(self, nodes: list[models.Machine]) -> bool:
+        for node in nodes:
+            self.provisioner.destroy_node(node.remote)
+        return True
 
     def node(self, **kwargs: dict[str, t.Union[str, object]]) -> t.Optional[NodeType]:
         raise NotImplementedError()
@@ -86,13 +86,13 @@ class BaseProvisioner:
         return self.provisioner.list_images(location)
 
     @retry(delay=5, jitter=(1, 5), tries=5, logger=None)
-    def _create_node(self, **kwargs: dict[str, object]) -> models.Node:
+    def _create_node(self, **kwargs: dict[str, object]) -> models.Machine:
         _opts = kwargs.copy()
         node = self.provisioner.create_node(**_opts)  # type: ignore
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0][0]
-        return models.Node(node=node, layout=self.layout)
+        return models.Machine.from_layout(node=node, layout=self.layout)
 
     def list_nodes(self, **kwargs: dict[str, object]) -> list[NodeType]:
         return self.provisioner.list_nodes(**kwargs)
@@ -152,7 +152,7 @@ class AWSProvisioner(BaseProvisioner):
         if not any(kp.name == self.layout.name for kp in self.list_key_pairs()):
             self.create_keypair(self.layout.name, str(self.layout.ssh_public_key))
 
-    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
         pass
 
     def image(self, runs_on: str) -> NodeImage:
@@ -177,7 +177,7 @@ class AWSProvisioner(BaseProvisioner):
     def delete_firewall(self, name: str) -> None:
         pass
 
-    def create(self) -> list[models.Node]:
+    def create(self) -> list[models.Machine] | None:
         pub_key = self.layout.ssh_public_key.expanduser().read_text()
         auth = NodeAuthSSHKey(pub_key)
         image = self.image(self.layout.runs_on)
@@ -216,9 +216,19 @@ class AWSProvisioner(BaseProvisioner):
             tags["environment"] = "ogc"
             tags["repo"] = "ogc"
 
-        _nodes = self.provisioner.create_node(**_opts)  # type: ignore
-        _nodes_models = [models.Node(node=node, layout=self.layout) for node in _nodes]
-        return _nodes_models
+        _nodes = self.provisioner.create_node(**opts)  # type: ignore
+        if _nodes:
+            _nodes_models = [
+                models.Machine.from_layout(node=node, layout=self.layout)
+                for node in _nodes
+            ]
+            _db = db.Manager()
+            for node in _nodes_models:
+                if node.instance_name:
+                    _db.add(node.instance_name, node)
+            _db.commit()
+            return _nodes_models
+        return None
 
     def node(self, **kwargs: dict[str, object]) -> NodeType:
         instance_id = kwargs.get("instance_id", None)
@@ -254,17 +264,18 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def destroy(self, node: NodeType) -> bool:
-        return self.provisioner.destroy_node(node, ex_sync=False)
-
-    def destroy_all_nodes(self, nodes: list[NodeType]) -> bool:
-        _nodes = self.provisioner.ex_destroy_multiple_nodes(node_list=nodes, destroy_boot_disk=True)  # type: ignore
+    def destroy(self, nodes: list[models.Machine]) -> bool:
+        _nodes = self.provisioner.ex_destroy_multiple_nodes(
+            node_list=[node.remote for node in nodes], destroy_boot_disk=True
+        )  # type: ignore
         return all([node is True for node in _nodes])
 
     def setup(self) -> None:
-        self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
+        tags = self.layout.tags or []
+        if self.layout.ports:
+            self.create_firewall(self.layout.name, self.layout.ports, tags)
 
-    def cleanup(self, node: models.Node, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
         return True
 
     def image(self, runs_on: str) -> NodeImage:
@@ -300,7 +311,7 @@ class GCEProvisioner(BaseProvisioner):
     def list_firewalls(self) -> list[str]:
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
-    def create(self) -> list[models.Node]:
+    def create(self) -> list[models.Machine] | None:
         image = self.image(self.layout.runs_on)
         if not image and not self.layout.username:
             raise ProvisionException(
@@ -351,7 +362,14 @@ class GCEProvisioner(BaseProvisioner):
             ex_preemptible=True,
         )
         _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
-        _nodes_models = [models.Node(node=node, layout=self.layout) for node in _nodes]
+        _nodes_models = [
+            models.Machine.from_layout(node=node, layout=self.layout) for node in _nodes
+        ]
+        _db = db.Manager()
+        for node in _nodes_models:
+            if node.instance_name:
+                _db.add(node.instance_name, node)
+        _db.commit()
         return _nodes_models
 
     def node(self, **kwargs: dict[str, object]) -> NodeType | None:
@@ -367,9 +385,10 @@ class GCEProvisioner(BaseProvisioner):
 
 
 def choose_provisioner(
-    name: str,
     layout: models.Layout,
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
-    provisioner: t.Type[BaseProvisioner] = choices[name]
-    return provisioner(layout=layout)
+    provisioner: t.Type[BaseProvisioner] = choices[layout.provider]
+    p = provisioner(layout=layout)
+    p.connect()
+    return p
