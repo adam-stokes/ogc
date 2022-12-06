@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ogc"
-version = "2.2.0"
+version = "3.0.0"
 description = "Provisioner, no more, no less."
 authors = ["Adam Stokes <51892+adam-stokes@users.noreply.github.com>"]
 license = "MIT"
@@ -23,7 +23,7 @@ colorama = "^0.4.4"
 click-didyoumean = "^0.3.0"
 rich = ">=10.0.0"
 python-slugify = "^6.1.1"
-attrs = "^21.4.0"
+attrs = "^22.1.0"
 arrow = "^1.2.2"
 pampy = "^0.3.0"
 toolz = "^0.11.2"
@@ -35,6 +35,8 @@ apache-libcloud = "^3.6.1"
 jinja2 = "^3.1.2"
 dotty-dict = "^1.3.1"
 wrapt-timeout-decorator = "^1.3.12.2"
+sqlitedict = "^2.0.0"
+blinker = "^1.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest-cov = "^4.0.0"
@@ -43,7 +45,7 @@ pytest-cov = "^4.0.0"
 allow_redefinition = false
 check_untyped_defs = true
 disallow_any_explicit = false
-disallow_untyped_calls = true
+disallow_untyped_calls = false
 ignore_errors = false
 ignore_missing_imports = true
 implicit_reexport = false
@@ -81,7 +83,7 @@ filterwarnings = [
 ]
 
 [tool.poetry.dev-dependencies]
-black = "^22.2.0"
+black = "^23.0.0"
 isort = "^5.10.1"
 python-frontmatter = "^1.0.0"
 pylint = "^2.12.2"
@@ -116,7 +118,9 @@ _git-commit = "git commit -asm 'Next Release'"
 _git-push = "git push"
 _git-push-tags = "git push --tags"
 _publish = "poetry publish --build -u ${PYPI_USER} -p ${PYPI_PASS}"
-bump-rev = "punch --part patch"
+bump-patch = "punch --part patch"
+bump-minor = "punch --part minor"
+bump-major = "punch --part major"
 fix = ["isort", "format"]
 format = "black ."
 isort  = "isort ."
@@ -125,7 +129,7 @@ mypy   = "mypy ogc maint"
 publish-docs = "mkdocs gh-deploy"
 pyre   = "pyre --search-path \"$(python -c 'import site; print(site.getsitepackages()[0])')\""
 pytest = "pytest --cov=ogc"
-release = ["clean", "isort", "format", "bump-rev", "publish-docs"]
+release = ["clean", "isort", "format", "bump-patch", "publish-docs"]
 serve-docs  = "mkdocs serve"
 test = ["pyre", "mypy", "lint", "pytest"]
 
