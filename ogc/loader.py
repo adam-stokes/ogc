@@ -7,6 +7,10 @@ import os
 import sys
 from pathlib import Path
 
+from .log import get_logger
+
+log = get_logger("ogc")
+
 
 def from_path(path: Path) -> object | None:
     """Loads module into intepreter"""
@@ -16,5 +20,6 @@ def from_path(path: Path) -> object | None:
     modname, _ = os.path.splitext(module)
     try:
         return importlib.import_module(modname)
-    except TypeError:
+    except ModuleNotFoundError as e:
+        log.warning(f"Could not load layout: {e}")
         return None
