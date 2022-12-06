@@ -77,6 +77,8 @@ class Deployer:
 
     def down(self) -> bool:
         """Tear down machines"""
+        if not self.exec("./teardown").ok():
+            log.debug("Could not run teardown script")
         self.provisioner.destroy(nodes=self.db.nodes().values())
         for node_name in self.db.nodes().keys():
             self.db.remove(node_name)
@@ -113,6 +115,7 @@ class Deployer:
                         error=e.stderr.decode(),
                     )
                 )
+            self.db.add(_node.instance_name, _node)
             return bool(error_code == 0)
 
         nodes = self.db.nodes().values()
