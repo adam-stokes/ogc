@@ -27,7 +27,6 @@ from retry import retry
 from safetywrap import Err, Ok, Result
 
 from ogc import db, models
-from ogc.log import CONSOLE as con
 from ogc.log import get_logger
 from ogc.provision import BaseProvisioner
 
@@ -96,27 +95,23 @@ class Deployer:
                 f"{_node.layout.username}@{_node.public_ip}",
             ]
             cmd_opts.append(cmd)
-            error_code = 0
             try:
                 out = sh.ssh(cmd_opts, _env=os.environ.copy(), _err_to_out=True)  # type: ignore
-                _node.actions.append(
-                    models.Actions(
+                log.debug(
+                    dict(
                         exit_code=out.exit_code,
                         out=out.stdout.decode(),
                         error=out.stderr.decode(),
                     )
                 )
             except sh.ErrorReturnCode as e:
-                error_code = e.exit_code  # type: ignore
-                _node.actions.append(
-                    models.Actions(
+                log.debug(
+                    dict(
                         exit_code=e.exit_code,  # type: ignore
                         out=e.stdout.decode(),
                         error=e.stderr.decode(),
                     )
                 )
-            self.db.add(_node.instance_name, _node)
-            return bool(error_code == 0)
 
         nodes = self.db.nodes().values()
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -125,8 +120,7 @@ class Deployer:
                 executor.submit(func, db.model_as_pickle(node)) for node in nodes
             ]
             wait(results, timeout=5)
-        self.db.commit()
-        return Ok(True)
+            return Ok(True)
 
     def exec_scripts(
         self, scripts: str | None = None, filters: t.Mapping[str, str] | None = None
@@ -192,8 +186,8 @@ class Deployer:
                 ssh_client = _node.ssh()
                 if ssh_client:
                     msd.run(_node.remote, ssh_client)
-                    convert_msd_to_actions(_node, msd=msd)
-                    self.db.add(_node.instance_name, _node)
+                for step in msd.steps:
+                    log.debug(step)
             return True
 
         nodes = self.db.nodes().values()
@@ -203,10 +197,9 @@ class Deployer:
                 executor.submit(func, db.model_as_pickle(node)) for node in nodes
             ]
             wait(results, timeout=5)
-        self.db.commit()
-        return Ok(all([res.result() is True for res in results])) or Err(
-            "Unable execute scripts"
-        )
+            return Ok(all([res.result() is True for res in results])) or Err(
+                "Unable execute scripts"
+            )
 
     @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def put(

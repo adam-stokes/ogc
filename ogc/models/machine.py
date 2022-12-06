@@ -9,7 +9,6 @@ from libcloud.compute.base import Node as NodeType
 from libcloud.compute.ssh import ParamikoSSHClient
 from retry import retry
 
-from .actions import Actions
 from .layout import Layout
 from .utils import get_new_uuid
 
@@ -30,7 +29,6 @@ class Machine:
     created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
     extra: t.Mapping | None = None
     tainted: bool = False
-    actions: list[Actions] | None = None
 
     @instance_name.default
     def _get_instance_name(self) -> str:
