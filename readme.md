@@ -20,25 +20,17 @@ $ pip install poetry
 $ poetry install
 ```
 
-!!! caution
-    If using poetry make sure to prefix running of `ogc` with the following:
-
-    ```
-    $ poetry run ogc
-    ```
-
-    Optionally, load up the virtualenv beforehand:
-
-    ```
-    $ poetry shell
-    ```
-
-Or install from [pypi](https://pypi.org):
+If using poetry make sure to prefix running of `ogc` with the following:
 
 ```
-$ pip install ogc
+$ poetry run ogc
 ```
 
+Optionally, load up the virtualenv beforehand:
+
+```
+$ poetry shell
+```
 ## Provider Setup
 
 OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. 
@@ -56,8 +48,7 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
-!!! note
-    More information can be found in our [Providers](user-guide/providers.md) documentation.
+More information can be found in our [Providers](user-guide/providers.md) documentation.
 
 ## Define Provisioning
 
@@ -80,7 +71,7 @@ layout = Layout(
     provider="google",
     remote_path="/home/ubuntu/ogc",
     runs_on="ubuntu-2004-lts",
-    scale=1,
+    scale=5,
     scripts="fixtures/ex_deploy_ubuntu",
     username="ubuntu",
     ssh_private_key="~/.ssh/id_rsa_libcloud",
@@ -108,7 +99,7 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 
 ## Provision and Deploy
 
-Once the specification is set, environment variables configured and a postgres database is accessible, execute a deployment in a new terminal:
+Once the specification is set, environment variables configured, execute a deployment in a new terminal:
 
 ```shell
 $ ogc launch ubuntu.py
