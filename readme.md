@@ -39,16 +39,6 @@ Or install from [pypi](https://pypi.org):
 $ pip install ogc
 ```
 
-## Initialize
-
-Next is to initialize the OGC environment, to do that run:
-
-```
-$ ogc init
-```
-
-It will ask you for a name, feel free to put something other than your actual name if desired.
-
 ## Provider Setup
 
 OGC currently supports AWS and GCP out of the box (more added soon). In order for OGC to connect and deploy to these clouds a few environment variables are needed. 
@@ -71,34 +61,49 @@ GOOGLE_DATACENTER="us-central1-a"
 
 ## Define Provisioning
 
-Once setup is complete, a provision specification is needed. This defines `ssh-keys` and one or more `layouts` to be provisioned. 
+Once setup is complete, a provision layout is needed.
 
-Create a file `ogc.toml` and place in the top level directory where `ogc` is run:
+Create a file `ubuntu.py`:
 
-```toml
-name = "ci"
+```python
+from ogc.deployer import Deployer
+from ogc.log import get_logger
+from ogc.models import Layout
+from ogc.provision import choose_provisioner
+from ogc.signals import after_provision, ready_provision, ready_teardown
 
-[ssh-keys]
-private = "~/.ssh/id_rsa_libcloud"
-public = "~/.ssh/id_rsa_libcloud.pub"
+log = get_logger("ogc")
 
-[layouts.elastic-agent-ubuntu]
-artifacts = "/home/ubuntu/output/*.xml"
-exclude = [ ".git", ".venv", "artifacts" ]
-extra = { }
-include = [ ]
-instance-size = "e2-standard-4"
-ports = [ "22:22", "80:80", "443:443", "5601:5601" ]
-provider = "google"
-remote-path = "/home/ubuntu/ogc"
-runs-on = "ubuntu-2004-lts"
-scale = 1
-scripts = "fixtures/ex_deploy_ubuntu"
-tags = [ "elastic-agent-8-1-x", "ubuntu-gcp" ]
-username = "ubuntu"
+layout = Layout(
+    instance_size="e2-standard-4",
+    name="ubuntu-ogc",
+    provider="google",
+    remote_path="/home/ubuntu/ogc",
+    runs_on="ubuntu-2004-lts",
+    scale=1,
+    scripts="fixtures/ex_deploy_ubuntu",
+    username="ubuntu",
+    ssh_private_key="~/.ssh/id_rsa_libcloud",
+    ssh_public_key="~/.ssh/id_rsa_libcloud.pub",
+    ports=["22:22", "80:80", "443:443", "5601:5601"],
+    tags=[],
+    labels=dict(
+        division="engineering", org="obs", team="observability", project="perf"
+    ),
+)
+
+# Alternatively
+# from ogc.provisioner import GCEProvisioner
+# provisioner = GCEProvisioner(layout=layout)
+
+provisioner = choose_provisioner(layout=layout)
+deploy = Deployer.from_provisioner(provisioner=provisioner)
+deploy.up()
+deploy.exec_scripts()
+deploy.down()
 ```
 
-This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-8** with Ubuntu OS. 
+This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-4** with Ubuntu OS. 
 The `scripts` section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.
 
 ## Provision and Deploy
@@ -106,14 +111,7 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 Once the specification is set, environment variables configured and a postgres database is accessible, execute a deployment in a new terminal:
 
 ```shell
-$ ogc launch
-```
-
-!!! note
-    If the file is something other than `ogc.toml` append the `--spec` option to the launch command:
-
-```shell
-$ ogc launch --spec my-custom-provision.toml
+$ ogc launch ubuntu.py
 ```
 
 # Next steps
