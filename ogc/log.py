@@ -36,7 +36,7 @@ def get_logger(name: str) -> Logger:
             log_time_format="[%H:%M:%S]",
             tracebacks_show_locals=True,
             tracebacks_suppress=["click"],
-            show_level=True if log_level == "DEBUG" else False,
+            show_level=True,
         )
         logger.addHandler(handler)
 
