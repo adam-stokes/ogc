@@ -28,12 +28,15 @@ def get_logger(name: str) -> Logger:
 
         log_level = os.environ.get("OGC_LOG_LEVEL", "").upper()
         logger = logging.getLogger("ogc")
-        logger.setLevel(logging.DEBUG if log_level == "DEBUG" else "INFO")
+        logger.setLevel(logging.DEBUG if log_level == "DEBUG" else logging.INFO)
         handler = RichHandler(
             rich_tracebacks=True,
             omit_repeated_times=False,
-            show_time=False,
+            show_time=True,
+            log_time_format="[%H:%M:%S]",
+            tracebacks_show_locals=True,
             tracebacks_suppress=["click"],
+            show_level=True if log_level == "DEBUG" else False,
         )
         logger.addHandler(handler)
 
