@@ -154,8 +154,7 @@ class Deployer:
                 scripts_to_run = [
                     fname for fname in _scripts.glob("**/*") if fname.stem != "teardown"
                 ]
-
-            scripts_to_run.reverse()
+                # scripts_to_run.reverse()
 
             context = Ctx(env=os.environ.copy(), node=_node, db=self.db)
             steps: list[Deployment] = [

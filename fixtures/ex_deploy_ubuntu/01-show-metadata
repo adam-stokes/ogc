@@ -1,7 +1,8 @@
 #!/bin/bash
 <%! from ogc.templatetags import run, header, hr %>
 <%namespace name="utils" file="/functions.mako"/>
-
+${utils.install_pkgs(['python3-pip'])}
+pip install sh
 
 ${header('Connection information')}
 echo "id: ${node.instance_id}"

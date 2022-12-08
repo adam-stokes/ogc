@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+from __future__ import annotations
+
+from sh import ls
+
+print(ls('/', l=True))
