@@ -57,31 +57,17 @@ def ls(by_tag: str, by_name: str, output_file: str) -> None:
     table.add_column("Name")
     table.add_column("Created")
     table.add_column("Status")
-    table.add_column("Connection", style="bold red on black")
     table.add_column("Labels")
-    table.add_column("Actions", style="purple")
+    table.add_column("Connection", style="bold red on black")
 
     for data in rows:
-        completed_actions = []
-        failed_actions = []
-        actions = []
-        if actions:
-            for action in actions:
-                if action.exit_code != 0:
-                    failed_actions.append(action)
-                else:
-                    completed_actions.append(action)
         table.add_row(
             data.id.split("-")[0],
             data.instance_name,
             arrow.get(data.created).humanize(),
             data.instance_state,
+            ",".join([f"[purple]{k}[/]={v}" for k, v in data.layout.labels.items()]),
             f"ssh -i {data.ssh_private_key} {data.username}@{data.public_ip}",
-            ",".join([f"{k}={v}" for k, v in data.layout.labels.items()]),
-            (
-                f"pass: {'[green]:heavy_check_mark:[/]' if not failed_actions else len(completed_actions)} "
-                f"fail: [red]{str(len(failed_actions)) if len(failed_actions) > 0 else len(failed_actions)}[/]"
-            ),
         )
 
     con.print(table, justify="center")

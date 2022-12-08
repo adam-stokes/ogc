@@ -127,15 +127,7 @@ class Deployer:
     ) -> Result[bool, str]:
         """Execute scripts
 
-        Async function for executing scripts/templates on a node.
-
-        **Synopsis:**
-
-        ```python
-        from ogc import actions, state, db
-        results = actions.exec_scripts_async(path="templates/deploy/ubuntu", filters={"name": "ogc-1"})
-        all(result == True for result in results)
-        ```
+        Executing scripts/templates on a node.
 
         Args:
             scripts (str): The full path or directory where the scripts reside locally.
@@ -187,7 +179,20 @@ class Deployer:
                 if ssh_client:
                     msd.run(_node.remote, ssh_client)
                 for step in msd.steps:
-                    log.debug(step)
+                    match step:
+                        case FileDeployment():
+                            log.debug(
+                                f"(source) {step.source if hasattr(step, 'source') else ''} "
+                                f"(target) {step.target if hasattr(step, 'target') else ''} "
+                            )
+                        case ScriptDeployment():
+                            log.debug(
+                                f"(exit) {step.exit_status if hasattr(step, 'exit_status') else 0} "
+                                f"(out) {step.stdout if hasattr(step, 'stdout') else ''} "
+                                f"(stderr) {step.stderr if hasattr(step, 'stderr') else ''}"
+                            )
+                        case _:
+                            log.debug(step)
             return True
 
         nodes = self.db.nodes().values()
@@ -272,59 +277,3 @@ class Deployer:
                 executor.submit(func, db.model_as_pickle(node)) for node in nodes
             ]
             wait(results, timeout=5)
-
-
-def show_result(model: models.Machine) -> None:
-    log.info("Deployment Result: ")
-    if not model.actions:
-        log.error("No action results found.")
-        return None
-
-    toolz.thread_last(
-        toolz.filter(lambda step: hasattr(step, "exit_code"), model.actions),
-        lambda step: log.info(f"  - ({step.exit_code}): {step}"),
-    )
-
-    log.info("Connection Information: ")
-    log.info(f"  - Node: {model.instance_name} {model.instance_state}")
-    log.info(
-        (
-            f"  - ssh -i {model.ssh_private_key.expanduser()} "
-            f"{model.username}@{model.public_ip}"
-        )
-    )
-
-
-def is_success(node: models.Node) -> bool:
-    if not node.actions:
-        return False
-
-    return all(
-        step.exit_code == 0 for step in node.actions if hasattr(step, "exit_code")
-    )
-
-
-def convert_msd_to_actions(
-    node: models.Machine, msd: MultiStepDeployment
-) -> models.Machine:
-    """Converts results from `MultistepDeployment` to `models.Actions`"""
-    for step in msd.steps:
-        log.debug(msd.steps)
-        if hasattr(step, "exit_status"):
-            if node.actions:
-                node.actions.append(
-                    models.Actions(
-                        exit_code=step.exit_status,
-                        out=step.stdout,
-                        error=step.stderr,
-                    )
-                )
-            else:
-                node.actions = [
-                    models.Actions(
-                        exit_code=step.exit_status,
-                        out=step.stdout,
-                        error=step.stderr,
-                    )
-                ]
-    return node

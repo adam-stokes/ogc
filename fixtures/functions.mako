@@ -25,3 +25,12 @@ tar -xf ${src} -C ${dst}
 tar -xf ${src}
 % endif
 </%def>
+
+<%def name="run(exe, *args, **kwargs)">
+<% 
+import sh
+cmd = sh.Command(exe)
+cmd = str(cmd.bake(*args, **kwargs))
+%>
+${cmd}
+</%def>

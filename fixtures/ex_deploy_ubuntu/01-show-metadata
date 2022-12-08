@@ -1,18 +1,29 @@
 #!/bin/bash
+<%! from ogc.templatetags import run, header, hr %>
+<%namespace name="utils" file="/functions.mako"/>
 
-echo "### ALL NODES"
+
+${header('Connection information')}
+echo "id: ${node.instance_id}"
+echo "name: ${node.instance_name}"
+echo "connection: ${node.layout.username}@${node.public_ip}"
+echo "provider ${node.layout.provider}"
+${hr()}
+
+${run('ls', '/', l=True, h=True)}
+
+
+${header('All nodes')}
 % for obj in db.nodes().values():
-% if obj.layout.tags:
-echo "${', '.join(obj.layout.tags)}" > $HOME/tags.txt
-% endif
-echo "[ID: ${obj.instance_id}] Name: ${obj.instance_name} || Connection: ${obj.layout.username}@${obj.public_ip} || Provider: ${obj.layout.provider}"
+echo "id: ${obj.instance_id}"
+echo "name: ${obj.instance_name}"
+echo "connection: ${obj.layout.username}@${obj.public_ip}"
+echo "provider ${obj.layout.provider}"
 % endfor
-echo "### ALL NODES"
+${header('All nodes finished')}
 
 
-echo "### CURRENT NODE"
-echo "[ID: ${node.instance_id}] Name: ${node.instance_name} || Connection: ${node.layout.username}@${node.public_ip} || Provider: ${node.layout.provider}"
-echo "### CURRENT NODE"
 
 
-mkdir -p $HOME/output && touch $HOME/output/test.xml
+${run('mkdir', node.layout.remote_path + "/output", p=True)} && \
+${run('touch', node.layout.remote_path + "/output/test.xml")}
