@@ -23,3 +23,13 @@ def from_path(path: Path) -> object | None:
     except ModuleNotFoundError as e:
         log.warning(f"Could not load layout: {e}")
         return None
+
+
+def run(mod: object, func: str, **kwargs: str) -> None:
+    """Runs the module function passing in options"""
+    try:
+        task_cmd = getattr(mod, func)
+        task_cmd(**kwargs)
+    except AttributeError as exc:
+        log.error(exc)
+        sys.exit(1)

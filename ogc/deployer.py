@@ -13,7 +13,6 @@ from multiprocessing import cpu_count
 from pathlib import Path
 
 import sh
-import toolz
 from attr import define, field
 from libcloud.compute.deployment import (
     Deployment,
@@ -95,23 +94,24 @@ class Deployer:
                 f"{_node.layout.username}@{_node.public_ip}",
             ]
             cmd_opts.append(cmd)
+            return_status = None
             try:
                 out = sh.ssh(cmd_opts, _env=os.environ.copy(), _err_to_out=True)  # type: ignore
-                log.debug(
-                    dict(
-                        exit_code=out.exit_code,
-                        out=out.stdout.decode(),
-                        error=out.stderr.decode(),
-                    )
+                return_status = dict(
+                    exit_code=out.exit_code,
+                    out=out.stdout.decode(),
+                    error=out.stderr.decode(),
                 )
             except sh.ErrorReturnCode as e:
-                log.debug(
-                    dict(
-                        exit_code=e.exit_code,  # type: ignore
-                        out=e.stdout.decode(),
-                        error=e.stderr.decode(),
-                    )
+                return_status = dict(
+                    exit_code=e.exit_code,  # type: ignore
+                    out=e.stdout.decode(),
+                    error=e.stderr.decode(),
                 )
+            if return_status:
+                log.debug(f"exit_code: {return_status['exit_code']}")
+                log.debug(f"out: {return_status['out']}")
+                log.debug(f"error: {return_status['error']}")
 
         nodes = self.db.nodes().values()
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:

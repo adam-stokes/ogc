@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 import ogc.loader
 from ogc import db
-from ogc.log import get_logger
+from ogc.log import CONSOLE, get_logger
 from ogc.signals import after_provision
 
 from .base import cli
@@ -47,7 +47,8 @@ def exec(spec: Path, cmd: str) -> None:
     if not deploy:
         log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    after_provision.send({"cmd": cmd})
+    with CONSOLE.status("Executing deployment command", spinner="aesthetic"):
+        after_provision.send({"cmd": cmd})
 
 
 @click.command(help="(R)Execute a set of scripts")
@@ -57,7 +58,8 @@ def exec_scripts(spec: Path, path: str) -> None:
     if not ogc.loader.from_path(spec):
         log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    after_provision.send({"path": path})
+    with CONSOLE.status("Executing deployment scripts", spinner="aesthetic"):
+        after_provision.send({"path": path})
 
 
 cli.add_command(ssh)

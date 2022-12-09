@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+import typing as t
+
+import rich.status
+
 from ogc.deployer import Deployer
 from ogc.log import get_logger
 from ogc.models import Layout
 from ogc.provision import choose_provisioner
-from ogc.signals import after_provision, ready_provision, ready_teardown
 
 log = get_logger("ogc")
 
@@ -16,7 +19,7 @@ layout = Layout(
     provider="google",
     remote_path="/home/ubuntu/ogc",
     runs_on="ubuntu-2004-lts",
-    scale=1,
+    scale=15,
     scripts="fixtures/ex_deploy_ubuntu",
     username="ubuntu",
     ssh_private_key="~/.ssh/id_rsa_libcloud",
@@ -27,38 +30,46 @@ layout = Layout(
         division="engineering", org="obs", team="observability", project="perf"
     ),
 )
+log.debug(layout)
 
 provisioner = choose_provisioner(layout=layout)
+log.debug(provisioner)
+
 deploy = Deployer.from_provisioner(provisioner=provisioner)
+log.debug(deploy)
 
 
-@ready_provision.connect
-def start(sender) -> None:
-    log.debug(layout)
-    deploy.up()
-
-    if "with_deploy" in sender and sender["with_deploy"]:
-        log.info("Executing scripts")
-        deploy.exec_scripts()
-
-    log.debug(deploy)
+def _get_status(**kwargs) -> rich.status.Status | None:
+    status: "rich.status.Status" | None = t.cast(
+        rich.status.Status, kwargs.get("status", None)
+    )
+    return status
 
 
-@ready_teardown.connect
-def end(sender) -> None:
-    provisioner = choose_provisioner(layout=layout)
-    deploy = Deployer.from_provisioner(provisioner=provisioner)
-    log.debug(f"Teardown {deploy} - {sender}")
-    deploy.down()
+def up(**kwargs: str) -> None:
+    """Bring up machines"""
+    status = _get_status(**kwargs)
+    if status:
+        status.start()
+        status.update(f"Deploying {layout.scale} node(s) for layout: {layout.name}")
+        deploy.up()
+        status.stop()
 
 
-@after_provision.connect
-def do(sender) -> None:
-    provisioner = choose_provisioner(layout=layout)
-    deploy = Deployer.from_provisioner(provisioner=provisioner)
-    if "cmd" in sender and sender["cmd"]:
-        deploy.exec(sender["cmd"])
-    elif "path" in sender and sender["path"]:
-        deploy.exec_scripts(scripts=sender["path"])
+def run(**kwargs: str) -> None:
+    """Execute scripts on machines"""
+    if kwargs.get("path", None):
+        log.info(f"Executing scripts path: {kwargs['path']}")
+        deploy.exec_scripts(scripts=kwargs["path"])
+    elif kwargs.get("cmd", None):
+        log.info(f"Executing command: {kwargs['cmd']}")
+        deploy.exec(kwargs["cmd"])
     else:
+        log.info(f"Executing scripts path: {layout.scripts}")
         deploy.exec_scripts()
+
+
+def down(**kwargs: str) -> None:
+    """Bring down machines"""
+    log.info(f"Teardown {deploy} - {kwargs}")
+    deploy.down()

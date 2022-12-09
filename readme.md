@@ -89,9 +89,22 @@ layout = Layout(
 
 provisioner = choose_provisioner(layout=layout)
 deploy = Deployer.from_provisioner(provisioner=provisioner)
-deploy.up()
-deploy.exec_scripts()
-deploy.down()
+def up(**kwargs):
+    deploy.up()
+
+def run(**kwargs):
+    # pass in a directory/filepath -o path=fixtures/ubuntu
+    if kwargs.get("path", None):
+        deploy.exec_scripts(scripts=kwargs["path"])
+    # pass in a cmd with -o cmd='ls -l /'
+    elif kwargs.get("cmd", None):
+        deploy.exec(kwargs["cmd"])
+    else:
+        deploy.exec_scripts()    
+    deploy.exec_scripts()
+
+def down(**kwargs):
+    deploy.down()
 ```
 
 This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-4** with Ubuntu OS. 
@@ -102,7 +115,9 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 Once the specification is set, environment variables configured, execute a deployment in a new terminal:
 
 ```shell
-$ ogc launch ubuntu.py
+$ ogc up ubuntu.py
+$ ogc run ubuntu.py -o cmd='sudo apt-get update && sudo apt-get dist-upgrade'
+$ ogc down ubuntu.py
 ```
 
 # Next steps

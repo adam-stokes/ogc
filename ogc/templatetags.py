@@ -8,7 +8,7 @@ LINE_SEP = "-"
 
 
 def run(exe: str, *args: str | None, **kwargs: bool | None) -> str:
-    """Converts a `sh.Command` to it's string reprsentation"""
+    """Converts a `sh.Command` to its string reprsentation"""
     cmd = sh.Command(exe)
     kwargs_parsed = {k: v for k, v in kwargs.items() if not k.startswith("_ogc")}
     out = str(cmd.bake(*args, **kwargs_parsed))

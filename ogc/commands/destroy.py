@@ -17,24 +17,28 @@ log = get_logger("ogc")
 
 @click.command(help="Destroys everything. Use with caution.")
 @click.option(
-    "--force/--no-force",
-    default=False,
-    help="Force removal regardless of connectivity",
-)
-@click.option(
-    "--only-db/--no-only-db",
-    default=False,
-    help="Force removal of database records only",
+    "--options",
+    "-o",
+    multiple=True,
+    help="Pass in -o <key>=<value> -o <key>=<value> which is used in the provision spec",
 )
 @click.argument("spec", type=Path)
-def rm_all(force: bool, only_db: bool, spec: Path) -> None:
+@click.argument("task", type=str, required=False)
+def rm_all(options: list[str], spec: Path, task: str) -> None:
     """Destroy all nodes"""
     load_dotenv()
-    if not ogc.loader.from_path(spec):
+
+    opts = {opt.split("=")[0]: opt.split("=")[1] for opt in options}
+
+    mod = ogc.loader.from_path(spec)
+    if not mod:
         log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    with CONSOLE.status("Destroy machines", spinner="aesthetic"):
-        ready_teardown.send(dict(force=force, only_db=only_db))
+    if task:
+        ogc.loader.run(mod, task, **opts)
+    else:
+        with CONSOLE.status("Destroy machines", spinner="aesthetic"):
+            ready_teardown.send(opts)
 
 
 cli.add_command(rm_all)
