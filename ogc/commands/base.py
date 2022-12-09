@@ -30,16 +30,16 @@ def cli(options: list[str], verbose: bool, task: str, spec: Path) -> None:
     load_dotenv()
     log = get_logger("ogc", verbose)
 
+    opts = {opt.split("=")[0]: opt.split("=")[1] for opt in options}
+    opts["status"] = Status("Running", console=CONSOLE)
+
     if task in RESERVED_TASKS:
         match task.lower():
             case "ls":
-                return ui_nodes_table()
+                return ui_nodes_table(output_file=opts.get("output_file", None))
             case "ssh":
                 # Special case, treat spec as a instance target
                 return ssh(str(spec))
-
-    opts = {opt.split("=")[0]: opt.split("=")[1] for opt in options}
-    opts["status"] = Status("Running", console=CONSOLE)
 
     mod = ogc.loader.from_path(spec)
     if not mod:
