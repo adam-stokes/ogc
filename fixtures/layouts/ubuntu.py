@@ -39,7 +39,7 @@ deploy = Deployer.from_provisioner(provisioner=provisioner)
 log.debug(deploy)
 
 
-def _get_status(**kwargs) -> rich.status.Status | None:
+def _get_status(**kwargs: str) -> rich.status.Status | None:
     status: "rich.status.Status" | None = t.cast(
         rich.status.Status, kwargs.get("status", None)
     )
