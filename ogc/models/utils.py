@@ -13,6 +13,7 @@ def get_new_uuid() -> str:
 
 
 def serialize(inst: str, field: str, value: str | datetime.datetime | Path) -> str:
+    """Serializes value into its proper type"""
     if isinstance(value, datetime.datetime):
         return value.isoformat()
     if isinstance(value, Path):

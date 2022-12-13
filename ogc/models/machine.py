@@ -64,6 +64,7 @@ class Machine:
 
     @retry(tries=5, delay=5, jitter=(1, 5), logger=None)
     def ssh(self) -> ParamikoSSHClient | None:
+        """Provides an SSH Client for use with provisioning"""
         if self.public_ip and self.username:
             _client = ParamikoSSHClient(
                 self.public_ip,

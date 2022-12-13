@@ -56,6 +56,14 @@ def render(template: Path, context: Ctx) -> str:
 
 @define
 class Deployer:
+    """Deployer
+    
+    The `Deployer` instance is responsible for bringing up nodes for a
+    particular provisioner, whether it be AWS or Google. This also has
+    the responsibility of uploading/downloading files to/from node(s)
+    and facilities for executing commands or a set of scripts on
+    the node(s).
+    """
     provisioner: BaseProvisioner
     db: t.Any
     force: bool = False
@@ -65,6 +73,14 @@ class Deployer:
     def from_provisioner(
         cls, provisioner: BaseProvisioner, force: bool = False
     ) -> Deployer:
+        """Obtain deployer instance
+
+        Args:
+            provisioner (BaseProvisioner): AWSProvisioner | GCEProvisioner
+            force (bool): Force load
+        Returns:
+            `Deployer`: A deployer instance
+        """
         return Deployer(provisioner=provisioner, force=force, db=db.Manager())
 
     def up(self) -> bool:
@@ -84,7 +100,14 @@ class Deployer:
         return True
 
     def exec(self, cmd: str) -> Result[bool, Exception]:
-        """Runs a command on the node(s)"""
+        """Execute commands on node(s)
+
+        Args:
+            cmd (str): Command to run on node
+
+        Returns:
+            Result[bool, Exception]: True if succesful, False otherwise.
+        """
 
         def _exec(node: bytes, cmd: str) -> bool:
             _node: models.Machine = db.pickle_to_model(node)
@@ -135,7 +158,7 @@ class Deployer:
             filters (Mapping[str, str]): Filters to pass into exec, currently `name` and `tag` are supported.
 
         Returns:
-            bool: True if succesful, False otherwise.
+            Result[bool, str]: True if succesful, False otherwise.
         """
 
         def _exec_scripts(node: bytes, scripts: str | None = None) -> bool:
@@ -209,6 +232,17 @@ class Deployer:
     def put(
         self, src: str, dst: str, excludes: list[str], includes: list[str] = []
     ) -> None:
+        """Upload file to remote node(s)
+
+        Args:
+            src (str): The full path or directory where the scripts reside locally.
+            dst (str): Remote destination
+            excludes (list[str]): List of file patterns to exclude
+            includes (list[str]): List of file patterns to include
+
+        Returns:
+            None: nop.
+        """
         def _put(
             node: bytes,
             src: str,
@@ -251,6 +285,16 @@ class Deployer:
 
     @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def get(self, dst: str, src: str) -> None:
+        """Download file to remote node(s)
+
+        Args:
+            dst (str): Remote destination
+            src (str): The full path or directory where download files locally.
+
+        Returns:
+            None: nop.
+        """
+
         def _get(node: bytes, dst: str, src: str) -> None:
             _node: models.Machine = db.pickle_to_model(node)
             cmd_opts = [

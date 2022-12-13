@@ -61,7 +61,6 @@ from ogc.deployer import Deployer
 from ogc.log import get_logger
 from ogc.models import Layout
 from ogc.provision import choose_provisioner
-from ogc.signals import after_provision, ready_provision, ready_teardown
 
 log = get_logger("ogc")
 
@@ -101,7 +100,6 @@ def run(**kwargs):
         deploy.exec(kwargs["cmd"])
     else:
         deploy.exec_scripts()    
-    deploy.exec_scripts()
 
 def down(**kwargs):
     deploy.down()

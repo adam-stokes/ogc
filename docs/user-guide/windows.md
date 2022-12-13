@@ -38,31 +38,61 @@ Once complete, grab the AMI ID, as this will be used in the `layout` specificati
 
 To provision and deploy a Windows machine, the following example spec will work:
 
-```toml
-name = "ci"
+Create a file `windows.py`:
 
-[ssh-keys]
-public = "~/.ssh/id_rsa_libcloud.pub"
-private = "~/.ssh/id_rsa_libcloud"
+```python
+from ogc.deployer import Deployer
+from ogc.log import get_logger
+from ogc.models import Layout
+from ogc.provision import choose_provisioner
 
-[layouts.elastic-agent-windows]
-runs-on = "ami-0587bd602f1da2f1d"
-instance-size = "c5.2xlarge"
-username = "ogc"
-scripts = "fixtures/ex_deploy_windows"
-provider = "aws"
-scale = 1
-remote-path = "ogc-src"
-exclude = [ ".git", ".venv", "artifacts" ]
-artifacts = "output\\*.xml"
-tags = [ "elastic-agent-8.1.x", "windows-aws" ]
-ports = [ "22:22" ]
+log = get_logger("ogc")
+
+layout = Layout(
+    instance_size="c5.2xlarge",
+    name="ubuntu-ogc",
+    provider="aws",
+    remote_path="ogc-src",
+    runs_on="ami-0587bd602f1da2f1d",
+    scale=1,
+    scripts="fixtures/ex_deploy_windows",
+    username="ogc",
+    ssh_private_key="~/.ssh/id_rsa_libcloud",
+    ssh_public_key="~/.ssh/id_rsa_libcloud.pub",
+    ports=["22:22", "80:80", "443:443", "5601:5601"],
+    tags=[],
+    labels=dict(
+        division="engineering", org="obs", team="observability", project="perf"
+    ),
+)
+
+# Alternatively
+# from ogc.provisioner import GCEProvisioner
+# provisioner = GCEProvisioner(layout=layout)
+
+provisioner = choose_provisioner(layout=layout)
+deploy = Deployer.from_provisioner(provisioner=provisioner)
+def up(**kwargs):
+    deploy.up()
+
+def run(**kwargs):
+    # pass in a directory/filepath -o path=fixtures/ubuntu
+    if kwargs.get("path", None):
+        deploy.exec_scripts(scripts=kwargs["path"])
+    # pass in a cmd with -o cmd='ls -l /'
+    elif kwargs.get("cmd", None):
+        deploy.exec(kwargs["cmd"])
+    else:
+        deploy.exec_scripts()    
+
+def down(**kwargs):
+    deploy.down()
 ```
 
 Once defined, simply running:
 
 ``` sh
-$ ogc launch
+$ ogc up windows.py
 ```
 
 Will get you a provisioned Windows machine!

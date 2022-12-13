@@ -71,5 +71,8 @@ nav:
   - 'Developer Guide':
     - 'Managing nodes': 'developer-guide/managing-nodes.md'
     - 'API':
-        - 'ogc': 'developer-guide/api/actions.md'
+        - 'ogc.deployer': 'developer-guide/api/deployer.md'
+        - 'ogc.models.machine': 'developer-guide/api/models/machine.md'
+        - 'ogc.models.layout': 'developer-guide/api/models/layout.md'
+        - 'ogc.models.utils': 'developer-guide/api/models/utils.md'
   - 'CLI Reference': 'commands/ogc.md'

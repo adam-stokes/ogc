@@ -53,45 +53,41 @@ With templating, you have the ability to query the underlying database to gather
 | db  | Exposes access to the database |
 | node | Current deployed node metadata |
 | env | Environment variables are made available through this key, `env['USER']` |
-| user | Current user metadata |
 
 
 ```bash
 #!/bin/bash
-echo ""
-% for node in db.get_nodes().unwrap():
-echo "[ID: ${node.instance_id}] Name: ${node.instance_name} || Connection: ${node.username}@${node.public_ip} || Provider: ${node.layout.provider}"
-% endfor
-echo ""
-```
+<%! from ogc.templatetags import run, header, hr %>
 
-The runtime environment is also available within the template context. In one example, we can export the following into our `.env` file and reference those in the templates:
-
-- **OGC_ELASTIC_AGENT_VERSION**
-- **OGC_ELASTIC_AGENT_SHA**
-- **OGC_ELASTIC_AGENT_VERSION**
-- **OGC_FLEET_URL**
-- **OGC_FLEET_ENROLLMENT_TOKEN** 
-
-See the below example for downloading elastic-agent and enrolling it into a fleet server:
-
-``` bash
-#!/bin/bash
 <%namespace name="utils" file="/functions.mako"/>
 
-<%
-url = "https://staging.elastic.co/%s-%s/downloads/beats/elastic-agent/elastic-agent-%s-linux-x86_64.tar.gz" % (env['OGC_ELASTIC_AGENT_VERSION'], env['OGC_ELASTIC_AGENT_SHA'], env['OGC_ELASTIC_AGENT_VERSION'])
-%>
-${utils.setup_env()}
-${utils.install_pkgs(['nano'])}
-${utils.download(url, 'elastic-agent.tar.gz')}
-${utils.extract('elastic-agent.tar.gz')}
+${header('Connection information')}
+echo "id: ${node.instance_id}"
+echo "name: ${node.instance_name}"
+echo "connection: ${node.layout.username}@${node.public_ip}"
+echo "provider ${node.layout.provider}"
+${hr()}
 
-mv elastic-agent-${env['OGC_ELASTIC_AGENT_VERSION']}-linux-x86_64 elastic-agent
+${run('ls', '/', l=True, h=True)}
 
-cd elastic-agent && ./elastic-agent install -f --url=${env['OGC_FLEET_URL']} --enrollment-token=${env['OGC_FLEET_ENROLLMENT_TOKEN']}
+
+${header('All nodes')}
+% for obj in db.nodes().values():
+echo "id: ${obj.instance_id}"
+echo "name: ${obj.instance_name}"
+echo "connection: ${obj.layout.username}@${obj.public_ip}"
+echo "provider ${obj.layout.provider}"
+% endfor
+${header('All nodes finished')}
+
+${run('mkdir', node.layout.remote_path + "/output", p=True)} && \
+${run('touch', node.layout.remote_path + "/output/test.xml")}
 ```
 
+The runtime environment is also available within the template context.
+
+!!! note
+    Any environment variables exported within OGC will be exposed in the templates.
 ## Reusable helpers
 
 In the above example we reference a file called `/functions.mako` this is just another template file that sits just outside of our defined `scripts`, for example, if our `scripts` is defined to be in `scripts/my_ubuntu_deploy` then this `functions.mako` will live at `scripts/functions.mako`. 

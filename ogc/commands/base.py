@@ -19,7 +19,7 @@ from ogc.ssh import ssh
     "--options",
     "-o",
     multiple=True,
-    help="Pass in -o <key>=<value> -o <key>=<value> which is used in the provision spec",
+    help="Pass in -o KEY=VALUE -o KEY=VALUE which is used in the provision spec",
     metavar="KEY=VAL",
 )
 @click.option("--verbose", "-v", required=False, help="Turn on debug", is_flag=True)

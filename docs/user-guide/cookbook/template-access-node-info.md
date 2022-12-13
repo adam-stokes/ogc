@@ -20,12 +20,12 @@ Save this file in the location of your defined `scripts` and give it a indexed n
 
 In some cases you may need to grab information from another node in the deployment, for example, a second node running Kibana in which the first node needs to perform some kind of API calls against it. 
 
-We can accomplish this using the `db` and `session` modules that's exposed in our templates. Create a file `02-curl-remote` with the following:
+We can accomplish this using the `db` and modules that's exposed in our templates. Create a file `02-curl-remote` with the following:
 
 ``` sh
 #!/bin/bash
 sudo pip install httpie
-KIBANA_HOST=${session.query(db.Node).filter(db.Node.instance_name.contains(["kibana"]).first() or '')}
+KIBANA_HOST=${node.instance_name.contains(["kibana"]).first() or '')}
 
 http -a username:passsword -f GET https://$KIBANA_HOST:5601/fleet/setup kbn-xsrf:ogc
 ```
