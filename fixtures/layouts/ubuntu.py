@@ -39,21 +39,10 @@ deploy = Deployer.from_provisioner(provisioner=provisioner)
 log.debug(deploy)
 
 
-def _get_status(**kwargs: str) -> rich.status.Status | None:
-    status: "rich.status.Status" | None = t.cast(
-        rich.status.Status, kwargs.get("status", None)
-    )
-    return status
-
-
 def up(**kwargs: str) -> None:
     """Bring up machines"""
-    status = _get_status(**kwargs)
-    if status:
-        status.start()
-        status.update(f"Deploying {layout.scale} node(s) for layout: {layout.name}")
-        deploy.up()
-        status.stop()
+    log.info(f"Deploying {layout.scale} node(s) for layout: {layout.name}")
+    deploy.up()
 
 
 def run(**kwargs: str) -> None:

@@ -12,7 +12,7 @@ from .utils import convert_tags_to_slug_tags
 @define
 class Layout:
     """Layout model
-    
+
     Synopsis:
 
     ```python
@@ -74,6 +74,7 @@ class Layout:
         deploy.down()
     ```
     """
+
     instance_size: str
     name: str
     provider: str

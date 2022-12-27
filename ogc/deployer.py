@@ -57,13 +57,14 @@ def render(template: Path, context: Ctx) -> str:
 @define
 class Deployer:
     """Deployer
-    
+
     The `Deployer` instance is responsible for bringing up nodes for a
     particular provisioner, whether it be AWS or Google. This also has
     the responsibility of uploading/downloading files to/from node(s)
     and facilities for executing commands or a set of scripts on
     the node(s).
     """
+
     provisioner: BaseProvisioner
     db: t.Any
     force: bool = False
@@ -243,6 +244,7 @@ class Deployer:
         Returns:
             None: nop.
         """
+
         def _put(
             node: bytes,
             src: str,
