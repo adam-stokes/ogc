@@ -20,8 +20,6 @@ class Layout:
 
     import typing as t
 
-    import rich.status
-
     from ogc.deployer import Deployer
     from ogc.log import get_logger
     from ogc.models import Layout
@@ -55,20 +53,8 @@ class Layout:
     log.debug(deploy)
 
 
-    def _get_status(**kwargs: str) -> rich.status.Status | None:
-        status: "rich.status.Status" | None = t.cast(
-            rich.status.Status, kwargs.get("status", None)
-        )
-        return status
-
-
     def up(**kwargs: str) -> None:
-        status = _get_status(**kwargs)
-        if status:
-            status.start()
-            status.update(f"Deploying {layout.scale} node(s) for layout: {layout.name}")
-            deploy.up()
-            status.stop()
+        deploy.up()
 
 
     def run(**kwargs: str) -> None:
