@@ -2,10 +2,6 @@
 
 from __future__ import annotations
 
-import typing as t
-
-import rich.status
-
 from ogc.deployer import Deployer
 from ogc.log import get_logger
 from ogc.models import Layout
