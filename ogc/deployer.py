@@ -23,7 +23,7 @@ from libcloud.compute.deployment import (
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from retry import retry
-from safetywrap import Err, Ok, Result
+
 
 from ogc import db, models
 from ogc.log import get_logger
@@ -92,7 +92,7 @@ class Deployer:
 
     def down(self) -> bool:
         """Tear down machines"""
-        if not self.exec("./teardown").ok():
+        if not self.exec("./teardown"):
             log.debug("Could not run teardown script")
         self.provisioner.destroy(nodes=self.db.nodes().values())
         for node_name in self.db.nodes().keys():
@@ -100,7 +100,7 @@ class Deployer:
         self.db.commit()
         return True
 
-    def exec(self, cmd: str) -> Result[bool, Exception]:
+    def exec(self, cmd: str) -> bool:
         """Execute commands on node(s)
 
         Args:
@@ -136,6 +136,8 @@ class Deployer:
                 log.debug(f"exit_code: {return_status['exit_code']}")
                 log.debug(f"out: {return_status['out']}")
                 log.debug(f"error: {return_status['error']}")
+                return bool(return_status['exit_code'] == 0)
+            return False
 
         nodes = self.db.nodes().values()
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -144,11 +146,11 @@ class Deployer:
                 executor.submit(func, db.model_as_pickle(node)) for node in nodes
             ]
             wait(results, timeout=5)
-            return Ok(True)
+            return True
 
     def exec_scripts(
         self, scripts: str | None = None, filters: t.Mapping[str, str] | None = None
-    ) -> Result[bool, str]:
+    ) -> bool:
         """Execute scripts
 
         Executing scripts/templates on a node.
@@ -159,7 +161,7 @@ class Deployer:
             filters (Mapping[str, str]): Filters to pass into exec, currently `name` and `tag` are supported.
 
         Returns:
-            Result[bool, str]: True if succesful, False otherwise.
+            True if succesful, False otherwise.
         """
 
         def _exec_scripts(node: bytes, scripts: str | None = None) -> bool:
@@ -225,9 +227,8 @@ class Deployer:
                 executor.submit(func, db.model_as_pickle(node)) for node in nodes
             ]
             wait(results, timeout=5)
-            return Ok(all([res.result() is True for res in results])) or Err(
-                "Unable execute scripts"
-            )
+            return all([res.result() is True for res in results])
+
 
     @retry(tries=3, delay=5, jitter=(5, 15), logger=None)
     def put(
