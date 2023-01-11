@@ -8,8 +8,14 @@
       
       
       
+      
+        <link rel="prev" href="../../deployer/">
+      
+      
+        <link rel="next" href="../layout/">
+      
       <link rel="icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-8.5.10">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.1">
     
     
       
@@ -17,15 +23,10 @@
       
     
     
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.975780f9.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.3bd4f189.min.css">
       
         
         <link rel="stylesheet" href="../../../../assets/stylesheets/palette.2505c338.min.css">
-        
-          
-          
-          <meta name="theme-color" content="#4cae4f">
-        
       
       
 
@@ -178,9 +179,7 @@
                     
 
 
-  
-
-<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href="../../../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
       
@@ -498,70 +497,120 @@
       
         <li class="md-nav__item">
   <a href="#ogc.models.machine.Machine" class="md-nav__link">
-    Machine
-  </a>
-  
-    <nav class="md-nav" aria-label="Machine">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__eq__" class="md-nav__link">
-    __eq__()
+    ogc.models.machine.Machine
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__getstate__" class="md-nav__link">
-    __getstate__()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.remote" class="md-nav__link">
+    remote
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__init__" class="md-nav__link">
-    __init__()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.layout" class="md-nav__link">
+    layout
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__ne__" class="md-nav__link">
-    __ne__()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.id" class="md-nav__link">
+    id
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__repr__" class="md-nav__link">
-    __repr__()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.username" class="md-nav__link">
+    username
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.__setstate__" class="md-nav__link">
-    __setstate__()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.ssh_private_key" class="md-nav__link">
+    ssh_private_key
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ogc.models.machine.Machine.from_layout" class="md-nav__link">
-    from_layout()
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.ssh_public_key" class="md-nav__link">
+    ssh_public_key
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_name" class="md-nav__link">
+    instance_name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_id" class="md-nav__link">
+    instance_id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_state" class="md-nav__link">
+    instance_state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.public_ip" class="md-nav__link">
+    public_ip
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.private_ip" class="md-nav__link">
+    private_ip
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.created" class="md-nav__link">
+    created
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.extra" class="md-nav__link">
+    extra
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.tainted" class="md-nav__link">
+    tainted
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ogc.models.machine.Machine.ssh" class="md-nav__link">
     ssh()
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.from_layout" class="md-nav__link">
+    from_layout()
+  </a>
   
 </li>
       
@@ -637,6 +686,151 @@
               </div>
             
             
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine" class="md-nav__link">
+    ogc.models.machine.Machine
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.remote" class="md-nav__link">
+    remote
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.layout" class="md-nav__link">
+    layout
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.id" class="md-nav__link">
+    id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.username" class="md-nav__link">
+    username
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.ssh_private_key" class="md-nav__link">
+    ssh_private_key
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.ssh_public_key" class="md-nav__link">
+    ssh_public_key
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_name" class="md-nav__link">
+    instance_name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_id" class="md-nav__link">
+    instance_id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.instance_state" class="md-nav__link">
+    instance_state
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.public_ip" class="md-nav__link">
+    public_ip
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.private_ip" class="md-nav__link">
+    private_ip
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.created" class="md-nav__link">
+    created
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.extra" class="md-nav__link">
+    extra
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.tainted" class="md-nav__link">
+    tainted
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.ssh" class="md-nav__link">
+    ssh()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.models.machine.Machine.from_layout" class="md-nav__link">
+    from_layout()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           
             <div class="md-content" data-md-component="content">
@@ -644,32 +838,24 @@
                 
                   
 
-  <a href="https://github.com/adam-stokes/ogc/edit/master/docs/developer-guide/api/models/machine.md" title="Edit this page" class="md-content__button md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25Z"/></svg>
-  </a>
+  
+  
+
 
 
 <h1 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h1>
 
 
-  <div class="doc doc-object doc-class">
+<div class="doc doc-object doc-class">
 
 
-
-<h2 id="ogc.models.machine.Machine" class="doc doc-heading">
-        <code>
-ogc.models.machine.Machine        </code>
-
-
-
-<a href="#ogc.models.machine.Machine" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents first">
+<a id="ogc.models.machine.Machine"></a>
+  <div class="doc doc-contents first">
 
 
 
 
+  
 
   <div class="doc doc-children">
 
@@ -679,210 +865,403 @@ ogc.models.machine.Machine        </code>
 
 
 
+<div class="doc doc-object doc-attribute">
 
 
 
+<h2 id="ogc.models.machine.Machine.remote" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">remote</span>
 
-
-
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
-<h3 id="ogc.models.machine.Machine.__eq__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__eq__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.remote" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">remote</span><span class="p">:</span> <span class="n">NodeType</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Method generated by attrs for class Machine.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.layout" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">layout</span>
 
-
-<h3 id="ogc.models.machine.Machine.__getstate__" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">__getstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__getstate__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.layout" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">layout</span><span class="p">:</span> <span class="n">Layout</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Automatically created by attrs.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.id" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">id</span>
 
-
-<h3 id="ogc.models.machine.Machine.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tainted</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.id" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">factory</span><span class="o">=</span><span class="n">get_new_uuid</span><span class="p">)</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Method generated by attrs for class Machine.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.username" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">username</span>
 
-
-<h3 id="ogc.models.machine.Machine.__ne__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__ne__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.username" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Method generated by attrs for class Machine.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.ssh_private_key" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">ssh_private_key</span>
 
-
-<h3 id="ogc.models.machine.Machine.__repr__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__repr__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.ssh_private_key" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ssh_private_key</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Method generated by attrs for class Machine.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.ssh_public_key" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">ssh_public_key</span>
 
-
-<h3 id="ogc.models.machine.Machine.__setstate__" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">__setstate__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.__setstate__" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.ssh_public_key" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ssh_public_key</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Automatically created by attrs.</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
 
+<h2 id="ogc.models.machine.Machine.instance_name" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">instance_name</span>
 
-
-<h3 id="ogc.models.machine.Machine.from_layout" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">from_layout</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span></code>
-
-  <span class="doc doc-properties">
-      <small class="doc doc-property doc-property-classmethod"><code>classmethod</code></small>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
   </span>
 
-<a href="#ogc.models.machine.Machine.from_layout" class="headerlink" title="Permanent link">&para;</a></h3>
+<a href="#ogc.models.machine.Machine.instance_name" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">instance_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
 
-    <div class="doc doc-contents ">
-
-      <p>Grabs the objects for deployment/provision</p>
-
-    </div>
-
+  <div class="doc doc-contents ">
   </div>
 
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-  <div class="doc doc-object doc-method">
+
+<h2 id="ogc.models.machine.Machine.instance_id" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">instance_id</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.instance_id" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">instance_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
 
-<h3 id="ogc.models.machine.Machine.ssh" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">ssh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+<h2 id="ogc.models.machine.Machine.instance_state" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">instance_state</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.instance_state" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">instance_state</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
 
 
-<a href="#ogc.models.machine.Machine.ssh" class="headerlink" title="Permanent link">&para;</a></h3>
 
-    <div class="doc doc-contents ">
+<h2 id="ogc.models.machine.Machine.public_ip" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">public_ip</span>
 
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.public_ip" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">public_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.models.machine.Machine.private_ip" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">private_ip</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.private_ip" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">private_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.models.machine.Machine.created" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">created</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.created" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">created</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.models.machine.Machine.extra" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">extra</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.extra" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">extra</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.models.machine.Machine.tainted" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">tainted</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.tainted" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">tainted</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.models.machine.Machine.ssh" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">ssh</span>
+
+
+<a href="#ogc.models.machine.Machine.ssh" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ssh</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">ParamikoSSHClient</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
       <p>Provides an SSH Client for use with provisioning</p>
 
-    </div>
+      <details class="quote">
+        <summary>Source code in <code>ogc/models/machine.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-65">65</a></span>
+<span class="normal"><a href="#__codelineno-0-66">66</a></span>
+<span class="normal"><a href="#__codelineno-0-67">67</a></span>
+<span class="normal"><a href="#__codelineno-0-68">68</a></span>
+<span class="normal"><a href="#__codelineno-0-69">69</a></span>
+<span class="normal"><a href="#__codelineno-0-70">70</a></span>
+<span class="normal"><a href="#__codelineno-0-71">71</a></span>
+<span class="normal"><a href="#__codelineno-0-72">72</a></span>
+<span class="normal"><a href="#__codelineno-0-73">73</a></span>
+<span class="normal"><a href="#__codelineno-0-74">74</a></span>
+<span class="normal"><a href="#__codelineno-0-75">75</a></span>
+<span class="normal"><a href="#__codelineno-0-76">76</a></span>
+<span class="normal"><a href="#__codelineno-0-77">77</a></span>
+<span class="normal"><a href="#__codelineno-0-78">78</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-65" name="__codelineno-0-65"></a><span class="nd">@retry</span><span class="p">(</span><span class="n">tries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-66" name="__codelineno-0-66"></a><span class="k">def</span> <span class="nf">ssh</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParamikoSSHClient</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-67" name="__codelineno-0-67"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Provides an SSH Client for use with provisioning&quot;&quot;&quot;</span>
+<a id="__codelineno-0-68" name="__codelineno-0-68"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">public_ip</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+<a id="__codelineno-0-69" name="__codelineno-0-69"></a>        <span class="n">_client</span> <span class="o">=</span> <span class="n">ParamikoSSHClient</span><span class="p">(</span>
+<a id="__codelineno-0-70" name="__codelineno-0-70"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">public_ip</span><span class="p">,</span>
+<a id="__codelineno-0-71" name="__codelineno-0-71"></a>            <span class="n">username</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+<a id="__codelineno-0-72" name="__codelineno-0-72"></a>            <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ssh_private_key</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()),</span>
+<a id="__codelineno-0-73" name="__codelineno-0-73"></a>            <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+<a id="__codelineno-0-74" name="__codelineno-0-74"></a>            <span class="n">use_compression</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-75" name="__codelineno-0-75"></a>        <span class="p">)</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>        <span class="n">_client</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="k">return</span> <span class="n">_client</span>
+<a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="k">return</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.models.machine.Machine.from_layout" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">from_layout</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#ogc.models.machine.Machine.from_layout" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">from_layout</span><span class="p">(</span><span class="n">layout</span><span class="p">:</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">NodeType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Machine</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Grabs the objects for deployment/provision</p>
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/models/machine.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-80">80</a></span>
+<span class="normal"><a href="#__codelineno-0-81">81</a></span>
+<span class="normal"><a href="#__codelineno-0-82">82</a></span>
+<span class="normal"><a href="#__codelineno-0-83">83</a></span>
+<span class="normal"><a href="#__codelineno-0-84">84</a></span>
+<span class="normal"><a href="#__codelineno-0-85">85</a></span>
+<span class="normal"><a href="#__codelineno-0-86">86</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-80" name="__codelineno-0-80"></a><span class="nd">@classmethod</span>
+<a id="__codelineno-0-81" name="__codelineno-0-81"></a><span class="k">def</span> <span class="nf">from_layout</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">layout</span><span class="p">:</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">NodeType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Machine</span><span class="p">:</span>
+<a id="__codelineno-0-82" name="__codelineno-0-82"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Grabs the objects for deployment/provision&quot;&quot;&quot;</span>
+<a id="__codelineno-0-83" name="__codelineno-0-83"></a>    <span class="k">return</span> <span class="n">Machine</span><span class="p">(</span>
+<a id="__codelineno-0-84" name="__codelineno-0-84"></a>        <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+<a id="__codelineno-0-85" name="__codelineno-0-85"></a>        <span class="n">remote</span><span class="o">=</span><span class="n">node</span><span class="p">,</span>
+<a id="__codelineno-0-86" name="__codelineno-0-86"></a>    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
 
   </div>
 
-
-
-
-
   </div>
 
-    </div>
-
-  </div>
+</div>
 
 
 
@@ -903,42 +1282,6 @@ ogc.models.machine.Machine        </code>
       </main>
       
         <footer class="md-footer">
-  
-    
-    <nav class="md-footer__inner md-grid" aria-label="Footer" >
-      
-        
-        <a href="../../deployer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ogc.deployer" rel="prev">
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
-          </div>
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              ogc.deployer
-            </div>
-          </div>
-        </a>
-      
-      
-        
-        <a href="../layout/" class="md-footer__link md-footer__link--next" aria-label="Next: ogc.models.layout" rel="next">
-          <div class="md-footer__title">
-            <div class="md-ellipsis">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              ogc.models.layout
-            </div>
-          </div>
-          <div class="md-footer__button md-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
-          </div>
-        </a>
-      
-    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -961,12 +1304,11 @@ ogc.models.machine.Machine        </code>
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.integrate", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.16e2a7d4.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.12658920.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../../assets/javascripts/bundle.5a2dcb6a.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.5cf534bf.min.js"></script>
       
-    
     
   </body>
 </html>
