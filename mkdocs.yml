@@ -2,7 +2,17 @@ site_name: OGC
 repo_url: https://github.com/adam-stokes/ogc
 plugins:
     - search
-    - mkdocstrings
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    show_source: true
+                    show_bases: false
+                    merge_init_into_class: true
+                    show_signature_annotations: true
+                    show_if_no_docstring: true
+                    separate_signature: true
+                    members_order: source    
 theme: 
     name: material
     palette:
@@ -12,8 +22,9 @@ theme:
         - navigation.instant
         - navigation.expand
         - navigation.top
-        - toc.integrate
         - toc.follow
+        - content.code.copy
+        - content.code.annotate
     font:
         text: Ubuntu
         code: Ubuntu Mono        
@@ -28,7 +39,7 @@ markdown_extensions:
     - footnotes
     - abbr
     - markdown.extensions.codehilite:
-        linenums: True
+        linenums: false
         guess_lang: false
         use_pygments: true
         noclasses: true
