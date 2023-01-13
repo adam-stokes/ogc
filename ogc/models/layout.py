@@ -1,17 +1,15 @@
 """Layout model"""
 from __future__ import annotations
 
-import typing as t
-from pathlib import Path
+# from attr import define, field
+from peewee import CharField, IntegerField
+from playhouse.sqlite_ext import JSONField
 
-from attr import define, field
-
-from .utils import convert_tags_to_slug_tags
+from . import BaseModel
 
 
-@define
-class Layout:
-    """Layout model
+class LayoutModel(BaseModel):
+    """Layout Model
 
     Synopsis:
 
@@ -75,21 +73,23 @@ class Layout:
     ```
     """
 
-    instance_size: str
-    name: str
-    provider: str
-    remote_path: str
-    runs_on: str
-    scale: int
-    scripts: str
-    username: str
-    ssh_private_key: t.LiteralString | Path = field(converter=Path)
-    ssh_public_key: t.LiteralString | Path = field(converter=Path)
-    tags: list[str] | None = field(converter=convert_tags_to_slug_tags)
-    labels: t.Mapping[str, str] | None = None
-    ports: list[str] | None = None
-    arch: str | None = "amd64"
-    artifacts: str | None = None
-    exclude: list[str] | None = None
-    extra: t.Mapping[str, str] | None = None
-    include: list[str] | None = None
+    class Meta:
+        table_name = "layouts"
+
+    instance_size = CharField()
+    name = CharField()
+    provider = CharField()
+    remote_path = CharField()
+    runs_on = CharField()
+    scale = IntegerField()
+    scripts = CharField()
+    username = CharField()
+    ssh_private_key = CharField()
+    ssh_public_key = CharField()
+    tags = JSONField(null=True)
+    labels = JSONField()
+    ports = JSONField()
+    arch = CharField(null=True)
+    exclude = CharField(null=True)
+    extra = JSONField(null=True)
+    include = CharField(null=True)

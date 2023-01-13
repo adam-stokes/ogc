@@ -1,86 +1,71 @@
 from __future__ import annotations
 
 import datetime
-import typing as t
 from pathlib import Path
 
-from attr import define, field
-from libcloud.compute.base import Node as NodeType
+import paramiko.ssh_exception
+from libcloud.compute.base import Node
 from libcloud.compute.ssh import ParamikoSSHClient
+from marshmallow_peewee import ModelSchema
+from peewee import BooleanField, CharField, DateTimeField, ForeignKeyField
+from playhouse.sqlite_ext import JSONField
 from retry import retry
 
-from .layout import Layout
-from .utils import get_new_uuid
+from ogc.log import get_logger
+
+from ..db import pickle_to_model
+from . import BaseModel
+from .layout import LayoutModel
+
+log = get_logger("ogc")
 
 
-@define
-class Machine:
-    remote: NodeType
-    layout: Layout
-    id: str = field(init=False, factory=get_new_uuid)
-    username: str | None = field(init=False)
-    ssh_private_key: Path = field(init=False)
-    ssh_public_key: Path = field(init=False)
-    instance_name: str | None = field(init=False)
-    instance_id: str | None = field(init=False)
-    instance_state: str | None = field(init=False)
-    public_ip: str | None = field(init=False)
-    private_ip: str | None = field(init=False)
-    created: datetime.datetime = field(init=False, default=datetime.datetime.utcnow())
-    extra: t.Mapping | None = None
-    tainted: bool = False
+class MachineModel(BaseModel):
+    class Meta:
+        table_name = "machines"
 
-    @instance_name.default
-    def _get_instance_name(self) -> str:
-        return self.remote.name
+    layout = ForeignKeyField(LayoutModel, backref="machines", on_delete="CASCADE")
+    instance_name = CharField()
+    instance_id = CharField()
+    instance_state = CharField()
+    public_ip = CharField()
+    private_ip = CharField()
+    created = DateTimeField(default=datetime.datetime.utcnow())
+    extra = JSONField(null=True)
+    tainted = BooleanField(default=False)
+    remote_state_file = CharField(null=True)
 
-    @instance_id.default
-    def _get_instance_id(self) -> str:
-        return str(self.remote.id)
-
-    @instance_state.default
-    def _get_instance_state(self) -> str:
-        return self.remote.state
-
-    @public_ip.default
-    def _get_public_ip(self) -> str:
-        return self.remote.public_ips[0]
-
-    @private_ip.default
-    def _get_private_ip(self) -> str:
-        return self.remote.private_ips[0]
-
-    @username.default
-    def _get_username(self) -> str:
-        return self.layout.username
-
-    @ssh_private_key.default
-    def _get_ssh_private_key(self) -> Path:
-        return Path(self.layout.ssh_private_key)
-
-    @ssh_public_key.default
-    def _get_ssh_public_key(self) -> Path:
-        return Path(self.layout.ssh_public_key)
+    def state(self) -> Node | None:
+        """Returns the store remote state of a node in the cloud"""
+        state_file_p = Path(str(self.remote_state_file))
+        if state_file_p.exists():
+            out: Node = pickle_to_model(state_file_p.read_bytes())
+            return out
+        return None
 
     @retry(tries=5, delay=5, jitter=(1, 5), logger=None)
     def ssh(self) -> ParamikoSSHClient | None:
         """Provides an SSH Client for use with provisioning"""
-        if self.public_ip and self.username:
+        priv_key = Path(self.layout.ssh_private_key).expanduser().resolve()
+        if self.public_ip and self.layout.username:
             _client = ParamikoSSHClient(
-                self.public_ip,
-                username=self.username,
-                key=str(self.ssh_private_key.expanduser()),
+                str(self.public_ip),
+                username=str(self.layout.username),
+                key=str(priv_key),
                 timeout=300,
                 use_compression=True,
             )
-            _client.connect()
+            try:
+                _client.connect()
+            except paramiko.ssh_exception.SSHException:
+                log.error(
+                    f"Authentication failed for: ({self.layout.name}/{priv_key}) {self.layout.username}@{self.public_ip}"
+                )
+                return None
             return _client
         return None
 
-    @classmethod
-    def from_layout(cls, layout: Layout, node: NodeType) -> Machine:
-        """Grabs the objects for deployment/provision"""
-        return Machine(
-            layout=layout,
-            remote=node,
-        )
+
+class MachineSchema(ModelSchema):
+    class Meta:
+        model = MachineModel

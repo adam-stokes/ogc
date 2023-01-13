@@ -8,11 +8,12 @@ import functools
 import os
 import typing as t
 import uuid
+from pathlib import Path
 
 from libcloud.common.google import ResourceNotFoundError
-from libcloud.compute.base import KeyPair
-from libcloud.compute.base import Node as NodeType
 from libcloud.compute.base import (
+    KeyPair,
+    Node,
     NodeAuthSSHKey,
     NodeDriver,
     NodeImage,
@@ -23,10 +24,12 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry import retry
 
-from ogc import db, models
+from ogc import db, signals
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import get_logger
+from ogc.models.layout import LayoutModel
+from ogc.models.machine import MachineModel
 
 log = get_logger("ogc")
 
@@ -34,8 +37,8 @@ log = get_logger("ogc")
 class BaseProvisioner:
     """Base provisioner"""
 
-    def __init__(self, layout: models.Layout):
-        self.layout: models.Layout = layout
+    def __init__(self, layout: LayoutModel):
+        self.layout: LayoutModel = layout
         self.env: t.Mapping[str, str] = os.environ.copy()
         self.provisioner: NodeDriver = self.connect()
 
@@ -46,23 +49,24 @@ class BaseProvisioner:
     def connect(self) -> NodeDriver:
         raise NotImplementedError()
 
-    def create(self) -> list[models.Machine] | None:
+    def create(self) -> list[MachineModel] | None:
         raise NotImplementedError()
 
     def setup(self) -> None:
         """Perform some provider specific setup before launch"""
         raise NotImplementedError()
 
-    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: MachineModel, **kwargs: dict[str, object]) -> bool:
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
-    def destroy(self, nodes: list[models.Machine]) -> bool:
+    def destroy(self, nodes: list[MachineModel]) -> bool:
         for node in nodes:
-            self.provisioner.destroy_node(node.remote)
+            if node.remote_state_file:
+                self.provisioner.destroy_node(node.state())
         return True
 
-    def node(self, **kwargs: dict[str, t.Union[str, object]]) -> t.Optional[NodeType]:
+    def node(self, **kwargs: t.Mapping[str, t.Union[str, object]]) -> Node | None:
         raise NotImplementedError()
 
     def sizes(self, instance_size: str) -> list[NodeSize]:
@@ -86,15 +90,28 @@ class BaseProvisioner:
         return self.provisioner.list_images(location)
 
     @retry(delay=5, jitter=(1, 5), tries=5, logger=None)
-    def _create_node(self, **kwargs: dict[str, object]) -> models.Machine:
+    def _create_node(self, **kwargs: dict[str, object]) -> MachineModel:
         _opts = kwargs.copy()
         node = self.provisioner.create_node(**_opts)  # type: ignore
         node = self.provisioner.wait_until_running(
             nodes=[node], wait_period=5, timeout=300
         )[0][0]
-        return models.Machine.from_layout(node=node, layout=self.layout)
+        if not node.id:
+            node.id = str(uuid.uuid4())
+        state_file_p = db.cache_path() / node.id
+        state_file_p.write_bytes(db.model_as_pickle(node))
+        machine = MachineModel(
+            layout=self.layout,
+            instance_name=node.name,
+            instance_id=node.id,
+            instance_state=node.state,
+            public_ip=node.public_ips[0],
+            private_ip=node.private_ips[0],
+            remote_state_file=(db.cache_path() / node.id).resolve(),
+        )
+        return machine
 
-    def list_nodes(self, **kwargs: dict[str, object]) -> list[NodeType]:
+    def list_nodes(self, **kwargs: dict[str, object]) -> list[Node]:
         return self.provisioner.list_nodes(**kwargs)
 
     def create_keypair(self, name: str, ssh_public_key: str) -> KeyPair:
@@ -152,7 +169,7 @@ class AWSProvisioner(BaseProvisioner):
         if not any(kp.name == self.layout.name for kp in self.list_key_pairs()):
             self.create_keypair(self.layout.name, str(self.layout.ssh_public_key))
 
-    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: Node, **kwargs: dict[str, object]) -> bool:
         pass
 
     def image(self, runs_on: str) -> NodeImage:
@@ -177,8 +194,8 @@ class AWSProvisioner(BaseProvisioner):
     def delete_firewall(self, name: str) -> None:
         pass
 
-    def create(self) -> list[models.Machine] | None:
-        pub_key = self.layout.ssh_public_key.expanduser().read_text()
+    def create(self) -> list[MachineModel] | None:
+        pub_key = Path(self.layout.ssh_public_key).expanduser().read_text()
         auth = NodeAuthSSHKey(pub_key)
         image = self.image(self.layout.runs_on)
         if not image and not self.layout.username:
@@ -216,21 +233,24 @@ class AWSProvisioner(BaseProvisioner):
             tags["environment"] = "ogc"
             tags["repo"] = "ogc"
 
-        _nodes = self.provisioner.create_node(**opts)  # type: ignore
-        if _nodes:
-            _nodes_models = [
-                models.Machine.from_layout(node=node, layout=self.layout)
-                for node in _nodes
-            ]
-            _db = db.Manager()
-            for node in _nodes_models:
-                if node.instance_name:
-                    _db.add(node.instance_name, node)
-            _db.commit()
-            return _nodes_models
-        return None
+        node = self.provisioner.create_node(**opts)  # type: ignore
+        _machines = []
+        state_file_p = db.cache_path() / node.id
+        state_file_p.write_bytes(db.model_as_pickle(node))
+        machine = MachineModel(
+            layout=self.layout,
+            instance_name=node.name,
+            instance_id=node.id,
+            instance_state=node.state,
+            public_ip=node.public_ips[0],
+            private_ip=node.private_ips[0],
+            remote_state_file=(db.cache_path() / node.id).resolve(),
+        )
+        machine.save()
+        _machines.append(machine)
+        return _machines if _machines else None
 
-    def node(self, **kwargs: dict[str, object]) -> NodeType:
+    def node(self, **kwargs: dict[str, object]) -> Node:
         instance_id = kwargs.get("instance_id", None)
         _nodes = self.provisioner.list_nodes(ex_node_ids=[instance_id])
         if _nodes:
@@ -264,9 +284,9 @@ class GCEProvisioner(BaseProvisioner):
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 
-    def destroy(self, nodes: list[models.Machine]) -> bool:
+    def destroy(self, nodes: list[MachineModel]) -> bool:
         _nodes = self.provisioner.ex_destroy_multiple_nodes(
-            node_list=[node.remote for node in nodes], destroy_boot_disk=True
+            node_list=[node.state() for node in nodes], destroy_boot_disk=True
         )  # type: ignore
         return all([node is True for node in _nodes])
 
@@ -275,7 +295,7 @@ class GCEProvisioner(BaseProvisioner):
         if self.layout.ports:
             self.create_firewall(self.layout.name, self.layout.ports, tags)
 
-    def cleanup(self, node: models.Machine, **kwargs: dict[str, object]) -> bool:
+    def cleanup(self, node: MachineModel, **kwargs: t.Mapping[str, t.Any]) -> bool:
         return True
 
     def image(self, runs_on: str) -> NodeImage:
@@ -311,7 +331,7 @@ class GCEProvisioner(BaseProvisioner):
     def list_firewalls(self) -> list[str]:
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
-    def create(self) -> list[models.Machine] | None:
+    def create(self) -> list[MachineModel] | None:
         image = self.image(self.layout.runs_on)
         if not image and not self.layout.username:
             raise ProvisionException(
@@ -325,7 +345,10 @@ class GCEProvisioner(BaseProvisioner):
                     "value": "%s: %s"
                     % (
                         self.layout.username,
-                        self.layout.ssh_public_key.expanduser().read_text().strip(),
+                        Path(self.layout.ssh_public_key)
+                        .expanduser()
+                        .read_text()
+                        .strip(),
                     ),
                 },
                 {
@@ -362,17 +385,24 @@ class GCEProvisioner(BaseProvisioner):
             ex_preemptible=True,
         )
         _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
-        _nodes_models = [
-            models.Machine.from_layout(node=node, layout=self.layout) for node in _nodes
-        ]
-        _db = db.Manager()
-        for node in _nodes_models:
-            if node.instance_name:
-                _db.add(node.instance_name, node)
-        _db.commit()
-        return _nodes_models
+        _machines = []
+        for node in _nodes:
+            state_file_p = db.cache_path() / node.id
+            state_file_p.write_bytes(db.model_as_pickle(node))
+            machine = MachineModel(
+                layout=self.layout,
+                instance_name=node.name,
+                instance_id=node.id,
+                instance_state=node.state,
+                public_ip=node.public_ips[0],
+                private_ip=node.private_ips[0],
+                remote_state_file=(db.cache_path() / node.id).resolve(),
+            )
+            machine.save()
+            _machines.append(machine)
+        return _machines
 
-    def node(self, **kwargs: dict[str, object]) -> NodeType | None:
+    def node(self, **kwargs: dict[str, object]) -> Node | None:
         _nodes = self.provisioner.list_nodes()
         instance_id = None
         if "instance_id" in kwargs:
@@ -384,11 +414,12 @@ class GCEProvisioner(BaseProvisioner):
         return f"<GCEProvisioner [{self.options['datacenter']}]>"
 
 
+@signals.init.connect
 def choose_provisioner(
-    layout: models.Layout,
+    layout: LayoutModel,
 ) -> BaseProvisioner:
     choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
-    provisioner: t.Type[BaseProvisioner] = choices[layout.provider]
+    provisioner: t.Type[BaseProvisioner] = choices[str(layout.provider)]
     p = provisioner(layout=layout)
     p.connect()
     return p

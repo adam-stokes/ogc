@@ -14,7 +14,7 @@ ${run('ls', '/', l=True, h=True)}
 
 
 ${header('All nodes')}
-% for obj in db.nodes().values():
+% for obj in nodes:
 echo "id: ${obj.instance_id}"
 echo "name: ${obj.instance_name}"
 echo "connection: ${obj.layout.username}@${obj.public_ip}"

@@ -22,15 +22,40 @@ rich = "*"
 python-slugify = "*"
 attrs = "*"
 cattrs = "*"
-arrow = "*"
 toolz = "*"
 dill = "*"
 apache-libcloud = "*"
 jinja2 = "*"
 dotty-dict = "*"
-sqlitedict = "*"
 blinker = "*"
+peewee = "^3.15.4"
+marshmallow-peewee = "^3.4.3"
 
+
+[tool.poetry.group.dev.dependencies]
+types-peewee = "^3.15.0.5"
+black = "*"
+isort = "*"
+python-frontmatter = "*"
+pylint = "*"
+Pygments = "*"
+pytest = "*"
+ipdb = "*"
+mypy = "*"
+"punch.py" = "*"
+pymdown-extensions = "*"
+click-man = "*"
+mkdocs-material = "*"
+mkdocs-click = "*"
+pyre-check = "*"
+poethepoet = "*"
+types-python-slugify = "*"
+types-retry = "*"
+types-click = "*"
+flake8 = "*"
+mkdocstrings-python = "*"
+pytest-cov = "*"
+mkdocs = "^1.4.2"
 
 [tool.mypy]
 allow_redefinition = false
@@ -66,37 +91,9 @@ line_length = 88
 
 [tool.pytest.ini_options]
 addopts = "--tb native -rf -s"
-markers = [
-    "harness: enables disabling the harness for certain tests"
-]
 filterwarnings = [
     "ignore::DeprecationWarning"
 ]
-
-[tool.poetry.dev-dependencies]
-black = "*"
-isort = "*"
-python-frontmatter = "*"
-pylint = "*"
-Pygments = "*"
-pytest = "*"
-ipdb = "*"
-mypy = "*"
-"punch.py" = "*"
-pymdown-extensions = "*"
-click-man = "*"
-mkdocs-material = "*"
-mkdocs-click = "*"
-pyre-check = "*"
-poethepoet = "*"
-types-python-slugify = "*"
-types-retry = "*"
-types-PyYAML = "*"
-types-click = "*"
-flake8 = "*"
-mkdocstrings-python = "*"
-pytest-cov = "*"
-mkdocs = "^1.4.2"
 
 [tool.poetry.scripts]
 ogc = "ogc.commands.base:start"

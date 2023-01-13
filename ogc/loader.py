@@ -27,9 +27,18 @@ def from_path(path: Path) -> object | None:
 
 def run(mod: object, func: str, **kwargs: str) -> None:
     """Runs the module function passing in options"""
+    dep = None
     try:
-        task_cmd = getattr(mod, func)
-        task_cmd(**kwargs)
+        deploy = getattr(mod, "deployment")
+        _, dep = deploy[0]
     except AttributeError as exc:
-        log.error(exc)
+        log.debug(f"Could not find {func}, trying signal", exc_info=exc)
+    if dep:
+        try:
+            sig = importlib.import_module("ogc.signals")
+            task_cmd = getattr(sig, func)
+            task_cmd.send(dep, **kwargs)
+        except ModuleNotFoundError as e:
+            log.debug("Could not find signal either, exiting.", exc_info=e)
+    else:
         sys.exit(1)

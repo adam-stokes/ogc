@@ -18,17 +18,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "arrow"
-version = "1.2.3"
-description = "Better dates & times for Python"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-python-dateutil = ">=2.7.0"
-
-[[package]]
 name = "astroid"
 version = "2.13.2"
 description = "An abstract syntax tree for Python with inference support."
@@ -517,7 +506,7 @@ python-versions = ">=3.7"
 name = "marshmallow"
 version = "3.19.0"
 description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -540,6 +529,22 @@ python-versions = "*"
 
 [package.dependencies]
 marshmallow = ">=2.0.0"
+
+[[package]]
+name = "marshmallow-peewee"
+version = "3.4.3"
+description = "Peewee integration with the Marshmallow (de)serialization library."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+marshmallow = ">3"
+peewee = ">3"
+
+[package.extras]
+build = ["bump2version", "wheel"]
+tests = ["pytest", "pytest-cov", "pytest-mypy"]
 
 [[package]]
 name = "matplotlib-inline"
@@ -714,7 +719,7 @@ python-versions = "*"
 name = "packaging"
 version = "23.0"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 
@@ -765,6 +770,14 @@ description = "Utility library for gitignore style pattern matching of file path
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "peewee"
+version = "3.15.4"
+description = "a little orm"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "pexpect"
@@ -1035,7 +1048,7 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 
@@ -1179,14 +1192,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "sqlitedict"
-version = "2.1.0"
-description = "Persistent dict in Python, backed up by sqlite3 and pickle, multithread-safe."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "stack-data"
 version = "0.6.2"
 description = "Extract data from python stack frames and tracebacks for informative displays"
@@ -1294,17 +1299,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "types-python-slugify"
-version = "7.0.0.1"
-description = "Typing stubs for python-slugify"
+name = "types-peewee"
+version = "3.15.0.5"
+description = "Typing stubs for peewee"
 category = "dev"
 optional = false
 python-versions = "*"
 
 [[package]]
-name = "types-pyyaml"
-version = "6.0.12.2"
-description = "Typing stubs for PyYAML"
+name = "types-python-slugify"
+version = "7.0.0.1"
+description = "Typing stubs for python-slugify"
 category = "dev"
 optional = false
 python-versions = "*"
@@ -1380,7 +1385,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11"
-content-hash = "873b4f0bc56f931ef4b99127be0c53b580e1755eed40f4602576d19eb38cdffb"
+content-hash = "5a0930afb220eea031df706db9dc50e866ae9db53a547c80d051d15a5f28ccfd"
 
 [metadata.files]
 apache-libcloud = [
@@ -1390,10 +1395,6 @@ apache-libcloud = [
 appnope = [
     {file = "appnope-0.1.3-py2.py3-none-any.whl", hash = "sha256:265a455292d0bd8a72453494fa24df5a11eb18373a60c7c0430889f22548605e"},
     {file = "appnope-0.1.3.tar.gz", hash = "sha256:02bd91c4de869fbb1e1c50aafc4098827a7a54ab2f39d9dcba6c9547ed920e24"},
-]
-arrow = [
-    {file = "arrow-1.2.3-py3-none-any.whl", hash = "sha256:5a49ab92e3b7b71d96cd6bfcc4df14efefc9dfa96ea19045815914a6ab6b1fe2"},
-    {file = "arrow-1.2.3.tar.gz", hash = "sha256:3934b30ca1b9f292376d9db15b19446088d12ec58629bc3f0da28fd55fb633a1"},
 ]
 astroid = [
     {file = "astroid-2.13.2-py3-none-any.whl", hash = "sha256:8f6a8d40c4ad161d6fc419545ae4b2f275ed86d1c989c97825772120842ee0d2"},
@@ -1819,6 +1820,10 @@ marshmallow-enum = [
     {file = "marshmallow-enum-1.5.1.tar.gz", hash = "sha256:38e697e11f45a8e64b4a1e664000897c659b60aa57bfa18d44e226a9920b6e58"},
     {file = "marshmallow_enum-1.5.1-py2.py3-none-any.whl", hash = "sha256:57161ab3dbfde4f57adeb12090f39592e992b9c86d206d02f6bd03ebec60f072"},
 ]
+marshmallow-peewee = [
+    {file = "Marshmallow-Peewee-3.4.3.tar.gz", hash = "sha256:161cfb9c9115926494eeefc0b2ad9a8f8493b40a45d056a72d9fc78d87fe6e33"},
+    {file = "Marshmallow_Peewee-3.4.3-py2.py3-none-any.whl", hash = "sha256:b0be4b804940d06595113bf69a4be42a6987c44f42a01f0482e8b5db09348e14"},
+]
 matplotlib-inline = [
     {file = "matplotlib-inline-0.1.6.tar.gz", hash = "sha256:f887e5f10ba98e8d2b150ddcf4702c1e5f8b3a20005eb0f74bfdbd360ee6f304"},
     {file = "matplotlib_inline-0.1.6-py3-none-any.whl", hash = "sha256:f1f41aab5328aa5aaea9b16d083b128102f8712542f819fe7e6a420ff581b311"},
@@ -1917,6 +1922,9 @@ pastel = [
 pathspec = [
     {file = "pathspec-0.10.3-py3-none-any.whl", hash = "sha256:3c95343af8b756205e2aba76e843ba9520a24dd84f68c22b9f93251507509dd6"},
     {file = "pathspec-0.10.3.tar.gz", hash = "sha256:56200de4077d9d0791465aa9095a01d421861e405b5096955051deefd697d6f6"},
+]
+peewee = [
+    {file = "peewee-3.15.4.tar.gz", hash = "sha256:2581520c8dfbacd9d580c2719ae259f0637a9e46eda47dfc0ce01864c6366205"},
 ]
 pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
@@ -2201,9 +2209,6 @@ sortedcontainers = [
     {file = "sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0"},
     {file = "sortedcontainers-2.4.0.tar.gz", hash = "sha256:25caa5a06cc30b6b83d11423433f65d1f9d76c4c6a0c90e3379eaa43b9bfdb88"},
 ]
-sqlitedict = [
-    {file = "sqlitedict-2.1.0.tar.gz", hash = "sha256:03d9cfb96d602996f1d4c2db2856f1224b96a9c431bdd16e78032a72940f9e8c"},
-]
 stack-data = [
     {file = "stack_data-0.6.2-py3-none-any.whl", hash = "sha256:cbb2a53eb64e5785878201a97ed7c7b94883f48b87bfb0bbe8b623c74679e4a8"},
     {file = "stack_data-0.6.2.tar.gz", hash = "sha256:32d2dd0376772d01b6cb9fc996f3c8b57a357089dec328ed4b6553d037eaf815"},
@@ -2243,13 +2248,13 @@ types-click = [
     {file = "types-click-7.1.8.tar.gz", hash = "sha256:b6604968be6401dc516311ca50708a0a28baa7a0cb840efd7412f0dbbff4e092"},
     {file = "types_click-7.1.8-py3-none-any.whl", hash = "sha256:8cb030a669e2e927461be9827375f83c16b8178c365852c060a34e24871e7e81"},
 ]
+types-peewee = [
+    {file = "types-peewee-3.15.0.5.tar.gz", hash = "sha256:5a907a87317878c7684800fe3eee901ba22467dbc3dffbf110ee62fd0bfa0008"},
+    {file = "types_peewee-3.15.0.5-py3-none-any.whl", hash = "sha256:1323a3a2e3831754a9acaa1fdf395283c545fc74bae34b2ff78099a8a1379ce6"},
+]
 types-python-slugify = [
     {file = "types-python-slugify-7.0.0.1.tar.gz", hash = "sha256:6b2d16e1465896df0e3685bd38eab7b8f945a3a7c18c4a2c2ef391b0e48dfce8"},
     {file = "types_python_slugify-7.0.0.1-py3-none-any.whl", hash = "sha256:3644bb44a25847ba5c8f9d15757f1d4b76064857c30e93517723618bd1152a19"},
-]
-types-pyyaml = [
-    {file = "types-PyYAML-6.0.12.2.tar.gz", hash = "sha256:6840819871c92deebe6a2067fb800c11b8a063632eb4e3e755914e7ab3604e83"},
-    {file = "types_PyYAML-6.0.12.2-py3-none-any.whl", hash = "sha256:1e94e80aafee07a7e798addb2a320e32956a373f376655128ae20637adb2655b"},
 ]
 types-retry = [
     {file = "types-retry-0.9.9.tar.gz", hash = "sha256:b1087b274680b542c796549e8488898d0b22cd89988ef1016ef56d4367ff4f41"},

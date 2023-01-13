@@ -7,10 +7,15 @@ import click
 from dotenv import load_dotenv
 
 import ogc.loader
-from ogc.db import ui_nodes_table
-from ogc.enums import RESERVED_TASKS
+import ogc.signals
+from ogc import db
 from ogc.log import get_logger
-from ogc.ssh import ssh
+from ogc.models import actions, layout, machine, tags
+
+dbi = db.connect()
+dbi.create_tables(
+    [machine.MachineModel, tags.TagModel, layout.LayoutModel, actions.ActionModel]
+)
 
 
 @click.command(help="Manage and Provision machines")
@@ -31,20 +36,11 @@ def cli(options: list[str], verbose: bool, spec: Path, task: str) -> None:
 
     opts = {opt.split("=")[0]: opt.split("=")[1] for opt in options}
 
-    if task in RESERVED_TASKS:
-        match task.lower():
-            case "ls":
-                return ui_nodes_table(output_file=opts.get("output_file", None))
-            case "ssh":
-                # Special case, treat spec as a instance target
-                return ssh(str(spec))
-
     mod = ogc.loader.from_path(spec)
     if not mod:
         log.error(f"Could not load {spec} into OGC.")
         sys.exit(1)
-    if task:
-        ogc.loader.run(mod, task, **opts)
+    ogc.loader.run(mod, task, **opts)
 
 
 def start() -> None:

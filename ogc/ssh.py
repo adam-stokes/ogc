@@ -3,25 +3,24 @@ from __future__ import annotations
 
 import os
 import sys
+import typing as t
+from pathlib import Path
 
 import sh
 
-from ogc import db
+from ogc.models.machine import MachineModel
 
 
-def ssh(instance: str) -> None:
+def ssh(machine: MachineModel) -> t.Mapping[str, str]:
     """ssh helper"""
-    _db = db.Manager()
-    instance_names = _db.nodes().keys()
-    node = None
-    if instance in instance_names:
-        node = _db.nodes()[instance]
-
-    if node:
-        cmd = [
-            "-i",
-            str(node.ssh_private_key.expanduser()),
-            f"{node.username}@{node.public_ip}",
-        ]
-        sh.ssh(cmd, _fg=True, _env=os.environ.copy())  # type: ignore
-        sys.exit(0)
+    cmd = [
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "UserKnownHostsFile=/dev/null",
+        "-i",
+        Path(machine.layout.ssh_private_key.expanduser()),
+        f"{machine.layout.username}@{machine.public_ip}",
+    ]
+    sh.ssh(cmd, _fg=True, _env=os.environ.copy())  # type: ignore
+    sys.exit(0)

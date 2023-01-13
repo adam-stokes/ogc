@@ -1,5 +1,15 @@
 """init"""
 from __future__ import annotations
 
-from .layout import *
-from .machine import *
+from peewee import *
+
+from ..db import connect
+
+db = connect()
+
+
+class BaseModel(Model):
+    """Base db model"""
+
+    class Meta:
+        database = db
