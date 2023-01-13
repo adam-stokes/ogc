@@ -61,52 +61,31 @@ Once setup is complete, a provision layout is needed.
 Create a file `ubuntu.py`:
 
 ```python
-from ogc.deployer import Deployer
+from ogc.deployer import init
+from ogc.fs import expand_path
 from ogc.log import get_logger
-from ogc.models import Layout
-from ogc.provision import choose_provisioner
 
 log = get_logger("ogc")
 
-layout = Layout(
-    instance_size="e2-standard-4",
-    name="ubuntu-ogc",
-    provider="google",
-    remote_path="/home/ubuntu/ogc",
-    runs_on="ubuntu-2004-lts",
-    scale=5,
-    scripts="fixtures/ex_deploy_ubuntu",
-    username="ubuntu",
-    ssh_private_key="~/.ssh/id_rsa_libcloud",
-    ssh_public_key="~/.ssh/id_rsa_libcloud.pub",
-    ports=["22:22", "80:80", "443:443", "5601:5601"],
-    tags=[],
-    labels=dict(
-        division="engineering", org="obs", team="observability", project="perf"
+deployment = init(
+    layout_model=dict(
+        instance_size="e2-standard-4",
+        name="ubuntu-ogc",
+        provider="google",
+        remote_path="/home/ubuntu/ogc",
+        runs_on="ubuntu-2004-lts",
+        scale=5,
+        scripts="fixtures/ex_deploy_ubuntu",
+        username="ubuntu",
+        ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
+        ssh_public_key=expand_path("~/.ssh/id_rsa_libcloud.pub"),
+        ports=["22:22", "80:80", "443:443", "5601:5601"],
+        tags=[],
+        labels=dict(
+            division="engineering", org="obs", team="observability", project="perf"
+        ),
     ),
 )
-
-# Alternatively
-# from ogc.provisioner import GCEProvisioner
-# provisioner = GCEProvisioner(layout=layout)
-
-provisioner = choose_provisioner(layout=layout)
-deploy = Deployer.from_provisioner(provisioner=provisioner)
-def up(**kwargs):
-    deploy.up()
-
-def run(**kwargs):
-    # pass in a directory/filepath -o path=fixtures/ubuntu
-    if kwargs.get("path", None):
-        deploy.exec_scripts(scripts=kwargs["path"])
-    # pass in a cmd with -o cmd='ls -l /'
-    elif kwargs.get("cmd", None):
-        deploy.exec(kwargs["cmd"])
-    else:
-        deploy.exec_scripts()    
-
-def down(**kwargs):
-    deploy.down()
 ```
 
 This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-4** with Ubuntu OS. 
@@ -117,9 +96,9 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 Once the specification is set, environment variables configured, execute a deployment in a new terminal:
 
 ```shell
-$ ogc up ubuntu.py
-$ ogc run ubuntu.py -o cmd='sudo apt-get update && sudo apt-get dist-upgrade'
-$ ogc down ubuntu.py
+$ ogc ubuntu.py up
+$ ogc ubuntu.py exec -o cmd='sudo apt-get update && sudo apt-get dist-upgrade'
+$ ogc ubuntu.py down
 ```
 
 # Next steps

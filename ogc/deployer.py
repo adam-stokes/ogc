@@ -90,7 +90,7 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
     Pass in a mapping of options to filter machines
 
     Args:
-        limit int Set the limit of machines returned
+        kwargs: the limit of machines returned
     Returns:
         List of deployed machines
     """
@@ -108,7 +108,7 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     """Execute commands on node(s)
 
     Args:
-        cmd (str): Command to run on node
+        kwargs: Mapping of `{"cmd": "ls -l"}`
 
     Returns:
         True if succesful, False otherwise.
@@ -186,9 +186,9 @@ def exec_scripts(
     Executing scripts/templates on a node.
 
     Args:
-        scripts The full path or directory where the scripts reside locally.
-                Supports single file and directory.
-        filters Filters to pass into exec, currently `name` and `tag` are supported.
+        provisioner: Orchestrator
+        kwargs: Mapping of what to run, options are:
+            `{"scripts": "/path/to/scripts"} || {"cmd": "echo cmd to execute"}`
 
     Returns:
         True if succesful, False otherwise.

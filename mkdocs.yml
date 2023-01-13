@@ -84,7 +84,9 @@ nav:
     - 'API':
         - 'ogc.deployer': 'developer-guide/api/deployer.md'
         - 'ogc.db': 'developer-guide/api/db.md'
+        - 'ogc.models.actions': 'developer-guide/api/models/actions.md'
         - 'ogc.models.machine': 'developer-guide/api/models/machine.md'
         - 'ogc.models.layout': 'developer-guide/api/models/layout.md'
+        - 'ogc.models.tags': 'developer-guide/api/models/tags.md'
         - 'ogc.models.utils': 'developer-guide/api/models/utils.md'
   - 'CLI Reference': 'commands/ogc.md'

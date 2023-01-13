@@ -1,3 +1,3 @@
 # API
 
-::: ogc.deployer.Deployer
+::: ogc.deployer

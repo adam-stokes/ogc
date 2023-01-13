@@ -1,3 +1,3 @@
 # API
 
-::: ogc.models.machine.Machine
+::: ogc.models.machine.MachineModel

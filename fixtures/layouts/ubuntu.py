@@ -15,7 +15,7 @@ deployment = init(
         provider="google",
         remote_path="/home/ubuntu/ogc",
         runs_on="ubuntu-2004-lts",
-        scale=2,
+        scale=1,
         scripts="fixtures/ex_deploy_ubuntu",
         username="ubuntu",
         ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
@@ -27,17 +27,3 @@ deployment = init(
         ),
     ),
 )
-
-
-# provisioner = choose_provisioner(layout=layout)
-# deploy = Deployer.from_provisioner(provisioner=provisioner)
-# deploy.up()
-# log.info(f"Executing custom scripts path: {kwargs['path']}")
-# deploy.exec_scripts(scripts=kwargs["path"])
-# log.info(f"Executing command: {kwargs['cmd']}")
-# deploy.exec(kwargs["cmd"])
-# log.info(f"Executing scripts path: {layout.scripts}")
-# deploy.exec_scripts()
-# log.info(f"Teardown {layout.machines.count()} machine(s)")
-# deploy.down()
-# layout.delete_instance()

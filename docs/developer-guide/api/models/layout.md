@@ -1,3 +1,3 @@
 # API
 
-::: ogc.models.layout.Layout
+::: ogc.models.layout.LayoutModel
