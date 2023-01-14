@@ -15,7 +15,6 @@ from pathlib import Path
 
 import arrow
 import sh
-from attr import define
 from libcloud.compute.deployment import (
     Deployment,
     FileDeployment,
@@ -71,8 +70,29 @@ def render(template: Path, context: Ctx) -> str:
     return str(_template.render(**context))
 
 
-def __filter_machines(**kwargs: str) -> list[MachineModel]:
-    """Filters machines by instance_id or all if none is provided"""
+class MachineOpts(t.TypedDict):
+    """Applicable options to filter machines by
+
+    Example:
+        ``` bash
+        ogc fixtures/layout/ubuntu exec -v -o cmd='hostname -i' -o instance_name=ogc-ubuntu-ogc-a19a-004
+        ```
+    """
+
+    instance_id: t.NotRequired[str]
+    instance_name: t.NotRequired[str]
+    limit: t.NotRequired[int]
+
+
+def __filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
+    """Filters machines by instance_id or all if none is provided
+
+    Args:
+        kwargs: Machine filter options
+
+    Returns:
+        List of machines
+    """
     return t.cast(
         list[MachineModel],
         pmatch(
@@ -90,7 +110,7 @@ def __filter_machines(**kwargs: str) -> list[MachineModel]:
 
 
 @signals.ssh.connect
-def ssh(provisioner: BaseProvisioner, **kwargs: str) -> None:
+def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     """Opens SSH connection to a machine
 
     Pass in a mapping of options to filter machines, a single machine
@@ -99,13 +119,6 @@ def ssh(provisioner: BaseProvisioner, **kwargs: str) -> None:
     Args:
         provisioner: provisioner
         kwargs: Mapping of options to pass to `ssh`
-
-    Options:
-        Dictionary mapping can contain the following:
-
-        |Key|Value|
-        |---|-----|
-        | instance_id | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -133,15 +146,12 @@ def ssh(provisioner: BaseProvisioner, **kwargs: str) -> None:
 
 
 @signals.up.connect
-def up(provisioner: BaseProvisioner, **kwargs: str) -> bool:
+def up(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Bring up machines
 
     Args:
         provisioner: provisioner
         kwargs: Mapping of options to pass to `up`
-
-    Options:
-        Currently takes no additional options.
 
     Returns:
         True if successful, False otherwise.
@@ -153,7 +163,7 @@ def up(provisioner: BaseProvisioner, **kwargs: str) -> bool:
 
 
 @signals.down.connect
-def down(provisioner: BaseProvisioner, **kwargs: str) -> bool:
+def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Tear down machines
 
     Pass in a **optional** mapping of options to filter machines
@@ -161,14 +171,6 @@ def down(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     Args:
         provisioner: Provisioner
         kwargs: Mapping of options to pass to `down`
-
-    Options:
-        Dictionary mapping can contain the following:
-
-        |Key|Value|
-        |---|-----|
-        | instance_id | Filter machine based on instance_id |
-        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -192,7 +194,9 @@ def down(provisioner: BaseProvisioner, **kwargs: str) -> bool:
 
 
 @signals.ls.connect
-def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None:
+def ls(
+    provisioner: BaseProvisioner, **kwargs: MachineOpts
+) -> list[MachineModel] | None:
     """Return a list of machines for deployment
 
     Pass in a mapping of options to filter machines
@@ -201,15 +205,11 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
         provisioner: Provisioner
         kwargs: Mapping of options to pass to `ls`
 
-    Options:
-        Dictionary mapping can contain the following:
+    Additional Options:
 
         |Key|Value|
         |---|-----|
         | output_file | Where to store status output, filename can end with .html or .svg |
-        | limit | Number of machines returned |
-        | instance_id | Filter machine based on instance_id |
-        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -294,21 +294,17 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
 
 
 @signals.exec.connect
-def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
+def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Execute commands on node(s)
 
     Args:
         provisioner: provisioner
         kwargs: Options to exec
 
-    Options:
-        Dictionary mapping can contain the following:
-
+    Additional Options:
         |Key|Value|
         |---|-----|
         | cmd | command to execute on remote machines |
-        | instance_id | Filter machine based on instance_id |
-        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -384,7 +380,7 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
 @signals.exec_scripts.connect
 def exec_scripts(
     provisioner: BaseProvisioner,
-    **kwargs: str,
+    **kwargs: MachineOpts,
 ) -> bool:
     """Execute scripts
 
@@ -394,14 +390,10 @@ def exec_scripts(
         provisioner: provisioner
         kwargs: Options to exec_scripts
 
-    Options:
-        Dictionary mapping can contain the following:
-
+    Additional Options:
         |Key|Value|
         |---|-----|
         | scripts | custom scripts path to execute |
-        | instance_id | Filter machine based on instance_id |
-        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -435,7 +427,6 @@ def exec_scripts(
             scripts_to_run = [
                 fname for fname in _scripts.glob("**/*") if fname.stem != "teardown"
             ]
-            # scripts_to_run.reverse()
 
         context = Ctx(
             env=os.environ.copy(),

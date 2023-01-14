@@ -278,7 +278,7 @@ class GCEProvisioner(BaseProvisioner):
             "datacenter": self.env.get("GOOGLE_DATACENTER", ""),
         }
 
-    @retry(delay=5, tries=10, jitter=(5, 25), logger=None)
+    @retry(tries=10, jitter=(5, 25), logger=None)
     @functools.lru_cache()
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
