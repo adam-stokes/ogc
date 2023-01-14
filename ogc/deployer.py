@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 import typing as t
 from concurrent.futures import ThreadPoolExecutor, wait
@@ -12,7 +13,9 @@ from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
 
+import arrow
 import sh
+from attr import define
 from libcloud.compute.deployment import (
     Deployment,
     FileDeployment,
@@ -21,8 +24,12 @@ from libcloud.compute.deployment import (
 )
 from mako.lookup import TemplateLookup
 from mako.template import Template
+from pampy import _
+from pampy import match as pmatch
+from rich.table import Table
 
 from ogc import db, signals
+from ogc.log import CONSOLE as con
 from ogc.log import get_logger
 from ogc.models.actions import ActionModel
 from ogc.models.layout import LayoutModel
@@ -42,7 +49,15 @@ class Ctx(t.TypedDict):
 
 
 def render(template: Path, context: Ctx) -> str:
-    """Returns the correct deployment based on type of step"""
+    """Returns the correct deployment based on type of step
+
+    Args:
+        template: path to template file
+        context: mapping of key,value to expose in template
+
+    Returns:
+        Rendered template string
+    """
     fpath = template.absolute()
     lookup = TemplateLookup(
         directories=[
@@ -54,9 +69,75 @@ def render(template: Path, context: Ctx) -> str:
     return str(_template.render(**context))
 
 
+def __filter_machines(**kwargs: str) -> list[MachineModel]:
+    """Filters machines by instance_id or all if none is provided"""
+    return t.cast(
+        list[MachineModel],
+        pmatch(
+            kwargs,
+            {"instance_id": _},
+            lambda x: [MachineModel.get_or_none(MachineModel.instance_id == x)],
+            {"instance_name": _},
+            lambda x: [MachineModel.get_or_none(MachineModel.instance_name == x)],
+            _,
+            [node for node in MachineModel.select()],
+        ),
+    )
+
+
+@signals.ssh.connect
+def ssh(provisioner: BaseProvisioner, **kwargs: str) -> None:
+    """Opens SSH connection to a machine
+
+    Pass in a mapping of options to filter machines, a single machine
+    must be queried
+
+    Args:
+        provisioner: provisioner
+        kwargs: Mapping of options to pass to `ssh`
+
+    Options:
+        Dictionary mapping can contain the following:
+
+        |Key|Value|
+        |---|-----|
+        | instance_id | Filter machine based on instance_name |
+
+    Example:
+        ``` bash
+        > ogc fixtures/layouts/ubuntu ssh -v -o instance_id=5407368969918077947
+        ```
+    """
+    nodes = __filter_machines(**kwargs)
+    if nodes:
+        machine = nodes[0]
+        if machine:
+            cmd = [
+                "-o",
+                "StrictHostKeyChecking=no",
+                "-o",
+                "UserKnownHostsFile=/dev/null",
+                "-i",
+                Path(machine.layout.ssh_private_key).expanduser(),
+                f"{machine.layout.username}@{machine.public_ip}",
+            ]
+
+            sh.ssh(cmd, _fg=True, _env=os.environ.copy())  # type: ignore
+            sys.exit(0)
+    log.error("Could not find machine to ssh to")
+    sys.exit(1)
+
+
 @signals.up.connect
 def up(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     """Bring up machines
+
+    Args:
+        provisioner: provisioner
+        kwargs: Mapping of options to pass to `up`
+
+    Options:
+        Currently takes no additional options.
 
     Returns:
         True if successful, False otherwise.
@@ -71,14 +152,35 @@ def up(provisioner: BaseProvisioner, **kwargs: str) -> bool:
 def down(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     """Tear down machines
 
-    Returns:
-        True if successful, False otherwise.
+     Pass in a **optional** mapping of options to filter machines
+
+     Args:
+         provisioner: Provisioner
+         kwargs: Mapping of options to pass to `down`
+
+    Options:
+         Dictionary mapping can contain the following:
+
+         |Key|Value|
+         |---|-----|
+         | instance_id | Filter machine based on instance_name |
+
+     Example:
+         ``` bash
+         # All  machines
+         > ogc fixtures/layouts/ubuntu down -v
+         # Single machine
+         > ogc fixtures/layouts/ubuntu down -v -o instance_id=5407368969918077947
+         ```
+     Returns:
+         True if successful, False otherwise.
     """
-    if not exec(provisioner, cmd="./teardown"):
+    nodes = __filter_machines(**kwargs)
+    if not exec(provisioner, cmd="./teardown", instance_id=kwargs["instance_id"]):
         log.debug("Could not run teardown script")
-    nodes = [node for node in MachineModel.select()]
     provisioner.destroy(nodes=nodes)
-    for machine in MachineModel.select():
+    for machine in nodes:
+        log.info(f"Deleting data for {machine.instance_name}")
         machine.delete_instance()
     return True
 
@@ -90,16 +192,98 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
     Pass in a mapping of options to filter machines
 
     Args:
-        kwargs: the limit of machines returned
+        provisioner: Provisioner
+        kwargs: Mapping of options to pass to `ls`
+
+    Options:
+        Dictionary mapping can contain the following:
+
+        |Key|Value|
+        |---|-----|
+        | limit | Number of machines returned |
+        | output_file | Where to store status output, filename can end with .html or .svg |
+
+    Example:
+        ``` bash
+        > ogc fixtures/layouts/ubuntu ls -v -o limit=8
+        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃ ID                             ┃ Name                                 ┃ Created            ┃ Status       ┃ Labels                                                                                      ┃ Connection                                                                                   ┃
+        ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+        │ 5407368969918077947            │ ogc-ubuntu-ogc-f664-000              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.134.169.153                                 │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 3631668729125788664            │ ogc-ubuntu-ogc-f664-001              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.188.125                                 │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 3575202029581097972            │ ogc-ubuntu-ogc-f664-002              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@104.155.176.229                                │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 4961396037101018096            │ ogc-ubuntu-ogc-f664-003              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.71.231.9                                    │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 6845512080056900556            │ ogc-ubuntu-ogc-f664-004              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.61.39                                   │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 8257796978812902341            │ ogc-ubuntu-ogc-f664-006              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.252.152                                 │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 4654244594843638721            │ ogc-ubuntu-ogc-f664-007              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.234.5                                   │
+        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+        │ 2604966443513535453            │ ogc-ubuntu-ogc-f664-008              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@35.226.159.94                                  │
+        └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+        Node Count: 8
+        ```
+
     Returns:
         List of deployed machines
     """
+
+    def ui_nodes_table(
+        nodes: list[MachineModel], output_file: str | None = None
+    ) -> None:
+        con.record = True
+        rows = nodes
+        rows_count = len(rows)
+
+        table = Table(
+            caption=f"Node Count: [green]{rows_count}[/]",
+            header_style="yellow on black",
+            caption_justify="left",
+            expand=True,
+            width=con.width,
+            show_lines=True,
+        )
+        table.add_column("ID")
+        table.add_column("Name")
+        table.add_column("Created")
+        table.add_column("Status")
+        table.add_column("Labels")
+        table.add_column("Connection", style="bold red on black")
+
+        for data in rows:
+            table.add_row(
+                data.instance_id,
+                data.instance_name,
+                arrow.get(data.created).humanize(),
+                data.instance_state,
+                ",".join(
+                    [f"[purple]{k}[/]={v}" for k, v in data.layout.labels.items()]
+                ),
+                f"ssh -i {Path(data.layout.ssh_private_key).expanduser()} {data.layout.username}@{data.public_ip}",
+            )
+
+        con.print(table, justify="center")
+        if output_file:
+            if output_file.endswith("svg"):
+                con.save_svg(output_file, title="Node List Output")
+            elif output_file.endswith("html"):
+                con.save_html(output_file)
+            else:
+                log.error(
+                    f"Unknown extension for {output_file}, must end in '.svg' or '.html'"
+                )
+        con.record = False
+
     log.info("Querying database for machines")
     query = MachineModel.select()
     if "limit" in kwargs:
         query = query.limit(kwargs["limit"])
     _machines = [machine for machine in query]
-    log.debug(_machines)
+    ui_nodes_table(nodes=_machines, output_file=kwargs.get("output_file", None))
     return _machines if _machines else None
 
 
@@ -108,7 +292,23 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     """Execute commands on node(s)
 
     Args:
-        kwargs: Mapping of `{"cmd": "ls -l"}`
+        provisioner: provisioner
+        kwargs: Options to exec
+
+    Options:
+        Dictionary mapping can contain the following:
+
+        |Key|Value|
+        |---|-----|
+        | cmd | command to execute on remote machines |
+        | instance_id | Filter machine based on instance_name |
+
+    Example:
+        ``` bash
+        > ogc fixtures/layouts/ubuntu exec -v -o cmd='ls -l'
+        # Single machine
+        > ogc fixtures/layouts/ubuntu exec -v -o cmd='ls -l' -o instance_id=2349146264239594441
+        ```
 
     Returns:
         True if succesful, False otherwise.
@@ -117,8 +317,8 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     nodes: list[MachineModel] | None = None
     if "cmd" in kwargs:
         cmd = kwargs["cmd"]
-    if "nodes" in kwargs:
-        nodes = t.cast(list[MachineModel], kwargs["nodes"])
+
+    nodes = __filter_machines(**kwargs)
 
     def _exec(node: bytes, cmd: str) -> bool:
         _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
@@ -139,32 +339,28 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
                 exit_code=out.exit_code,
                 out=out.stdout.decode(),
                 error=out.stderr.decode(),
-                cmd=out.cmd,
+                cmd=" ".join(txt.decode() for txt in out.cmd),
             )
         except sh.ErrorReturnCode as e:
             return_status = dict(
                 exit_code=e.exit_code,
                 out=e.stdout.decode(),
                 error=e.stderr.decode(),
-                cmd=e.full_cmd,
+                cmd=str(e.full_cmd),
             )
         if return_status:
-            log.debug(f"exit_code: {return_status['exit_code']}")
-            log.debug(f"out: {return_status['out']}")
-            log.debug(f"error: {return_status['error']}")
+            log.debug(return_status)
             action = ActionModel(
                 machine=_node,
                 exit_code=return_status["exit_code"],
                 out=return_status["out"],
                 err=return_status["error"],
-                cmd=return_status["cmd"],
+                cmd=str(return_status["cmd"]),
             )
             action.save()
             return bool(return_status["exit_code"] == 0)
         return False
 
-    if not nodes:
-        nodes = [node for node in MachineModel.select()]
     if cmd:
         with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             func = partial(_exec, cmd=cmd)
@@ -186,10 +382,23 @@ def exec_scripts(
     Executing scripts/templates on a node.
 
     Args:
-        provisioner: Orchestrator
-        kwargs: Mapping of what to run, options are:
-            `{"scripts": "/path/to/scripts"} || {"cmd": "echo cmd to execute"}`
+        provisioner: provisioner
+        kwargs: Options to exec_scripts
 
+    Options:
+        Dictionary mapping can contain the following:
+
+        |Key|Value|
+        |---|-----|
+        | scripts | custom scripts path to execute |
+        | instance_id | Filter machine based on instance_name |
+
+    Example:
+        ``` bash
+        > ogc fixtures/layouts/ubuntu exec_scripts -v -o scripts='/home/ubuntu/new-deploy-scripts'
+        # Optionally, run the scripts defined in the layout
+        > ogc fixtures/layouts/ubuntu exec_scripts -v
+        ```
     Returns:
         True if succesful, False otherwise.
     """
@@ -197,8 +406,8 @@ def exec_scripts(
     nodes: list[MachineModel] | None = None
     if "scripts" in kwargs:
         scripts = kwargs["scripts"]
-    if "nodes" in kwargs:
-        nodes = t.cast(list[MachineModel], kwargs["nodes"])
+
+    nodes = __filter_machines(**kwargs)
 
     def _exec_scripts(node: bytes, scripts: str | Path | None = None) -> bool:
         _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
@@ -269,9 +478,6 @@ def exec_scripts(
                     case _:
                         log.debug(step)
         return True
-
-    if not nodes:
-        nodes = [node for node in MachineModel.select()]
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
         func = partial(_exec_scripts, scripts=scripts)

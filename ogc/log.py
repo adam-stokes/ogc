@@ -17,6 +17,18 @@ class Logger(logging.Logger):
     ...  # pragma: nocover
 
 
+def log_missing_options(*args: str, **kwargs: str) -> bool:
+    """Helper for setting required options on deployment operations"""
+    _log = logging.getLogger("ogc")
+    _missing_opts = []
+    for arg in args:
+        if arg not in kwargs:
+            _missing_opts.append(f"{arg}=<needs_input>")
+    if _missing_opts:
+        _log.error(f"Missing required options to task: `-o {' '.join(_missing_opts)}`")
+    return bool(len(_missing_opts) > 0)
+
+
 def get_logger(name: str, verbose: bool = False) -> Logger:
     """
     Get a `logging.Logger` instance

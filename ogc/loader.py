@@ -32,13 +32,22 @@ def run(mod: object, func: str, **kwargs: str) -> None:
         deploy = getattr(mod, "deployment")
         _, dep = deploy[0]
     except AttributeError as exc:
-        log.debug(f"Could not find {func}, trying signal", exc_info=exc)
-    if dep:
+        log.debug(
+            "Could not find deployment entry, make sure the "
+            "step has `deployment = init(layout_model=dict()`",
+            exc_info=exc,
+        )
+        sys.exit(1)
+
+    try:
+        task_cmd = getattr(mod, func)
+        task_cmd(**kwargs)
+    except AttributeError:
+        log.debug(f"Could not find custom task {func}, searching signals...")
         try:
             sig = importlib.import_module("ogc.signals")
             task_cmd = getattr(sig, func)
             task_cmd.send(dep, **kwargs)
         except ModuleNotFoundError as e:
             log.debug("Could not find signal either, exiting.", exc_info=e)
-    else:
-        sys.exit(1)
+    return None

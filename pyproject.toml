@@ -30,6 +30,8 @@ dotty-dict = "*"
 blinker = "*"
 peewee = "^3.15.4"
 marshmallow-peewee = "^3.4.3"
+arrow = "^1.2.3"
+pampy = "^0.3.0"
 
 
 [tool.poetry.group.dev.dependencies]

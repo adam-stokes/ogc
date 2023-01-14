@@ -15,7 +15,7 @@ deployment = init(
         provider="google",
         remote_path="/home/ubuntu/ogc",
         runs_on="ubuntu-2004-lts",
-        scale=1,
+        scale=9,
         scripts="fixtures/ex_deploy_ubuntu",
         username="ubuntu",
         ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
@@ -27,3 +27,8 @@ deployment = init(
         ),
     ),
 )
+
+
+def hithere(**kwargs: str):
+    print("hi there")
+    print(kwargs)
