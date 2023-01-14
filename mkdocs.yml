@@ -79,6 +79,7 @@ nav:
     - 'Windows': 'user-guide/windows.md'
     - 'Cookbook':
         - 'Access node info': 'user-guide/cookbook/template-access-node-info.md'
+        - 'GCloud Auth and Docker': 'user-guide/cookbook/docker-gcloud-auth.md'
   - 'Developer Guide':
     - 'Managing nodes': 'developer-guide/managing-nodes.md'
     - 'API':
