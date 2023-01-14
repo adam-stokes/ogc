@@ -43,6 +43,8 @@ log = get_logger("ogc")
 
 
 class Ctx(t.TypedDict):
+    """Typed mapping of the context options passed into a rendered template"""
+
     env: t.Required[dict]
     node: t.Required[MachineModel]
     nodes: t.Required[t.Any]
@@ -79,6 +81,8 @@ def __filter_machines(**kwargs: str) -> list[MachineModel]:
             lambda x: [MachineModel.get_or_none(MachineModel.instance_id == x)],
             {"instance_name": _},
             lambda x: [MachineModel.get_or_none(MachineModel.instance_name == x)],
+            {"limit": _},
+            lambda x: [node for node in MachineModel.select().limit(x)],
             _,
             [node for node in MachineModel.select()],
         ),
@@ -152,31 +156,33 @@ def up(provisioner: BaseProvisioner, **kwargs: str) -> bool:
 def down(provisioner: BaseProvisioner, **kwargs: str) -> bool:
     """Tear down machines
 
-     Pass in a **optional** mapping of options to filter machines
+    Pass in a **optional** mapping of options to filter machines
 
-     Args:
-         provisioner: Provisioner
-         kwargs: Mapping of options to pass to `down`
+    Args:
+        provisioner: Provisioner
+        kwargs: Mapping of options to pass to `down`
 
     Options:
-         Dictionary mapping can contain the following:
+        Dictionary mapping can contain the following:
 
-         |Key|Value|
-         |---|-----|
-         | instance_id | Filter machine based on instance_name |
+        |Key|Value|
+        |---|-----|
+        | instance_id | Filter machine based on instance_id |
+        | instance_name | Filter machine based on instance_name |
 
-     Example:
-         ``` bash
-         # All  machines
-         > ogc fixtures/layouts/ubuntu down -v
-         # Single machine
-         > ogc fixtures/layouts/ubuntu down -v -o instance_id=5407368969918077947
-         ```
-     Returns:
-         True if successful, False otherwise.
+    Example:
+        ``` bash
+        # All  machines
+        > ogc fixtures/layouts/ubuntu down -v
+        # Single machine
+        > ogc fixtures/layouts/ubuntu down -v -o instance_id=5407368969918077947
+        ```
+    Returns:
+        True if successful, False otherwise.
     """
     nodes = __filter_machines(**kwargs)
-    if not exec(provisioner, cmd="./teardown", instance_id=kwargs["instance_id"]):
+    kwargs.update({"cmd": "./teardown"})
+    if not exec(provisioner, **kwargs):
         log.debug("Could not run teardown script")
     provisioner.destroy(nodes=nodes)
     for machine in nodes:
@@ -200,8 +206,10 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
 
         |Key|Value|
         |---|-----|
-        | limit | Number of machines returned |
         | output_file | Where to store status output, filename can end with .html or .svg |
+        | limit | Number of machines returned |
+        | instance_id | Filter machine based on instance_id |
+        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -279,12 +287,10 @@ def ls(provisioner: BaseProvisioner, **kwargs: str) -> list[MachineModel] | None
         con.record = False
 
     log.info("Querying database for machines")
-    query = MachineModel.select()
-    if "limit" in kwargs:
-        query = query.limit(kwargs["limit"])
-    _machines = [machine for machine in query]
-    ui_nodes_table(nodes=_machines, output_file=kwargs.get("output_file", None))
-    return _machines if _machines else None
+
+    nodes = __filter_machines(**kwargs)
+    ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
+    return nodes if nodes else None
 
 
 @signals.exec.connect
@@ -301,7 +307,8 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
         |Key|Value|
         |---|-----|
         | cmd | command to execute on remote machines |
-        | instance_id | Filter machine based on instance_name |
+        | instance_id | Filter machine based on instance_id |
+        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -319,6 +326,8 @@ def exec(provisioner: BaseProvisioner, **kwargs: str) -> bool:
         cmd = kwargs["cmd"]
 
     nodes = __filter_machines(**kwargs)
+
+    log.info(f"Executing commands across {len(nodes)} node(s)")
 
     def _exec(node: bytes, cmd: str) -> bool:
         _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
@@ -391,7 +400,8 @@ def exec_scripts(
         |Key|Value|
         |---|-----|
         | scripts | custom scripts path to execute |
-        | instance_id | Filter machine based on instance_name |
+        | instance_id | Filter machine based on instance_id |
+        | instance_name | Filter machine based on instance_name |
 
     Example:
         ``` bash
@@ -408,6 +418,8 @@ def exec_scripts(
         scripts = kwargs["scripts"]
 
     nodes = __filter_machines(**kwargs)
+
+    log.info(f"Executing scripts across {len(nodes)} node(s)")
 
     def _exec_scripts(node: bytes, scripts: str | Path | None = None) -> bool:
         _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
