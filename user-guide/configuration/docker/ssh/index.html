@@ -9,24 +9,24 @@
       
       
       
-        <link rel="prev" href="../providers/">
+        <link rel="prev" href="../../../..">
       
       
-        <link rel="next" href="../cookbook/template-access-node-info/">
+        <link rel="next" href="../gcloud-auth/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.4">
     
     
       
-        <title>Windows - OGC</title>
+        <title>SSH - OGC</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.9c788c91.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.9c788c91.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.2505c338.min.css">
       
       
 
@@ -42,9 +42,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#windows" class="md-skip">
+        <a href="#docker-and-ssh" class="md-skip">
           Skip to content
         </a>
       
@@ -83,7 +83,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OGC" class="md-header__button md-logo" aria-label="OGC" data-md-component="logo">
+    <a href="../../../.." title="OGC" class="md-header__button md-logo" aria-label="OGC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Windows
+              SSH
             
           </span>
         </div>
@@ -181,7 +181,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
+    <a href="../../../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -212,7 +212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -254,20 +254,20 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-        
-      
-      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_2_1" tabindex="0" aria-expanded="false">
+        <label class="md-nav__link" for="__nav_2_1" tabindex="0" aria-expanded="true">
           Configuration
           <span class="md-nav__icon md-icon"></span>
         </label>
@@ -283,20 +283,20 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-        
-      
-      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1_1" type="checkbox" id="__nav_2_1_1" >
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2_1_1" type="checkbox" id="__nav_2_1_1" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_2_1_1" tabindex="0" aria-expanded="false">
+        <label class="md-nav__link" for="__nav_2_1_1" tabindex="0" aria-expanded="true">
           Docker
           <span class="md-nav__icon md-icon"></span>
         </label>
@@ -312,11 +312,66 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../configuration/docker/ssh/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          SSH
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         SSH
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-shared-data-volume" class="md-nav__link">
+    Create a shared data volume
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bind-mount-ssh-keys" class="md-nav__link">
+    Bind mount ssh keys
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#place-keys-in-working-directory" class="md-nav__link">
+    Place keys in working directory
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -328,7 +383,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/docker/gcloud-auth/" class="md-nav__link">
+      <a href="../gcloud-auth/" class="md-nav__link">
         Google Authentication
       </a>
     </li>
@@ -356,7 +411,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../managing-nodes/" class="md-nav__link">
+      <a href="../../../managing-nodes/" class="md-nav__link">
         Managing a deployment
       </a>
     </li>
@@ -370,7 +425,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../defining-layouts/" class="md-nav__link">
+      <a href="../../../defining-layouts/" class="md-nav__link">
         Defining Layouts
       </a>
     </li>
@@ -384,7 +439,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scripting/" class="md-nav__link">
+      <a href="../../../scripting/" class="md-nav__link">
         Scripting
       </a>
     </li>
@@ -398,7 +453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../providers/" class="md-nav__link">
+      <a href="../../../providers/" class="md-nav__link">
         Providers
       </a>
     </li>
@@ -410,73 +465,11 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Windows
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../windows/" class="md-nav__link">
         Windows
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#build-ami" class="md-nav__link">
-    Build AMI
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#windows-2019" class="md-nav__link">
-    Windows 2019
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scripting" class="md-nav__link">
-    Scripting
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -517,7 +510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cookbook/template-access-node-info/" class="md-nav__link">
+      <a href="../../../cookbook/template-access-node-info/" class="md-nav__link">
         Access node info
       </a>
     </li>
@@ -575,7 +568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/managing-nodes/" class="md-nav__link">
+      <a href="../../../../developer-guide/managing-nodes/" class="md-nav__link">
         Managing nodes
       </a>
     </li>
@@ -618,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/deployer/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/deployer/" class="md-nav__link">
         ogc.deployer
       </a>
     </li>
@@ -632,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/db/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/db/" class="md-nav__link">
         ogc.db
       </a>
     </li>
@@ -646,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/fs/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/fs/" class="md-nav__link">
         ogc.fs
       </a>
     </li>
@@ -660,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/loader/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/loader/" class="md-nav__link">
         ogc.loader
       </a>
     </li>
@@ -674,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/provision/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/provision/" class="md-nav__link">
         ogc.provision
       </a>
     </li>
@@ -688,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/templatetags/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/templatetags/" class="md-nav__link">
         ogc.templatetags
       </a>
     </li>
@@ -702,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/actions/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/actions/" class="md-nav__link">
         ogc.models.actions
       </a>
     </li>
@@ -716,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/machine/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/machine/" class="md-nav__link">
         ogc.models.machine
       </a>
     </li>
@@ -730,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/layout/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/layout/" class="md-nav__link">
         ogc.models.layout
       </a>
     </li>
@@ -744,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/tags/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/tags/" class="md-nav__link">
         ogc.models.tags
       </a>
     </li>
@@ -758,7 +751,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/utils/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/utils/" class="md-nav__link">
         ogc.models.utils
       </a>
     </li>
@@ -787,7 +780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../commands/ogc/" class="md-nav__link">
+      <a href="../../../../commands/ogc/" class="md-nav__link">
         CLI Reference
       </a>
     </li>
@@ -821,29 +814,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#build-ami" class="md-nav__link">
-    Build AMI
+  <a href="#create-a-shared-data-volume" class="md-nav__link">
+    Create a shared data volume
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#windows-2019" class="md-nav__link">
-    Windows 2019
+  <a href="#bind-mount-ssh-keys" class="md-nav__link">
+    Bind mount ssh keys
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#usage" class="md-nav__link">
-    Usage
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#scripting" class="md-nav__link">
-    Scripting
+  <a href="#place-keys-in-working-directory" class="md-nav__link">
+    Place keys in working directory
   </a>
   
 </li>
@@ -867,54 +853,70 @@
 
 
 
-<h1 id="windows">Windows<a class="headerlink" href="#windows" title="Permanent link">&para;</a></h1>
-<p>OGC supports provisioning Windows instances, however, it does make a couple of assumptions:</p>
-<ul>
-<li>OpenSSH Server is running on the Windows Machine</li>
-<li>Rsync is installed and available</li>
-<li>Passwordless ssh is setup</li>
-</ul>
-<p>Fortunately, we provide you with a <a href="https://packer.io">Packer</a> setup that will let you 
-quickly build an AWS AMI to meet those requirements.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If using OGC contributed packer build, only AWS is supported at this time.</p>
-</div>
-<h2 id="build-ami">Build AMI<a class="headerlink" href="#build-ami" title="Permanent link">&para;</a></h2>
-<p>The configurations are located in <a href="https://github.com/adam-stokes/ogc/contrib">contrib/</a>, to get started run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/adam-stokes/ogc
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>ogc/contrib
+<h1 id="docker-and-ssh">Docker and SSH<a class="headerlink" href="#docker-and-ssh" title="Permanent link">&para;</a></h1>
+<p>There's a couple of ways to handle this, the first way is to mount the ssh credentials defined in your layout to be accessible within the OGC container.</p>
+<h2 id="create-a-shared-data-volume">Create a shared data volume<a class="headerlink" href="#create-a-shared-data-volume" title="Permanent link">&para;</a></h2>
+<p>May be best to create a shared local data volume in docker with all the ssh keys that could be used for deployment. Then utilize docker's <code>--volumes-from</code> feature to mount the shared volume into each ogc container run.</p>
+<p>This <a href="https://www.digitalocean.com/community/tutorials/how-to-share-data-between-docker-containers">DigitalOcean article</a> is good for learning how to share volumes across containers.</p>
+<h2 id="bind-mount-ssh-keys">Bind mount ssh keys<a class="headerlink" href="#bind-mount-ssh-keys" title="Permanent link">&para;</a></h2>
+<p>Here we are telling docker to make sure our ssh keys are accessible within the containers <code>/root/.ssh</code> path.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span> <span class="nn">ogc.deployer</span> <span class="kn">import</span> <span class="n">init</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span> <span class="nn">ogc.fs</span> <span class="kn">import</span> <span class="n">expand_path</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span> <span class="nn">ogc.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;ogc&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">deployment</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">layout_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;e2-standard-4&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ubuntu-ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu/ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ubuntu-2004-lts&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud&quot;</span><span class="p">),</span> <span class="c1"># (1)</span>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud.pub&quot;</span><span class="p">),</span> <span class="c1"># (2)</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>        <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;22:22&quot;</span><span class="p">,</span> <span class="s2">&quot;80:80&quot;</span><span class="p">,</span> <span class="s2">&quot;443:443&quot;</span><span class="p">,</span> <span class="s2">&quot;5601:5601&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="n">tags</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>        <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="n">division</span><span class="o">=</span><span class="s2">&quot;engineering&quot;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">team</span><span class="o">=</span><span class="s2">&quot;observability&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;perf&quot;</span>
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>        <span class="p">),</span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="p">),</span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">)</span>
 </code></pre></div>
-<div class="admonition alert">
-<p class="admonition-title">Alert</p>
-<p>If using these Packer configs, please note the default user to use is: <code>ogc</code></p>
-</div>
-<h2 id="windows-2019">Windows 2019<a class="headerlink" href="#windows-2019" title="Permanent link">&para;</a></h2>
-<p>To build a Windows 2019 Server instance run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ogc/contrib&gt;<span class="w"> </span>$<span class="w"> </span>packer<span class="w"> </span>build<span class="w"> </span>windows2019.json
+<ol>
+<li>We are using a SSH credential that is outside of our current working directory</li>
+<li>Same for our public ssh key</li>
+</ol>
+<p>Since our SSH key's will not be copied in by default we'll need to tell docker how to access it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-v<span class="w"> </span>~/.ssh/id_rsa_libcloud:/root/.ssh/id_rsa_libcloud<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>-v<span class="w"> </span>~/.ssh/id_rsa_libcloud:/root/.ssh/id_rsa_libcloud<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>ogc<span class="w"> </span>fixtures/layouts/ubuntu<span class="w"> </span>up<span class="w"> </span>-v
 </code></pre></div>
-<p>Once complete, grab the AMI ID, as this will be used in the <code>layout</code> specification of OGC.</p>
-<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
-<p>To provision and deploy a Windows machine, the following example spec will work:</p>
-<p>Create a file <code>windows.py</code>:</p>
+<h2 id="place-keys-in-working-directory">Place keys in working directory<a class="headerlink" href="#place-keys-in-working-directory" title="Permanent link">&para;</a></h2>
+<p>Another simple solution is to create a ssh passwordless keypair and place it directly in your project directory. This will allow docker to copy those keys into the container during execution and made available to OGC.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span> <span class="nn">ogc.deployer</span> <span class="kn">import</span> <span class="n">init</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">ogc.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span> <span class="nn">ogc.fs</span> <span class="kn">import</span> <span class="n">expand_path</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span> <span class="nn">ogc.fs</span> <span class="kn">import</span> <span class="n">expand_path</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">from</span> <span class="nn">ogc.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;ogc&quot;</span><span class="p">)</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">deployment</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span>
 <a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="n">layout_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;c5.2xlarge&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;e2-standard-4&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ubuntu-ogc&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;aws&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;ogc-src&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ami-0587bd602f1da2f1d&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_windows&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ogc&quot;</span><span class="p">,</span>
-<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud&quot;</span><span class="p">),</span>
-<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud.pub&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu/ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ubuntu-2004-lts&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="s2">&quot;fixtures/id_rsa_libcloud&quot;</span><span class="p">,</span> 
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="s2">&quot;fixtures/id_rsa_libcloud.pub&quot;</span><span class="p">,</span>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>        <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;22:22&quot;</span><span class="p">,</span> <span class="s2">&quot;80:80&quot;</span><span class="p">,</span> <span class="s2">&quot;443:443&quot;</span><span class="p">,</span> <span class="s2">&quot;5601:5601&quot;</span><span class="p">],</span>
 <a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>        <span class="n">tags</span><span class="o">=</span><span class="p">[],</span>
 <a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>        <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -923,18 +925,19 @@ quickly build an AWS AMI to meet those requirements.</p>
 <a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>    <span class="p">),</span>
 <a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="p">)</span>
 </code></pre></div>
-<p>Once defined, simply running:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>ogc<span class="w"> </span>windows<span class="w"> </span>up<span class="w"> </span>-v
+<p>In the above example, the ssh keys are now stored in <code>&lt;pwd&gt;/fixtures</code>. Now running our docker container can be accomplished as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up<span class="w"> </span>-v
 </code></pre></div>
-<p>Will get you a provisioned Windows machine!</p>
-<h2 id="scripting">Scripting<a class="headerlink" href="#scripting" title="Permanent link">&para;</a></h2>
-<p>Powershell a good choice, works out of the box on Windows, however, if you want to use a different programming 
-language the choice is yours. All the templating, database, and context is available.</p>
-<p>For example, to print out the current node information, edit a file <code>01-powershell</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>powershell echo &quot;${node.instance_name}:${node.public_ip}&quot; &gt; ${node.instance_name}.txt
-</code></pre></div>
-<p>This is a simple example, for a more advanced deployment it may be best to create 
-your <code>ps1</code> files and then reference them through powershell interpreter.</p>
+<details class="caution">
+<summary>Caution</summary>
+<p>If you keep your project in a git repo please make sure to add your ssh keys to <code>.gitignore</code></p>
+</details>
 
 
 
@@ -977,10 +980,10 @@ your <code>ps1</code> files and then reference them through powershell interpret
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.ba449ae6.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ba449ae6.min.js"></script>
       
     
   </body>

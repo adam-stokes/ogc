@@ -1,0 +1,2191 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../loader/">
+      
+      
+        <link rel="next" href="../templatetags/">
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.4">
+    
+    
+      
+        <title>ogc.provision - OGC</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.9c788c91.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:300,300i,400,400i,700,700i%7CUbuntu+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Ubuntu";--md-code-font:"Ubuntu Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="OGC" class="md-header__button md-logo" aria-label="OGC" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OGC
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ogc.provision
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/adam-stokes/ogc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    OGC
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/adam-stokes/ogc" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        Getting Started
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2" tabindex="0" aria-expanded="false">
+          User Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="User Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          User Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_1" tabindex="0" aria-expanded="false">
+          Configuration
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Configuration" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          Configuration
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1_1" type="checkbox" id="__nav_2_1_1" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_1_1" tabindex="0" aria-expanded="false">
+          Docker
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Docker" data-md-level="3">
+        <label class="md-nav__title" for="__nav_2_1_1">
+          <span class="md-nav__icon md-icon"></span>
+          Docker
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/configuration/docker/ssh/" class="md-nav__link">
+        SSH
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/configuration/docker/gcloud-auth/" class="md-nav__link">
+        Google Authentication
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/managing-nodes/" class="md-nav__link">
+        Managing a deployment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/defining-layouts/" class="md-nav__link">
+        Defining Layouts
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/scripting/" class="md-nav__link">
+        Scripting
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/providers/" class="md-nav__link">
+        Providers
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/windows/" class="md-nav__link">
+        Windows
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+      
+      
+        
+      
+      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_7" type="checkbox" id="__nav_2_7" >
+      
+      
+      
+        <label class="md-nav__link" for="__nav_2_7" tabindex="0" aria-expanded="false">
+          Cookbook
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Cookbook" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_7">
+          <span class="md-nav__icon md-icon"></span>
+          Cookbook
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../user-guide/cookbook/template-access-node-info/" class="md-nav__link">
+        Access node info
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" tabindex="0" aria-expanded="true">
+          Developer Guide
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Developer Guide" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Developer Guide
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../managing-nodes/" class="md-nav__link">
+        Managing nodes
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3_2" tabindex="0" aria-expanded="true">
+          API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="API" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployer/" class="md-nav__link">
+        ogc.deployer
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../db/" class="md-nav__link">
+        ogc.db
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fs/" class="md-nav__link">
+        ogc.fs
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../loader/" class="md-nav__link">
+        ogc.loader
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          ogc.provision
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        ogc.provision
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner" class="md-nav__link">
+    ogc.provision.GCEProvisioner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.options" class="md-nav__link">
+    options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.connect" class="md-nav__link">
+    connect()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.destroy" class="md-nav__link">
+    destroy()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.setup" class="md-nav__link">
+    setup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.cleanup" class="md-nav__link">
+    cleanup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.image" class="md-nav__link">
+    image()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.create_firewall" class="md-nav__link">
+    create_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.delete_firewall" class="md-nav__link">
+    delete_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.list_firewalls" class="md-nav__link">
+    list_firewalls()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.create" class="md-nav__link">
+    create()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.node" class="md-nav__link">
+    node()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.__str__" class="md-nav__link">
+    __str__()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner" class="md-nav__link">
+    ogc.provision.AWSProvisioner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.options" class="md-nav__link">
+    options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.connect" class="md-nav__link">
+    connect()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.setup" class="md-nav__link">
+    setup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.cleanup" class="md-nav__link">
+    cleanup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.image" class="md-nav__link">
+    image()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.create_firewall" class="md-nav__link">
+    create_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.delete_firewall" class="md-nav__link">
+    delete_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.create" class="md-nav__link">
+    create()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.node" class="md-nav__link">
+    node()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.__str__" class="md-nav__link">
+    __str__()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../templatetags/" class="md-nav__link">
+        ogc.templatetags
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/actions/" class="md-nav__link">
+        ogc.models.actions
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/machine/" class="md-nav__link">
+        ogc.models.machine
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/layout/" class="md-nav__link">
+        ogc.models.layout
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/tags/" class="md-nav__link">
+        ogc.models.tags
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/utils/" class="md-nav__link">
+        ogc.models.utils
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../commands/ogc/" class="md-nav__link">
+        CLI Reference
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner" class="md-nav__link">
+    ogc.provision.GCEProvisioner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.options" class="md-nav__link">
+    options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.connect" class="md-nav__link">
+    connect()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.destroy" class="md-nav__link">
+    destroy()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.setup" class="md-nav__link">
+    setup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.cleanup" class="md-nav__link">
+    cleanup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.image" class="md-nav__link">
+    image()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.create_firewall" class="md-nav__link">
+    create_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.delete_firewall" class="md-nav__link">
+    delete_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.list_firewalls" class="md-nav__link">
+    list_firewalls()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.create" class="md-nav__link">
+    create()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.node" class="md-nav__link">
+    node()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.GCEProvisioner.__str__" class="md-nav__link">
+    __str__()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner" class="md-nav__link">
+    ogc.provision.AWSProvisioner
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.options" class="md-nav__link">
+    options
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.connect" class="md-nav__link">
+    connect()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.setup" class="md-nav__link">
+    setup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.cleanup" class="md-nav__link">
+    cleanup()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.image" class="md-nav__link">
+    image()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.create_firewall" class="md-nav__link">
+    create_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.delete_firewall" class="md-nav__link">
+    delete_firewall()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.create" class="md-nav__link">
+    create()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.node" class="md-nav__link">
+    node()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ogc.provision.AWSProvisioner.__str__" class="md-nav__link">
+    __str__()
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+<a id="ogc.provision.GCEProvisioner"></a>
+  <div class="doc doc-contents first">
+
+  
+      <p>Provides abstraction for the GCE provisioner</p>
+
+<details class="required-environment-variables">
+  <summary>Required Environment Variables</summary>
+  <ul>
+<li><strong>GOOGLE_APPLICATION_SERVICE_ACCOUNT</strong></li>
+<li><strong>GOOGLE_APPLICATION_CREDENTIALS</strong></li>
+<li><strong>GOOGLE_PROJECT</strong></li>
+<li><strong>GOOGLE_DATACENTER</strong></li>
+</ul>
+</details>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.options" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#ogc.provision.GCEProvisioner.options" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">options</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.connect" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">connect</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
+  </span>
+
+<a href="#ogc.provision.GCEProvisioner.connect" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">connect</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NodeDriver</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-290">290</a></span>
+<span class="normal"><a href="#__codelineno-0-291">291</a></span>
+<span class="normal"><a href="#__codelineno-0-292">292</a></span>
+<span class="normal"><a href="#__codelineno-0-293">293</a></span>
+<span class="normal"><a href="#__codelineno-0-294">294</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-290" name="__codelineno-0-290"></a><span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">()</span>
+<a id="__codelineno-0-291" name="__codelineno-0-291"></a><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeDriver</span><span class="p">:</span>
+<a id="__codelineno-0-292" name="__codelineno-0-292"></a>    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting provider connection: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-293" name="__codelineno-0-293"></a>    <span class="n">gce</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">Provider</span><span class="o">.</span><span class="n">GCE</span><span class="p">)</span>
+<a id="__codelineno-0-294" name="__codelineno-0-294"></a>    <span class="k">return</span> <span class="n">gce</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.destroy" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">destroy</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.destroy" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">destroy</span><span class="p">(</span><span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-296">296</a></span>
+<span class="normal"><a href="#__codelineno-0-297">297</a></span>
+<span class="normal"><a href="#__codelineno-0-298">298</a></span>
+<span class="normal"><a href="#__codelineno-0-299">299</a></span>
+<span class="normal"><a href="#__codelineno-0-300">300</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-297" name="__codelineno-0-297"></a>    <span class="n">_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_destroy_multiple_nodes</span><span class="p">(</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a>        <span class="n">node_list</span><span class="o">=</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">()</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">],</span> <span class="n">destroy_boot_disk</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a>    <span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a>    <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">node</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">_nodes</span><span class="p">])</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.setup" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">setup</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.setup" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">setup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-302">302</a></span>
+<span class="normal"><a href="#__codelineno-0-303">303</a></span>
+<span class="normal"><a href="#__codelineno-0-304">304</a></span>
+<span class="normal"><a href="#__codelineno-0-305">305</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a>    <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span> <span class="ow">or</span> <span class="p">[]</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">create_firewall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.cleanup" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">cleanup</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.cleanup" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">cleanup</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">node</span><span class="p">:</span> <span class="n">MachineModel</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Any</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-307">307</a></span>
+<span class="normal"><a href="#__codelineno-0-308">308</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">MachineModel</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-308" name="__codelineno-0-308"></a>    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.image" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">image</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.image" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">image</span><span class="p">(</span><span class="n">runs_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeImage</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-310">310</a></span>
+<span class="normal"><a href="#__codelineno-0-311">311</a></span>
+<span class="normal"><a href="#__codelineno-0-312">312</a></span>
+<span class="normal"><a href="#__codelineno-0-313">313</a></span>
+<span class="normal"><a href="#__codelineno-0-314">314</a></span>
+<span class="normal"><a href="#__codelineno-0-315">315</a></span>
+<span class="normal"><a href="#__codelineno-0-316">316</a></span>
+<span class="normal"><a href="#__codelineno-0-317">317</a></span>
+<span class="normal"><a href="#__codelineno-0-318">318</a></span>
+<span class="normal"><a href="#__codelineno-0-319">319</a></span>
+<span class="normal"><a href="#__codelineno-0-320">320</a></span>
+<span class="normal"><a href="#__codelineno-0-321">321</a></span>
+<span class="normal"><a href="#__codelineno-0-322">322</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runs_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeImage</span><span class="p">:</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="c1"># Pull from partial first</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">partial_image</span><span class="p">:</span> <span class="n">NodeImage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_get_image_from_family</span><span class="p">(</span><span class="n">runs_on</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="k">if</span> <span class="n">partial_image</span><span class="p">:</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>            <span class="k">return</span> <span class="n">partial_image</span>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>    <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find </span><span class="si">{</span><span class="n">runs_on</span><span class="si">}</span><span class="s2">, falling back internal image map&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>    <span class="n">_runs_on</span> <span class="o">=</span> <span class="n">CLOUD_IMAGE_MAP</span><span class="p">[</span><span class="s2">&quot;google&quot;</span><span class="p">][</span><span class="s2">&quot;amd64&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">runs_on</span><span class="p">)</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">images</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">_runs_on</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>        <span class="k">raise</span> <span class="n">ProvisionException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not determine image for </span><span class="si">{</span><span class="n">_runs_on</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.create_firewall" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">create_firewall</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.create_firewall" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_firewall</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-324">324</a></span>
+<span class="normal"><a href="#__codelineno-0-325">325</a></span>
+<span class="normal"><a href="#__codelineno-0-326">326</a></span>
+<span class="normal"><a href="#__codelineno-0-327">327</a></span>
+<span class="normal"><a href="#__codelineno-0-328">328</a></span>
+<span class="normal"><a href="#__codelineno-0-329">329</a></span>
+<span class="normal"><a href="#__codelineno-0-330">330</a></span>
+<span class="normal"><a href="#__codelineno-0-331">331</a></span>
+<span class="normal"><a href="#__codelineno-0-332">332</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-324" name="__codelineno-0-324"></a><span class="k">def</span> <span class="nf">create_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>    <span class="n">ports</span> <span class="o">=</span> <span class="p">[</span><span class="n">port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">]</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_get_firewall</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>    <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No firewall found, will create one to attach nodes to.&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_create_firewall</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>            <span class="n">name</span><span class="p">,</span> <span class="p">[{</span><span class="s2">&quot;IPProtocol&quot;</span><span class="p">:</span> <span class="s2">&quot;tcp&quot;</span><span class="p">,</span> <span class="s2">&quot;ports&quot;</span><span class="p">:</span> <span class="n">ports</span><span class="p">}],</span> <span class="n">target_tags</span><span class="o">=</span><span class="n">tags</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.delete_firewall" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">delete_firewall</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.delete_firewall" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">delete_firewall</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-334">334</a></span>
+<span class="normal"><a href="#__codelineno-0-335">335</a></span>
+<span class="normal"><a href="#__codelineno-0-336">336</a></span>
+<span class="normal"><a href="#__codelineno-0-337">337</a></span>
+<span class="normal"><a href="#__codelineno-0-338">338</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-334" name="__codelineno-0-334"></a><span class="k">def</span> <span class="nf">delete_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>    <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_destroy_firewall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_get_firewall</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>    <span class="k">except</span> <span class="n">ResourceNotFoundError</span><span class="p">:</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>        <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to delete firewall </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.list_firewalls" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">list_firewalls</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.list_firewalls" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">list_firewalls</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-340">340</a></span>
+<span class="normal"><a href="#__codelineno-0-341">341</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-340" name="__codelineno-0-340"></a><span class="k">def</span> <span class="nf">list_firewalls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_list_firewalls</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.create" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">create</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.create" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-343">343</a></span>
+<span class="normal"><a href="#__codelineno-0-344">344</a></span>
+<span class="normal"><a href="#__codelineno-0-345">345</a></span>
+<span class="normal"><a href="#__codelineno-0-346">346</a></span>
+<span class="normal"><a href="#__codelineno-0-347">347</a></span>
+<span class="normal"><a href="#__codelineno-0-348">348</a></span>
+<span class="normal"><a href="#__codelineno-0-349">349</a></span>
+<span class="normal"><a href="#__codelineno-0-350">350</a></span>
+<span class="normal"><a href="#__codelineno-0-351">351</a></span>
+<span class="normal"><a href="#__codelineno-0-352">352</a></span>
+<span class="normal"><a href="#__codelineno-0-353">353</a></span>
+<span class="normal"><a href="#__codelineno-0-354">354</a></span>
+<span class="normal"><a href="#__codelineno-0-355">355</a></span>
+<span class="normal"><a href="#__codelineno-0-356">356</a></span>
+<span class="normal"><a href="#__codelineno-0-357">357</a></span>
+<span class="normal"><a href="#__codelineno-0-358">358</a></span>
+<span class="normal"><a href="#__codelineno-0-359">359</a></span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span>
+<span class="normal"><a href="#__codelineno-0-361">361</a></span>
+<span class="normal"><a href="#__codelineno-0-362">362</a></span>
+<span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span>
+<span class="normal"><a href="#__codelineno-0-366">366</a></span>
+<span class="normal"><a href="#__codelineno-0-367">367</a></span>
+<span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
+<span class="normal"><a href="#__codelineno-0-373">373</a></span>
+<span class="normal"><a href="#__codelineno-0-374">374</a></span>
+<span class="normal"><a href="#__codelineno-0-375">375</a></span>
+<span class="normal"><a href="#__codelineno-0-376">376</a></span>
+<span class="normal"><a href="#__codelineno-0-377">377</a></span>
+<span class="normal"><a href="#__codelineno-0-378">378</a></span>
+<span class="normal"><a href="#__codelineno-0-379">379</a></span>
+<span class="normal"><a href="#__codelineno-0-380">380</a></span>
+<span class="normal"><a href="#__codelineno-0-381">381</a></span>
+<span class="normal"><a href="#__codelineno-0-382">382</a></span>
+<span class="normal"><a href="#__codelineno-0-383">383</a></span>
+<span class="normal"><a href="#__codelineno-0-384">384</a></span>
+<span class="normal"><a href="#__codelineno-0-385">385</a></span>
+<span class="normal"><a href="#__codelineno-0-386">386</a></span>
+<span class="normal"><a href="#__codelineno-0-387">387</a></span>
+<span class="normal"><a href="#__codelineno-0-388">388</a></span>
+<span class="normal"><a href="#__codelineno-0-389">389</a></span>
+<span class="normal"><a href="#__codelineno-0-390">390</a></span>
+<span class="normal"><a href="#__codelineno-0-391">391</a></span>
+<span class="normal"><a href="#__codelineno-0-392">392</a></span>
+<span class="normal"><a href="#__codelineno-0-393">393</a></span>
+<span class="normal"><a href="#__codelineno-0-394">394</a></span>
+<span class="normal"><a href="#__codelineno-0-395">395</a></span>
+<span class="normal"><a href="#__codelineno-0-396">396</a></span>
+<span class="normal"><a href="#__codelineno-0-397">397</a></span>
+<span class="normal"><a href="#__codelineno-0-398">398</a></span>
+<span class="normal"><a href="#__codelineno-0-399">399</a></span>
+<span class="normal"><a href="#__codelineno-0-400">400</a></span>
+<span class="normal"><a href="#__codelineno-0-401">401</a></span>
+<span class="normal"><a href="#__codelineno-0-402">402</a></span>
+<span class="normal"><a href="#__codelineno-0-403">403</a></span>
+<span class="normal"><a href="#__codelineno-0-404">404</a></span>
+<span class="normal"><a href="#__codelineno-0-405">405</a></span>
+<span class="normal"><a href="#__codelineno-0-406">406</a></span>
+<span class="normal"><a href="#__codelineno-0-407">407</a></span>
+<span class="normal"><a href="#__codelineno-0-408">408</a></span>
+<span class="normal"><a href="#__codelineno-0-409">409</a></span>
+<span class="normal"><a href="#__codelineno-0-410">410</a></span>
+<span class="normal"><a href="#__codelineno-0-411">411</a></span>
+<span class="normal"><a href="#__codelineno-0-412">412</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-343" name="__codelineno-0-343"></a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>    <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span><span class="p">)</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">image</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>        <span class="k">raise</span> <span class="n">ProvisionException</span><span class="p">(</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="sa">f</span><span class="s2">&quot;Could not locate AMI and/or username for: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="p">)</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>    <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">instance_size</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>    <span class="n">ex_metadata</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>        <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>            <span class="p">{</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>                <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;ssh-keys&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                <span class="o">%</span> <span class="p">(</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>                    <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_public_key</span><span class="p">)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>                    <span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>                    <span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>                    <span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+<a id="__codelineno-0-361" name="__codelineno-0-361"></a>                <span class="p">),</span>
+<a id="__codelineno-0-362" name="__codelineno-0-362"></a>            <span class="p">},</span>
+<a id="__codelineno-0-363" name="__codelineno-0-363"></a>            <span class="p">{</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a>                <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="s2">&quot;startup-script&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_userdata</span><span class="p">()</span>
+<a id="__codelineno-0-366" name="__codelineno-0-366"></a>                <span class="k">if</span> <span class="s2">&quot;windows&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span>
+<a id="__codelineno-0-367" name="__codelineno-0-367"></a>                <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-368" name="__codelineno-0-368"></a>            <span class="p">},</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a>        <span class="p">]</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>    <span class="p">}</span>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">create_firewall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+<a id="__codelineno-0-374" name="__codelineno-0-374"></a>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a>    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;created-%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user-</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ogc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>        <span class="c1"># Store some extra metadata similar to what other projects use</span>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;environment-ogc&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;repo-ogc&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a>    <span class="n">suffix</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">4</span><span class="p">]</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a>    <span class="n">opts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a>        <span class="n">base_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;ogc-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>        <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a>        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a>        <span class="n">number</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a>        <span class="n">ex_metadata</span><span class="o">=</span><span class="n">ex_metadata</span><span class="p">,</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>        <span class="n">ex_tags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>        <span class="n">ex_labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>        <span class="n">ex_disk_type</span><span class="o">=</span><span class="s2">&quot;pd-ssd&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">ex_disk_size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>        <span class="n">ex_preemptible</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;OGC_DISABLE_SPOT&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="n">_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_create_multiple_nodes</span><span class="p">(</span><span class="o">**</span><span class="n">opts</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">_machines</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-398" name="__codelineno-0-398"></a>    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">_nodes</span><span class="p">:</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>        <span class="n">state_file_p</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cache_path</span><span class="p">()</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="n">state_file_p</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="n">machine</span> <span class="o">=</span> <span class="n">MachineModel</span><span class="p">(</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>            <span class="n">instance_name</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="n">instance_id</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="n">instance_state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="n">public_ip</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">public_ips</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="n">private_ip</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">private_ips</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="n">remote_state_file</span><span class="o">=</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">cache_path</span><span class="p">()</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="p">)</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">machine</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">_machines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">machine</span><span class="p">)</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>    <span class="k">return</span> <span class="n">_machines</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.node" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">node</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.node" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">node</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-414">414</a></span>
+<span class="normal"><a href="#__codelineno-0-415">415</a></span>
+<span class="normal"><a href="#__codelineno-0-416">416</a></span>
+<span class="normal"><a href="#__codelineno-0-417">417</a></span>
+<span class="normal"><a href="#__codelineno-0-418">418</a></span>
+<span class="normal"><a href="#__codelineno-0-419">419</a></span>
+<span class="normal"><a href="#__codelineno-0-420">420</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-414" name="__codelineno-0-414"></a><span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>    <span class="n">_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">list_nodes</span><span class="p">()</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>    <span class="n">instance_id</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>    <span class="k">if</span> <span class="s2">&quot;instance_id&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>        <span class="n">instance_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;instance_id&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>    <span class="n">_node</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">_nodes</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">instance_id</span><span class="p">]</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>    <span class="k">return</span> <span class="n">_node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_node</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.GCEProvisioner.__str__" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">__str__</span>
+
+
+<a href="#ogc.provision.GCEProvisioner.__str__" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__str__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-422">422</a></span>
+<span class="normal"><a href="#__codelineno-0-423">423</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-422" name="__codelineno-0-422"></a><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GCEProvisioner [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;datacenter&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&gt;&quot;</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+<a id="ogc.provision.AWSProvisioner"></a>
+  <div class="doc doc-contents first">
+
+  
+      <p>AWS Provisioner</p>
+
+<details class="required-environment-variables">
+  <summary>Required Environment Variables</summary>
+  <ul>
+<li><strong>AWS_ACCESS_KEY_ID</strong></li>
+<li><strong>AWS_SECRET_ACCESS_KEY</strong></li>
+</ul>
+</details>
+<details class="optional-environment-variables">
+  <summary>Optional Environment Variables</summary>
+  <ul>
+<li><strong>AWS_REGION</strong></li>
+</ul>
+</details>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.options" class="doc doc-heading">
+        <span class="doc doc-object-name doc-attribute-name">options</span>
+
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#ogc.provision.AWSProvisioner.options" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">options</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.connect" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">connect</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.connect" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">connect</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NodeDriver</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-166">166</a></span>
+<span class="normal"><a href="#__codelineno-0-167">167</a></span>
+<span class="normal"><a href="#__codelineno-0-168">168</a></span>
+<span class="normal"><a href="#__codelineno-0-169">169</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-166" name="__codelineno-0-166"></a><span class="nd">@retry</span><span class="p">(</span><span class="n">delay</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">25</span><span class="p">),</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-167" name="__codelineno-0-167"></a><span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeDriver</span><span class="p">:</span>
+<a id="__codelineno-0-168" name="__codelineno-0-168"></a>    <span class="n">aws</span> <span class="o">=</span> <span class="n">get_driver</span><span class="p">(</span><span class="n">Provider</span><span class="o">.</span><span class="n">EC2</span><span class="p">)</span>
+<a id="__codelineno-0-169" name="__codelineno-0-169"></a>    <span class="k">return</span> <span class="n">aws</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.setup" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">setup</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.setup" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">setup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-171">171</a></span>
+<span class="normal"><a href="#__codelineno-0-172">172</a></span>
+<span class="normal"><a href="#__codelineno-0-173">173</a></span>
+<span class="normal"><a href="#__codelineno-0-174">174</a></span>
+<span class="normal"><a href="#__codelineno-0-175">175</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-171" name="__codelineno-0-171"></a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-172" name="__codelineno-0-172"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+<a id="__codelineno-0-173" name="__codelineno-0-173"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">create_firewall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ports</span><span class="p">)</span>
+<a id="__codelineno-0-174" name="__codelineno-0-174"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">kp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">kp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_key_pairs</span><span class="p">()):</span>
+<a id="__codelineno-0-175" name="__codelineno-0-175"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">create_keypair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_public_key</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.cleanup" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">cleanup</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.cleanup" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">cleanup</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-177">177</a></span>
+<span class="normal"><a href="#__codelineno-0-178">178</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-177" name="__codelineno-0-177"></a><span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-178" name="__codelineno-0-178"></a>    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.image" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">image</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.image" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">image</span><span class="p">(</span><span class="n">runs_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeImage</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-180">180</a></span>
+<span class="normal"><a href="#__codelineno-0-181">181</a></span>
+<span class="normal"><a href="#__codelineno-0-182">182</a></span>
+<span class="normal"><a href="#__codelineno-0-183">183</a></span>
+<span class="normal"><a href="#__codelineno-0-184">184</a></span>
+<span class="normal"><a href="#__codelineno-0-185">185</a></span>
+<span class="normal"><a href="#__codelineno-0-186">186</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-180" name="__codelineno-0-180"></a><span class="k">def</span> <span class="nf">image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runs_on</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NodeImage</span><span class="p">:</span>
+<a id="__codelineno-0-181" name="__codelineno-0-181"></a>    <span class="k">if</span> <span class="n">runs_on</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ami-&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-182" name="__codelineno-0-182"></a>        <span class="n">_runs_on</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">runs_on</span>
+<a id="__codelineno-0-183" name="__codelineno-0-183"></a>    <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-184" name="__codelineno-0-184"></a>        <span class="c1"># FIXME: need proper architecture detection</span>
+<a id="__codelineno-0-185" name="__codelineno-0-185"></a>        <span class="n">_runs_on</span> <span class="o">=</span> <span class="n">CLOUD_IMAGE_MAP</span><span class="p">[</span><span class="s2">&quot;aws&quot;</span><span class="p">][</span><span class="s2">&quot;amd64&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">runs_on</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-186" name="__codelineno-0-186"></a>    <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="n">_runs_on</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.create_firewall" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">create_firewall</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.create_firewall" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create_firewall</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+  
+      <p>Creates the security group for enabling traffic between nodes</p>
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-188">188</a></span>
+<span class="normal"><a href="#__codelineno-0-189">189</a></span>
+<span class="normal"><a href="#__codelineno-0-190">190</a></span>
+<span class="normal"><a href="#__codelineno-0-191">191</a></span>
+<span class="normal"><a href="#__codelineno-0-192">192</a></span>
+<span class="normal"><a href="#__codelineno-0-193">193</a></span>
+<span class="normal"><a href="#__codelineno-0-194">194</a></span>
+<span class="normal"><a href="#__codelineno-0-195">195</a></span>
+<span class="normal"><a href="#__codelineno-0-196">196</a></span>
+<span class="normal"><a href="#__codelineno-0-197">197</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-188" name="__codelineno-0-188"></a><span class="k">def</span> <span class="nf">create_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ports</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-189" name="__codelineno-0-189"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates the security group for enabling traffic between nodes&quot;&quot;&quot;</span>
+<a id="__codelineno-0-190" name="__codelineno-0-190"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">sg</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span> <span class="k">for</span> <span class="n">sg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_get_security_groups</span><span class="p">()):</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-191" name="__codelineno-0-191"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_create_security_group</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;ogc sg&quot;</span><span class="p">,</span> <span class="n">vpc_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-192" name="__codelineno-0-192"></a>
+<a id="__codelineno-0-193" name="__codelineno-0-193"></a>    <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
+<a id="__codelineno-0-194" name="__codelineno-0-194"></a>        <span class="n">ingress</span><span class="p">,</span> <span class="n">egress</span> <span class="o">=</span> <span class="n">port</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-195" name="__codelineno-0-195"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">ex_authorize_security_group</span><span class="p">(</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-196" name="__codelineno-0-196"></a>            <span class="n">name</span><span class="p">,</span> <span class="n">ingress</span><span class="p">,</span> <span class="n">egress</span><span class="p">,</span> <span class="s2">&quot;0.0.0.0/0&quot;</span><span class="p">,</span> <span class="s2">&quot;tcp&quot;</span>
+<a id="__codelineno-0-197" name="__codelineno-0-197"></a>        <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.delete_firewall" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">delete_firewall</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.delete_firewall" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">delete_firewall</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-199">199</a></span>
+<span class="normal"><a href="#__codelineno-0-200">200</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-199" name="__codelineno-0-199"></a><span class="k">def</span> <span class="nf">delete_firewall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-200" name="__codelineno-0-200"></a>    <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.create" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">create</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.create" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">create</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-202">202</a></span>
+<span class="normal"><a href="#__codelineno-0-203">203</a></span>
+<span class="normal"><a href="#__codelineno-0-204">204</a></span>
+<span class="normal"><a href="#__codelineno-0-205">205</a></span>
+<span class="normal"><a href="#__codelineno-0-206">206</a></span>
+<span class="normal"><a href="#__codelineno-0-207">207</a></span>
+<span class="normal"><a href="#__codelineno-0-208">208</a></span>
+<span class="normal"><a href="#__codelineno-0-209">209</a></span>
+<span class="normal"><a href="#__codelineno-0-210">210</a></span>
+<span class="normal"><a href="#__codelineno-0-211">211</a></span>
+<span class="normal"><a href="#__codelineno-0-212">212</a></span>
+<span class="normal"><a href="#__codelineno-0-213">213</a></span>
+<span class="normal"><a href="#__codelineno-0-214">214</a></span>
+<span class="normal"><a href="#__codelineno-0-215">215</a></span>
+<span class="normal"><a href="#__codelineno-0-216">216</a></span>
+<span class="normal"><a href="#__codelineno-0-217">217</a></span>
+<span class="normal"><a href="#__codelineno-0-218">218</a></span>
+<span class="normal"><a href="#__codelineno-0-219">219</a></span>
+<span class="normal"><a href="#__codelineno-0-220">220</a></span>
+<span class="normal"><a href="#__codelineno-0-221">221</a></span>
+<span class="normal"><a href="#__codelineno-0-222">222</a></span>
+<span class="normal"><a href="#__codelineno-0-223">223</a></span>
+<span class="normal"><a href="#__codelineno-0-224">224</a></span>
+<span class="normal"><a href="#__codelineno-0-225">225</a></span>
+<span class="normal"><a href="#__codelineno-0-226">226</a></span>
+<span class="normal"><a href="#__codelineno-0-227">227</a></span>
+<span class="normal"><a href="#__codelineno-0-228">228</a></span>
+<span class="normal"><a href="#__codelineno-0-229">229</a></span>
+<span class="normal"><a href="#__codelineno-0-230">230</a></span>
+<span class="normal"><a href="#__codelineno-0-231">231</a></span>
+<span class="normal"><a href="#__codelineno-0-232">232</a></span>
+<span class="normal"><a href="#__codelineno-0-233">233</a></span>
+<span class="normal"><a href="#__codelineno-0-234">234</a></span>
+<span class="normal"><a href="#__codelineno-0-235">235</a></span>
+<span class="normal"><a href="#__codelineno-0-236">236</a></span>
+<span class="normal"><a href="#__codelineno-0-237">237</a></span>
+<span class="normal"><a href="#__codelineno-0-238">238</a></span>
+<span class="normal"><a href="#__codelineno-0-239">239</a></span>
+<span class="normal"><a href="#__codelineno-0-240">240</a></span>
+<span class="normal"><a href="#__codelineno-0-241">241</a></span>
+<span class="normal"><a href="#__codelineno-0-242">242</a></span>
+<span class="normal"><a href="#__codelineno-0-243">243</a></span>
+<span class="normal"><a href="#__codelineno-0-244">244</a></span>
+<span class="normal"><a href="#__codelineno-0-245">245</a></span>
+<span class="normal"><a href="#__codelineno-0-246">246</a></span>
+<span class="normal"><a href="#__codelineno-0-247">247</a></span>
+<span class="normal"><a href="#__codelineno-0-248">248</a></span>
+<span class="normal"><a href="#__codelineno-0-249">249</a></span>
+<span class="normal"><a href="#__codelineno-0-250">250</a></span>
+<span class="normal"><a href="#__codelineno-0-251">251</a></span>
+<span class="normal"><a href="#__codelineno-0-252">252</a></span>
+<span class="normal"><a href="#__codelineno-0-253">253</a></span>
+<span class="normal"><a href="#__codelineno-0-254">254</a></span>
+<span class="normal"><a href="#__codelineno-0-255">255</a></span>
+<span class="normal"><a href="#__codelineno-0-256">256</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-202" name="__codelineno-0-202"></a><span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-203" name="__codelineno-0-203"></a>    <span class="n">pub_key</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_public_key</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+<a id="__codelineno-0-204" name="__codelineno-0-204"></a>    <span class="n">auth</span> <span class="o">=</span> <span class="n">NodeAuthSSHKey</span><span class="p">(</span><span class="n">pub_key</span><span class="p">)</span>
+<a id="__codelineno-0-205" name="__codelineno-0-205"></a>    <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span><span class="p">)</span>
+<a id="__codelineno-0-206" name="__codelineno-0-206"></a>    <span class="k">if</span> <span class="ow">not</span> <span class="n">image</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+<a id="__codelineno-0-207" name="__codelineno-0-207"></a>        <span class="k">raise</span> <span class="n">ProvisionException</span><span class="p">(</span>
+<a id="__codelineno-0-208" name="__codelineno-0-208"></a>            <span class="sa">f</span><span class="s2">&quot;Could not locate AMI and/or username for: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-209" name="__codelineno-0-209"></a>        <span class="p">)</span>
+<a id="__codelineno-0-210" name="__codelineno-0-210"></a>
+<a id="__codelineno-0-211" name="__codelineno-0-211"></a>    <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">instance_size</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-212" name="__codelineno-0-212"></a>
+<a id="__codelineno-0-213" name="__codelineno-0-213"></a>    <span class="n">opts</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-214" name="__codelineno-0-214"></a>        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-215" name="__codelineno-0-215"></a>        <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+<a id="__codelineno-0-216" name="__codelineno-0-216"></a>        <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+<a id="__codelineno-0-217" name="__codelineno-0-217"></a>        <span class="n">auth</span><span class="o">=</span><span class="n">auth</span><span class="p">,</span>
+<a id="__codelineno-0-218" name="__codelineno-0-218"></a>        <span class="n">ex_securitygroup</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-219" name="__codelineno-0-219"></a>        <span class="n">ex_spot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-220" name="__codelineno-0-220"></a>        <span class="n">ex_maxcount</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+<a id="__codelineno-0-221" name="__codelineno-0-221"></a>        <span class="n">ex_userdata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_userdata</span><span class="p">()</span>
+<a id="__codelineno-0-222" name="__codelineno-0-222"></a>        <span class="k">if</span> <span class="s2">&quot;windows&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">runs_on</span>
+<a id="__codelineno-0-223" name="__codelineno-0-223"></a>        <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-224" name="__codelineno-0-224"></a>        <span class="n">ex_terminate_on_shutdown</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-225" name="__codelineno-0-225"></a>    <span class="p">)</span>
+<a id="__codelineno-0-226" name="__codelineno-0-226"></a>    <span class="n">tags</span> <span class="o">=</span> <span class="p">{}</span>
+<a id="__codelineno-0-227" name="__codelineno-0-227"></a>
+<a id="__codelineno-0-228" name="__codelineno-0-228"></a>    <span class="c1"># Store some metadata for helping with cleanup</span>
+<a id="__codelineno-0-229" name="__codelineno-0-229"></a>    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-230" name="__codelineno-0-230"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+<a id="__codelineno-0-231" name="__codelineno-0-231"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+<a id="__codelineno-0-232" name="__codelineno-0-232"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;user-</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ogc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-233" name="__codelineno-0-233"></a>        <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;created&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">now</span>
+<a id="__codelineno-0-234" name="__codelineno-0-234"></a>        <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;user_tag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;user-</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;USER&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ogc&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-235" name="__codelineno-0-235"></a>        <span class="c1"># Store some extra metadata similar to what other projects use</span>
+<a id="__codelineno-0-236" name="__codelineno-0-236"></a>        <span class="n">epoch</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+<a id="__codelineno-0-237" name="__codelineno-0-237"></a>        <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;created_date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">epoch</span>
+<a id="__codelineno-0-238" name="__codelineno-0-238"></a>        <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;environment&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ogc&quot;</span>
+<a id="__codelineno-0-239" name="__codelineno-0-239"></a>        <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;repo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ogc&quot;</span>
+<a id="__codelineno-0-240" name="__codelineno-0-240"></a>
+<a id="__codelineno-0-241" name="__codelineno-0-241"></a>    <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">create_node</span><span class="p">(</span><span class="o">**</span><span class="n">opts</span><span class="p">)</span>  <span class="c1"># type: ignore</span>
+<a id="__codelineno-0-242" name="__codelineno-0-242"></a>    <span class="n">_machines</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-0-243" name="__codelineno-0-243"></a>    <span class="n">state_file_p</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">cache_path</span><span class="p">()</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span>
+<a id="__codelineno-0-244" name="__codelineno-0-244"></a>    <span class="n">state_file_p</span><span class="o">.</span><span class="n">write_bytes</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+<a id="__codelineno-0-245" name="__codelineno-0-245"></a>    <span class="n">machine</span> <span class="o">=</span> <span class="n">MachineModel</span><span class="p">(</span>
+<a id="__codelineno-0-246" name="__codelineno-0-246"></a>        <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
+<a id="__codelineno-0-247" name="__codelineno-0-247"></a>        <span class="n">instance_name</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+<a id="__codelineno-0-248" name="__codelineno-0-248"></a>        <span class="n">instance_id</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+<a id="__codelineno-0-249" name="__codelineno-0-249"></a>        <span class="n">instance_state</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+<a id="__codelineno-0-250" name="__codelineno-0-250"></a>        <span class="n">public_ip</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">public_ips</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-251" name="__codelineno-0-251"></a>        <span class="n">private_ip</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">private_ips</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<a id="__codelineno-0-252" name="__codelineno-0-252"></a>        <span class="n">remote_state_file</span><span class="o">=</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">cache_path</span><span class="p">()</span> <span class="o">/</span> <span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">(),</span>
+<a id="__codelineno-0-253" name="__codelineno-0-253"></a>    <span class="p">)</span>
+<a id="__codelineno-0-254" name="__codelineno-0-254"></a>    <span class="n">machine</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<a id="__codelineno-0-255" name="__codelineno-0-255"></a>    <span class="n">_machines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">machine</span><span class="p">)</span>
+<a id="__codelineno-0-256" name="__codelineno-0-256"></a>    <span class="k">return</span> <span class="n">_machines</span> <span class="k">if</span> <span class="n">_machines</span> <span class="k">else</span> <span class="kc">None</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.node" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">node</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.node" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">node</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-258">258</a></span>
+<span class="normal"><a href="#__codelineno-0-259">259</a></span>
+<span class="normal"><a href="#__codelineno-0-260">260</a></span>
+<span class="normal"><a href="#__codelineno-0-261">261</a></span>
+<span class="normal"><a href="#__codelineno-0-262">262</a></span>
+<span class="normal"><a href="#__codelineno-0-263">263</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-258" name="__codelineno-0-258"></a><span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Node</span><span class="p">:</span>
+<a id="__codelineno-0-259" name="__codelineno-0-259"></a>    <span class="n">instance_id</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;instance_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<a id="__codelineno-0-260" name="__codelineno-0-260"></a>    <span class="n">_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">provisioner</span><span class="o">.</span><span class="n">list_nodes</span><span class="p">(</span><span class="n">ex_node_ids</span><span class="o">=</span><span class="p">[</span><span class="n">instance_id</span><span class="p">])</span>
+<a id="__codelineno-0-261" name="__codelineno-0-261"></a>    <span class="k">if</span> <span class="n">_nodes</span><span class="p">:</span>
+<a id="__codelineno-0-262" name="__codelineno-0-262"></a>        <span class="k">return</span> <span class="n">_nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a id="__codelineno-0-263" name="__codelineno-0-263"></a>    <span class="k">raise</span> <span class="n">ProvisionException</span><span class="p">(</span><span class="s2">&quot;Unable to get node information&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+
+<h2 id="ogc.provision.AWSProvisioner.__str__" class="doc doc-heading">
+        <span class="doc doc-object-name doc-function-name">__str__</span>
+
+
+<a href="#ogc.provision.AWSProvisioner.__str__" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__str__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</code></pre></div>
+
+  <div class="doc doc-contents ">
+
+      <details class="quote">
+        <summary>Source code in <code>ogc/provision.py</code></summary>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-265">265</a></span>
+<span class="normal"><a href="#__codelineno-0-266">266</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-265" name="__codelineno-0-265"></a><span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-0-266" name="__codelineno-0-266"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;AWSProvisioner [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">]&gt;&quot;</span>
+</code></pre></div></td></tr></table></div>
+      </details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" hidden>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.ba449ae6.min.js"></script>
+      
+    
+  </body>
+</html>

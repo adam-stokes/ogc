@@ -1,0 +1,14 @@
+{% macro docker_run_proper(task, opts=None, from_gcloud=True) -%}
+```shell
+$ docker run \
+    --env-file .env \
+    --rm \
+    {%- if from_gcloud %}
+    --volumes-from gcloud-config \
+    {%- endif %}
+    -v `pwd`:`pwd` \
+    -w `pwd` \
+    -it gorambo/ogc:v4 \
+    ogc ubuntu.py {{task}} -v{% if opts %}{% for opt in opts %} -o {{opt}}{% endfor %}{% endif %}
+```
+{%- endmacro -%}

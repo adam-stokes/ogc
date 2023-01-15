@@ -9,24 +9,24 @@
       
       
       
-        <link rel="prev" href="../configuration/docker/gcloud-auth/">
+        <link rel="prev" href="../ssh/">
       
       
-        <link rel="next" href="../defining-layouts/">
+        <link rel="next" href="../../../managing-nodes/">
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.4">
     
     
       
-        <title>Managing a deployment - OGC</title>
+        <title>Google Authentication - OGC</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.9c788c91.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.9c788c91.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.2505c338.min.css">
       
       
 
@@ -42,9 +42,9 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -69,7 +69,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#managing-a-deployment" class="md-skip">
+        <a href="#google-cloud-authentication-and-docker" class="md-skip">
           Skip to content
         </a>
       
@@ -83,7 +83,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OGC" class="md-header__button md-logo" aria-label="OGC" data-md-component="logo">
+    <a href="../../../.." title="OGC" class="md-header__button md-logo" aria-label="OGC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Managing a deployment
+              Google Authentication
             
           </span>
         </div>
@@ -181,7 +181,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
+    <a href="../../../.." title="OGC" class="md-nav__button md-logo" aria-label="OGC" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -212,7 +212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../.." class="md-nav__link">
         Getting Started
       </a>
     </li>
@@ -254,20 +254,20 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-        
-      
-      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" >
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_2_1" tabindex="0" aria-expanded="false">
+        <label class="md-nav__link" for="__nav_2_1" tabindex="0" aria-expanded="true">
           Configuration
           <span class="md-nav__icon md-icon"></span>
         </label>
@@ -283,20 +283,20 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
       
       
-        
-      
-      <input class="md-nav__toggle md-toggle md-toggle--indeterminate" data-md-toggle="__nav_2_1_1" type="checkbox" id="__nav_2_1_1" >
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_2_1_1" type="checkbox" id="__nav_2_1_1" checked>
       
       
       
-        <label class="md-nav__link" for="__nav_2_1_1" tabindex="0" aria-expanded="false">
+        <label class="md-nav__link" for="__nav_2_1_1" tabindex="0" aria-expanded="true">
           Docker
           <span class="md-nav__icon md-icon"></span>
         </label>
@@ -314,37 +314,9 @@
   
   
     <li class="md-nav__item">
-      <a href="../configuration/docker/ssh/" class="md-nav__link">
+      <a href="../ssh/" class="md-nav__link">
         SSH
       </a>
-    </li>
-  
-
-            
-          
-            
-              
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../configuration/docker/gcloud-auth/" class="md-nav__link">
-        Google Authentication
-      </a>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
-    </li>
-  
-
-            
-          
-        </ul>
-      </nav>
     </li>
   
 
@@ -366,12 +338,12 @@
       
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
-          Managing a deployment
+          Google Authentication
           <span class="md-nav__icon md-icon"></span>
         </label>
       
       <a href="./" class="md-nav__link md-nav__link--active">
-        Managing a deployment
+        Google Authentication
       </a>
       
         
@@ -390,36 +362,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#listing-nodes" class="md-nav__link">
-    Listing Nodes
+  <a href="#create-container" class="md-nav__link">
+    Create Container
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#accessing-nodes" class="md-nav__link">
-    Accessing nodes
+  <a href="#setup-authentication-and-environment" class="md-nav__link">
+    Setup authentication and environment
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#executing-commands" class="md-nav__link">
-    Executing commands
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#executing-a-scripts-directory" class="md-nav__link">
-    Executing a scripts directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#destroying-nodes" class="md-nav__link">
-    Destroying nodes
+  <a href="#attach-container-to-ogc" class="md-nav__link">
+    Attach container to OGC
   </a>
   
 </li>
@@ -433,13 +391,41 @@
 
             
           
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+            
+          
             
               
   
   
   
     <li class="md-nav__item">
-      <a href="../defining-layouts/" class="md-nav__link">
+      <a href="../../../managing-nodes/" class="md-nav__link">
+        Managing a deployment
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../defining-layouts/" class="md-nav__link">
         Defining Layouts
       </a>
     </li>
@@ -453,7 +439,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scripting/" class="md-nav__link">
+      <a href="../../../scripting/" class="md-nav__link">
         Scripting
       </a>
     </li>
@@ -467,7 +453,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../providers/" class="md-nav__link">
+      <a href="../../../providers/" class="md-nav__link">
         Providers
       </a>
     </li>
@@ -481,7 +467,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../windows/" class="md-nav__link">
+      <a href="../../../windows/" class="md-nav__link">
         Windows
       </a>
     </li>
@@ -524,7 +510,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../cookbook/template-access-node-info/" class="md-nav__link">
+      <a href="../../../cookbook/template-access-node-info/" class="md-nav__link">
         Access node info
       </a>
     </li>
@@ -582,7 +568,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/managing-nodes/" class="md-nav__link">
+      <a href="../../../../developer-guide/managing-nodes/" class="md-nav__link">
         Managing nodes
       </a>
     </li>
@@ -625,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/deployer/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/deployer/" class="md-nav__link">
         ogc.deployer
       </a>
     </li>
@@ -639,7 +625,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/db/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/db/" class="md-nav__link">
         ogc.db
       </a>
     </li>
@@ -653,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/fs/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/fs/" class="md-nav__link">
         ogc.fs
       </a>
     </li>
@@ -667,7 +653,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/loader/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/loader/" class="md-nav__link">
         ogc.loader
       </a>
     </li>
@@ -681,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/provision/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/provision/" class="md-nav__link">
         ogc.provision
       </a>
     </li>
@@ -695,7 +681,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/templatetags/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/templatetags/" class="md-nav__link">
         ogc.templatetags
       </a>
     </li>
@@ -709,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/actions/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/actions/" class="md-nav__link">
         ogc.models.actions
       </a>
     </li>
@@ -723,7 +709,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/machine/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/machine/" class="md-nav__link">
         ogc.models.machine
       </a>
     </li>
@@ -737,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/layout/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/layout/" class="md-nav__link">
         ogc.models.layout
       </a>
     </li>
@@ -751,7 +737,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/tags/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/tags/" class="md-nav__link">
         ogc.models.tags
       </a>
     </li>
@@ -765,7 +751,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../developer-guide/api/models/utils/" class="md-nav__link">
+      <a href="../../../../developer-guide/api/models/utils/" class="md-nav__link">
         ogc.models.utils
       </a>
     </li>
@@ -794,7 +780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../commands/ogc/" class="md-nav__link">
+      <a href="../../../../commands/ogc/" class="md-nav__link">
         CLI Reference
       </a>
     </li>
@@ -828,36 +814,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#listing-nodes" class="md-nav__link">
-    Listing Nodes
+  <a href="#create-container" class="md-nav__link">
+    Create Container
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#accessing-nodes" class="md-nav__link">
-    Accessing nodes
+  <a href="#setup-authentication-and-environment" class="md-nav__link">
+    Setup authentication and environment
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#executing-commands" class="md-nav__link">
-    Executing commands
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#executing-a-scripts-directory" class="md-nav__link">
-    Executing a scripts directory
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#destroying-nodes" class="md-nav__link">
-    Destroying nodes
+  <a href="#attach-container-to-ogc" class="md-nav__link">
+    Attach container to OGC
   </a>
   
 </li>
@@ -881,38 +853,23 @@
 
 
 
-<h1 id="managing-a-deployment">Managing a Deployment<a class="headerlink" href="#managing-a-deployment" title="Permanent link">&para;</a></h1>
-<p>Learn how to list, inspect, access and debug your node deployments.</p>
-<details class="caution">
-<summary>Assumptions</summary>
-<p>This assumes you've created a layout in a file named <code>ubuntu.py</code> and you have <code>.env</code> plus Google Authentication completed.</p>
-</details>
-<h2 id="listing-nodes">Listing Nodes<a class="headerlink" href="#listing-nodes" title="Permanent link">&para;</a></h2>
-<p>To list nodes in your deployment, run the following:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>ls<span class="w"> </span>-v
+<h1 id="google-cloud-authentication-and-docker">Google Cloud authentication and Docker<a class="headerlink" href="#google-cloud-authentication-and-docker" title="Permanent link">&para;</a></h1>
+<p>Using a separate container for storing the Google cloud credentials we can easily target certain
+commands to run with that authentication in place.</p>
+<h2 id="create-container">Create Container<a class="headerlink" href="#create-container" title="Permanent link">&para;</a></h2>
+<p>First, create the <code>gcloud-config</code> container:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-ti<span class="w"> </span>--name<span class="w"> </span>gcloud-config<span class="w"> </span>google/cloud-sdk<span class="w"> </span>gcloud<span class="w"> </span>auth<span class="w"> </span>login
 </code></pre></div>
-<p>Which gives a table output of current node deployments:</p>
-<p><img alt="Listing Nodes" src="../assets/list_nodes.svg" /></p>
-<h2 id="accessing-nodes">Accessing nodes<a class="headerlink" href="#accessing-nodes" title="Permanent link">&para;</a></h2>
-<p>OGC provides a helper command for easily accessing any of the nodes in your deployment.</p>
-<p>To login to a node run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>ssh<span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">instance_id</span><span class="o">=</span><span class="m">123432432</span>
+<p>This will store your credentials in the gcloud-config container volume.</p>
+<h2 id="setup-authentication-and-environment">Setup authentication and environment<a class="headerlink" href="#setup-authentication-and-environment" title="Permanent link">&para;</a></h2>
+<p>Download a service account credentials file from <a href="https://cloud.google.com/iam/docs/service-account">Google</a> and setup the <code>.env</code> in your project root:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">GOOGLE_APPLICATION_CREDENTIALS</span><span class="o">=</span>my-google-service-creds.json
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nv">GOOGLE_APPLICATION_SERVICE_ACCOUNT</span><span class="o">=</span>my-google@**.iam.gserviceaccount.com
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nv">GOOGLE_PROJECT</span><span class="o">=</span>my-project
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">GOOGLE_DATACENTER</span><span class="o">=</span>us-central1-a
 </code></pre></div>
-<p>Or</p>
+<h2 id="attach-container-to-ogc">Attach container to OGC<a class="headerlink" href="#attach-container-to-ogc" title="Permanent link">&para;</a></h2>
+<p>Next, to use that with OGC, run:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
@@ -920,41 +877,7 @@
 <a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>ssh<span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">instance_name</span><span class="o">=</span>ogc-ubuntu-001
-</code></pre></div>
-<h2 id="executing-commands">Executing commands<a class="headerlink" href="#executing-commands" title="Permanent link">&para;</a></h2>
-<p>Running arbitrary commands can be accomplished with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">cmd</span><span class="o">=</span><span class="err">&#39;</span>ls<span class="w"> </span>-l<span class="w"> </span>/
-</code></pre></div>
-<h2 id="executing-a-scripts-directory">Executing a scripts directory<a class="headerlink" href="#executing-a-scripts-directory" title="Permanent link">&para;</a></h2>
-<p>In addition to running arbitrary commands, OGC can also execute a directory of templates/scripts:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>exec_scripts<span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">scripts</span><span class="o">=</span>fixtures/ex_deploy_ubuntu
-</code></pre></div>
-<p>This can be useful to re-run a deployment or add new functionality/one-offs to a node without disturbing the original layout specifications. Access to the database and all templating is available as well.</p>
-<h2 id="destroying-nodes">Destroying nodes<a class="headerlink" href="#destroying-nodes" title="Permanent link">&para;</a></h2>
-<p>OGC allows destroying of individual or a full blown cleanup. To remove a single node we run:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>down<span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">instance_name</span><span class="o">=</span>ogc-ubuntu-001
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up<span class="w"> </span>-v
 </code></pre></div>
 
 
@@ -998,10 +921,10 @@
       <div class="md-dialog__inner md-typeset"></div>
     </div>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.expand", "navigation.top", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.ba449ae6.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.ba449ae6.min.js"></script>
       
     
   </body>
