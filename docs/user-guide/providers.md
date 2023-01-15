@@ -14,3 +14,8 @@ In order to access a cloud provider, there are certain environment variables tha
 - **GOOGLE_APPLICATION_SERVICE_ACCOUNT**
 - **GOOGLE_PROJECT**
 - **GOOGLE_DATACENTER**
+
+### Authentication and Docker
+
+Using `OGC` via docker is the easiest way to get started, please see this documentation on how to [setup
+authentication with GCE/OGC/Docker](cookbook/docker-gcloud-auth.md).

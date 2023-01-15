@@ -5,55 +5,38 @@ Learn the layout specification and how to create your own provisioning layouts.
 Create a file `ubuntu.py`:
 
 ```python
-from ogc.deployer import Deployer
+"""layout spec"""
+
+from __future__ import annotations
+
+from ogc.deployer import init
+from ogc.fs import expand_path
 from ogc.log import get_logger
-from ogc.models import Layout
-from ogc.provision import choose_provisioner
 
 log = get_logger("ogc")
 
-layout = Layout(
-    instance_size="e2-standard-4",
-    name="ubuntu-ogc",
-    provider="google",
-    remote_path="/home/ubuntu/ogc",
-    runs_on="ubuntu-2004-lts",
-    scale=5,
-    scripts="fixtures/ex_deploy_ubuntu",
-    username="ubuntu",
-    ssh_private_key="~/.ssh/id_rsa_libcloud",
-    ssh_public_key="~/.ssh/id_rsa_libcloud.pub",
-    ports=["22:22", "80:80", "443:443", "5601:5601"],
-    tags=[],
-    labels=dict(
-        division="engineering", org="obs", team="observability", project="perf"
+deployment = init(
+    layout_model=dict(
+        instance_size="e2-standard-4",
+        name="ubuntu-ogc",
+        provider="google",
+        remote_path="/home/ubuntu/ogc",
+        runs_on="ubuntu-2004-lts",
+        scale=9,
+        scripts="fixtures/ex_deploy_ubuntu",
+        username="ubuntu",
+        ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
+        ssh_public_key=expand_path("~/.ssh/id_rsa_libcloud.pub"),
+        ports=["22:22", "80:80", "443:443", "5601:5601"],
+        tags=[],
+        labels=dict(
+            division="engineering", org="obs", team="observability", project="perf"
+        ),
     ),
 )
-
-# Alternatively
-# from ogc.provisioner import GCEProvisioner
-# provisioner = GCEProvisioner(layout=layout)
-
-provisioner = choose_provisioner(layout=layout)
-deploy = Deployer.from_provisioner(provisioner=provisioner)
-def up(**kwargs):
-    deploy.up()
-
-def run(**kwargs):
-    # pass in a directory/filepath -o path=fixtures/ubuntu
-    if kwargs.get("path", None):
-        deploy.exec_scripts(scripts=kwargs["path"])
-    # pass in a cmd with -o cmd='ls -l /'
-    elif kwargs.get("cmd", None):
-        deploy.exec(kwargs["cmd"])
-    else:
-        deploy.exec_scripts()    
-
-def down(**kwargs):
-    deploy.down()
 ```
 
-Each layout has a friendly name associated as seen by `elastic-agent-ubuntu`. The next section is going to go over each option and describe its meaning.
+Each layout has a friendly name associated as seen by `ubuntu-ogc`. The next section is going to go over each option and describe its meaning.
 
 **provider**
 
@@ -107,7 +90,7 @@ In the case of **Google**, any username can be given. In the case of **AWS**, th
 
 The location on your machine where templates/scripts resides. These will be uploaded and executed during the deployment phase.
 
-!!! note 
+??? note 
     See [scripting](user-guide/../scripting.md) for more information.
 
 **scale**

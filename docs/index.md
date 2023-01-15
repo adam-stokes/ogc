@@ -8,6 +8,16 @@ Welcome to the getting started guide! This should be a quick introduction to get
 
 ## Install
 
+### Recommended
+
+```shell
+$ docker run --env-file .env --rm --volumes-from gcloud-config -v `pwd`:`pwd` -w `pwd` -it ogc:latest ogc fixtures/layouts/ubuntu up -v
+```
+
+??? note "GCE and Docker Authentication"
+    Checkout [OGC+Docker+GCE](user-guide/cookbook/docker-gcloud-auth.md) authentication for more information.
+
+### Alternatives
 We use and recommend the use of **[Poetry](https://python-poetry.org/)**:
 
 ```shell
@@ -15,7 +25,7 @@ $ pip install poetry
 $ poetry install
 ```
 
-!!! caution
+??? warning "Running in Poetry"
     If using poetry make sure to prefix running of `ogc` with the following:
 
     ```
@@ -27,12 +37,6 @@ $ poetry install
     ```
     $ poetry shell
     ```
-
-Or install from [pypi](https://pypi.org):
-
-```
-$ pip install ogc
-```
 
 ## Provider Setup
 
@@ -51,7 +55,7 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
-!!! note
+??? note
     More information can be found in our [Providers](user-guide/providers.md) documentation.
 
 ## Define Provisioning
