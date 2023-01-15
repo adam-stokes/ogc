@@ -6,3 +6,13 @@ __pycache__/
 .venv/
 .vscode/
 .pytest*
+artifacts
+docs
+fixtures
+man
+maint
+contrib
+site
+tests
+tools
+.env*

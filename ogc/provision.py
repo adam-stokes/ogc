@@ -382,7 +382,7 @@ class GCEProvisioner(BaseProvisioner):
             ex_labels=self.layout.labels,
             ex_disk_type="pd-ssd",
             ex_disk_size=100,
-            ex_preemptible=True,
+            ex_preemptible=os.environ.get("OGC_DISABLE_SPOT", True),
         )
         _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
         _machines = []
