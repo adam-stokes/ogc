@@ -11,7 +11,10 @@ Welcome to the getting started guide! This should be a quick introduction to get
 ### Recommended
 
 ```shell
-$ docker run --env-file .env --rm --volumes-from gcloud-config -v `pwd`:`pwd` -w `pwd` -it ogc:latest ogc fixtures/layouts/ubuntu up -v
+$ docker run --env-file .env \
+    --rm --volumes-from gcloud-config \
+    -v `pwd`:`pwd` -w `pwd` -it \
+    gorambo/ogc:v4 ogc fixtures/layouts/ubuntu up -v
 ```
 
 ??? note "GCE and Docker Authentication"
