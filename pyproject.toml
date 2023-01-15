@@ -58,6 +58,8 @@ flake8 = "*"
 mkdocstrings-python = "*"
 pytest-cov = "*"
 mkdocs = "^1.4.2"
+mkdocs-autorefs = "^0.4.1"
+mkdocs-macros-plugin = "^0.7.0"
 
 [tool.mypy]
 allow_redefinition = false

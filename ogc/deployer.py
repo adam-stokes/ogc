@@ -122,7 +122,7 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
 
     Example:
         ``` bash
-        > ogc fixtures/layouts/ubuntu ssh -v -o instance_id=5407368969918077947
+        > ogc ubuntu.py ssh -v -o instance_id=5407368969918077947
         ```
     """
     nodes = __filter_machines(**kwargs)
@@ -175,9 +175,9 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     Example:
         ``` bash
         # All  machines
-        > ogc fixtures/layouts/ubuntu down -v
+        > ogc ubuntu.py down -v
         # Single machine
-        > ogc fixtures/layouts/ubuntu down -v -o instance_id=5407368969918077947
+        > ogc ubuntu.py down -v -o instance_id=5407368969918077947
         ```
     Returns:
         True if successful, False otherwise.
@@ -213,7 +213,7 @@ def ls(
 
     Example:
         ``` bash
-        > ogc fixtures/layouts/ubuntu ls -v -o limit=8
+        > ogc ubuntu.py ls -v -o limit=8
         ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
         ┃ ID                             ┃ Name                                 ┃ Created            ┃ Status       ┃ Labels                                                                                      ┃ Connection                                                                                   ┃
         ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
@@ -308,9 +308,9 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
     Example:
         ``` bash
-        > ogc fixtures/layouts/ubuntu exec -v -o cmd='ls -l'
+        > ogc ubuntu.py exec -v -o cmd='ls -l'
         # Single machine
-        > ogc fixtures/layouts/ubuntu exec -v -o cmd='ls -l' -o instance_id=2349146264239594441
+        > ogc ubuntu.py exec -v -o cmd='ls -l' -o instance_id=2349146264239594441
         ```
 
     Returns:
@@ -397,9 +397,9 @@ def exec_scripts(
 
     Example:
         ``` bash
-        > ogc fixtures/layouts/ubuntu exec_scripts -v -o scripts='/home/ubuntu/new-deploy-scripts'
+        > ogc ubuntu.py exec_scripts -v -o scripts='/home/ubuntu/new-deploy-scripts'
         # Optionally, run the scripts defined in the layout
-        > ogc fixtures/layouts/ubuntu exec_scripts -v
+        > ogc ubuntu.py exec_scripts -v
         ```
     Returns:
         True if succesful, False otherwise.

@@ -6,5 +6,4 @@ This page provides documentation for our command line tool.
     :module: ogc.commands.base
     :command: cli
     :prog_name: ogc
-    :style: table
     :depth: 1

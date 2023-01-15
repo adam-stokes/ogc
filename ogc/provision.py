@@ -145,9 +145,14 @@ pacapt install rsync || true
 class AWSProvisioner(BaseProvisioner):
     """AWS Provisioner
 
-    Environment variables required:
-    AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY
+    Required Environment Variables:
+
+        - **AWS_ACCESS_KEY_ID**
+        - **AWS_SECRET_ACCESS_KEY**
+
+    Optional Environment Variables:
+
+        - **AWS_REGION**
     """
 
     @property
@@ -264,9 +269,13 @@ class AWSProvisioner(BaseProvisioner):
 class GCEProvisioner(BaseProvisioner):
     """Provides abstraction for the GCE provisioner
 
-    Environment variables required:
-    GOOGLE_APPLICATION_SERVICE_ACCOUNT: Service user_id associated with credentials
-    GOOGLE_APPLICATION_CREDENTIALS: Credentials file for the service account
+    Required Environment Variables:
+
+        - **GOOGLE_APPLICATION_SERVICE_ACCOUNT**
+        - **GOOGLE_APPLICATION_CREDENTIALS**
+        - **GOOGLE_PROJECT**
+        - **GOOGLE_DATACENTER**
+
     """
 
     @property

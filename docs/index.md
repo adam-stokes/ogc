@@ -1,3 +1,4 @@
+{% import 'subs.j2' as subs -%}
 # OGC
 
 ogc - provisioning, that's it.
@@ -10,12 +11,7 @@ Welcome to the getting started guide! This should be a quick introduction to get
 
 ### Recommended
 
-```shell
-$ docker run --env-file .env \
-    --rm --volumes-from gcloud-config \
-    -v `pwd`:`pwd` -w `pwd` -it \
-    gorambo/ogc:v4 ogc fixtures/layouts/ubuntu up -v
-```
+{{ subs.docker_run_proper('up') }}
 
 ??? note "GCE and Docker Authentication"
     Checkout [OGC+Docker+GCE](user-guide/configuration/docker/gcloud-auth.md) authentication for more information.

@@ -1,3 +1,4 @@
+{% import 'subs.j2' as subs %}
 # Managing a Deployment
 
 Learn how to list, inspect, access and debug your node deployments.
@@ -9,9 +10,7 @@ Learn how to list, inspect, access and debug your node deployments.
 
 To list nodes in your deployment, run the following:
 
-```
-$ ogc ubuntu.py ls -v
-```
+{{ subs.docker_run_proper('ls') }}
 
 Which gives a table output of current node deployments:
 
@@ -24,27 +23,23 @@ OGC provides a helper command for easily accessing any of the nodes in your depl
 
 To login to a node run:
 
-```shell
-$ ogc ubuntu.py ssh -v -o instance_id=123432432
-# Or
-$ ogc ubuntu.py ssh -v -o instance_name=ogc-ubuntu-001
-```
+{{ subs.docker_run_proper('ssh', opts=['instance_id=123432432']) }}
+
+Or
+
+{{ subs.docker_run_proper('ssh', opts=['instance_name=ogc-ubuntu-001']) }}
 
 ## Executing commands
 
 Running arbitrary commands can be accomplished with:
 
-```
-$ ogc ubuntu.py exec -v -o cmd='ls -l /'
-```
+{{ subs.docker_run_proper('exec', opts=["cmd='ls -l /"]) }}
 
 ## Executing a scripts directory
 
 In addition to running arbitrary commands, OGC can also execute a directory of templates/scripts:
 
-```
-$ ogc ubuntu.py exec_scripts -v -o scripts=fixtures/ex_deploy_ubuntu
-```
+{{ subs.docker_run_proper('exec_scripts', opts=['scripts=fixtures/ex_deploy_ubuntu']) }}
 
 This can be useful to re-run a deployment or add new functionality/one-offs to a node without disturbing the original layout specifications. Access to the database and all templating is available as well.
 
@@ -52,6 +47,4 @@ This can be useful to re-run a deployment or add new functionality/one-offs to a
 
 OGC allows destroying of individual or a full blown cleanup. To remove a single node we run:
 
-```
-$ ogc ubuntu.py -v -o instance_name=ogc-ubuntu-001
-```
+{{ subs.docker_run_proper('down', opts=['instance_name=ogc-ubuntu-001']) }}

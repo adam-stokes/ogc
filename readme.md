@@ -1,6 +1,6 @@
 <h1 align="center">ogc</h1>
 
-<p align="center">ogc - provisioning, that's it.</p>
+<p align="center">provisioning, that's it.</p>
 
 <p align="center">
 <a href="https://adam-stokes.github.io/ogc/">View Documentation</a>

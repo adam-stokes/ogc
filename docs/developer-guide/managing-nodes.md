@@ -1,3 +1,4 @@
+{% import 'subs.j2' as subs %}
 # Managing Nodes Programatically
 
 ## Requirements
@@ -50,6 +51,4 @@ deployment = init(
 
 To launch this node layout:
 
-```
-$ ogc ubuntu.py up -v
-```
+{{ subs.docker_run_proper('up') }}

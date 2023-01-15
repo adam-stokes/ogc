@@ -13,6 +13,7 @@ plugins:
                     show_if_no_docstring: true
                     separate_signature: true
                     members_order: source    
+    - macros
 theme: 
     name: material
     palette:
@@ -74,6 +75,7 @@ nav:
   - 'User Guide':
     - "Configuration":
         - "Docker":
+            - "SSH": 'user-guide/configuration/docker/ssh.md'
             - "Google Authentication": 'user-guide/configuration/docker/gcloud-auth.md'
     - 'Managing a deployment': 'user-guide/managing-nodes.md'
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
