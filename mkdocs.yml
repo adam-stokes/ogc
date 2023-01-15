@@ -72,6 +72,9 @@ markdown_extensions:
 nav:
   - 'Getting Started': 'index.md'
   - 'User Guide':
+    - "Configuration":
+        - "Docker":
+            - "Google Authentication": 'user-guide/configuration/docker/gcloud-auth.md'
     - 'Managing a deployment': 'user-guide/managing-nodes.md'
     - 'Defining Layouts': 'user-guide/defining-layouts.md'
     - 'Scripting': 'user-guide/scripting.md'
@@ -79,7 +82,6 @@ nav:
     - 'Windows': 'user-guide/windows.md'
     - 'Cookbook':
         - 'Access node info': 'user-guide/cookbook/template-access-node-info.md'
-        - 'GCloud Auth and Docker': 'user-guide/cookbook/docker-gcloud-auth.md'
   - 'Developer Guide':
     - 'Managing nodes': 'developer-guide/managing-nodes.md'
     - 'API':

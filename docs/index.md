@@ -18,7 +18,7 @@ $ docker run --env-file .env \
 ```
 
 ??? note "GCE and Docker Authentication"
-    Checkout [OGC+Docker+GCE](user-guide/cookbook/docker-gcloud-auth.md) authentication for more information.
+    Checkout [OGC+Docker+GCE](user-guide/configuration/docker/gcloud-auth.md) authentication for more information.
 
 ### Alternatives
 We use and recommend the use of **[Poetry](https://python-poetry.org/)**:
