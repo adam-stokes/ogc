@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import datetime
-import functools
 import os
 import typing as t
 import uuid
@@ -288,7 +287,6 @@ class GCEProvisioner(BaseProvisioner):
         }
 
     @retry(tries=5, logger=None)
-    @functools.lru_cache()
     def connect(self) -> NodeDriver:
         log.debug(f"Getting provider connection: {self.options}")
         gce = get_driver(Provider.GCE)
