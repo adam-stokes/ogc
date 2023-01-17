@@ -783,18 +783,23 @@
 <p>Welcome to the getting started guide! This should be a quick introduction to get up and running with OGC. More information on customizing and extending OGC can be found in the user documentation.</p>
 <h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
 <h3 id="recommended">Recommended<a class="headerlink" href="#recommended" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>$<span class="w"> </span>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><span class="filename">bash -c</span><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up<span class="w"> </span>-v
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span>-v<span class="w"> </span>ssh-creds:/root/.ssh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up<span class="w"> </span>-v
 </code></pre></div>
 <details class="note">
-<summary>GCE and Docker Authentication</summary>
-<p>Checkout <a href="user-guide/configuration/docker/gcloud-auth/">OGC+Docker+GCE</a> authentication for more information.</p>
+<summary>SSH/GCE/Docker Authentication</summary>
+<p>A couple of articles to help setup ssh/gce authentication for use within docker.</p>
+<ul>
+<li><a href="user-guide/configuration/docker/gcloud-auth/">OGC+Docker+GCE</a> </li>
+<li><a href="user-guide/configuration/docker/ssh/">OGC+Docker+SSH</a></li>
+</ul>
 </details>
 <h3 id="alternatives">Alternatives<a class="headerlink" href="#alternatives" title="Permanent link">&para;</a></h3>
 <p>We use and recommend the use of <strong><a href="https://python-poetry.org/">Poetry</a></strong>:</p>
@@ -823,46 +828,70 @@
 <a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>GOOGLE_DATACENTER=&quot;us-central1-a&quot;
 </code></pre></div>
 <details class="note">
-<summary>Note</summary>
+<summary>Additional Provider Information</summary>
 <p>More information can be found in our <a href="user-guide/providers/">Providers</a> documentation.</p>
 </details>
 <h2 id="define-provisioning">Define Provisioning<a class="headerlink" href="#define-provisioning" title="Permanent link">&para;</a></h2>
-<p>Once setup is complete, a provision layout is needed.</p>
-<p>Create a file <code>ubuntu.py</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span> <span class="nn">ogc.deployer</span> <span class="kn">import</span> <span class="n">init</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span> <span class="nn">ogc.fs</span> <span class="kn">import</span> <span class="n">expand_path</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kn">from</span> <span class="nn">ogc.log</span> <span class="kn">import</span> <span class="n">get_logger</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">log</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;ogc&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">deployment</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    <span class="n">layout_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;e2-standard-4&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ubuntu-ogc&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu/ogc&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ubuntu-2004-lts&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_ubuntu&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ubuntu&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud&quot;</span><span class="p">),</span>
-<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud.pub&quot;</span><span class="p">),</span>
-<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>        <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;22:22&quot;</span><span class="p">,</span> <span class="s2">&quot;80:80&quot;</span><span class="p">,</span> <span class="s2">&quot;443:443&quot;</span><span class="p">,</span> <span class="s2">&quot;5601:5601&quot;</span><span class="p">],</span>
-<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>        <span class="n">tags</span><span class="o">=</span><span class="p">[],</span>
-<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a>        <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-<a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a>            <span class="n">division</span><span class="o">=</span><span class="s2">&quot;engineering&quot;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">team</span><span class="o">=</span><span class="s2">&quot;observability&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;perf&quot;</span>
-<a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a>        <span class="p">),</span>
-<a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a>    <span class="p">),</span>
-<a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="p">)</span>
+<p>Once configuration is complete, a provision layout is needed, create the following:</p>
+<div class="highlight"><span class="filename">ubuntu.py</span><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">init</span><span class="p">,</span> <span class="n">fs</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">deployment</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    <span class="n">layout_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;e2-standard-4&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ubuntu-ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu/ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ubuntu-2004-lts&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="n">fs</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud&quot;</span><span class="p">),</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="n">fs</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud.pub&quot;</span><span class="p">),</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>        <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;22:22&quot;</span><span class="p">,</span> <span class="s2">&quot;80:80&quot;</span><span class="p">,</span> <span class="s2">&quot;443:443&quot;</span><span class="p">,</span> <span class="s2">&quot;5601:5601&quot;</span><span class="p">],</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>        <span class="n">tags</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>        <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>            <span class="n">division</span><span class="o">=</span><span class="s2">&quot;engineering&quot;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">team</span><span class="o">=</span><span class="s2">&quot;observability&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;perf&quot;</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>        <span class="p">),</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a>    <span class="p">),</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="p">)</span>
 </code></pre></div>
 <p>This specification tells OGC to deploy 5 nodes running on Google's <strong>e2-standard-4</strong> with Ubuntu OS. 
 The <code>scripts</code> section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.</p>
 <h2 id="provision-and-deploy">Provision and Deploy<a class="headerlink" href="#provision-and-deploy" title="Permanent link">&para;</a></h2>
 <p>Once the specification is set, environment variables configured, execute a deployment in a new terminal:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>$<span class="w"> </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up
-<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>$<span class="w"> </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-o<span class="w"> </span><span class="nv">cmd</span><span class="o">=</span><span class="s1">&#39;sudo apt-get update &amp;&amp; sudo apt-get dist-upgrade&#39;</span>
-<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>$<span class="w"> </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>down
-</code></pre></div>
+<h3 id="bring-up">Bring up<a class="headerlink" href="#bring-up" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">bash -c</span><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span>-v<span class="w"> </span>ssh-creds:/root/.ssh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="hll"><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>up<span class="w"> </span>-v
+</span></code></pre></div>
+<h3 id="execute-commands">Execute commands<a class="headerlink" href="#execute-commands" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">bash -c</span><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span>-v<span class="w"> </span>ssh-creds:/root/.ssh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="hll"><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">cmd</span><span class="o">=</span><span class="s1">&#39;sudo apt-get update &amp;&amp; sudo apt-get dist-upgrade&#39;</span>
+</span></code></pre></div>
+<h3 id="bring-down">Bring down<a class="headerlink" href="#bring-down" title="Permanent link">&para;</a></h3>
+<div class="highlight"><span class="filename">bash -c</span><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>run<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>--env-file<span class="w"> </span>.env<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span>--rm<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span>--volumes-from<span class="w"> </span>gcloud-config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span>-v<span class="w"> </span>ssh-creds:/root/.ssh<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span>-v<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span>:<span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span>-w<span class="w"> </span><span class="sb">`</span><span class="nb">pwd</span><span class="sb">`</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span>-it<span class="w"> </span>gorambo/ogc:v4<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="hll"><span class="w">    </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>down<span class="w"> </span>-v
+</span></code></pre></div>
 <h1 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h1>
 <p>Learn how to manage your deployments in our <a href="user-guide/managing-nodes/">User Guide - Managing a deployment</a></p>
 
