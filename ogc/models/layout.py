@@ -14,11 +14,7 @@ class LayoutModel(BaseModel):
     Synopsis:
 
     ```python
-    from ogc.deployer import init
-    from ogc.fs import expand_path
-    from ogc.log import get_logger
-
-    log = get_logger("ogc")
+    from ogc.deployer import init, fs
 
     deployment = init(
         layout_model=dict(
@@ -30,8 +26,8 @@ class LayoutModel(BaseModel):
             scale=9,
             scripts="fixtures/ex_deploy_ubuntu",
             username="ubuntu",
-            ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
-            ssh_public_key=expand_path("~/.ssh/id_rsa_libcloud.pub"),
+            ssh_private_key=fs.expand_path("~/.ssh/id_rsa_libcloud"),
+            ssh_public_key=fs.expand_path("~/.ssh/id_rsa_libcloud.pub"),
             ports=["22:22", "80:80", "443:443", "5601:5601"],
             tags=[],
             labels=dict(
@@ -46,9 +42,9 @@ class LayoutModel(BaseModel):
 
     Example:
         ```bash
-        > docker run --env-file .env --rm --volumes-from gcloud-config -v `pwd`:`pwd` -w `pwd` -it ogc:latest ogc fixtures/layouts/ubuntu ls -v
-        # Or run a custom task `hithere`
-        > docker run --env-file .env --rm --volumes-from gcloud-config -v `pwd`:`pwd` -w `pwd` -it ogc:latest ogc fixtures/layouts/ubuntu rerun_scripts -v -o scripts=/a/different/scripts/path
+        > ogc ubuntu.py ls -v
+        # Or run a custom task `rerun_scripts`
+        > ogc ubuntu.py rerun_scripts -v -o scripts=/a/different/scripts/path
         ```
     """
 

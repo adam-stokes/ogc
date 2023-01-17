@@ -36,7 +36,7 @@ docker run --env-file .env \
     --volumes-from gcloud-config \
     -v ssh-creds:/root/.ssh \
     -v `pwd`:`pwd` -w `pwd` \
-    -it ogc:latest \
+    -it ogc:v4 \
     ogc ubuntu.py up -v
 ```
 
