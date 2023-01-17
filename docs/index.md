@@ -13,9 +13,11 @@ Welcome to the getting started guide! This should be a quick introduction to get
 
 {{ subs.docker_run_proper('up') }}
 
-??? note "GCE and Docker Authentication"
-    Checkout [OGC+Docker+GCE](user-guide/configuration/docker/gcloud-auth.md) authentication for more information.
+??? note "SSH/GCE/Docker Authentication"
+    A couple of articles to help setup ssh/gce authentication for use within docker.
 
+    - [OGC+Docker+GCE](user-guide/configuration/docker/gcloud-auth.md) 
+    - [OGC+Docker+SSH](user-guide/configuration/docker/ssh.md)
 ### Alternatives
 We use and recommend the use of **[Poetry](https://python-poetry.org/)**:
 
@@ -54,42 +56,14 @@ GOOGLE_PROJECT="example-project"
 GOOGLE_DATACENTER="us-central1-a"
 ```
 
-??? note
+??? note "Additional Provider Information"
     More information can be found in our [Providers](user-guide/providers.md) documentation.
 
 ## Define Provisioning
 
-Once setup is complete, a provision layout is needed.
+Once configuration is complete, a provision layout is needed, create the following:
 
-Create a file `ubuntu.py`:
-
-```python
-from ogc.deployer import init
-from ogc.fs import expand_path
-from ogc.log import get_logger
-
-log = get_logger("ogc")
-
-deployment = init(
-    layout_model=dict(
-        instance_size="e2-standard-4",
-        name="ubuntu-ogc",
-        provider="google",
-        remote_path="/home/ubuntu/ogc",
-        runs_on="ubuntu-2004-lts",
-        scale=5,
-        scripts="fixtures/ex_deploy_ubuntu",
-        username="ubuntu",
-        ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
-        ssh_public_key=expand_path("~/.ssh/id_rsa_libcloud.pub"),
-        ports=["22:22", "80:80", "443:443", "5601:5601"],
-        tags=[],
-        labels=dict(
-            division="engineering", org="obs", team="observability", project="perf"
-        ),
-    ),
-)
-```
+{{ subs.code_example(scale=5) }}
 
 This specification tells OGC to deploy 5 nodes running on Google's **e2-standard-4** with Ubuntu OS. 
 The `scripts` section tells OGC where the template files/scripts are located that need to be uploaded to each node during the deployment phase.
@@ -98,11 +72,16 @@ The `scripts` section tells OGC where the template files/scripts are located tha
 
 Once the specification is set, environment variables configured, execute a deployment in a new terminal:
 
-```shell
-$ ogc ubuntu.py up
-$ ogc ubuntu.py exec -o cmd='sudo apt-get update && sudo apt-get dist-upgrade'
-$ ogc ubuntu.py down
-```
+### Bring up
+
+{{ subs.docker_run_proper(task="up", hl_lines="9") }}
+
+### Execute commands
+
+{{ subs.docker_run_proper(task="exec", opts=["cmd='sudo apt-get update && sudo apt-get dist-upgrade'"], hl_lines="9") }}
+
+### Bring down
+{{ subs.docker_run_proper(task="down", hl_lines="9") }}
 
 # Next steps
 

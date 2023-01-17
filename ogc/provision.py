@@ -288,7 +288,8 @@ class GCEProvisioner(BaseProvisioner):
 
     @retry(tries=5, logger=None)
     def connect(self) -> NodeDriver:
-        log.debug(f"Getting provider connection: {self.options}")
+        log.info("Establing provider connection...")
+        log.debug(self.options)
         gce = get_driver(Provider.GCE)
         return gce(**self.options)
 

@@ -1,14 +1,41 @@
-{% macro docker_run_proper(task, opts=None, from_gcloud=True) -%}
-```shell
-$ docker run \
+{% macro docker_run_proper(task, opts=None, from_gcloud=True, hl_lines=None, title="bash -c") -%}
+```shell title="{{title}}" {% if hl_lines %}hl_lines="{{hl_lines}}"{% endif %}
+docker run \
     --env-file .env \
     --rm \
     {%- if from_gcloud %}
     --volumes-from gcloud-config \
     {%- endif %}
+    -v ssh-creds:/root/.ssh \
     -v `pwd`:`pwd` \
     -w `pwd` \
     -it gorambo/ogc:v4 \
     ogc ubuntu.py {{task}} -v{% if opts %}{% for opt in opts %} -o {{opt}}{% endfor %}{% endif %}
+```
+{%- endmacro -%}
+
+{% macro code_example(ssh_path="~/.ssh/id_rsa_libcloud", hl_lines=None, title="ubuntu.py", scale="1") -%}
+``` python title="{{title}}" {% if hl_lines %}hl_lines="{{hl_lines}}"{% endif %}
+from ogc import init, fs
+
+deployment = init(
+    layout_model=dict(
+        instance_size="e2-standard-4",
+        name="ubuntu-ogc",
+        provider="google",
+        remote_path="/home/ubuntu/ogc",
+        runs_on="ubuntu-2004-lts",
+        scale={{scale}},
+        scripts="fixtures/ex_deploy_ubuntu",
+        username="ubuntu",
+        ssh_private_key=fs.expand_path("{{ssh_path}}"),
+        ssh_public_key=fs.expand_path("{{ssh_path}}.pub"),
+        ports=["22:22", "80:80", "443:443", "5601:5601"],
+        tags=[],
+        labels=dict(
+            division="engineering", org="obs", team="observability", project="perf"
+        ),
+    ),
+)
 ```
 {%- endmacro -%}
