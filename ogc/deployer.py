@@ -295,14 +295,10 @@ def ls(
         > ogc ubuntu.py uname -v
         [19:20:14] INFO     Establing provider connection...                                                              
         [19:20:25] INFO     Executing commands across 1 node(s)                                                           
-        [19:20:27] DEBUG    {'exit_code': 0, 
-                             'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9 \
-                                        18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux\n", 
-                             'error': '', 
-                             'cmd': '/usr/bin/ssh -o StrictHostKeyChecking=no -o \
-                                                     UserKnownHostsFile=/dev/null \
-                                                         -i /root/.ssh/id_ed25519 \
-                                                     ubuntu@34.27.170.121 uname -a'}                                                                                
+        [19:20:27] DEBUG    {'exit_code': 0, 'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9                 
+                            18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux", 'error': '', 'cmd': '/usr/bin/ssh -o                      
+                            StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519                              
+                            ubuntu@34.27.170.121 uname -a'} 
         commands executed successfully
         ```
 
