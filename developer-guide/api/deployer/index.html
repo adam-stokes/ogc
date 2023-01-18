@@ -2238,95 +2238,146 @@ must be queried</p>
   <div class="doc doc-contents ">
   
       <p>Return a list of machines for deployment</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%;"><span></span><code>Pass in a mapping of options to filter machines
+<p>Pass in a mapping of options to filter machines</p>
 
-Args:
-    provisioner: Provisioner
-    kwargs: Mapping of options to pass to `ls`
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>provisioner</code></td>
+          <td>
+                <code><span title="ogc.provision.BaseProvisioner">BaseProvisioner</span></code>
+          </td>
+          <td><p>Provisioner</p></td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>kwargs</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="ogc.deployer.MachineOpts" href="#ogc.deployer.MachineOpts">MachineOpts</a></code>
+          </td>
+          <td><p>Mapping of options to pass to <code>ls</code></p></td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
-Additional Options:
-
-    |Key|Value|
-    |---|-----|
-    | output_file | Where to store status output, filename can end with .html or .svg |
-    | suppress_output | Whether to print out the table or just return results
-
-Example:
-    ``` bash
-    &gt; ogc ubuntu.py ls -v -o limit=8
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    ┃ ID                             ┃ Name                                 ┃ Created            ┃ Status       ┃ Labels                                                                                      ┃ Connection                                                                                   ┃
-    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-    │ 5407368969918077947            │ ogc-ubuntu-ogc-f664-000              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.134.169.153                                 │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 3631668729125788664            │ ogc-ubuntu-ogc-f664-001              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.188.125                                 │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 3575202029581097972            │ ogc-ubuntu-ogc-f664-002              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@104.155.176.229                                │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 4961396037101018096            │ ogc-ubuntu-ogc-f664-003              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.71.231.9                                    │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 6845512080056900556            │ ogc-ubuntu-ogc-f664-004              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.61.39                                   │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 8257796978812902341            │ ogc-ubuntu-ogc-f664-006              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.252.152                                 │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 4654244594843638721            │ ogc-ubuntu-ogc-f664-007              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.234.5                                   │
-    ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-    │ 2604966443513535453            │ ogc-ubuntu-ogc-f664-008              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@35.226.159.94                                  │
-    └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    Node Count: 8
-    ```
-
-    Suppressing the output is useful if you are using the framework programatically.
-
-    ``` python title=&quot;ubuntu.py&quot;
-    from ogc.deployer import ls
-    from ogc import fs, init
-
-    deployment = init(
-        layout_model=dict(
-            instance_size=&quot;e2-standard-4&quot;,
-            name=&quot;ubuntu-ogc&quot;,
-            provider=&quot;google&quot;,
-            remote_path=&quot;/home/ubuntu/ogc&quot;,
-            runs_on=&quot;ubuntu-2004-lts&quot;,
-            scale=9,
-            scripts=&quot;fixtures/ex_deploy_ubuntu&quot;,
-            username=&quot;ubuntu&quot;,
-            ssh_private_key=fs.expand_path(&quot;~/.ssh/id_rsa_libcloud&quot;),
-            ssh_public_key=fs.expand_path(&quot;~/.ssh/id_rsa_libcloud.pub&quot;),
-            ports=[&quot;22:22&quot;, &quot;80:80&quot;, &quot;443:443&quot;, &quot;5601:5601&quot;],
-            tags=[],
-            labels=dict(
-                division=&quot;engineering&quot;, org=&quot;obs&quot;, team=&quot;observability&quot;, project=&quot;perf&quot;
-            ),
-        ),
-    )
-
-
-    def uname(**kwargs: str):
-        kwargs.update({&quot;cmd&quot;: &quot;uname -a&quot;})
-        output = exec(deployment, **kwargs)
-        if output:
-            print(&quot;commands executed successfully&quot;)
-    ```
-
-    Execute the above:
-    ```bash title=&quot;bash -c&quot;
-    &gt; ogc ubuntu.py uname -v
-    [19:20:14] INFO     Establing provider connection...                                                              
-    [19:20:25] INFO     Executing commands across 1 node(s)                                                           
-    [19:20:27] DEBUG    {&#39;exit_code&#39;: 0, 
-                         &#39;out&#39;: &quot;Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9                                         18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+<details class="additional-options">
+  <summary>Additional Options</summary>
+  <table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output_file</td>
+<td>Where to store status output, filename can end with .html or .svg</td>
+</tr>
+<tr>
+<td>suppress_output</td>
+<td>Whether to print out the table or just return results</td>
+</tr>
+</tbody>
+</table>
+</details>
+<details class="example">
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>&gt;<span class="w"> </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>ls<span class="w"> </span>-v<span class="w"> </span>-o<span class="w"> </span><span class="nv">limit</span><span class="o">=</span><span class="m">8</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>┃<span class="w"> </span>ID<span class="w">                             </span>┃<span class="w"> </span>Name<span class="w">                                 </span>┃<span class="w"> </span>Created<span class="w">            </span>┃<span class="w"> </span>Status<span class="w">       </span>┃<span class="w"> </span>Labels<span class="w">                                                                                      </span>┃<span class="w"> </span>Connection<span class="w">                                                                                   </span>┃
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│<span class="w"> </span><span class="m">5407368969918077947</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-000<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.134.169.153<span class="w">                                 </span>│
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│<span class="w"> </span><span class="m">3631668729125788664</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-001<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.133.188.125<span class="w">                                 </span>│
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│<span class="w"> </span><span class="m">3575202029581097972</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-002<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@104.155.176.229<span class="w">                                </span>│
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│<span class="w"> </span><span class="m">4961396037101018096</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-003<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.71.231.9<span class="w">                                    </span>│
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│<span class="w"> </span><span class="m">6845512080056900556</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-004<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.170.61.39<span class="w">                                   </span>│
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│<span class="w"> </span><span class="m">8257796978812902341</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-006<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.170.252.152<span class="w">                                 </span>│
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│<span class="w"> </span><span class="m">4654244594843638721</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-007<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@34.133.234.5<span class="w">                                   </span>│
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│<span class="w"> </span><span class="m">2604966443513535453</span><span class="w">            </span>│<span class="w"> </span>ogc-ubuntu-ogc-f664-008<span class="w">              </span>│<span class="w"> </span>an<span class="w"> </span>hour<span class="w"> </span>ago<span class="w">        </span>│<span class="w"> </span>running<span class="w">      </span>│<span class="w"> </span><span class="nv">division</span><span class="o">=</span>engineering,org<span class="o">=</span>obs,team<span class="o">=</span>observability,project<span class="o">=</span>perf<span class="w">                                </span>│<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>/Users/adam/.ssh/id_rsa_libcloud<span class="w"> </span>ubuntu@35.226.159.94<span class="w">                                  </span>│
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>Node<span class="w"> </span>Count:<span class="w"> </span><span class="m">8</span>
 </code></pre></div>
-
-<p>", 
-                             'error': '', 
-                             'cmd': '/usr/bin/ssh -o StrictHostKeyChecking=no -o                                                      UserKnownHostsFile=/dev/null                                                          -i /root/.ssh/id_ed25519                                                      ubuntu@34.27.170.121 uname -a'}                                                                              <br />
-        commands executed successfully
-        ```</p>
-<div class="codehilite" style="background: #272822"><pre style="line-height: 125%;"><span></span><code>Returns:
-    List of deployed machines
+<p>Suppressing the output is useful if you are using the framework programatically.</p>
+<div class="highlight"><span class="filename">ubuntu.py</span><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span> <span class="nn">ogc.deployer</span> <span class="kn">import</span> <span class="n">ls</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span> <span class="nn">ogc</span> <span class="kn">import</span> <span class="n">fs</span><span class="p">,</span> <span class="n">init</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">deployment</span> <span class="o">=</span> <span class="n">init</span><span class="p">(</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">layout_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="n">instance_size</span><span class="o">=</span><span class="s2">&quot;e2-standard-4&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ubuntu-ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="n">provider</span><span class="o">=</span><span class="s2">&quot;google&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="n">remote_path</span><span class="o">=</span><span class="s2">&quot;/home/ubuntu/ogc&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>        <span class="n">runs_on</span><span class="o">=</span><span class="s2">&quot;ubuntu-2004-lts&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>        <span class="n">scale</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="n">scripts</span><span class="o">=</span><span class="s2">&quot;fixtures/ex_deploy_ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;ubuntu&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>        <span class="n">ssh_private_key</span><span class="o">=</span><span class="n">fs</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud&quot;</span><span class="p">),</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>        <span class="n">ssh_public_key</span><span class="o">=</span><span class="n">fs</span><span class="o">.</span><span class="n">expand_path</span><span class="p">(</span><span class="s2">&quot;~/.ssh/id_rsa_libcloud.pub&quot;</span><span class="p">),</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>        <span class="n">ports</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;22:22&quot;</span><span class="p">,</span> <span class="s2">&quot;80:80&quot;</span><span class="p">,</span> <span class="s2">&quot;443:443&quot;</span><span class="p">,</span> <span class="s2">&quot;5601:5601&quot;</span><span class="p">],</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>        <span class="n">tags</span><span class="o">=</span><span class="p">[],</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>        <span class="n">labels</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>            <span class="n">division</span><span class="o">=</span><span class="s2">&quot;engineering&quot;</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">team</span><span class="o">=</span><span class="s2">&quot;observability&quot;</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="s2">&quot;perf&quot;</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="p">),</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    <span class="p">),</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="p">)</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="k">def</span> <span class="nf">uname</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;cmd&quot;</span><span class="p">:</span> <span class="s2">&quot;uname -a&quot;</span><span class="p">})</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>    <span class="n">output</span> <span class="o">=</span> <span class="n">exec</span><span class="p">(</span><span class="n">deployment</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;commands executed successfully&quot;</span><span class="p">)</span>
 </code></pre></div>
+<p>Execute the above:
+<div class="highlight"><span class="filename">bash -c</span><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>&gt;<span class="w"> </span>ogc<span class="w"> </span>ubuntu.py<span class="w"> </span>uname<span class="w"> </span>-v
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="o">[</span><span class="m">19</span>:20:14<span class="o">]</span><span class="w"> </span>INFO<span class="w">     </span>Establing<span class="w"> </span>provider<span class="w"> </span>connection...<span class="w">                                                              </span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="o">[</span><span class="m">19</span>:20:25<span class="o">]</span><span class="w"> </span>INFO<span class="w">     </span>Executing<span class="w"> </span>commands<span class="w"> </span>across<span class="w"> </span><span class="m">1</span><span class="w"> </span>node<span class="o">(</span>s<span class="o">)</span><span class="w">                                                           </span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="o">[</span><span class="m">19</span>:20:27<span class="o">]</span><span class="w"> </span>DEBUG<span class="w">    </span><span class="o">{</span><span class="s1">&#39;exit_code&#39;</span>:<span class="w"> </span><span class="m">0</span>,<span class="w"> </span><span class="s1">&#39;out&#39;</span>:<span class="w"> </span><span class="s2">&quot;Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9                 </span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="s2">                    18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux&quot;</span>,<span class="w"> </span><span class="s1">&#39;error&#39;</span>:<span class="w"> </span><span class="s1">&#39;&#39;</span>,<span class="w"> </span><span class="s1">&#39;cmd&#39;</span>:<span class="w"> </span><span class="s1">&#39;/usr/bin/ssh -o                      </span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s1">                    StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519                              </span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="s1">                    ubuntu@34.27.170.121 uname -a&#39;</span><span class="o">}</span><span class="w"> </span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>commands<span class="w"> </span>executed<span class="w"> </span>successfully
+</code></pre></div></p>
+</details>
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>list[<a class="autorefs autorefs-internal" title="ogc.models.machine.MachineModel" href="../models/machine/#ogc.models.machine.MachineModel">MachineModel</a>] | None</code>
+          </td>
+          <td><p>List of deployed machines</p></td>
+        </tr>
+    </tbody>
+  </table>
 
       <details class="quote">
         <summary>Source code in <code>ogc/deployer.py</code></summary>
@@ -2474,11 +2525,7 @@ Example:
 <span class="normal"><a href="#__codelineno-0-357">357</a></span>
 <span class="normal"><a href="#__codelineno-0-358">358</a></span>
 <span class="normal"><a href="#__codelineno-0-359">359</a></span>
-<span class="normal"><a href="#__codelineno-0-360">360</a></span>
-<span class="normal"><a href="#__codelineno-0-361">361</a></span>
-<span class="normal"><a href="#__codelineno-0-362">362</a></span>
-<span class="normal"><a href="#__codelineno-0-363">363</a></span>
-<span class="normal"><a href="#__codelineno-0-364">364</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="k">def</span> <span class="nf">ls</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-360">360</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-216" name="__codelineno-0-216"></a><span class="k">def</span> <span class="nf">ls</span><span class="p">(</span>
 <a id="__codelineno-0-217" name="__codelineno-0-217"></a>    <span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span>
 <a id="__codelineno-0-218" name="__codelineno-0-218"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-219" name="__codelineno-0-219"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of machines for deployment</span>
@@ -2560,73 +2607,69 @@ Example:
 <a id="__codelineno-0-295" name="__codelineno-0-295"></a><span class="sd">        &gt; ogc ubuntu.py uname -v</span>
 <a id="__codelineno-0-296" name="__codelineno-0-296"></a><span class="sd">        [19:20:14] INFO     Establing provider connection...                                                              </span>
 <a id="__codelineno-0-297" name="__codelineno-0-297"></a><span class="sd">        [19:20:25] INFO     Executing commands across 1 node(s)                                                           </span>
-<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        [19:20:27] DEBUG    {&#39;exit_code&#39;: 0, </span>
-<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                             &#39;out&#39;: &quot;Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9 \</span>
-<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">                                        18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux\n&quot;, </span>
-<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">                             &#39;error&#39;: &#39;&#39;, </span>
-<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">                             &#39;cmd&#39;: &#39;/usr/bin/ssh -o StrictHostKeyChecking=no -o \</span>
-<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">                                                     UserKnownHostsFile=/dev/null \</span>
-<a id="__codelineno-0-304" name="__codelineno-0-304"></a><span class="sd">                                                         -i /root/.ssh/id_ed25519 \</span>
-<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">                                                     ubuntu@34.27.170.121 uname -a&#39;}                                                                                </span>
-<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        commands executed successfully</span>
-<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">        ```</span>
+<a id="__codelineno-0-298" name="__codelineno-0-298"></a><span class="sd">        [19:20:27] DEBUG    {&#39;exit_code&#39;: 0, &#39;out&#39;: &quot;Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9                 </span>
+<a id="__codelineno-0-299" name="__codelineno-0-299"></a><span class="sd">                            18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux&quot;, &#39;error&#39;: &#39;&#39;, &#39;cmd&#39;: &#39;/usr/bin/ssh -o                      </span>
+<a id="__codelineno-0-300" name="__codelineno-0-300"></a><span class="sd">                            StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519                              </span>
+<a id="__codelineno-0-301" name="__codelineno-0-301"></a><span class="sd">                            ubuntu@34.27.170.121 uname -a&#39;} </span>
+<a id="__codelineno-0-302" name="__codelineno-0-302"></a><span class="sd">        commands executed successfully</span>
+<a id="__codelineno-0-303" name="__codelineno-0-303"></a><span class="sd">        ```</span>
+<a id="__codelineno-0-304" name="__codelineno-0-304"></a>
+<a id="__codelineno-0-305" name="__codelineno-0-305"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-306" name="__codelineno-0-306"></a><span class="sd">        List of deployed machines</span>
+<a id="__codelineno-0-307" name="__codelineno-0-307"></a><span class="sd">    &quot;&quot;&quot;</span>
 <a id="__codelineno-0-308" name="__codelineno-0-308"></a>
-<a id="__codelineno-0-309" name="__codelineno-0-309"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-310" name="__codelineno-0-310"></a><span class="sd">        List of deployed machines</span>
-<a id="__codelineno-0-311" name="__codelineno-0-311"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-312" name="__codelineno-0-312"></a>
-<a id="__codelineno-0-313" name="__codelineno-0-313"></a>    <span class="k">def</span> <span class="nf">ui_nodes_table</span><span class="p">(</span>
-<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">],</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-315" name="__codelineno-0-315"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">con</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">True</span>
-<a id="__codelineno-0-317" name="__codelineno-0-317"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">nodes</span>
-<a id="__codelineno-0-318" name="__codelineno-0-318"></a>        <span class="n">rows_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
-<a id="__codelineno-0-319" name="__codelineno-0-319"></a>
-<a id="__codelineno-0-320" name="__codelineno-0-320"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
-<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="n">caption</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Node Count: [green]</span><span class="si">{</span><span class="n">rows_count</span><span class="si">}</span><span class="s2">[/]&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="n">header_style</span><span class="o">=</span><span class="s2">&quot;yellow on black&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-323" name="__codelineno-0-323"></a>            <span class="n">caption_justify</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-324" name="__codelineno-0-324"></a>            <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-325" name="__codelineno-0-325"></a>            <span class="n">width</span><span class="o">=</span><span class="n">con</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-<a id="__codelineno-0-326" name="__codelineno-0-326"></a>            <span class="n">show_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="p">)</span>
-<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-330" name="__codelineno-0-330"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Created&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Status&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-332" name="__codelineno-0-332"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Labels&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-333" name="__codelineno-0-333"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Connection&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold red on black&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-334" name="__codelineno-0-334"></a>
-<a id="__codelineno-0-335" name="__codelineno-0-335"></a>        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
-<a id="__codelineno-0-336" name="__codelineno-0-336"></a>            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
-<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_id</span><span class="p">,</span>
-<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span>
-<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="n">arrow</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">created</span><span class="p">)</span><span class="o">.</span><span class="n">humanize</span><span class="p">(),</span>
-<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_state</span><span class="p">,</span>
-<a id="__codelineno-0-341" name="__codelineno-0-341"></a>                <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-<a id="__codelineno-0-342" name="__codelineno-0-342"></a>                    <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[purple]</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">[/]=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
-<a id="__codelineno-0-343" name="__codelineno-0-343"></a>                <span class="p">),</span>
-<a id="__codelineno-0-344" name="__codelineno-0-344"></a>                <span class="sa">f</span><span class="s2">&quot;ssh -i </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_private_key</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">public_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="p">)</span>
-<a id="__codelineno-0-346" name="__codelineno-0-346"></a>
-<a id="__codelineno-0-347" name="__codelineno-0-347"></a>        <span class="n">con</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-348" name="__codelineno-0-348"></a>        <span class="k">if</span> <span class="n">output_file</span><span class="p">:</span>
-<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">if</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;svg&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="n">con</span><span class="o">.</span><span class="n">save_svg</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Node List Output&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-351" name="__codelineno-0-351"></a>            <span class="k">elif</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;html&quot;</span><span class="p">):</span>
-<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="n">con</span><span class="o">.</span><span class="n">save_html</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
-<a id="__codelineno-0-353" name="__codelineno-0-353"></a>            <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-354" name="__codelineno-0-354"></a>                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
-<a id="__codelineno-0-355" name="__codelineno-0-355"></a>                    <span class="sa">f</span><span class="s2">&quot;Unknown extension for </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">, must end in &#39;.svg&#39; or &#39;.html&#39;&quot;</span>
-<a id="__codelineno-0-356" name="__codelineno-0-356"></a>                <span class="p">)</span>
-<a id="__codelineno-0-357" name="__codelineno-0-357"></a>        <span class="n">con</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">False</span>
-<a id="__codelineno-0-358" name="__codelineno-0-358"></a>
-<a id="__codelineno-0-359" name="__codelineno-0-359"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Querying database for machines&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-360" name="__codelineno-0-360"></a>
-<a id="__codelineno-0-361" name="__codelineno-0-361"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-362" name="__codelineno-0-362"></a>    <span class="k">if</span> <span class="s2">&quot;suppress_output&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-<a id="__codelineno-0-363" name="__codelineno-0-363"></a>        <span class="n">ui_nodes_table</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-<a id="__codelineno-0-364" name="__codelineno-0-364"></a>    <span class="k">return</span> <span class="n">nodes</span> <span class="k">if</span> <span class="n">nodes</span> <span class="k">else</span> <span class="kc">None</span>
+<a id="__codelineno-0-309" name="__codelineno-0-309"></a>    <span class="k">def</span> <span class="nf">ui_nodes_table</span><span class="p">(</span>
+<a id="__codelineno-0-310" name="__codelineno-0-310"></a>        <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">],</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-311" name="__codelineno-0-311"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-0-312" name="__codelineno-0-312"></a>        <span class="n">con</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">True</span>
+<a id="__codelineno-0-313" name="__codelineno-0-313"></a>        <span class="n">rows</span> <span class="o">=</span> <span class="n">nodes</span>
+<a id="__codelineno-0-314" name="__codelineno-0-314"></a>        <span class="n">rows_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+<a id="__codelineno-0-315" name="__codelineno-0-315"></a>
+<a id="__codelineno-0-316" name="__codelineno-0-316"></a>        <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
+<a id="__codelineno-0-317" name="__codelineno-0-317"></a>            <span class="n">caption</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Node Count: [green]</span><span class="si">{</span><span class="n">rows_count</span><span class="si">}</span><span class="s2">[/]&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-318" name="__codelineno-0-318"></a>            <span class="n">header_style</span><span class="o">=</span><span class="s2">&quot;yellow on black&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-319" name="__codelineno-0-319"></a>            <span class="n">caption_justify</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-320" name="__codelineno-0-320"></a>            <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-321" name="__codelineno-0-321"></a>            <span class="n">width</span><span class="o">=</span><span class="n">con</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+<a id="__codelineno-0-322" name="__codelineno-0-322"></a>            <span class="n">show_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-323" name="__codelineno-0-323"></a>        <span class="p">)</span>
+<a id="__codelineno-0-324" name="__codelineno-0-324"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-325" name="__codelineno-0-325"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-326" name="__codelineno-0-326"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Created&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-327" name="__codelineno-0-327"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Status&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-328" name="__codelineno-0-328"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Labels&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-329" name="__codelineno-0-329"></a>        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Connection&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;bold red on black&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-330" name="__codelineno-0-330"></a>
+<a id="__codelineno-0-331" name="__codelineno-0-331"></a>        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+<a id="__codelineno-0-332" name="__codelineno-0-332"></a>            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
+<a id="__codelineno-0-333" name="__codelineno-0-333"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_id</span><span class="p">,</span>
+<a id="__codelineno-0-334" name="__codelineno-0-334"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_name</span><span class="p">,</span>
+<a id="__codelineno-0-335" name="__codelineno-0-335"></a>                <span class="n">arrow</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">created</span><span class="p">)</span><span class="o">.</span><span class="n">humanize</span><span class="p">(),</span>
+<a id="__codelineno-0-336" name="__codelineno-0-336"></a>                <span class="n">data</span><span class="o">.</span><span class="n">instance_state</span><span class="p">,</span>
+<a id="__codelineno-0-337" name="__codelineno-0-337"></a>                <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+<a id="__codelineno-0-338" name="__codelineno-0-338"></a>                    <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;[purple]</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">[/]=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+<a id="__codelineno-0-339" name="__codelineno-0-339"></a>                <span class="p">),</span>
+<a id="__codelineno-0-340" name="__codelineno-0-340"></a>                <span class="sa">f</span><span class="s2">&quot;ssh -i </span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_private_key</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">public_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-341" name="__codelineno-0-341"></a>            <span class="p">)</span>
+<a id="__codelineno-0-342" name="__codelineno-0-342"></a>
+<a id="__codelineno-0-343" name="__codelineno-0-343"></a>        <span class="n">con</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-344" name="__codelineno-0-344"></a>        <span class="k">if</span> <span class="n">output_file</span><span class="p">:</span>
+<a id="__codelineno-0-345" name="__codelineno-0-345"></a>            <span class="k">if</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;svg&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-346" name="__codelineno-0-346"></a>                <span class="n">con</span><span class="o">.</span><span class="n">save_svg</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Node List Output&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-347" name="__codelineno-0-347"></a>            <span class="k">elif</span> <span class="n">output_file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;html&quot;</span><span class="p">):</span>
+<a id="__codelineno-0-348" name="__codelineno-0-348"></a>                <span class="n">con</span><span class="o">.</span><span class="n">save_html</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
+<a id="__codelineno-0-349" name="__codelineno-0-349"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-350" name="__codelineno-0-350"></a>                <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+<a id="__codelineno-0-351" name="__codelineno-0-351"></a>                    <span class="sa">f</span><span class="s2">&quot;Unknown extension for </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2">, must end in &#39;.svg&#39; or &#39;.html&#39;&quot;</span>
+<a id="__codelineno-0-352" name="__codelineno-0-352"></a>                <span class="p">)</span>
+<a id="__codelineno-0-353" name="__codelineno-0-353"></a>        <span class="n">con</span><span class="o">.</span><span class="n">record</span> <span class="o">=</span> <span class="kc">False</span>
+<a id="__codelineno-0-354" name="__codelineno-0-354"></a>
+<a id="__codelineno-0-355" name="__codelineno-0-355"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Querying database for machines&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-356" name="__codelineno-0-356"></a>
+<a id="__codelineno-0-357" name="__codelineno-0-357"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-358" name="__codelineno-0-358"></a>    <span class="k">if</span> <span class="s2">&quot;suppress_output&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-359" name="__codelineno-0-359"></a>        <span class="n">ui_nodes_table</span><span class="p">(</span><span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+<a id="__codelineno-0-360" name="__codelineno-0-360"></a>    <span class="k">return</span> <span class="n">nodes</span> <span class="k">if</span> <span class="n">nodes</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -2651,11 +2694,11 @@ Example:
 
       <details class="quote">
         <summary>Source code in <code>ogc/deployer.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-367">367</a></span>
-<span class="normal"><a href="#__codelineno-0-368">368</a></span>
-<span class="normal"><a href="#__codelineno-0-369">369</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-367" name="__codelineno-0-367"></a><span class="nd">@signals</span><span class="o">.</span><span class="n">exec</span><span class="o">.</span><span class="n">connect</span>
-<a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="k">def</span> <span class="nf">exec_hook</span><span class="p">(</span><span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-369" name="__codelineno-0-369"></a>    <span class="k">return</span> <span class="n">exec</span><span class="p">(</span><span class="n">provisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-363">363</a></span>
+<span class="normal"><a href="#__codelineno-0-364">364</a></span>
+<span class="normal"><a href="#__codelineno-0-365">365</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-363" name="__codelineno-0-363"></a><span class="nd">@signals</span><span class="o">.</span><span class="n">exec</span><span class="o">.</span><span class="n">connect</span>
+<a id="__codelineno-0-364" name="__codelineno-0-364"></a><span class="k">def</span> <span class="nf">exec_hook</span><span class="p">(</span><span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-365" name="__codelineno-0-365"></a>    <span class="k">return</span> <span class="n">exec</span><span class="p">(</span><span class="n">provisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -2758,7 +2801,11 @@ Example:
 
       <details class="quote">
         <summary>Source code in <code>ogc/deployer.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-372">372</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-368">368</a></span>
+<span class="normal"><a href="#__codelineno-0-369">369</a></span>
+<span class="normal"><a href="#__codelineno-0-370">370</a></span>
+<span class="normal"><a href="#__codelineno-0-371">371</a></span>
+<span class="normal"><a href="#__codelineno-0-372">372</a></span>
 <span class="normal"><a href="#__codelineno-0-373">373</a></span>
 <span class="normal"><a href="#__codelineno-0-374">374</a></span>
 <span class="normal"><a href="#__codelineno-0-375">375</a></span>
@@ -2834,91 +2881,87 @@ Example:
 <span class="normal"><a href="#__codelineno-0-445">445</a></span>
 <span class="normal"><a href="#__codelineno-0-446">446</a></span>
 <span class="normal"><a href="#__codelineno-0-447">447</a></span>
-<span class="normal"><a href="#__codelineno-0-448">448</a></span>
-<span class="normal"><a href="#__codelineno-0-449">449</a></span>
-<span class="normal"><a href="#__codelineno-0-450">450</a></span>
-<span class="normal"><a href="#__codelineno-0-451">451</a></span>
-<span class="normal"><a href="#__codelineno-0-452">452</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="k">def</span> <span class="nf">exec</span><span class="p">(</span><span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute commands on node(s)</span>
+<span class="normal"><a href="#__codelineno-0-448">448</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-368" name="__codelineno-0-368"></a><span class="k">def</span> <span class="nf">exec</span><span class="p">(</span><span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-369" name="__codelineno-0-369"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute commands on node(s)</span>
+<a id="__codelineno-0-370" name="__codelineno-0-370"></a>
+<a id="__codelineno-0-371" name="__codelineno-0-371"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-372" name="__codelineno-0-372"></a><span class="sd">        provisioner: provisioner</span>
+<a id="__codelineno-0-373" name="__codelineno-0-373"></a><span class="sd">        kwargs: Options to exec</span>
 <a id="__codelineno-0-374" name="__codelineno-0-374"></a>
-<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        provisioner: provisioner</span>
-<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        kwargs: Options to exec</span>
-<a id="__codelineno-0-378" name="__codelineno-0-378"></a>
-<a id="__codelineno-0-379" name="__codelineno-0-379"></a><span class="sd">    Additional Options:</span>
-<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">        |Key|Value|</span>
-<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        |---|-----|</span>
-<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        | cmd | command to execute on remote machines |</span>
-<a id="__codelineno-0-383" name="__codelineno-0-383"></a>
-<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">    Example:</span>
-<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        ``` bash</span>
-<a id="__codelineno-0-386" name="__codelineno-0-386"></a><span class="sd">        &gt; ogc ubuntu.py exec -v -o cmd=&#39;ls -l&#39;</span>
-<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">        # Single machine</span>
-<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        &gt; ogc ubuntu.py exec -v -o cmd=&#39;ls -l&#39; -o instance_id=2349146264239594441</span>
-<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">        ```</span>
-<a id="__codelineno-0-390" name="__codelineno-0-390"></a>
-<a id="__codelineno-0-391" name="__codelineno-0-391"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-392" name="__codelineno-0-392"></a><span class="sd">        True if succesful, False otherwise.</span>
-<a id="__codelineno-0-393" name="__codelineno-0-393"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-394" name="__codelineno-0-394"></a>    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-396" name="__codelineno-0-396"></a>    <span class="k">if</span> <span class="s2">&quot;cmd&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-<a id="__codelineno-0-397" name="__codelineno-0-397"></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-375" name="__codelineno-0-375"></a><span class="sd">    Additional Options:</span>
+<a id="__codelineno-0-376" name="__codelineno-0-376"></a><span class="sd">        |Key|Value|</span>
+<a id="__codelineno-0-377" name="__codelineno-0-377"></a><span class="sd">        |---|-----|</span>
+<a id="__codelineno-0-378" name="__codelineno-0-378"></a><span class="sd">        | cmd | command to execute on remote machines |</span>
+<a id="__codelineno-0-379" name="__codelineno-0-379"></a>
+<a id="__codelineno-0-380" name="__codelineno-0-380"></a><span class="sd">    Example:</span>
+<a id="__codelineno-0-381" name="__codelineno-0-381"></a><span class="sd">        ``` bash</span>
+<a id="__codelineno-0-382" name="__codelineno-0-382"></a><span class="sd">        &gt; ogc ubuntu.py exec -v -o cmd=&#39;ls -l&#39;</span>
+<a id="__codelineno-0-383" name="__codelineno-0-383"></a><span class="sd">        # Single machine</span>
+<a id="__codelineno-0-384" name="__codelineno-0-384"></a><span class="sd">        &gt; ogc ubuntu.py exec -v -o cmd=&#39;ls -l&#39; -o instance_id=2349146264239594441</span>
+<a id="__codelineno-0-385" name="__codelineno-0-385"></a><span class="sd">        ```</span>
+<a id="__codelineno-0-386" name="__codelineno-0-386"></a>
+<a id="__codelineno-0-387" name="__codelineno-0-387"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-388" name="__codelineno-0-388"></a><span class="sd">        True if succesful, False otherwise.</span>
+<a id="__codelineno-0-389" name="__codelineno-0-389"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-390" name="__codelineno-0-390"></a>    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-391" name="__codelineno-0-391"></a>    <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-392" name="__codelineno-0-392"></a>    <span class="k">if</span> <span class="s2">&quot;cmd&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-393" name="__codelineno-0-393"></a>        <span class="n">cmd</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-394" name="__codelineno-0-394"></a>
+<a id="__codelineno-0-395" name="__codelineno-0-395"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-396" name="__codelineno-0-396"></a>
+<a id="__codelineno-0-397" name="__codelineno-0-397"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing commands across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> node(s)&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-398" name="__codelineno-0-398"></a>
-<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-400" name="__codelineno-0-400"></a>
-<a id="__codelineno-0-401" name="__codelineno-0-401"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing commands across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> node(s)&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-402" name="__codelineno-0-402"></a>
-<a id="__codelineno-0-403" name="__codelineno-0-403"></a>    <span class="k">def</span> <span class="nf">_exec</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-404" name="__codelineno-0-404"></a>        <span class="n">_node</span><span class="p">:</span> <span class="n">MachineModel</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">MachineModel</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">pickle_to_model</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
-<a id="__codelineno-0-405" name="__codelineno-0-405"></a>        <span class="n">cmd_opts</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="s2">&quot;StrictHostKeyChecking=no&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-409" name="__codelineno-0-409"></a>            <span class="s2">&quot;UserKnownHostsFile=/dev/null&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-410" name="__codelineno-0-410"></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-411" name="__codelineno-0-411"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_private_key</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(),</span>
-<a id="__codelineno-0-412" name="__codelineno-0-412"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">_node</span><span class="o">.</span><span class="n">public_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-413" name="__codelineno-0-413"></a>        <span class="p">]</span>
-<a id="__codelineno-0-414" name="__codelineno-0-414"></a>        <span class="n">cmd_opts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
-<a id="__codelineno-0-415" name="__codelineno-0-415"></a>        <span class="n">return_status</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-416" name="__codelineno-0-416"></a>        <span class="k">try</span><span class="p">:</span>
-<a id="__codelineno-0-417" name="__codelineno-0-417"></a>            <span class="n">out</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">ssh</span><span class="p">(</span><span class="n">cmd_opts</span><span class="p">,</span> <span class="n">_env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">_err_to_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-0-418" name="__codelineno-0-418"></a>            <span class="n">return_status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-<a id="__codelineno-0-419" name="__codelineno-0-419"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">exit_code</span><span class="p">,</span>
-<a id="__codelineno-0-420" name="__codelineno-0-420"></a>                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
-<a id="__codelineno-0-421" name="__codelineno-0-421"></a>                <span class="n">error</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
-<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">cmd</span><span class="p">),</span>
-<a id="__codelineno-0-423" name="__codelineno-0-423"></a>            <span class="p">)</span>
-<a id="__codelineno-0-424" name="__codelineno-0-424"></a>        <span class="k">except</span> <span class="n">sh</span><span class="o">.</span><span class="n">ErrorReturnCode</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-<a id="__codelineno-0-425" name="__codelineno-0-425"></a>            <span class="n">return_status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-<a id="__codelineno-0-426" name="__codelineno-0-426"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">exit_code</span><span class="p">,</span>
-<a id="__codelineno-0-427" name="__codelineno-0-427"></a>                <span class="n">out</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
-<a id="__codelineno-0-428" name="__codelineno-0-428"></a>                <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
-<a id="__codelineno-0-429" name="__codelineno-0-429"></a>                <span class="n">cmd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">full_cmd</span><span class="p">),</span>
-<a id="__codelineno-0-430" name="__codelineno-0-430"></a>            <span class="p">)</span>
-<a id="__codelineno-0-431" name="__codelineno-0-431"></a>        <span class="k">if</span> <span class="n">return_status</span><span class="p">:</span>
-<a id="__codelineno-0-432" name="__codelineno-0-432"></a>            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">return_status</span><span class="p">)</span>
-<a id="__codelineno-0-433" name="__codelineno-0-433"></a>            <span class="n">action</span> <span class="o">=</span> <span class="n">ActionModel</span><span class="p">(</span>
-<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="n">machine</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
-<a id="__codelineno-0-435" name="__codelineno-0-435"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;exit_code&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-436" name="__codelineno-0-436"></a>                <span class="n">out</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;out&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-437" name="__codelineno-0-437"></a>                <span class="n">err</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
-<a id="__codelineno-0-438" name="__codelineno-0-438"></a>                <span class="n">cmd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]),</span>
-<a id="__codelineno-0-439" name="__codelineno-0-439"></a>            <span class="p">)</span>
-<a id="__codelineno-0-440" name="__codelineno-0-440"></a>            <span class="n">action</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-<a id="__codelineno-0-441" name="__codelineno-0-441"></a>            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;exit_code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-442" name="__codelineno-0-442"></a>        <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-443" name="__codelineno-0-443"></a>
-<a id="__codelineno-0-444" name="__codelineno-0-444"></a>    <span class="k">if</span> <span class="n">cmd</span><span class="p">:</span>
-<a id="__codelineno-0-445" name="__codelineno-0-445"></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">MAX_WORKERS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="n">func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_exec</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">)</span>
-<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-448" name="__codelineno-0-448"></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span>
-<a id="__codelineno-0-449" name="__codelineno-0-449"></a>            <span class="p">]</span>
-<a id="__codelineno-0-450" name="__codelineno-0-450"></a>            <span class="n">wait</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<a id="__codelineno-0-451" name="__codelineno-0-451"></a>            <span class="k">return</span> <span class="kc">True</span>
-<a id="__codelineno-0-452" name="__codelineno-0-452"></a>    <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-399" name="__codelineno-0-399"></a>    <span class="k">def</span> <span class="nf">_exec</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-400" name="__codelineno-0-400"></a>        <span class="n">_node</span><span class="p">:</span> <span class="n">MachineModel</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">MachineModel</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">pickle_to_model</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+<a id="__codelineno-0-401" name="__codelineno-0-401"></a>        <span class="n">cmd_opts</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-402" name="__codelineno-0-402"></a>            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-403" name="__codelineno-0-403"></a>            <span class="s2">&quot;StrictHostKeyChecking=no&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-404" name="__codelineno-0-404"></a>            <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-405" name="__codelineno-0-405"></a>            <span class="s2">&quot;UserKnownHostsFile=/dev/null&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-406" name="__codelineno-0-406"></a>            <span class="s2">&quot;-i&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-407" name="__codelineno-0-407"></a>            <span class="n">Path</span><span class="p">(</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">ssh_private_key</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(),</span>
+<a id="__codelineno-0-408" name="__codelineno-0-408"></a>            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">_node</span><span class="o">.</span><span class="n">public_ip</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-409" name="__codelineno-0-409"></a>        <span class="p">]</span>
+<a id="__codelineno-0-410" name="__codelineno-0-410"></a>        <span class="n">cmd_opts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+<a id="__codelineno-0-411" name="__codelineno-0-411"></a>        <span class="n">return_status</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-412" name="__codelineno-0-412"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-0-413" name="__codelineno-0-413"></a>            <span class="n">out</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">ssh</span><span class="p">(</span><span class="n">cmd_opts</span><span class="p">,</span> <span class="n">_env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">_err_to_out</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-0-414" name="__codelineno-0-414"></a>            <span class="n">return_status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-415" name="__codelineno-0-415"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">exit_code</span><span class="p">,</span>
+<a id="__codelineno-0-416" name="__codelineno-0-416"></a>                <span class="n">out</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+<a id="__codelineno-0-417" name="__codelineno-0-417"></a>                <span class="n">error</span><span class="o">=</span><span class="n">out</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+<a id="__codelineno-0-418" name="__codelineno-0-418"></a>                <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">cmd</span><span class="p">),</span>
+<a id="__codelineno-0-419" name="__codelineno-0-419"></a>            <span class="p">)</span>
+<a id="__codelineno-0-420" name="__codelineno-0-420"></a>        <span class="k">except</span> <span class="n">sh</span><span class="o">.</span><span class="n">ErrorReturnCode</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-0-421" name="__codelineno-0-421"></a>            <span class="n">return_status</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+<a id="__codelineno-0-422" name="__codelineno-0-422"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">exit_code</span><span class="p">,</span>
+<a id="__codelineno-0-423" name="__codelineno-0-423"></a>                <span class="n">out</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+<a id="__codelineno-0-424" name="__codelineno-0-424"></a>                <span class="n">error</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+<a id="__codelineno-0-425" name="__codelineno-0-425"></a>                <span class="n">cmd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">full_cmd</span><span class="p">),</span>
+<a id="__codelineno-0-426" name="__codelineno-0-426"></a>            <span class="p">)</span>
+<a id="__codelineno-0-427" name="__codelineno-0-427"></a>        <span class="k">if</span> <span class="n">return_status</span><span class="p">:</span>
+<a id="__codelineno-0-428" name="__codelineno-0-428"></a>            <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">return_status</span><span class="p">)</span>
+<a id="__codelineno-0-429" name="__codelineno-0-429"></a>            <span class="n">action</span> <span class="o">=</span> <span class="n">ActionModel</span><span class="p">(</span>
+<a id="__codelineno-0-430" name="__codelineno-0-430"></a>                <span class="n">machine</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
+<a id="__codelineno-0-431" name="__codelineno-0-431"></a>                <span class="n">exit_code</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;exit_code&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-432" name="__codelineno-0-432"></a>                <span class="n">out</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;out&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-433" name="__codelineno-0-433"></a>                <span class="n">err</span><span class="o">=</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">],</span>
+<a id="__codelineno-0-434" name="__codelineno-0-434"></a>                <span class="n">cmd</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;cmd&quot;</span><span class="p">]),</span>
+<a id="__codelineno-0-435" name="__codelineno-0-435"></a>            <span class="p">)</span>
+<a id="__codelineno-0-436" name="__codelineno-0-436"></a>            <span class="n">action</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<a id="__codelineno-0-437" name="__codelineno-0-437"></a>            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">return_status</span><span class="p">[</span><span class="s2">&quot;exit_code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<a id="__codelineno-0-438" name="__codelineno-0-438"></a>        <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-439" name="__codelineno-0-439"></a>
+<a id="__codelineno-0-440" name="__codelineno-0-440"></a>    <span class="k">if</span> <span class="n">cmd</span><span class="p">:</span>
+<a id="__codelineno-0-441" name="__codelineno-0-441"></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">MAX_WORKERS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+<a id="__codelineno-0-442" name="__codelineno-0-442"></a>            <span class="n">func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_exec</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">)</span>
+<a id="__codelineno-0-443" name="__codelineno-0-443"></a>            <span class="n">results</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-444" name="__codelineno-0-444"></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span>
+<a id="__codelineno-0-445" name="__codelineno-0-445"></a>            <span class="p">]</span>
+<a id="__codelineno-0-446" name="__codelineno-0-446"></a>            <span class="n">wait</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-0-447" name="__codelineno-0-447"></a>            <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-0-448" name="__codelineno-0-448"></a>    <span class="k">return</span> <span class="kc">False</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -2943,17 +2986,17 @@ Example:
 
       <details class="quote">
         <summary>Source code in <code>ogc/deployer.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-455">455</a></span>
-<span class="normal"><a href="#__codelineno-0-456">456</a></span>
-<span class="normal"><a href="#__codelineno-0-457">457</a></span>
-<span class="normal"><a href="#__codelineno-0-458">458</a></span>
-<span class="normal"><a href="#__codelineno-0-459">459</a></span>
-<span class="normal"><a href="#__codelineno-0-460">460</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="nd">@signals</span><span class="o">.</span><span class="n">exec_scripts</span><span class="o">.</span><span class="n">connect</span>
-<a id="__codelineno-0-456" name="__codelineno-0-456"></a><span class="k">def</span> <span class="nf">exec_scripts_hook</span><span class="p">(</span>
-<a id="__codelineno-0-457" name="__codelineno-0-457"></a>    <span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span>
-<a id="__codelineno-0-458" name="__codelineno-0-458"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">,</span>
-<a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="k">return</span> <span class="n">exec_scripts</span><span class="p">(</span><span class="n">provisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-451">451</a></span>
+<span class="normal"><a href="#__codelineno-0-452">452</a></span>
+<span class="normal"><a href="#__codelineno-0-453">453</a></span>
+<span class="normal"><a href="#__codelineno-0-454">454</a></span>
+<span class="normal"><a href="#__codelineno-0-455">455</a></span>
+<span class="normal"><a href="#__codelineno-0-456">456</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-451" name="__codelineno-0-451"></a><span class="nd">@signals</span><span class="o">.</span><span class="n">exec_scripts</span><span class="o">.</span><span class="n">connect</span>
+<a id="__codelineno-0-452" name="__codelineno-0-452"></a><span class="k">def</span> <span class="nf">exec_scripts_hook</span><span class="p">(</span>
+<a id="__codelineno-0-453" name="__codelineno-0-453"></a>    <span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span>
+<a id="__codelineno-0-454" name="__codelineno-0-454"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">,</span>
+<a id="__codelineno-0-455" name="__codelineno-0-455"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-456" name="__codelineno-0-456"></a>    <span class="k">return</span> <span class="n">exec_scripts</span><span class="p">(</span><span class="n">provisioner</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
@@ -3057,7 +3100,11 @@ Example:
 
       <details class="quote">
         <summary>Source code in <code>ogc/deployer.py</code></summary>
-        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-463">463</a></span>
+        <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-459">459</a></span>
+<span class="normal"><a href="#__codelineno-0-460">460</a></span>
+<span class="normal"><a href="#__codelineno-0-461">461</a></span>
+<span class="normal"><a href="#__codelineno-0-462">462</a></span>
+<span class="normal"><a href="#__codelineno-0-463">463</a></span>
 <span class="normal"><a href="#__codelineno-0-464">464</a></span>
 <span class="normal"><a href="#__codelineno-0-465">465</a></span>
 <span class="normal"><a href="#__codelineno-0-466">466</a></span>
@@ -3161,119 +3208,115 @@ Example:
 <span class="normal"><a href="#__codelineno-0-564">564</a></span>
 <span class="normal"><a href="#__codelineno-0-565">565</a></span>
 <span class="normal"><a href="#__codelineno-0-566">566</a></span>
-<span class="normal"><a href="#__codelineno-0-567">567</a></span>
-<span class="normal"><a href="#__codelineno-0-568">568</a></span>
-<span class="normal"><a href="#__codelineno-0-569">569</a></span>
-<span class="normal"><a href="#__codelineno-0-570">570</a></span>
-<span class="normal"><a href="#__codelineno-0-571">571</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="k">def</span> <span class="nf">exec_scripts</span><span class="p">(</span>
-<a id="__codelineno-0-464" name="__codelineno-0-464"></a>    <span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span>
-<a id="__codelineno-0-465" name="__codelineno-0-465"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">,</span>
-<a id="__codelineno-0-466" name="__codelineno-0-466"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute scripts</span>
-<a id="__codelineno-0-468" name="__codelineno-0-468"></a>
-<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">    Executing scripts/templates on a node.</span>
+<span class="normal"><a href="#__codelineno-0-567">567</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-459" name="__codelineno-0-459"></a><span class="k">def</span> <span class="nf">exec_scripts</span><span class="p">(</span>
+<a id="__codelineno-0-460" name="__codelineno-0-460"></a>    <span class="n">provisioner</span><span class="p">:</span> <span class="n">BaseProvisioner</span><span class="p">,</span>
+<a id="__codelineno-0-461" name="__codelineno-0-461"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">MachineOpts</span><span class="p">,</span>
+<a id="__codelineno-0-462" name="__codelineno-0-462"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-463" name="__codelineno-0-463"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute scripts</span>
+<a id="__codelineno-0-464" name="__codelineno-0-464"></a>
+<a id="__codelineno-0-465" name="__codelineno-0-465"></a><span class="sd">    Executing scripts/templates on a node.</span>
+<a id="__codelineno-0-466" name="__codelineno-0-466"></a>
+<a id="__codelineno-0-467" name="__codelineno-0-467"></a><span class="sd">    Args:</span>
+<a id="__codelineno-0-468" name="__codelineno-0-468"></a><span class="sd">        provisioner: provisioner</span>
+<a id="__codelineno-0-469" name="__codelineno-0-469"></a><span class="sd">        kwargs: Options to exec_scripts</span>
 <a id="__codelineno-0-470" name="__codelineno-0-470"></a>
-<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Args:</span>
-<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        provisioner: provisioner</span>
-<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        kwargs: Options to exec_scripts</span>
-<a id="__codelineno-0-474" name="__codelineno-0-474"></a>
-<a id="__codelineno-0-475" name="__codelineno-0-475"></a><span class="sd">    Additional Options:</span>
-<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">        |Key|Value|</span>
-<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        |---|-----|</span>
-<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        | scripts | custom scripts path to execute |</span>
-<a id="__codelineno-0-479" name="__codelineno-0-479"></a>
-<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">    Example:</span>
-<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        ``` bash</span>
-<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">        &gt; ogc ubuntu.py exec_scripts -v -o scripts=&#39;/home/ubuntu/new-deploy-scripts&#39;</span>
-<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        # Optionally, run the scripts defined in the layout</span>
-<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">        &gt; ogc ubuntu.py exec_scripts -v</span>
-<a id="__codelineno-0-485" name="__codelineno-0-485"></a><span class="sd">        ```</span>
-<a id="__codelineno-0-486" name="__codelineno-0-486"></a><span class="sd">    Returns:</span>
-<a id="__codelineno-0-487" name="__codelineno-0-487"></a><span class="sd">        True if succesful, False otherwise.</span>
-<a id="__codelineno-0-488" name="__codelineno-0-488"></a><span class="sd">    &quot;&quot;&quot;</span>
-<a id="__codelineno-0-489" name="__codelineno-0-489"></a>    <span class="n">scripts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-491" name="__codelineno-0-491"></a>    <span class="k">if</span> <span class="s2">&quot;scripts&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-<a id="__codelineno-0-492" name="__codelineno-0-492"></a>        <span class="n">scripts</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scripts&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-471" name="__codelineno-0-471"></a><span class="sd">    Additional Options:</span>
+<a id="__codelineno-0-472" name="__codelineno-0-472"></a><span class="sd">        |Key|Value|</span>
+<a id="__codelineno-0-473" name="__codelineno-0-473"></a><span class="sd">        |---|-----|</span>
+<a id="__codelineno-0-474" name="__codelineno-0-474"></a><span class="sd">        | scripts | custom scripts path to execute |</span>
+<a id="__codelineno-0-475" name="__codelineno-0-475"></a>
+<a id="__codelineno-0-476" name="__codelineno-0-476"></a><span class="sd">    Example:</span>
+<a id="__codelineno-0-477" name="__codelineno-0-477"></a><span class="sd">        ``` bash</span>
+<a id="__codelineno-0-478" name="__codelineno-0-478"></a><span class="sd">        &gt; ogc ubuntu.py exec_scripts -v -o scripts=&#39;/home/ubuntu/new-deploy-scripts&#39;</span>
+<a id="__codelineno-0-479" name="__codelineno-0-479"></a><span class="sd">        # Optionally, run the scripts defined in the layout</span>
+<a id="__codelineno-0-480" name="__codelineno-0-480"></a><span class="sd">        &gt; ogc ubuntu.py exec_scripts -v</span>
+<a id="__codelineno-0-481" name="__codelineno-0-481"></a><span class="sd">        ```</span>
+<a id="__codelineno-0-482" name="__codelineno-0-482"></a><span class="sd">    Returns:</span>
+<a id="__codelineno-0-483" name="__codelineno-0-483"></a><span class="sd">        True if succesful, False otherwise.</span>
+<a id="__codelineno-0-484" name="__codelineno-0-484"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-0-485" name="__codelineno-0-485"></a>    <span class="n">scripts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-486" name="__codelineno-0-486"></a>    <span class="n">nodes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MachineModel</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<a id="__codelineno-0-487" name="__codelineno-0-487"></a>    <span class="k">if</span> <span class="s2">&quot;scripts&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+<a id="__codelineno-0-488" name="__codelineno-0-488"></a>        <span class="n">scripts</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;scripts&quot;</span><span class="p">]</span>
+<a id="__codelineno-0-489" name="__codelineno-0-489"></a>
+<a id="__codelineno-0-490" name="__codelineno-0-490"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<a id="__codelineno-0-491" name="__codelineno-0-491"></a>
+<a id="__codelineno-0-492" name="__codelineno-0-492"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing scripts across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> node(s)&quot;</span><span class="p">)</span>
 <a id="__codelineno-0-493" name="__codelineno-0-493"></a>
-<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="n">nodes</span> <span class="o">=</span> <span class="n">__filter_machines</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<a id="__codelineno-0-495" name="__codelineno-0-495"></a>
-<a id="__codelineno-0-496" name="__codelineno-0-496"></a>    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing scripts across </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> node(s)&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-497" name="__codelineno-0-497"></a>
-<a id="__codelineno-0-498" name="__codelineno-0-498"></a>    <span class="k">def</span> <span class="nf">_exec_scripts</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">scripts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<a id="__codelineno-0-499" name="__codelineno-0-499"></a>        <span class="n">_node</span><span class="p">:</span> <span class="n">MachineModel</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">MachineModel</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">pickle_to_model</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
-<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="n">_scripts</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">scripts</span><span class="p">)</span> <span class="k">if</span> <span class="n">scripts</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">scripts</span><span class="p">)</span>
-<a id="__codelineno-0-501" name="__codelineno-0-501"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-502" name="__codelineno-0-502"></a>            <span class="k">return</span> <span class="kc">False</span>
-<a id="__codelineno-0-503" name="__codelineno-0-503"></a>
-<a id="__codelineno-0-504" name="__codelineno-0-504"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">scripts_to_run</span> <span class="o">=</span> <span class="p">[</span><span class="n">_scripts</span><span class="o">.</span><span class="n">resolve</span><span class="p">()]</span>
-<a id="__codelineno-0-506" name="__codelineno-0-506"></a>        <span class="k">else</span><span class="p">:</span>
-<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="c1"># teardown file is a special file that gets executed before node</span>
-<a id="__codelineno-0-508" name="__codelineno-0-508"></a>            <span class="c1"># destroy</span>
-<a id="__codelineno-0-509" name="__codelineno-0-509"></a>            <span class="n">scripts_to_run</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-510" name="__codelineno-0-510"></a>                <span class="n">fname</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">stem</span> <span class="o">!=</span> <span class="s2">&quot;teardown&quot;</span>
-<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="p">]</span>
-<a id="__codelineno-0-512" name="__codelineno-0-512"></a>
-<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">Ctx</span><span class="p">(</span>
-<a id="__codelineno-0-514" name="__codelineno-0-514"></a>            <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
-<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="n">node</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
-<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">MachineModel</span><span class="o">.</span><span class="n">select</span><span class="p">()],</span>
-<a id="__codelineno-0-517" name="__codelineno-0-517"></a>        <span class="p">)</span>
-<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Deployment</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-<a id="__codelineno-0-519" name="__codelineno-0-519"></a>            <span class="n">ScriptDeployment</span><span class="p">(</span><span class="n">script</span><span class="o">=</span><span class="n">render</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<a id="__codelineno-0-520" name="__codelineno-0-520"></a>            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scripts_to_run</span>
-<a id="__codelineno-0-521" name="__codelineno-0-521"></a>            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="p">]</span>
-<a id="__codelineno-0-523" name="__codelineno-0-523"></a>
-<a id="__codelineno-0-524" name="__codelineno-0-524"></a>        <span class="c1"># Add teardown script as just a filedeployment</span>
-<a id="__codelineno-0-525" name="__codelineno-0-525"></a>        <span class="n">teardown_script</span> <span class="o">=</span> <span class="n">_scripts</span> <span class="o">/</span> <span class="s2">&quot;teardown&quot;</span>
-<a id="__codelineno-0-526" name="__codelineno-0-526"></a>        <span class="k">if</span> <span class="n">teardown_script</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-<a id="__codelineno-0-527" name="__codelineno-0-527"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-<a id="__codelineno-0-528" name="__codelineno-0-528"></a>                <span class="n">temp_contents</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">teardown_script</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
-<a id="__codelineno-0-529" name="__codelineno-0-529"></a>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">temp_contents</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-<a id="__codelineno-0-530" name="__codelineno-0-530"></a>                <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FileDeployment</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;teardown&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-531" name="__codelineno-0-531"></a>                <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ScriptDeployment</span><span class="p">(</span><span class="s2">&quot;chmod +x teardown&quot;</span><span class="p">))</span>
-<a id="__codelineno-0-532" name="__codelineno-0-532"></a>
-<a id="__codelineno-0-533" name="__codelineno-0-533"></a>        <span class="k">if</span> <span class="n">steps</span><span class="p">:</span>
-<a id="__codelineno-0-534" name="__codelineno-0-534"></a>            <span class="n">msd</span> <span class="o">=</span> <span class="n">MultiStepDeployment</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
-<a id="__codelineno-0-535" name="__codelineno-0-535"></a>            <span class="n">ssh_client</span> <span class="o">=</span> <span class="n">_node</span><span class="o">.</span><span class="n">ssh</span><span class="p">()</span>
-<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="k">if</span> <span class="n">ssh_client</span><span class="p">:</span>
-<a id="__codelineno-0-537" name="__codelineno-0-537"></a>                <span class="n">node_state</span> <span class="o">=</span> <span class="n">_node</span><span class="o">.</span><span class="n">state</span><span class="p">()</span>
-<a id="__codelineno-0-538" name="__codelineno-0-538"></a>                <span class="k">if</span> <span class="n">node_state</span><span class="p">:</span>
-<a id="__codelineno-0-539" name="__codelineno-0-539"></a>                    <span class="n">msd</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">node_state</span><span class="p">,</span> <span class="n">ssh_client</span><span class="p">)</span>
-<a id="__codelineno-0-540" name="__codelineno-0-540"></a>            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">msd</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                <span class="k">match</span> <span class="n">step</span><span class="p">:</span>
-<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                    <span class="k">case</span> <span class="n">FileDeployment</span><span class="p">():</span>
-<a id="__codelineno-0-543" name="__codelineno-0-543"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-544" name="__codelineno-0-544"></a>                            <span class="sa">f</span><span class="s2">&quot;(source) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">source</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;source&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-545" name="__codelineno-0-545"></a>                            <span class="sa">f</span><span class="s2">&quot;(target) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">target</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;target&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-546" name="__codelineno-0-546"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-547" name="__codelineno-0-547"></a>                    <span class="k">case</span> <span class="n">ScriptDeployment</span><span class="p">():</span>
-<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                            <span class="sa">f</span><span class="s2">&quot;(exit) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">exit_status</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;exit_status&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="mi">0</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                            <span class="sa">f</span><span class="s2">&quot;(out) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">stdout</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stdout&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
-<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="sa">f</span><span class="s2">&quot;(stderr) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">stderr</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stderr&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
-<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-553" name="__codelineno-0-553"></a>                        <span class="n">action</span> <span class="o">=</span> <span class="n">ActionModel</span><span class="p">(</span>
-<a id="__codelineno-0-554" name="__codelineno-0-554"></a>                            <span class="n">machine</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
-<a id="__codelineno-0-555" name="__codelineno-0-555"></a>                            <span class="n">exit_code</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">exit_status</span>
-<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;exit_status&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-557" name="__codelineno-0-557"></a>                            <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-<a id="__codelineno-0-558" name="__codelineno-0-558"></a>                            <span class="n">out</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;stdout&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-559" name="__codelineno-0-559"></a>                            <span class="n">err</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">stderr</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;stderr&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-560" name="__codelineno-0-560"></a>                            <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">script</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-561" name="__codelineno-0-561"></a>                        <span class="p">)</span>
-<a id="__codelineno-0-562" name="__codelineno-0-562"></a>                        <span class="n">action</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-<a id="__codelineno-0-563" name="__codelineno-0-563"></a>                    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-<a id="__codelineno-0-564" name="__codelineno-0-564"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
-<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="k">return</span> <span class="kc">True</span>
-<a id="__codelineno-0-566" name="__codelineno-0-566"></a>
-<a id="__codelineno-0-567" name="__codelineno-0-567"></a>    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">MAX_WORKERS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-<a id="__codelineno-0-568" name="__codelineno-0-568"></a>        <span class="n">func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_exec_scripts</span><span class="p">,</span> <span class="n">scripts</span><span class="o">=</span><span class="n">scripts</span><span class="p">)</span>
-<a id="__codelineno-0-569" name="__codelineno-0-569"></a>        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">]</span>
-<a id="__codelineno-0-570" name="__codelineno-0-570"></a>        <span class="n">wait</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<a id="__codelineno-0-571" name="__codelineno-0-571"></a>        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">res</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
+<a id="__codelineno-0-494" name="__codelineno-0-494"></a>    <span class="k">def</span> <span class="nf">_exec_scripts</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">scripts</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-0-495" name="__codelineno-0-495"></a>        <span class="n">_node</span><span class="p">:</span> <span class="n">MachineModel</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">MachineModel</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">pickle_to_model</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+<a id="__codelineno-0-496" name="__codelineno-0-496"></a>        <span class="n">_scripts</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">scripts</span><span class="p">)</span> <span class="k">if</span> <span class="n">scripts</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">_node</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">scripts</span><span class="p">)</span>
+<a id="__codelineno-0-497" name="__codelineno-0-497"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-498" name="__codelineno-0-498"></a>            <span class="k">return</span> <span class="kc">False</span>
+<a id="__codelineno-0-499" name="__codelineno-0-499"></a>
+<a id="__codelineno-0-500" name="__codelineno-0-500"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+<a id="__codelineno-0-501" name="__codelineno-0-501"></a>            <span class="n">scripts_to_run</span> <span class="o">=</span> <span class="p">[</span><span class="n">_scripts</span><span class="o">.</span><span class="n">resolve</span><span class="p">()]</span>
+<a id="__codelineno-0-502" name="__codelineno-0-502"></a>        <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-0-503" name="__codelineno-0-503"></a>            <span class="c1"># teardown file is a special file that gets executed before node</span>
+<a id="__codelineno-0-504" name="__codelineno-0-504"></a>            <span class="c1"># destroy</span>
+<a id="__codelineno-0-505" name="__codelineno-0-505"></a>            <span class="n">scripts_to_run</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-506" name="__codelineno-0-506"></a>                <span class="n">fname</span> <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">_scripts</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">stem</span> <span class="o">!=</span> <span class="s2">&quot;teardown&quot;</span>
+<a id="__codelineno-0-507" name="__codelineno-0-507"></a>            <span class="p">]</span>
+<a id="__codelineno-0-508" name="__codelineno-0-508"></a>
+<a id="__codelineno-0-509" name="__codelineno-0-509"></a>        <span class="n">context</span> <span class="o">=</span> <span class="n">Ctx</span><span class="p">(</span>
+<a id="__codelineno-0-510" name="__codelineno-0-510"></a>            <span class="n">env</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+<a id="__codelineno-0-511" name="__codelineno-0-511"></a>            <span class="n">node</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
+<a id="__codelineno-0-512" name="__codelineno-0-512"></a>            <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">MachineModel</span><span class="o">.</span><span class="n">select</span><span class="p">()],</span>
+<a id="__codelineno-0-513" name="__codelineno-0-513"></a>        <span class="p">)</span>
+<a id="__codelineno-0-514" name="__codelineno-0-514"></a>        <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Deployment</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+<a id="__codelineno-0-515" name="__codelineno-0-515"></a>            <span class="n">ScriptDeployment</span><span class="p">(</span><span class="n">script</span><span class="o">=</span><span class="n">render</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">context</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<a id="__codelineno-0-516" name="__codelineno-0-516"></a>            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">scripts_to_run</span>
+<a id="__codelineno-0-517" name="__codelineno-0-517"></a>            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+<a id="__codelineno-0-518" name="__codelineno-0-518"></a>        <span class="p">]</span>
+<a id="__codelineno-0-519" name="__codelineno-0-519"></a>
+<a id="__codelineno-0-520" name="__codelineno-0-520"></a>        <span class="c1"># Add teardown script as just a filedeployment</span>
+<a id="__codelineno-0-521" name="__codelineno-0-521"></a>        <span class="n">teardown_script</span> <span class="o">=</span> <span class="n">_scripts</span> <span class="o">/</span> <span class="s2">&quot;teardown&quot;</span>
+<a id="__codelineno-0-522" name="__codelineno-0-522"></a>        <span class="k">if</span> <span class="n">teardown_script</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+<a id="__codelineno-0-523" name="__codelineno-0-523"></a>            <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">delete</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<a id="__codelineno-0-524" name="__codelineno-0-524"></a>                <span class="n">temp_contents</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">teardown_script</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+<a id="__codelineno-0-525" name="__codelineno-0-525"></a>                <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">temp_contents</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+<a id="__codelineno-0-526" name="__codelineno-0-526"></a>                <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FileDeployment</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;teardown&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-527" name="__codelineno-0-527"></a>                <span class="n">steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ScriptDeployment</span><span class="p">(</span><span class="s2">&quot;chmod +x teardown&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-528" name="__codelineno-0-528"></a>
+<a id="__codelineno-0-529" name="__codelineno-0-529"></a>        <span class="k">if</span> <span class="n">steps</span><span class="p">:</span>
+<a id="__codelineno-0-530" name="__codelineno-0-530"></a>            <span class="n">msd</span> <span class="o">=</span> <span class="n">MultiStepDeployment</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span>
+<a id="__codelineno-0-531" name="__codelineno-0-531"></a>            <span class="n">ssh_client</span> <span class="o">=</span> <span class="n">_node</span><span class="o">.</span><span class="n">ssh</span><span class="p">()</span>
+<a id="__codelineno-0-532" name="__codelineno-0-532"></a>            <span class="k">if</span> <span class="n">ssh_client</span><span class="p">:</span>
+<a id="__codelineno-0-533" name="__codelineno-0-533"></a>                <span class="n">node_state</span> <span class="o">=</span> <span class="n">_node</span><span class="o">.</span><span class="n">state</span><span class="p">()</span>
+<a id="__codelineno-0-534" name="__codelineno-0-534"></a>                <span class="k">if</span> <span class="n">node_state</span><span class="p">:</span>
+<a id="__codelineno-0-535" name="__codelineno-0-535"></a>                    <span class="n">msd</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">node_state</span><span class="p">,</span> <span class="n">ssh_client</span><span class="p">)</span>
+<a id="__codelineno-0-536" name="__codelineno-0-536"></a>            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">msd</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
+<a id="__codelineno-0-537" name="__codelineno-0-537"></a>                <span class="k">match</span> <span class="n">step</span><span class="p">:</span>
+<a id="__codelineno-0-538" name="__codelineno-0-538"></a>                    <span class="k">case</span> <span class="n">FileDeployment</span><span class="p">():</span>
+<a id="__codelineno-0-539" name="__codelineno-0-539"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+<a id="__codelineno-0-540" name="__codelineno-0-540"></a>                            <span class="sa">f</span><span class="s2">&quot;(source) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">source</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;source&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-541" name="__codelineno-0-541"></a>                            <span class="sa">f</span><span class="s2">&quot;(target) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">target</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;target&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-542" name="__codelineno-0-542"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-543" name="__codelineno-0-543"></a>                    <span class="k">case</span> <span class="n">ScriptDeployment</span><span class="p">():</span>
+<a id="__codelineno-0-544" name="__codelineno-0-544"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+<a id="__codelineno-0-545" name="__codelineno-0-545"></a>                            <span class="sa">f</span><span class="s2">&quot;(exit) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">exit_status</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;exit_status&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="mi">0</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-546" name="__codelineno-0-546"></a>                            <span class="sa">f</span><span class="s2">&quot;(out) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">stdout</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stdout&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> &quot;</span>
+<a id="__codelineno-0-547" name="__codelineno-0-547"></a>                            <span class="sa">f</span><span class="s2">&quot;(stderr) </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">stderr</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;stderr&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="__codelineno-0-548" name="__codelineno-0-548"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-549" name="__codelineno-0-549"></a>                        <span class="n">action</span> <span class="o">=</span> <span class="n">ActionModel</span><span class="p">(</span>
+<a id="__codelineno-0-550" name="__codelineno-0-550"></a>                            <span class="n">machine</span><span class="o">=</span><span class="n">_node</span><span class="p">,</span>
+<a id="__codelineno-0-551" name="__codelineno-0-551"></a>                            <span class="n">exit_code</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">exit_status</span>
+<a id="__codelineno-0-552" name="__codelineno-0-552"></a>                            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;exit_status&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-553" name="__codelineno-0-553"></a>                            <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+<a id="__codelineno-0-554" name="__codelineno-0-554"></a>                            <span class="n">out</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;stdout&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-555" name="__codelineno-0-555"></a>                            <span class="n">err</span><span class="o">=</span><span class="n">step</span><span class="o">.</span><span class="n">stderr</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="s2">&quot;stderr&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-556" name="__codelineno-0-556"></a>                            <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">script</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-557" name="__codelineno-0-557"></a>                        <span class="p">)</span>
+<a id="__codelineno-0-558" name="__codelineno-0-558"></a>                        <span class="n">action</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<a id="__codelineno-0-559" name="__codelineno-0-559"></a>                    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+<a id="__codelineno-0-560" name="__codelineno-0-560"></a>                        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+<a id="__codelineno-0-561" name="__codelineno-0-561"></a>        <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-0-562" name="__codelineno-0-562"></a>
+<a id="__codelineno-0-563" name="__codelineno-0-563"></a>    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">MAX_WORKERS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+<a id="__codelineno-0-564" name="__codelineno-0-564"></a>        <span class="n">func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">_exec_scripts</span><span class="p">,</span> <span class="n">scripts</span><span class="o">=</span><span class="n">scripts</span><span class="p">)</span>
+<a id="__codelineno-0-565" name="__codelineno-0-565"></a>        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">model_as_pickle</span><span class="p">(</span><span class="n">node</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">]</span>
+<a id="__codelineno-0-566" name="__codelineno-0-566"></a>        <span class="n">wait</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<a id="__codelineno-0-567" name="__codelineno-0-567"></a>        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="n">res</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span><span class="p">])</span>
 </code></pre></div></td></tr></table></div>
       </details>
   </div>
