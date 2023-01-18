@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from ogc.deployer import init
-from ogc.fs import expand_path
-from ogc.log import get_logger
+from ogc import exec, fs, get_logger, init
 
 log = get_logger("ogc")
 
@@ -18,8 +16,8 @@ deployment = init(
         scale=9,
         scripts="fixtures/ex_deploy_ubuntu",
         username="ubuntu",
-        ssh_private_key=expand_path("~/.ssh/id_rsa_libcloud"),
-        ssh_public_key=expand_path("~/.ssh/id_rsa_libcloud.pub"),
+        ssh_private_key=fs.expand_path("~/.ssh/id_rsa_libcloud"),
+        ssh_public_key=fs.expand_path("~/.ssh/id_rsa_libcloud.pub"),
         ports=["22:22", "80:80", "443:443", "5601:5601"],
         tags=[],
         labels=dict(
@@ -29,6 +27,6 @@ deployment = init(
 )
 
 
-def hithere(**kwargs: str):
-    print("hi there")
-    print(kwargs)
+def ls_all(**kwargs: str):
+    kwargs.update({"cmd": "ls -l /var"})
+    exec(deployment, **kwargs)

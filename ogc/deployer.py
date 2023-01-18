@@ -110,6 +110,10 @@ def __filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
 
 
 @signals.ssh.connect
+def ssh_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
+    return ssh(provisioner, **kwargs)
+
+
 def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     """Opens SSH connection to a machine
 
@@ -146,6 +150,11 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
 
 
 @signals.up.connect
+def up_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
+    """Signal hook for bringing up deployment"""
+    return up(provisioner, **kwargs)
+
+
 def up(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Bring up machines
 
@@ -163,6 +172,10 @@ def up(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
 
 @signals.down.connect
+def down_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
+    return down(provisioner, **kwargs)
+
+
 def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Tear down machines
 
@@ -194,6 +207,12 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
 
 @signals.ls.connect
+def ls_hook(
+    provisioner: BaseProvisioner, **kwargs: MachineOpts
+) -> list[MachineModel] | None:
+    return ls(provisioner, **kwargs)
+
+
 def ls(
     provisioner: BaseProvisioner, **kwargs: MachineOpts
 ) -> list[MachineModel] | None:
@@ -210,6 +229,7 @@ def ls(
         |Key|Value|
         |---|-----|
         | output_file | Where to store status output, filename can end with .html or .svg |
+        | suppress_output | Whether to print out the table or just return results
 
     Example:
         ``` bash
@@ -234,6 +254,56 @@ def ls(
         │ 2604966443513535453            │ ogc-ubuntu-ogc-f664-008              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@35.226.159.94                                  │
         └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
         Node Count: 8
+        ```
+
+        Suppressing the output is useful if you are using the framework programatically.
+
+        ``` python title="ubuntu.py"
+        from ogc.deployer import ls
+        from ogc import fs, init
+
+        deployment = init(
+            layout_model=dict(
+                instance_size="e2-standard-4",
+                name="ubuntu-ogc",
+                provider="google",
+                remote_path="/home/ubuntu/ogc",
+                runs_on="ubuntu-2004-lts",
+                scale=9,
+                scripts="fixtures/ex_deploy_ubuntu",
+                username="ubuntu",
+                ssh_private_key=fs.expand_path("~/.ssh/id_rsa_libcloud"),
+                ssh_public_key=fs.expand_path("~/.ssh/id_rsa_libcloud.pub"),
+                ports=["22:22", "80:80", "443:443", "5601:5601"],
+                tags=[],
+                labels=dict(
+                    division="engineering", org="obs", team="observability", project="perf"
+                ),
+            ),
+        )
+
+
+        def uname(**kwargs: str):
+            kwargs.update({"cmd": "uname -a"})
+            output = exec(deployment, **kwargs)
+            if output:
+                print("commands executed successfully")
+        ```
+
+        Execute the above:
+        ```bash title="bash -c"
+        > ogc ubuntu.py uname -v
+        [19:20:14] INFO     Establing provider connection...                                                              
+        [19:20:25] INFO     Executing commands across 1 node(s)                                                           
+        [19:20:27] DEBUG    {'exit_code': 0, 
+                             'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9 \
+                                        18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux\n", 
+                             'error': '', 
+                             'cmd': '/usr/bin/ssh -o StrictHostKeyChecking=no -o \
+                                                     UserKnownHostsFile=/dev/null \
+                                                         -i /root/.ssh/id_ed25519 \
+                                                     ubuntu@34.27.170.121 uname -a'}                                                                                
+        commands executed successfully
         ```
 
     Returns:
@@ -289,11 +359,16 @@ def ls(
     log.info("Querying database for machines")
 
     nodes = __filter_machines(**kwargs)
-    ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
+    if "suppress_output" not in kwargs:
+        ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
     return nodes if nodes else None
 
 
 @signals.exec.connect
+def exec_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
+    return exec(provisioner, **kwargs)
+
+
 def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     """Execute commands on node(s)
 
@@ -378,6 +453,13 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
 
 @signals.exec_scripts.connect
+def exec_scripts_hook(
+    provisioner: BaseProvisioner,
+    **kwargs: MachineOpts,
+) -> bool:
+    return exec_scripts(provisioner, **kwargs)
+
+
 def exec_scripts(
     provisioner: BaseProvisioner,
     **kwargs: MachineOpts,
