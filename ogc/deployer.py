@@ -259,8 +259,7 @@ def ls(
         Suppressing the output is useful if you are using the framework programatically.
 
         ``` python title="ubuntu.py"
-        from ogc.deployer import ls
-        from ogc import fs, init
+        from ogc import ls, fs, init, exec
 
         deployment = init(
             layout_model=dict(
