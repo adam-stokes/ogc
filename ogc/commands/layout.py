@@ -23,11 +23,11 @@ def _layout() -> None:
     """Layout manager"""
 
 
-@click.command(help="Add/Modify/Delete layouts")
+@click.command(help="Import layouts from specification")
 @click.argument("spec", type=Path, metavar="<layouts.yml>")
 def _import(spec: Path) -> None:
     """Manages layouts"""
-    log = get_logger("ogc.commands.layout.add")
+    log = get_logger("ogc.commands.layout.import")
     if not spec.exists():
         log.critical(f"Unable to locate {spec}, please double check the path.")
         sys.exit(1)
@@ -37,7 +37,7 @@ def _import(spec: Path) -> None:
         layout.LayoutModel.get_or_create(**item)
 
     for item in layout.LayoutModel.select():
-        log.info(f"Added layout: {item.id}:{item.runs_on}")
+        log.info(f"Added layout: {item.id}:{item.runs_on} - {item.tags}")
 
 
 _layout.add_command(_import, name="import")

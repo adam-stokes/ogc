@@ -25,10 +25,10 @@ layouts:
     name: ubuntu-ogc
     provider: google
     remote_path: /home/ubuntu/ogc
-    runs_on: centos-15
+    runs_on: ubuntu-2004-lts
     scale: 1
-    scripts: "fixtures/ex_deploy_centos"
-    username: "centos"
+    scripts: "fixtures/ex_deploy_ubuntu"
+    username: "ubuntu"
     ssh_private_key: ~/.ssh/id_rsa_libcloud
     ssh_public_key: ~/.ssh/id_rsa_libcloud.pub"
     ports:
@@ -38,6 +38,7 @@ layouts:
       - "5601:5601"
     tags:
       - elastic-agent
+      - ubuntu-2004-elastic-agent-7.x
     labels:
       division: "engineering"
       org: "obs"
