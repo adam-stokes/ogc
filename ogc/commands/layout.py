@@ -1,6 +1,7 @@
 """Manages layouts"""
 from __future__ import annotations
 
+import io
 import sys
 from pathlib import Path
 
@@ -24,15 +25,23 @@ def _layout() -> None:
 
 
 @click.command(help="Import layouts from specification")
-@click.argument("spec", type=Path, metavar="<layouts.yml>")
+@click.argument(
+    "spec", type=click.File("r"), default=sys.stdin, metavar="<layouts.yml>"
+)
 def _import(spec: Path) -> None:
     """Manages layouts"""
     log = get_logger("ogc.commands.layout.import")
-    if not spec.exists():
+
+    if not isinstance(spec, io.TextIOWrapper) and not spec.exists():
         log.critical(f"Unable to locate {spec}, please double check the path.")
         sys.exit(1)
 
-    layouts_from_spec = yaml.safe_load(spec.read_text())
+    layouts_from_spec = None
+    if isinstance(spec, io.TextIOWrapper):
+        layouts_from_spec = yaml.safe_load(spec.read())
+    else:
+        layouts_from_spec = yaml.safe_load(spec.read_text())
+
     for item in layouts_from_spec["layouts"]:
         layout.LayoutModel.get_or_create(**item)
 
