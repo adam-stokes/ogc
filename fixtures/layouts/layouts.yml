@@ -8,7 +8,7 @@ layouts:
     scripts: "fixtures/ex_deploy_ubuntu"
     username: "ubuntu"
     ssh_private_key: ~/.ssh/id_rsa_libcloud
-    ssh_public_key: ~/.ssh/id_rsa_libcloud.pub"
+    ssh_public_key: ~/.ssh/id_rsa_libcloud.pub
     ports:
       - "22:22"
       - "80:80"
@@ -25,12 +25,12 @@ layouts:
     name: ubuntu-ogc
     provider: google
     remote_path: /home/ubuntu/ogc
-    runs_on: ubuntu-2004-lts
+    runs_on: debian-10
     scale: 1
     scripts: "fixtures/ex_deploy_ubuntu"
     username: "ubuntu"
     ssh_private_key: ~/.ssh/id_rsa_libcloud
-    ssh_public_key: ~/.ssh/id_rsa_libcloud.pub"
+    ssh_public_key: ~/.ssh/id_rsa_libcloud.pub
     ports:
       - "22:22"
       - "80:80"
@@ -38,9 +38,32 @@ layouts:
       - "5601:5601"
     tags:
       - elastic-agent
-      - ubuntu-2004-elastic-agent-7.x
+      - debian
     labels:
       division: "engineering"
       org: "obs"
       team: "observability"
       project: "perf"      
+  - instance_size: e2-standard-4
+    name: ubuntu-ogc
+    provider: google
+    remote_path: /home/ubuntu/ogc
+    runs_on: sles-12
+    scale: 1
+    scripts: "fixtures/ex_deploy_sles"
+    username: "sles"
+    ssh_private_key: ~/.ssh/id_rsa_libcloud
+    ssh_public_key: ~/.ssh/id_rsa_libcloud.pub
+    ports:
+      - "22:22"
+      - "80:80"
+      - "443:443"
+      - "5601:5601"
+    tags:
+      - elastic-agent
+      - sles
+    labels:
+      division: "engineering"
+      org: "obs"
+      team: "observability"
+      project: "perf"  

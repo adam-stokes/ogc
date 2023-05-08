@@ -39,7 +39,18 @@ class BaseProvisioner:
     def __init__(self, layout: LayoutModel):
         self.layout: LayoutModel = layout
         self.env: t.Mapping[str, str] = os.environ.copy()
-        self.provisioner: NodeDriver = self.connect()
+        self.provisioner: NodeDriver | None = None
+
+    @classmethod
+    def from_layout(cls, layout: LayoutModel, connect: bool = True) -> BaseProvisioner:
+        _prov = (
+            GCEProvisioner(layout=layout)
+            if layout.provider == "google"
+            else AWSProvisioner(layout=layout)
+        )
+        if connect:
+            _prov.provisioner = _prov.connect()
+        return _prov
 
     @property
     def options(self) -> t.Mapping[str, str]:
@@ -286,11 +297,10 @@ class GCEProvisioner(BaseProvisioner):
             "datacenter": self.env.get("GOOGLE_DATACENTER", ""),
         }
 
-    @retry(tries=5, logger=None)
+    # @retry(tries=5, logger=None)
     def connect(self) -> NodeDriver:
-        log.info("Establing provider connection...")
-        log.debug(self.options)
         gce = get_driver(Provider.GCE)
+        log.debug(f"Establing provider connection...{gce} - {self.options}")
         return gce(**self.options)
 
     def destroy(self, nodes: list[MachineModel]) -> bool:
