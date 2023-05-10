@@ -10,8 +10,10 @@ import yaml
 
 from ogc import db
 from ogc.commands.base import cli
+from ogc.deployer import ls_layouts
 from ogc.log import get_logger
 from ogc.models import actions, layout, machine, tags
+from ogc.provision import BaseProvisioner
 
 dbi = db.connect()
 dbi.create_tables(
@@ -47,7 +49,28 @@ def _import(spec: Path) -> None:
 
     for item in layout.LayoutModel.select():
         log.info(f"Added layout: {item.id}:{item.runs_on} - {item.tags}")
+    sys.exit(1)
+
+
+@click.command(help="List imported layouts")
+@click.option("--as-yaml", is_flag=True, help="Output as YAML")
+@click.option("--as-json", is_flag=True, help="Output as JSON")
+@click.argument("tag", type=str, metavar="tag", nargs=-1)
+def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
+    """Lists layouts"""
+    log = get_logger("ogc.commands.layout.list")
+    _layout: layout.LayoutModel = layout.LayoutModel.select().first()
+    provisioner = BaseProvisioner.from_layout(layout=_layout, connect=False)
+    opts = {}
+    if tag:
+        opts.update({"tag": tag})
+    if as_yaml:
+        opts.update({"yaml": as_yaml})
+    if as_json:
+        opts.update({"json": as_json})
+    ls_layouts(provisioner=provisioner, **opts)
 
 
 _layout.add_command(_import, name="import")
+_layout.add_command(_list, name="ls")
 cli.add_command(_layout, name="layout")

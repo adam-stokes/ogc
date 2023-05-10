@@ -120,6 +120,37 @@ def filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
     )
 
 
+def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
+    """Filters layouts
+
+    Args:
+        kwargs: Machine filter options
+
+    Returns:
+        List of layouts
+    """
+    return t.cast(
+        list[LayoutModel],
+        pmatch(
+            kwargs,
+            {"name": _},
+            lambda x: [LayoutModel.get_or_none(LayoutModel.name == x)],
+            {"id": _},
+            lambda x: [MachineModel.get_or_none(MachineModel.id == x)],
+            {"limit": _},
+            lambda x: [layout for layout in LayoutModel.select().limit(x)],
+            {"tag": _},
+            lambda x: [
+                layout
+                for layout in LayoutModel.select()
+                if x and set(x).intersection(layout.tags)
+            ],
+            _,
+            [layout for layout in LayoutModel.select()],
+        ),
+    )
+
+
 @signals.ssh.connect
 def ssh_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     return ssh(provisioner, **kwargs)
@@ -393,6 +424,83 @@ def ls(
     elif "suppress_output" not in kwargs:
         ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
     return nodes if nodes else None
+
+
+def ls_layouts(
+    provisioner: BaseProvisioner, **kwargs: MachineOpts
+) -> list[LayoutModel] | None:
+    """Return a list of layouts deployment
+
+    Pass in a mapping of options to filter layouts
+
+    Args:
+        provisioner: Provisioner
+        kwargs: Mapping of options to pass to `ls`
+
+    Additional Options:
+
+        |Key|Value|
+        |---|-----|
+        | as_json | output to json |
+        | as_yaml | Output as YAML |
+        | suppress_output | Whether to print out the table or just return results |
+
+    Example:
+        ``` bash
+        > ogc -v layout ls
+
+    Returns:
+        List of imported layouts
+    """
+
+    def ui_layouts_yaml(layouts: list[LayoutModel]) -> None:
+        con.print(yaml.safe_dump([model_to_dict(layout) for layout in layouts]))
+
+    def ui_layouts_json(layouts: list[LayoutModel]) -> None:
+        con.print(
+            json.dumps(
+                [model_to_dict(layout) for layout in layouts],
+                skipkeys=True,
+                default=str,
+                indent=2,
+            )
+        )
+
+    def ui_layouts_table(layouts: list[LayoutModel]) -> None:
+        con.record = True
+        rows = layouts
+        rows_count = len(rows)
+
+        table = Table(
+            caption=f"Layout Count: [green]{rows_count}[/]",
+            header_style="yellow on black",
+            caption_justify="left",
+            expand=True,
+            width=con.width,
+            show_lines=True,
+        )
+
+        for key in model_to_dict(rows[0]).keys():
+            table.add_column(key.lower())
+
+        for data in rows:
+            data.ports = ",".join(data.ports)
+            data.tags = ",".join(data.tags)
+            data.labels = ",".join(data.labels)
+            item = [str(i) for i in model_to_dict(data).values()]
+            table.add_row(*item)
+
+        con.print(table, justify="center")
+        con.record = False
+
+    layouts = filter_layouts(**kwargs)
+    if "yaml" in kwargs and kwargs["yaml"]:
+        ui_layouts_yaml(layouts=layouts)
+    elif "json" in kwargs and kwargs["json"]:
+        ui_layouts_json(layouts=layouts)
+    elif "suppress_output" not in kwargs:
+        ui_layouts_table(layouts=layouts)
+    return layouts if layouts else None
 
 
 @signals.exec.connect
