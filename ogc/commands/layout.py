@@ -49,7 +49,6 @@ def _import(spec: Path) -> None:
 
     for item in layout.LayoutModel.select():
         log.info(f"Added layout: {item.id}:{item.runs_on} - {item.tags}")
-    sys.exit(1)
 
 
 @click.command(help="List imported layouts")

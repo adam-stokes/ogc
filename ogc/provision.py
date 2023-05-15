@@ -325,7 +325,7 @@ class GCEProvisioner(BaseProvisioner):
                 return partial_image
         except ResourceNotFoundError:
             log.debug(f"Could not find {runs_on}, falling back internal image map")
-        _runs_on = CLOUD_IMAGE_MAP["google"]["amd64"].get(runs_on)
+        _runs_on = CLOUD_IMAGE_MAP["google"].get(runs_on)
         try:
             return [i for i in self.images() if i.name == _runs_on][0]
         except IndexError:
@@ -406,6 +406,8 @@ class GCEProvisioner(BaseProvisioner):
         _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
         _machines = []
         for node in _nodes:
+            if not hasattr(node, "id"):
+                raise ProvisionException(f"Failed to create node {node.name}: ({node.code}) {node.error}")
             state_file_p = db.cache_path() / node.id
             state_file_p.write_bytes(db.model_as_pickle(node))
             machine = MachineModel(

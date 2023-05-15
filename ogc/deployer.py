@@ -356,10 +356,10 @@ def ls(
     """
 
     def ui_nodes_yaml(nodes: list[MachineModel]) -> None:
-        con.print(yaml.safe_dump([model_to_dict(node) for node in nodes]))
+        con.out(yaml.safe_dump([model_to_dict(node) for node in nodes]))
 
     def ui_nodes_json(nodes: list[MachineModel]) -> None:
-        con.print(
+        con.out(
             json.dumps(
                 [model_to_dict(node) for node in nodes],
                 skipkeys=True,
