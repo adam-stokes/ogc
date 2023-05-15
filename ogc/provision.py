@@ -331,6 +331,27 @@ class GCEProvisioner(BaseProvisioner):
         except IndexError:
             raise ProvisionException(f"Could not determine image for {_runs_on}")
 
+    def image_from_family(self, runs_on: str) -> NodeImage:
+        """Grab image from remote api"""
+        image_family_endpoint = "https://compute.googleapis.com/compute/v1/projects/%s/global/images/family/%s"
+        request_endpoint = None
+        if runs_on.startswith("ubuntu"):
+            request_endpoint = image_family_endpoint % ("ubuntu-os-cloud", runs_on)
+        elif runs_on.startswith("centos"):
+            request_endpoint = image_family_endpoint % ("centos-cloud", runs_on)
+        elif runs_on.startswith("debian"):
+            request_endpoint = image_family_endpoint % ("debian-cloud", runs_on)
+        elif runs_on.startswith("rocky"):
+            request_endpoint = image_family_endpoint % ("rocky-linux-cloud", runs_on)
+        elif runs_on.startswith("sles"):
+            request_endpoint = image_family_endpoint % ("suse-cloud", runs_on)
+        elif runs_on.startswith("rhel"):
+            request_endpoint = image_family_endpoint % ("rhel-cloud", runs_on)
+        elif runs_on.startswith("windows"):
+            request_endpoint = image_family_endpoint % ("windows-cloud", runs_on)
+
+        return self.provisioner.ex_get_image_from_family(request_endpoint)
+
     def create_firewall(self, name: str, ports: list[str], tags: list[str]) -> None:
         ports = [port.split(":")[0] for port in ports]
         try:
@@ -401,10 +422,9 @@ class GCEProvisioner(BaseProvisioner):
 
         suffix = str(uuid.uuid4())[:4]
         opts = dict(
-            base_name=f"ogc-{self.layout.name}-{suffix}",
-            image=image,
+            name=f"ogc-{self.layout.name}-{suffix}",
             size=size,
-            number=self.layout.scale,
+            image=self.image_from_family(self.layout.runs_on),
             ex_metadata=ex_metadata,
             ex_tags=self.layout.tags,
             ex_labels=self.layout.labels,
@@ -412,7 +432,7 @@ class GCEProvisioner(BaseProvisioner):
             ex_disk_size=100,
             ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
-        _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
+        _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         _machines = []
         for node in _nodes:
             if not hasattr(node, "id"):

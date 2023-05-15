@@ -81,7 +81,7 @@ def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
 
 @click.command(help="Remove imported layouts")
 @click.option("--all", is_flag=True, help="Remove all layouts")
-@click.argument("name", type=str, metavar="name")
+@click.argument("name", type=str, metavar="name", nargs=-1)
 def _rm(all: bool, name: str) -> None:
     """Remove layouts layouts"""
     log = get_logger("ogc.commands.layout.rm")
@@ -89,8 +89,8 @@ def _rm(all: bool, name: str) -> None:
         log.info("Removing all layouts")
         layout.LayoutModel.delete().execute()
     if name:
-        log.info(f"Removing {name} layout")
-        model = layout.LayoutModel.get_or_none(layout.LayoutModel.name == name)
+        log.info(f"Removing {name[0]} layout")
+        model = layout.LayoutModel.get_or_none(layout.LayoutModel.name == name[0])
         if not model:
             log.warning(f"Layout {name} doesn't exist.")
             return
