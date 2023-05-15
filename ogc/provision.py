@@ -390,15 +390,15 @@ class GCEProvisioner(BaseProvisioner):
                         .read_text()
                         .strip(),
                     ),
-                },
-                {
-                    "key": "startup-script",
-                    "value": self._userdata()
-                    if "windows" not in self.layout.runs_on
-                    else "",
-                },
+                }
             ]
         }
+
+        if "windows" not in self.layout.runs_on:
+            ex_metadata["items"].append(
+                {"key": "startup-script", "value": self._userdata()}
+            )
+
         if "windows" in self.layout.runs_on:
             # To get this to work, these custom metadata keys were also set project
             # wide in google console
