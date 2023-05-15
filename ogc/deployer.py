@@ -4,17 +4,19 @@
 
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
 import typing as t
-from concurrent.futures import ThreadPoolExecutor, wait
 from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
 
 import arrow
 import sh
+import yaml
+from gevent.pool import Pool
 from libcloud.compute.deployment import (
     Deployment,
     FileDeployment,
@@ -25,9 +27,10 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 from pampy import _
 from pampy import match as pmatch
+from playhouse.shortcuts import model_to_dict
 from rich.table import Table
 
-from ogc import db, signals
+from ogc import signals
 from ogc.log import CONSOLE as con
 from ogc.log import get_logger
 from ogc.models.actions import ActionModel
@@ -39,6 +42,7 @@ from ogc.provision import BaseProvisioner
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 
 log = get_logger("ogc")
+pool = Pool(MAX_WORKERS)
 
 
 class Ctx(t.TypedDict):
@@ -82,9 +86,10 @@ class MachineOpts(t.TypedDict):
     instance_id: t.NotRequired[str]
     instance_name: t.NotRequired[str]
     limit: t.NotRequired[int]
+    tag: t.NotRequired[str]
 
 
-def __filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
+def filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
     """Filters machines by instance_id or all if none is provided
 
     Args:
@@ -103,8 +108,45 @@ def __filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
             lambda x: [MachineModel.get_or_none(MachineModel.instance_name == x)],
             {"limit": _},
             lambda x: [node for node in MachineModel.select().limit(x)],
+            {"tag": _},
+            lambda x: [
+                node
+                for node in MachineModel.select()
+                if x and set(x).intersection(node.layout.tags)
+            ],
             _,
             [node for node in MachineModel.select()],
+        ),
+    )
+
+
+def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
+    """Filters layouts
+
+    Args:
+        kwargs: Machine filter options
+
+    Returns:
+        List of layouts
+    """
+    return t.cast(
+        list[LayoutModel],
+        pmatch(
+            kwargs,
+            {"name": _},
+            lambda x: [LayoutModel.get_or_none(LayoutModel.name == x)],
+            {"id": _},
+            lambda x: [MachineModel.get_or_none(MachineModel.id == x)],
+            {"limit": _},
+            lambda x: [layout for layout in LayoutModel.select().limit(x)],
+            {"tag": _},
+            lambda x: [
+                layout
+                for layout in LayoutModel.select()
+                if x and set(x).intersection(layout.tags)
+            ],
+            _,
+            [layout for layout in LayoutModel.select()],
         ),
     )
 
@@ -129,7 +171,7 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
         > ogc ubuntu.py ssh -v -o instance_id=5407368969918077947
         ```
     """
-    nodes = __filter_machines(**kwargs)
+    nodes = filter_machines(**kwargs)
     if nodes:
         machine = nodes[0]
         if machine:
@@ -155,7 +197,7 @@ def up_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     return up(provisioner, **kwargs)
 
 
-def up(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
+def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
     """Bring up machines
 
     Args:
@@ -166,8 +208,15 @@ def up(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
         True if successful, False otherwise.
     """
     log.info("Bringing up machines")
-    provisioner.setup()
-    provisioner.create()
+
+    def _up_async(layout: LayoutModel) -> None:
+        provisioner = BaseProvisioner.from_layout(layout=layout)
+        provisioner.setup()
+        provisioner.create()
+
+    for layout in layouts:
+        pool.spawn(_up_async, layout)
+    pool.join()
     return True
 
 
@@ -195,7 +244,7 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     Returns:
         True if successful, False otherwise.
     """
-    nodes = __filter_machines(**kwargs)
+    nodes = filter_machines(**kwargs)
     kwargs.update({"cmd": "./teardown"})
     if not exec(provisioner, **kwargs):
         log.debug("Could not run teardown script")
@@ -229,7 +278,8 @@ def ls(
         |Key|Value|
         |---|-----|
         | output_file | Where to store status output, filename can end with .html or .svg |
-        | suppress_output | Whether to print out the table or just return results
+        | yaml | Output as YAML |
+        | suppress_output | Whether to print out the table or just return results |
 
     Example:
         ``` bash
@@ -292,18 +342,31 @@ def ls(
         Execute the above:
         ```bash title="bash -c"
         > ogc ubuntu.py uname -v
-        [19:20:14] INFO     Establing provider connection...                                                              
-        [19:20:25] INFO     Executing commands across 1 node(s)                                                           
-        [19:20:27] DEBUG    {'exit_code': 0, 'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9                 
-                            18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux", 'error': '', 'cmd': '/usr/bin/ssh -o                      
-                            StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519                              
-                            ubuntu@34.27.170.121 uname -a'} 
+        [19:20:14] INFO     Establing provider connection...
+        [19:20:25] INFO     Executing commands across 1 node(s)
+        [19:20:27] DEBUG    {'exit_code': 0, 'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9
+                            18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux", 'error': '', 'cmd': '/usr/bin/ssh -o
+                            StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519
+                            ubuntu@34.27.170.121 uname -a'}
         commands executed successfully
         ```
 
     Returns:
         List of deployed machines
     """
+
+    def ui_nodes_yaml(nodes: list[MachineModel]) -> None:
+        con.print(yaml.safe_dump([model_to_dict(node) for node in nodes]))
+
+    def ui_nodes_json(nodes: list[MachineModel]) -> None:
+        con.print(
+            json.dumps(
+                [model_to_dict(node) for node in nodes],
+                skipkeys=True,
+                default=str,
+                indent=2,
+            )
+        )
 
     def ui_nodes_table(
         nodes: list[MachineModel], output_file: str | None = None
@@ -325,6 +388,7 @@ def ls(
         table.add_column("Created")
         table.add_column("Status")
         table.add_column("Labels")
+        table.add_column("Tags")
         table.add_column("Connection", style="bold red on black")
 
         for data in rows:
@@ -336,6 +400,7 @@ def ls(
                 ",".join(
                     [f"[purple]{k}[/]={v}" for k, v in data.layout.labels.items()]
                 ),
+                ",".join([f"[purple]{tag}[/]" for tag in data.layout.tags]),
                 f"ssh -i {Path(data.layout.ssh_private_key).expanduser()} {data.layout.username}@{data.public_ip}",
             )
 
@@ -351,20 +416,99 @@ def ls(
                 )
         con.record = False
 
-    log.info("Querying database for machines")
-
-    nodes = __filter_machines(**kwargs)
-    if "suppress_output" not in kwargs:
+    nodes = filter_machines(**kwargs)
+    if "yaml" in kwargs and kwargs["yaml"]:
+        ui_nodes_yaml(nodes=nodes)
+    elif "json" in kwargs and kwargs["json"]:
+        ui_nodes_json(nodes=nodes)
+    elif "suppress_output" not in kwargs:
         ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
     return nodes if nodes else None
 
 
+def ls_layouts(
+    provisioner: BaseProvisioner, **kwargs: MachineOpts
+) -> list[LayoutModel] | None:
+    """Return a list of layouts deployment
+
+    Pass in a mapping of options to filter layouts
+
+    Args:
+        provisioner: Provisioner
+        kwargs: Mapping of options to pass to `ls`
+
+    Additional Options:
+
+        |Key|Value|
+        |---|-----|
+        | as_json | output to json |
+        | as_yaml | Output as YAML |
+        | suppress_output | Whether to print out the table or just return results |
+
+    Example:
+        ``` bash
+        > ogc -v layout ls
+
+    Returns:
+        List of imported layouts
+    """
+
+    def ui_layouts_yaml(layouts: list[LayoutModel]) -> None:
+        con.print(yaml.safe_dump([model_to_dict(layout) for layout in layouts]))
+
+    def ui_layouts_json(layouts: list[LayoutModel]) -> None:
+        con.print(
+            json.dumps(
+                [model_to_dict(layout) for layout in layouts],
+                skipkeys=True,
+                default=str,
+                indent=2,
+            )
+        )
+
+    def ui_layouts_table(layouts: list[LayoutModel]) -> None:
+        con.record = True
+        rows = layouts
+        rows_count = len(rows)
+
+        table = Table(
+            caption=f"Layout Count: [green]{rows_count}[/]",
+            header_style="yellow on black",
+            caption_justify="left",
+            expand=True,
+            width=con.width,
+            show_lines=True,
+        )
+
+        for key in model_to_dict(rows[0]).keys():
+            table.add_column(key.lower())
+
+        for data in rows:
+            data.ports = ",".join(data.ports)
+            data.tags = ",".join(data.tags)
+            data.labels = ",".join(data.labels)
+            item = [str(i) for i in model_to_dict(data).values()]
+            table.add_row(*item)
+
+        con.print(table, justify="center")
+        con.record = False
+
+    layouts = filter_layouts(**kwargs)
+    if "yaml" in kwargs and kwargs["yaml"]:
+        ui_layouts_yaml(layouts=layouts)
+    elif "json" in kwargs and kwargs["json"]:
+        ui_layouts_json(layouts=layouts)
+    elif "suppress_output" not in kwargs:
+        ui_layouts_table(layouts=layouts)
+    return layouts if layouts else None
+
+
 @signals.exec.connect
-def exec_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
-    return exec(provisioner, **kwargs)
+def exec_hook(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
+    return exec(layouts, **kwargs)
 
 
-def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
+def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
     """Execute commands on node(s)
 
     Args:
@@ -378,9 +522,9 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
     Example:
         ``` bash
-        > ogc ubuntu.py exec -v -o cmd='ls -l'
+        > ogc -v exec 'ls -l'
         # Single machine
-        > ogc ubuntu.py exec -v -o cmd='ls -l' -o instance_id=2349146264239594441
+        > ogc -v exec sles-machine-1 'ls -l'
         ```
 
     Returns:
@@ -391,19 +535,19 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     if "cmd" in kwargs:
         cmd = kwargs["cmd"]
 
-    nodes = __filter_machines(**kwargs)
+    nodes = filter_machines(**kwargs)
 
-    log.info(f"Executing commands across {len(nodes)} node(s)")
+    log.info(f"Executing '{cmd}' across {len(nodes)} node(s)")
 
-    def _exec(node: bytes, cmd: str) -> bool:
-        _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
+    def _exec(node: MachineModel, cmd: str) -> bool:
+        _node: MachineModel = node
         cmd_opts = [
             "-o",
             "StrictHostKeyChecking=no",
             "-o",
             "UserKnownHostsFile=/dev/null",
             "-i",
-            Path(_node.layout.ssh_private_key).expanduser(),
+            str(Path(_node.layout.ssh_private_key).expanduser()),
             f"{_node.layout.username}@{_node.public_ip}",
         ]
         cmd_opts.append(cmd)
@@ -411,10 +555,10 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
         try:
             out = sh.ssh(cmd_opts, _env=os.environ.copy(), _err_to_out=True)
             return_status = dict(
-                exit_code=out.exit_code,
-                out=out.stdout.decode(),
-                error=out.stderr.decode(),
-                cmd=" ".join(txt.decode() for txt in out.cmd),
+                exit_code=0,
+                out=out,
+                error=out,
+                cmd=" ".join(txt for txt in cmd_opts),
             )
         except sh.ErrorReturnCode as e:
             return_status = dict(
@@ -424,6 +568,7 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
                 cmd=str(e.full_cmd),
             )
         if return_status:
+            return_status.update({"machine": _node.instance_name})
             log.debug(return_status)
             action = ActionModel(
                 machine=_node,
@@ -437,26 +582,22 @@ def exec(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
         return False
 
     if cmd:
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-            func = partial(_exec, cmd=cmd)
-            results = [
-                executor.submit(func, db.model_as_pickle(node)) for node in nodes
-            ]
-            wait(results, timeout=5)
-            return True
+        for node in nodes:
+            pool.spawn(_exec, node, cmd)
+        return bool(pool.join())
     return False
 
 
 @signals.exec_scripts.connect
 def exec_scripts_hook(
-    provisioner: BaseProvisioner,
+    layouts: list[LayoutModel],
     **kwargs: MachineOpts,
 ) -> bool:
-    return exec_scripts(provisioner, **kwargs)
+    return exec_scripts(layouts, **kwargs)
 
 
 def exec_scripts(
-    provisioner: BaseProvisioner,
+    layouts: list[LayoutModel],
     **kwargs: MachineOpts,
 ) -> bool:
     """Execute scripts
@@ -486,12 +627,12 @@ def exec_scripts(
     if "scripts" in kwargs:
         scripts = kwargs["scripts"]
 
-    nodes = __filter_machines(**kwargs)
+    nodes = filter_machines(**kwargs)
 
     log.info(f"Executing scripts across {len(nodes)} node(s)")
 
-    def _exec_scripts(node: bytes, scripts: str | Path | None = None) -> bool:
-        _node: MachineModel = t.cast(MachineModel, db.pickle_to_model(node))
+    def _exec_scripts(node: MachineModel, scripts: str | Path | None = None) -> bool:
+        _node: MachineModel = node
         _scripts = Path(scripts) if scripts else Path(_node.layout.scripts)
         if not _scripts.exists():
             return False
@@ -536,11 +677,13 @@ def exec_scripts(
                 match step:
                     case FileDeployment():
                         log.debug(
+                            f"(machine) {_node.instance_name} "
                             f"(source) {step.source if hasattr(step, 'source') else ''} "
                             f"(target) {step.target if hasattr(step, 'target') else ''} "
                         )
                     case ScriptDeployment():
                         log.debug(
+                            f"(machine) {_node.instance_name} "
                             f"(exit) {step.exit_status if hasattr(step, 'exit_status') else 0} "
                             f"(out) {step.stdout if hasattr(step, 'stdout') else ''} "
                             f"(stderr) {step.stderr if hasattr(step, 'stderr') else ''}"
@@ -559,11 +702,9 @@ def exec_scripts(
                         log.debug(step)
         return True
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        func = partial(_exec_scripts, scripts=scripts)
-        results = [executor.submit(func, db.model_as_pickle(node)) for node in nodes]
-        wait(results, timeout=5)
-        return all([res.result() is True for res in results])
+    for node in nodes:
+        pool.spawn(_exec_scripts, node, scripts)
+    return pool.join()
 
 
 def _init(layout_model: t.Mapping[str, t.Any]) -> BaseProvisioner | None:
