@@ -372,7 +372,7 @@ class GCEProvisioner(BaseProvisioner):
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
     def create(self) -> list[MachineModel] | None:
-        image = self.image(self.layout.runs_on)
+        image = self.image_from_family(self.layout.runs_on)
         if not image and not self.layout.username:
             raise ProvisionException(
                 f"Could not locate AMI and/or username for: {self.layout.runs_on}"
@@ -400,7 +400,9 @@ class GCEProvisioner(BaseProvisioner):
             ]
         }
         if "windows" in self.layout.runs_on:
-            # Install ssh
+            # To get this to work, these custom metadata keys were also set project
+            # wide in google console
+            # https://cloud.google.com/compute/docs/connect/windows-ssh#startup-script
             ex_metadata["items"].append(
                 {
                     "key": "sysprep-specialize-script-cmd",
@@ -432,6 +434,7 @@ class GCEProvisioner(BaseProvisioner):
             ex_disk_size=100,
             ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
+        print(opts)
         _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         _machines = []
         for node in _nodes:
