@@ -378,6 +378,15 @@ class GCEProvisioner(BaseProvisioner):
                 },
             ]
         }
+        if "windows" in self.layout.runs_on:
+            # Install ssh
+            ex_metadata["items"].append(
+                {
+                    "key": "sysprep-specialize-script-cmd",
+                    "value": "googet -noconfirm=true install google-compute-engine-ssh",
+                }
+            )
+            ex_metadata["items"].append({"key": "enable-windows-ssh", "value": "TRUE"})
 
         if self.layout.ports:
             self.create_firewall(self.layout.name, self.layout.ports, self.layout.tags)
@@ -401,13 +410,15 @@ class GCEProvisioner(BaseProvisioner):
             ex_labels=self.layout.labels,
             ex_disk_type="pd-ssd",
             ex_disk_size=100,
-            ex_preemptible=os.environ.get("OGC_DISABLE_SPOT", True),
+            ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
         _nodes = self.provisioner.ex_create_multiple_nodes(**opts)  # type: ignore
         _machines = []
         for node in _nodes:
             if not hasattr(node, "id"):
-                raise ProvisionException(f"Failed to create node {node.name}: ({node.code}) {node.error}")
+                raise ProvisionException(
+                    f"Failed to create node {node.name}: ({node.code}) {node.error}"
+                )
             state_file_p = db.cache_path() / node.id
             state_file_p.write_bytes(db.model_as_pickle(node))
             machine = MachineModel(

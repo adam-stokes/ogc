@@ -7,6 +7,7 @@ from pathlib import Path
 
 import click
 import yaml
+from peewee import IntegrityError
 
 from ogc import db
 from ogc.commands.base import cli
@@ -16,9 +17,6 @@ from ogc.models import actions, layout, machine, tags
 from ogc.provision import BaseProvisioner
 
 dbi = db.connect()
-dbi.create_tables(
-    [machine.MachineModel, tags.TagModel, layout.LayoutModel, actions.ActionModel]
-)
 
 
 @click.group()
@@ -44,8 +42,16 @@ def _import(spec: Path) -> None:
     else:
         layouts_from_spec = yaml.safe_load(spec.read_text())
 
+    dbi.create_tables(
+        [machine.MachineModel, tags.TagModel, layout.LayoutModel, actions.ActionModel]
+    )
+
     for item in layouts_from_spec["layouts"]:
-        layout.LayoutModel.get_or_create(**item)
+        try:
+            layout.LayoutModel.get_or_create(**item)
+        except IntegrityError as exc:
+            log.error(f"Unable to import layout: {exc}")
+            sys.exit(1)
 
     for item in layout.LayoutModel.select():
         log.info(f"Added layout: {item.id}:{item.runs_on} - {item.tags}")
@@ -59,6 +65,9 @@ def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
     """Lists layouts"""
     log = get_logger("ogc.commands.layout.list")
     _layout: layout.LayoutModel = layout.LayoutModel.select().first()
+    if not _layout:
+        log.info("No layouts defined.")
+        return
     provisioner = BaseProvisioner.from_layout(layout=_layout, connect=False)
     opts = {}
     if tag:
@@ -70,6 +79,25 @@ def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
     ls_layouts(provisioner=provisioner, **opts)
 
 
+@click.command(help="Remove imported layouts")
+@click.option("--all", is_flag=True, help="Remove all layouts")
+@click.argument("name", type=str, metavar="name")
+def _rm(all: bool, name: str) -> None:
+    """Remove layouts layouts"""
+    log = get_logger("ogc.commands.layout.rm")
+    if all:
+        log.info("Removing all layouts")
+        layout.LayoutModel.delete().execute()
+    if name:
+        log.info(f"Removing {name} layout")
+        model = layout.LayoutModel.get_or_none(layout.LayoutModel.name == name)
+        if not model:
+            log.warning(f"Layout {name} doesn't exist.")
+            return
+        model.delete_instance()
+
+
 _layout.add_command(_import, name="import")
 _layout.add_command(_list, name="ls")
+_layout.add_command(_rm, name="rm")
 cli.add_command(_layout, name="layout")

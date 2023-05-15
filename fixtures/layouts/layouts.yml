@@ -22,7 +22,7 @@ layouts:
       team: "observability"
       project: "perf"
   - instance_size: e2-standard-4
-    name: ubuntu-ogc
+    name: ubuntu-2-ogc
     provider: google
     remote_path: /home/ubuntu/ogc
     runs_on: debian-10
@@ -45,7 +45,7 @@ layouts:
       team: "observability"
       project: "perf"      
   - instance_size: e2-standard-4
-    name: ubuntu-ogc
+    name: sles-ogc
     provider: google
     remote_path: /home/ubuntu/ogc
     runs_on: sles-12

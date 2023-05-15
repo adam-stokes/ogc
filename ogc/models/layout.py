@@ -52,7 +52,7 @@ class LayoutModel(BaseModel):
         table_name = "layouts"
 
     instance_size = CharField()
-    name = CharField()
+    name = CharField(unique=True)
     provider = CharField()
     remote_path = CharField()
     runs_on = CharField()
