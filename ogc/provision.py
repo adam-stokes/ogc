@@ -307,6 +307,7 @@ class GCEProvisioner(BaseProvisioner):
         _nodes = self.provisioner.ex_destroy_multiple_nodes(
             node_list=[node.state() for node in nodes], destroy_boot_disk=True
         )  # type: ignore
+        self.delete_firewall(str(self.layout.name))
         return all([node is True for node in _nodes])
 
     def setup(self) -> None:
