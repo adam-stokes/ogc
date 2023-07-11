@@ -5,12 +5,9 @@ from pathlib import Path
 
 import click
 
-from ogc import db
 from ogc.commands.base import cli
 from ogc.deployer import exec, exec_scripts
 from ogc.models import layout
-
-dbi = db.connect()
 
 
 @click.command(help="Execute command against machines")
@@ -19,7 +16,7 @@ dbi = db.connect()
 def _exec(tag: str, cmd: str) -> None:
     """Launches machines from layout specifications by tag"""
     _layouts: list[layout.LayoutModel] = [
-        _l for _l in layout.LayoutModel.select() if set(tag).intersection(_l.tags)
+        _l for _l in layout.LayoutModel.query() if set(tag).intersection(_l.tags)
     ]
     opts = {"cmd": cmd}
     if tag:
@@ -33,7 +30,7 @@ def _exec(tag: str, cmd: str) -> None:
 def _exec_scripts(tag: str, script_dir: Path) -> None:
     """Launches machines from layout specifications by tag"""
     _layouts: list[layout.LayoutModel] = [
-        _l for _l in layout.LayoutModel.select() if set(tag).intersection(_l.tags)
+        _l for _l in layout.LayoutModel.query() if set(tag).intersection(_l.tags)
     ]
     opts = {"scripts": script_dir}
     if tag:

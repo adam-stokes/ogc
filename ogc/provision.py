@@ -9,7 +9,7 @@ import typing as t
 import uuid
 from pathlib import Path
 
-from libcloud.common.google import ResourceNotFoundError
+from libcloud.common.google import InvalidRequestError, ResourceNotFoundError
 from libcloud.compute.base import (
     KeyPair,
     Node,
@@ -70,10 +70,9 @@ class BaseProvisioner:
         """Perform some provider specific cleanup after node destroy typically"""
         raise NotImplementedError()
 
-    def destroy(self, nodes: list[MachineModel]) -> bool:
+    def destroy(self, nodes: list[Node]) -> bool:
         for node in nodes:
-            if node.remote_state_file:
-                self.provisioner.destroy_node(node.state())
+            self.provisioner.destroy_node(node)
         return True
 
     def node(self, **kwargs: t.Mapping[str, t.Union[str, object]]) -> Node | None:
@@ -108,17 +107,12 @@ class BaseProvisioner:
         )[0][0]
         if not node.id:
             node.id = str(uuid.uuid4())
-        state_file_p = db.cache_path() / node.id
-        state_file_p.write_bytes(db.model_as_pickle(node))
+        cache = db.cache_path()
         machine = MachineModel(
             layout=self.layout,
-            instance_name=node.name,
-            instance_id=node.id,
-            instance_state=node.state,
-            public_ip=node.public_ips[0],
-            private_ip=node.private_ips[0],
-            remote_state_file=(db.cache_path() / node.id).resolve(),
+            node=node,
         )
+        cache[node.id] = db.model_as_pickle(machine)
         return machine
 
     def list_nodes(self, **kwargs: dict[str, object]) -> list[Node]:
@@ -250,8 +244,9 @@ class AWSProvisioner(BaseProvisioner):
 
         node = self.provisioner.create_node(**opts)  # type: ignore
         _machines = []
-        state_file_p = db.cache_path() / node.id
-        state_file_p.write_bytes(db.model_as_pickle(node))
+        machine_cache_p = db.cache_path() / node.id
+        node_state_p = Path(f"{machine_cache_p.resolve()}.state")
+        node_state_p.write_bytes(db.model_as_pickle(node))
         machine = MachineModel(
             layout=self.layout,
             instance_name=node.name,
@@ -259,9 +254,8 @@ class AWSProvisioner(BaseProvisioner):
             instance_state=node.state,
             public_ip=node.public_ips[0],
             private_ip=node.private_ips[0],
-            remote_state_file=(db.cache_path() / node.id).resolve(),
+            remote_state_file=node_state_p.resolve(),
         )
-        machine.save()
         _machines.append(machine)
         return _machines if _machines else None
 
@@ -297,15 +291,15 @@ class GCEProvisioner(BaseProvisioner):
             "datacenter": self.env.get("GOOGLE_DATACENTER", ""),
         }
 
-    # @retry(tries=5, logger=None)
+    @retry(tries=5, logger=None)
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
         log.debug(f"Establing provider connection...{gce} - {self.options}")
         return gce(**self.options)
 
-    def destroy(self, nodes: list[MachineModel]) -> bool:
+    def destroy(self, nodes: list[Node]) -> bool:
         _nodes = self.provisioner.ex_destroy_multiple_nodes(
-            node_list=[node.state() for node in nodes], destroy_boot_disk=True
+            node_list=[node for node in nodes], destroy_boot_disk=True
         )  # type: ignore
         self.delete_firewall(str(self.layout.name))
         return all([node is True for node in _nodes])
@@ -358,7 +352,7 @@ class GCEProvisioner(BaseProvisioner):
         try:
             self.provisioner.ex_get_firewall(name)  # type: ignore
         except ResourceNotFoundError:
-            log.warning("No firewall found, will create one to attach nodes to.")
+            log.warning(f"No firewall found, will create {name} to attach nodes to.")
             self.provisioner.ex_create_firewall(  # type: ignore
                 name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
             )
@@ -367,12 +361,14 @@ class GCEProvisioner(BaseProvisioner):
         try:
             self.provisioner.ex_destroy_firewall(self.provisioner.ex_get_firewall(name))  # type: ignore
         except ResourceNotFoundError:
-            log.error(f"Unable to delete firewall {name}")
+            log.error(f"Could not find firewall {name} to delete, will retry")
+        except InvalidRequestError as e:
+            log.error(f"Error deleting firewall {name}: {e}")
 
     def list_firewalls(self) -> list[str]:
         return self.provisioner.ex_list_firewalls()  # type: ignore
 
-    def create(self) -> list[MachineModel] | None:
+    def create(self) -> None:
         image = self.image_from_family(self.layout.runs_on)
         if not image and not self.layout.username:
             raise ProvisionException(
@@ -435,28 +431,19 @@ class GCEProvisioner(BaseProvisioner):
             ex_disk_size=100,
             ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
-        print(opts)
         _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
-        _machines = []
         for node in _nodes:
             if not hasattr(node, "id"):
                 raise ProvisionException(
                     f"Failed to create node {node.name}: ({node.code}) {node.error}"
                 )
-            state_file_p = db.cache_path() / node.id
-            state_file_p.write_bytes(db.model_as_pickle(node))
+            cache = db.cache_path()
             machine = MachineModel(
                 layout=self.layout,
-                instance_name=node.name,
-                instance_id=node.id,
-                instance_state=node.state,
-                public_ip=node.public_ips[0],
-                private_ip=node.private_ips[0],
-                remote_state_file=(db.cache_path() / node.id).resolve(),
+                node=node,
             )
-            machine.save()
-            _machines.append(machine)
-        return _machines
+            cache[node.id] = db.model_as_pickle(machine)
+        return None
 
     def node(self, **kwargs: dict[str, object]) -> Node | None:
         _nodes = self.provisioner.list_nodes()

@@ -1,14 +1,15 @@
 """Layout model"""
 from __future__ import annotations
 
-# from attr import define, field
-from peewee import CharField, IntegerField
-from playhouse.sqlite_ext import JSONField
+import uuid
 
-from . import BaseModel
+from attr import define, field
+
+from ogc import db
 
 
-class LayoutModel(BaseModel):
+@define
+class LayoutModel:
     """Layout Model
 
     Synopsis:
@@ -48,23 +49,44 @@ class LayoutModel(BaseModel):
         ```
     """
 
-    class Meta:
-        table_name = "layouts"
+    instance_size: str = field()
+    name: str = field()
+    provider: str = field()
+    remote_path: str = field()
+    runs_on: str = field()
+    scale: int = field()
+    scripts: str = field()
+    username: str = field()
+    ssh_private_key: str = field()
+    ssh_public_key: str = field()
+    tags: list[str] = field()
+    labels: dict = field()
+    ports: dict = field()
+    id: str = field()
 
-    instance_size = CharField()
-    name = CharField(unique=True)
-    provider = CharField()
-    remote_path = CharField()
-    runs_on = CharField()
-    scale = IntegerField()
-    scripts = CharField()
-    username = CharField()
-    ssh_private_key = CharField()
-    ssh_public_key = CharField()
-    tags = JSONField(null=True)
-    labels = JSONField()
-    ports = JSONField()
-    arch = CharField(null=True)
-    exclude = CharField(null=True)
-    extra = JSONField(null=True)
-    include = CharField(null=True)
+    @classmethod
+    def create_from_specs(cls, specs: list) -> None:
+        """Creates layout objects from spec file"""
+        cache = db.cache_layout_path()
+        for spec in specs:
+            uid = str(uuid.uuid4())[:8]
+            spec["id"] = uid
+            layout = LayoutModel(**spec)
+            cache[uid] = db.model_as_pickle(layout)
+
+    @classmethod
+    def query(cls, **kwargs: str) -> list[LayoutModel]:
+        """list layouts"""
+        cache = db.cache_layout_path()
+        _layouts = [
+            db.pickle_to_model(cache.get(layout)) for layout in cache.iterkeys()
+        ]
+        _filtered_layouts = []
+        if kwargs:
+            for k, v in kwargs.items():
+                for _layout in _layouts:
+                    if getattr(_layout, k) == v:
+                        _filtered_layouts.append(_layout)
+        if _filtered_layouts:
+            return _filtered_layouts
+        return _layouts

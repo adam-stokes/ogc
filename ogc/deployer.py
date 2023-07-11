@@ -16,6 +16,7 @@ from pathlib import Path
 import arrow
 import sh
 import yaml
+from attrs import asdict, fields, filters
 from gevent.pool import Pool
 from libcloud.compute.deployment import (
     Deployment,
@@ -27,7 +28,6 @@ from mako.lookup import TemplateLookup
 from mako.template import Template
 from pampy import _
 from pampy import match as pmatch
-from playhouse.shortcuts import model_to_dict
 from rich.table import Table
 
 from ogc import signals
@@ -103,19 +103,23 @@ def filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
         pmatch(
             kwargs,
             {"instance_id": _},
-            lambda x: [MachineModel.get_or_none(MachineModel.instance_id == x)],
+            lambda x: [
+                node for node in MachineModel.query() if x and x == node.node.id
+            ],
             {"instance_name": _},
-            lambda x: [MachineModel.get_or_none(MachineModel.instance_name == x)],
+            lambda x: [
+                node for node in MachineModel.query() if x and x == node.node.name
+            ],
             {"limit": _},
-            lambda x: [node for node in MachineModel.select().limit(x)],
+            lambda x: [node for node in MachineModel.query()[:x]],
             {"tag": _},
             lambda x: [
                 node
-                for node in MachineModel.select()
+                for node in MachineModel.query()
                 if x and set(x).intersection(node.layout.tags)
             ],
             _,
-            [node for node in MachineModel.select()],
+            [node for node in MachineModel.query()],
         ),
     )
 
@@ -124,7 +128,7 @@ def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
     """Filters layouts
 
     Args:
-        kwargs: Machine filter options
+        kwargs: Layout filter options
 
     Returns:
         List of layouts
@@ -134,19 +138,17 @@ def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
         pmatch(
             kwargs,
             {"name": _},
-            lambda x: [LayoutModel.get_or_none(LayoutModel.name == x)],
-            {"id": _},
-            lambda x: [MachineModel.get_or_none(MachineModel.id == x)],
+            lambda x: [LayoutModel.query(name=x)],
             {"limit": _},
-            lambda x: [layout for layout in LayoutModel.select().limit(x)],
+            lambda x: [layout for layout in LayoutModel.query()[:x]],
             {"tag": _},
             lambda x: [
                 layout
-                for layout in LayoutModel.select()
+                for layout in LayoutModel.query()
                 if x and set(x).intersection(layout.tags)
             ],
             _,
-            [layout for layout in LayoutModel.select()],
+            [layout for layout in LayoutModel.query()],
         ),
     )
 
@@ -182,7 +184,7 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
                 "UserKnownHostsFile=/dev/null",
                 "-i",
                 Path(machine.layout.ssh_private_key).expanduser(),
-                f"{machine.layout.username}@{machine.public_ip}",
+                f"{machine.layout.username}@{machine.node.public_ips[0]}",
             ]
 
             sh.ssh(cmd, _fg=True, _env=os.environ.copy())  # type: ignore
@@ -249,9 +251,6 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
     if not exec(provisioner, **kwargs):
         log.debug("Could not run teardown script")
     provisioner.destroy(nodes=nodes)
-    for machine in nodes:
-        log.info(f"Deleting data for {machine.instance_name}")
-        machine.delete_instance()
     return True
 
 
@@ -356,12 +355,22 @@ def ls(
     """
 
     def ui_nodes_yaml(nodes: list[MachineModel]) -> None:
-        con.out(yaml.safe_dump([model_to_dict(node) for node in nodes]))
+        con.out(
+            yaml.safe_dump(
+                [
+                    asdict(node, filter=filters.exclude(fields(MachineModel).node, int))
+                    for node in nodes
+                ]
+            )
+        )
 
     def ui_nodes_json(nodes: list[MachineModel]) -> None:
         con.out(
             json.dumps(
-                [model_to_dict(node) for node in nodes],
+                [
+                    asdict(node, filter=filters.exclude(fields(MachineModel).node, int))
+                    for node in nodes
+                ],
                 skipkeys=True,
                 default=str,
                 indent=2,
@@ -393,15 +402,15 @@ def ls(
 
         for data in rows:
             table.add_row(
-                data.instance_id,
-                data.instance_name,
+                data.node.id,
+                data.node.name,
                 arrow.get(data.created).humanize(),
-                data.instance_state,
+                data.node.state,
                 ",".join(
                     [f"[purple]{k}[/]={v}" for k, v in data.layout.labels.items()]
                 ),
                 ",".join([f"[purple]{tag}[/]" for tag in data.layout.tags]),
-                f"ssh -i {Path(data.layout.ssh_private_key).expanduser()} {data.layout.username}@{data.public_ip}",
+                f"ssh -i {Path(data.layout.ssh_private_key).expanduser()} {data.layout.username}@{data.node.public_ips[0]}",
             )
 
         con.print(table, justify="center")
@@ -454,12 +463,12 @@ def ls_layouts(
     """
 
     def ui_layouts_yaml(layouts: list[LayoutModel]) -> None:
-        con.print(yaml.safe_dump([model_to_dict(layout) for layout in layouts]))
+        con.print(yaml.safe_dump([asdict(layout) for layout in layouts]))
 
     def ui_layouts_json(layouts: list[LayoutModel]) -> None:
         con.print(
             json.dumps(
-                [model_to_dict(layout) for layout in layouts],
+                [asdict(layout) for layout in layouts],
                 skipkeys=True,
                 default=str,
                 indent=2,
@@ -480,14 +489,14 @@ def ls_layouts(
             show_lines=True,
         )
 
-        for key in model_to_dict(rows[0]).keys():
+        for key in asdict(rows[0]).keys():
             table.add_column(key.lower())
 
         for data in rows:
             data.ports = ",".join(data.ports)
             data.tags = ",".join(data.tags)
             data.labels = ",".join(data.labels)
-            item = [str(i) for i in model_to_dict(data).values()]
+            item = [str(i) for i in asdict(data).values()]
             table.add_row(*item)
 
         con.print(table, justify="center")
@@ -548,7 +557,7 @@ def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
             "UserKnownHostsFile=/dev/null",
             "-i",
             str(Path(_node.layout.ssh_private_key).expanduser()),
-            f"{_node.layout.username}@{_node.public_ip}",
+            f"{_node.layout.username}@{_node.node.public_ips[0]}",
         ]
         cmd_opts.append(cmd)
         return_status = None
@@ -568,16 +577,17 @@ def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
                 cmd=str(e.full_cmd),
             )
         if return_status:
-            return_status.update({"machine": _node.instance_name})
+            return_status.update({"machine": _node.node.name})
             log.debug(return_status)
+
             action = ActionModel(
                 machine=_node,
-                exit_code=return_status["exit_code"],
-                out=return_status["out"],
-                err=return_status["error"],
+                exit_code=int(return_status["exit_code"]),
+                out=str(return_status["out"]),
+                err=str(return_status["error"]),
                 cmd=str(return_status["cmd"]),
             )
-            action.save()
+            log.info(action)
             return bool(return_status["exit_code"] == 0)
         return False
 
@@ -649,7 +659,7 @@ def exec_scripts(
         context = Ctx(
             env=os.environ.copy(),
             node=_node,
-            nodes=[node for node in MachineModel.select()],
+            nodes=[node for node in MachineModel.query()],
         )
         steps: list[Deployment] = [
             ScriptDeployment(script=render(s, context), name=s.name)
@@ -670,20 +680,20 @@ def exec_scripts(
             msd = MultiStepDeployment(steps)
             ssh_client = _node.ssh()
             if ssh_client:
-                node_state = _node.state()
+                node_state = _node.node
                 if node_state:
                     msd.run(node_state, ssh_client)
             for step in msd.steps:
                 match step:
                     case FileDeployment():
                         log.debug(
-                            f"(machine) {_node.instance_name} "
+                            f"(machine) {_node.node.name} "
                             f"(source) {step.source if hasattr(step, 'source') else ''} "
                             f"(target) {step.target if hasattr(step, 'target') else ''} "
                         )
                     case ScriptDeployment():
                         log.debug(
-                            f"(machine) {_node.instance_name} "
+                            f"(machine) {_node.node.name} "
                             f"(exit) {step.exit_status if hasattr(step, 'exit_status') else 0} "
                             f"(out) {step.stdout if hasattr(step, 'stdout') else ''} "
                             f"(stderr) {step.stderr if hasattr(step, 'stderr') else ''}"
@@ -697,7 +707,7 @@ def exec_scripts(
                             err=step.stderr if hasattr(step, "stderr") else "",
                             cmd=f"{step.script} {step.args}",
                         )
-                        action.save()
+                        log.info(action)
                     case _:
                         log.debug(step)
         return True

@@ -2,21 +2,19 @@
 from __future__ import annotations
 
 import io
+import shutil
 import sys
 from pathlib import Path
 
 import click
 import yaml
-from peewee import IntegrityError
 
 from ogc import db
 from ogc.commands.base import cli
 from ogc.deployer import ls_layouts
 from ogc.log import get_logger
-from ogc.models import actions, layout, machine, tags
+from ogc.models import layout
 from ogc.provision import BaseProvisioner
-
-dbi = db.connect()
 
 
 @click.group()
@@ -42,19 +40,8 @@ def _import(spec: Path) -> None:
     else:
         layouts_from_spec = yaml.safe_load(spec.read_text())
 
-    dbi.create_tables(
-        [machine.MachineModel, tags.TagModel, layout.LayoutModel, actions.ActionModel]
-    )
-
-    for item in layouts_from_spec["layouts"]:
-        try:
-            layout.LayoutModel.get_or_create(**item)
-        except IntegrityError as exc:
-            log.error(f"Unable to import layout: {exc}")
-            sys.exit(1)
-
-    for item in layout.LayoutModel.select():
-        log.info(f"Added layout: {item.id}:{item.runs_on} - {item.tags}")
+    log.info(f"Adding {len(layouts_from_spec['layouts'])} layout(s) to cache.")
+    layout.LayoutModel.create_from_specs(specs=layouts_from_spec["layouts"])
 
 
 @click.command(help="List imported layouts")
@@ -64,11 +51,11 @@ def _import(spec: Path) -> None:
 def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
     """Lists layouts"""
     log = get_logger("ogc.commands.layout.list")
-    _layout: layout.LayoutModel = layout.LayoutModel.select().first()
+    _layout: list[layout.LayoutModel] = layout.LayoutModel.query()
     if not _layout:
         log.info("No layouts defined.")
         return
-    provisioner = BaseProvisioner.from_layout(layout=_layout, connect=False)
+    provisioner = BaseProvisioner.from_layout(layout=_layout[0], connect=False)
     opts = {}
     if tag:
         opts.update({"tag": tag})
@@ -85,16 +72,18 @@ def _list(as_yaml: bool, as_json: bool, tag: str) -> None:
 def _rm(all: bool, name: str) -> None:
     """Remove layouts layouts"""
     log = get_logger("ogc.commands.layout.rm")
+    cache = db.cache_layout_path()
     if all:
         log.info("Removing all layouts")
-        layout.LayoutModel.delete().execute()
+        cache.clear()
+
     if name:
         log.info(f"Removing {name[0]} layout")
-        model = layout.LayoutModel.get_or_none(layout.LayoutModel.name == name[0])
+        model = layout.LayoutModel.query(name=name)[0]
+        cache.delete(model.id)
         if not model:
             log.warning(f"Layout {name} doesn't exist.")
             return
-        model.delete_instance()
 
 
 _layout.add_command(_import, name="import")

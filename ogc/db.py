@@ -4,7 +4,7 @@ import typing as t
 from pathlib import Path
 
 import dill
-from playhouse.sqlite_ext import SqliteExtDatabase
+from diskcache import Cache
 
 from ogc.log import get_logger
 
@@ -24,21 +24,13 @@ def pickle_to_model(obj: bytes) -> t.Any:
     return dill.loads(obj)
 
 
-def connect() -> SqliteExtDatabase:
-    """Get the associated database file
-
-    Returns:
-        Connection to sqlite database
-    """
-    p = Path(__file__).cwd() / ".ogc-cache"
-    p.mkdir(parents=True, exist_ok=True)
-    return SqliteExtDatabase(
-        str(p / "data.db"), pragmas=(("journal_mode", "wal"), ("foreign_keys", 1))
-    )
-
-
-def cache_path() -> Path:
+def cache_path() -> Cache:
     """Returns where to store files"""
     p = Path(__file__).cwd() / ".ogc-cache/nodes"
-    p.mkdir(parents=True, exist_ok=True)
-    return p
+    return Cache(directory=p, size=2**30)
+
+
+def cache_layout_path() -> Cache:
+    """Where machines are stored"""
+    p = Path(__file__).cwd() / ".ogc-cache/layouts"
+    return Cache(directory=p, size=2**30)

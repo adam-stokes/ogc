@@ -4,9 +4,9 @@
 <%namespace name="utils" file="/functions.mako"/>
 
 ${header('Connection information')}
-echo "id: ${node.instance_id}"
-echo "name: ${node.instance_name}"
-echo "connection: ${node.layout.username}@${node.public_ip}"
+echo "id: ${node.node.id}"
+echo "name: ${node.node.name}"
+echo "connection: ${node.layout.username}@${node.node.public_ips[0]}"
 echo "provider ${node.layout.provider}"
 ${hr()}
 
@@ -15,9 +15,9 @@ ${run('ls', '/', l=True, h=True)}
 
 ${header('All nodes')}
 % for obj in nodes:
-echo "id: ${obj.instance_id}"
-echo "name: ${obj.instance_name}"
-echo "connection: ${obj.layout.username}@${obj.public_ip}"
+echo "id: ${obj.node.id}"
+echo "name: ${obj.node.name}"
+echo "connection: ${obj.layout.username}@${obj.node.public_ips[0]}"
 echo "provider ${obj.layout.provider}"
 % endfor
 ${header('All nodes finished')}
