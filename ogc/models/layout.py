@@ -69,7 +69,7 @@ class LayoutModel:
         """Creates layout objects from spec file"""
         cache = db.cache_layout_path()
         for spec in specs:
-            uid = str(uuid.uuid4())[:8]
+            uid = str(uuid.uuid4())
             spec["id"] = uid
             layout = LayoutModel(**spec)
             cache[uid] = db.model_as_pickle(layout)
