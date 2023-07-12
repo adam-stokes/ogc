@@ -429,7 +429,7 @@ class GCEProvisioner(BaseProvisioner):
             self.layout.tags.append("environment-ogc")
             self.layout.tags.append("repo-ogc")
 
-        suffix = str(uuid.uuid4())[:4]
+        suffix = str(uuid.uuid4())[:8]
         opts = dict(
             name=f"ogc-{self.layout.name}-{suffix}",
             size=size,
@@ -441,7 +441,14 @@ class GCEProvisioner(BaseProvisioner):
             ex_disk_size=100,
             ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
-        _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
+        try:
+            _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
+        except ResourceNotFoundError:
+            log.error("Failed to create node", exc_info=True)
+            # Usually a name clash
+            suffix = str(uuid.uuid4())[:8]
+            opts["name"] = f"ogc-{self.layout.name}-{suffix}"
+            _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         if not _nodes:
             log.error("Could not create nodes")
         for node in _nodes:
