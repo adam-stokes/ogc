@@ -442,9 +442,11 @@ class GCEProvisioner(BaseProvisioner):
             ex_preemptible=os.environ.get("OGC_ENABLE_SPOT", False),
         )
         _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
+        if not _nodes:
+            log.error("Could not create nodes")
         for node in _nodes:
             if not hasattr(node, "id"):
-                raise ProvisionException(
+                log.error(
                     f"Failed to create node {node.name}: ({node.code}) {node.error}"
                 )
             cache = db.cache_path()

@@ -213,8 +213,12 @@ def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
 
     def _up_async(layout: LayoutModel) -> None:
         provisioner = BaseProvisioner.from_layout(layout=layout)
-        provisioner.setup()
-        provisioner.create()
+        try:
+            provisioner.setup()
+            provisioner.create()
+        except Exception:
+            log.error("Could not bring up instance", exc_info=True)
+            sys.exit(1)
 
     for layout in layouts:
         pool.spawn(_up_async, layout)
