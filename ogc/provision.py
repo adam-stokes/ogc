@@ -294,8 +294,18 @@ class GCEProvisioner(BaseProvisioner):
     @retry(tries=5, logger=None)
     def connect(self) -> NodeDriver:
         gce = get_driver(Provider.GCE)
-        log.debug(f"Establing provider connection...{gce} - {self.options}")
-        return gce(**self.options)
+
+        driver = gce(**self.options)
+        try:
+            _has_locations = driver.list_locations()
+            if not _has_locations:
+                log.error("Could not connect to provider.")
+        except Exception:
+            log.error("could not connect", exc_info=True)
+        log.debug(
+            f"Establing provider connection {self.options['user_id']} / {self.options['project']} / {self.options['datacenter']}"
+        )
+        return driver
 
     def destroy(self, nodes: list[Node]) -> bool:
         _nodes = self.provisioner.ex_destroy_multiple_nodes(
