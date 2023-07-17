@@ -34,6 +34,7 @@ pyyaml = "*"
 gevent = "*"
 diskcache = "*"
 pytest = "^7.4.0"
+greenlet = "2.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
