@@ -7,7 +7,7 @@ from multiprocessing import cpu_count
 import click
 from gevent.pool import Pool
 
-from ogc import db
+from ogc import db, fs
 from ogc.commands.base import cli
 from ogc.log import get_logger
 from ogc.models import machine
@@ -26,7 +26,9 @@ def down(tag: str) -> None:
     """Destroys machines from layout specifications by tag"""
 
     def _down_async(machine: machine.MachineModel) -> None:
-        provisioner = BaseProvisioner.from_layout(layout=machine.layout)
+        provisioner = BaseProvisioner.from_layout(
+            layout=machine.layout, connect=not bool(fs.gcloud())
+        )
         provisioner.destroy([machine.node])
 
     cache_nodes = db.cache_path()

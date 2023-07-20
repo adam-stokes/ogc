@@ -1,5 +1,8 @@
 FROM python:3.11-slim-buster as base
 
+COPY --from=gcr.io/google.com/cloudsdktool/google-cloud-cli:latest /usr/bin/gcloud /usr/bin/
+COPY --from=gcr.io/google.com/cloudsdktool/google-cloud-cli:latest /usr/lib/google-cloud-sdk/lib /usr/lib/
+
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONUNBUFFERED=1
@@ -22,7 +25,7 @@ from base as builder
 ENV PIP_DEFAULT_TIMEOUT=100 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
-    POETRY_VERSION=1.4.2 \
+    POETRY_VERSION=1.5.1 \
     DEBIAN_FRONTEND=noninteractive
 RUN pip --no-cache-dir install wheel poetry==$POETRY_VERSION
 RUN python -m venv /venv

@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import datetime
 import os
+import shutil
+import subprocess
 import typing as t
 import uuid
 from pathlib import Path
@@ -27,7 +29,7 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry import retry
 
-from ogc import db, signals
+from ogc import db, fs, signals
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import get_logger
@@ -287,6 +289,11 @@ class GCEProvisioner(BaseProvisioner):
     """
 
     @property
+    def __gcloud_opts(self) -> list[str]:
+        """global opts passed to gcloud"""
+        return ["-q", f"--zone={self.options['datacenter']}", "--format=json"]
+
+    @property
     def options(self) -> t.Mapping[str, str]:
         return {
             "user_id": self.env.get("GOOGLE_APPLICATION_SERVICE_ACCOUNT", ""),
@@ -311,8 +318,28 @@ class GCEProvisioner(BaseProvisioner):
         return driver
 
     def destroy(self, nodes: list[Node]) -> bool:
+        node = nodes[0]
+        if _gcloud := fs.gcloud():
+            cmd = [
+                _gcloud,
+                "compute",
+                "instances",
+                "delete",
+                node.name,
+            ] + self.__gcloud_opts
+            result = subprocess.run(
+                cmd,
+                check=False,
+                shell=False,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                env=os.environ.copy(),
+            )
+            log.info(result)
+            return result.returncode == 0
+
         _nodes = self.provisioner.ex_destroy_multiple_nodes(
-            node_list=[node for node in nodes], destroy_boot_disk=True
+            node_list=[node], destroy_boot_disk=True
         )  # type: ignore
         self.delete_firewall(str(self.layout.name))
         return all([node is True for node in _nodes])
@@ -439,7 +466,7 @@ class GCEProvisioner(BaseProvisioner):
 
         suffix = str(uuid.uuid4())[:8]
         opts = dict(
-            name=f"ogc-{self.layout.name}-{suffix}",
+            name=f"{self.layout.name}-{suffix}",
             size=size,
             image=self.image_from_family(self.layout.runs_on),
             ex_metadata=ex_metadata,
@@ -455,7 +482,7 @@ class GCEProvisioner(BaseProvisioner):
             log.error("Failed to create node", exc_info=True)
             # Usually a name clash
             suffix = str(uuid.uuid4())[:8]
-            opts["name"] = f"ogc-{self.layout.name}-{suffix}"
+            opts["name"] = f"{self.layout.name}-{suffix}"
             _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         if not _nodes:
             log.error("Could not create nodes")

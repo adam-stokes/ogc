@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path as Path_
+
+
+def gcloud() -> str | None:
+    """return path to gcloud"""
+    return shutil.which("gcloud")
 
 
 def ensure_cache_dir() -> Path_:
