@@ -27,7 +27,7 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry import retry
 
-from ogc import db, signals
+from ogc import db
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
 from ogc.log import get_logger
@@ -439,7 +439,7 @@ class GCEProvisioner(BaseProvisioner):
 
         suffix = str(uuid.uuid4())[:8]
         opts = dict(
-            name=f"ogc-{self.layout.name}-{suffix}",
+            name=f"{self.layout.name}-{suffix}",
             size=size,
             image=self.image_from_family(self.layout.runs_on),
             ex_metadata=ex_metadata,
@@ -455,7 +455,7 @@ class GCEProvisioner(BaseProvisioner):
             log.error("Failed to create node", exc_info=True)
             # Usually a name clash
             suffix = str(uuid.uuid4())[:8]
-            opts["name"] = f"ogc-{self.layout.name}-{suffix}"
+            opts["name"] = f"{self.layout.name}-{suffix}"
             _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         if not _nodes:
             log.error("Could not create nodes")
@@ -482,14 +482,3 @@ class GCEProvisioner(BaseProvisioner):
 
     def __str__(self) -> str:
         return f"<GCEProvisioner [{self.options['datacenter']}]>"
-
-
-@signals.init.connect
-def choose_provisioner(
-    layout: LayoutModel,
-) -> BaseProvisioner:
-    choices = {"aws": AWSProvisioner, "google": GCEProvisioner}
-    provisioner: t.Type[BaseProvisioner] = choices[str(layout.provider)]
-    p = provisioner(layout=layout)
-    p.connect()
-    return p

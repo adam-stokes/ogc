@@ -30,7 +30,6 @@ from pampy import _
 from pampy import match as pmatch
 from rich.table import Table
 
-from ogc import signals
 from ogc.log import CONSOLE as con
 from ogc.log import get_logger
 from ogc.models.actions import ActionModel
@@ -153,11 +152,6 @@ def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
     )
 
 
-@signals.ssh.connect
-def ssh_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
-    return ssh(provisioner, **kwargs)
-
-
 def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     """Opens SSH connection to a machine
 
@@ -193,12 +187,6 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     sys.exit(1)
 
 
-@signals.up.connect
-def up_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
-    """Signal hook for bringing up deployment"""
-    return up(provisioner, **kwargs)
-
-
 def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
     """Bring up machines
 
@@ -223,11 +211,6 @@ def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
         pool.spawn(_up_async, layout)
     pool.join()
     return True
-
-
-@signals.down.connect
-def down_hook(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
-    return down(provisioner, **kwargs)
 
 
 def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
@@ -255,13 +238,6 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
         log.debug("Could not run teardown script")
     provisioner.destroy(nodes=nodes)
     return True
-
-
-@signals.ls.connect
-def ls_hook(
-    provisioner: BaseProvisioner, **kwargs: MachineOpts
-) -> list[MachineModel] | None:
-    return ls(provisioner, **kwargs)
 
 
 def ls(
@@ -515,11 +491,6 @@ def ls_layouts(
     return layouts if layouts else None
 
 
-@signals.exec.connect
-def exec_hook(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
-    return exec(layouts, **kwargs)
-
-
 def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
     """Execute commands on node(s)
 
@@ -599,14 +570,6 @@ def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
             pool.spawn(_exec, node, cmd)
         return bool(pool.join())
     return False
-
-
-@signals.exec_scripts.connect
-def exec_scripts_hook(
-    layouts: list[LayoutModel],
-    **kwargs: MachineOpts,
-) -> bool:
-    return exec_scripts(layouts, **kwargs)
 
 
 def exec_scripts(
@@ -718,16 +681,3 @@ def exec_scripts(
     for node in nodes:
         pool.spawn(_exec_scripts, node, scripts)
     return pool.join()
-
-
-def _init(layout_model: t.Mapping[str, t.Any]) -> BaseProvisioner | None:
-    """Loads deployment, kicks off signal dispatch"""
-    provisioner: BaseProvisioner
-    layout, _ = LayoutModel.get_or_create(**layout_model)
-    provisioner = signals.init.send(layout)
-    if provisioner:
-        return provisioner
-    return None
-
-
-init = partial(_init)

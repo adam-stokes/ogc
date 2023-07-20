@@ -90,7 +90,6 @@ nav:
         - 'ogc.deployer': 'developer-guide/api/deployer.md'
         - 'ogc.db': 'developer-guide/api/db.md'
         - 'ogc.fs': 'developer-guide/api/fs.md'
-        - 'ogc.loader': 'developer-guide/api/loader.md'
         - 'ogc.provision': 'developer-guide/api/provision.md'
         - 'ogc.templatetags': 'developer-guide/api/templatetags.md'
         - 'ogc.models.actions': 'developer-guide/api/models/actions.md'
