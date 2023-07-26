@@ -56,6 +56,19 @@ class BaseProvisioner:
             _prov.provisioner = _prov.connect()
         return _prov
 
+    @classmethod
+    def from_machine(
+        cls, machine: MachineModel, connect: bool = True
+    ) -> BaseProvisioner:
+        _prov = (
+            GCEProvisioner(layout=machine.layout)
+            if machine.layout.provider == "google"
+            else AWSProvisioner(layout=machine.layout)
+        )
+        if connect:
+            _prov.provisioner = _prov.connect()
+        return _prov
+
     @property
     def options(self) -> t.Mapping[str, str]:
         raise NotImplementedError()

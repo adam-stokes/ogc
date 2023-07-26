@@ -34,6 +34,7 @@ gevent = "*"
 diskcache = "*"
 pytest = "^7.4.0"
 greenlet = "2.0.1"
+magicattr = "^0.1.6"
 
 
 [tool.poetry.group.dev.dependencies]

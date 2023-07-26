@@ -4,11 +4,13 @@ import typing as t
 from pathlib import Path
 
 import dill
+import magicattr
 from diskcache import Cache
 
 from ogc.log import get_logger
+from ogc.models.machine import MachineModel
 
-log = get_logger("ogc")
+log = get_logger("ogc.db")
 
 dill.settings["recurse"] = True
 
@@ -30,7 +32,23 @@ def cache_path() -> Cache:
     return Cache(directory=p, size=2**30)
 
 
-def cache_layout_path() -> Cache:
-    """Where machines are stored"""
-    p = Path(__file__).cwd() / ".ogc-cache/layouts"
-    return Cache(directory=p, size=2**30)
+def query(**kwargs: str) -> list[MachineModel] | None:
+    """list machines"""
+    cache = cache_path()
+    _machines = [pickle_to_model(cache.get(machine)) for machine in cache.iterkeys()]
+
+    if not kwargs:
+        return _machines
+
+    _filtered_machines = []
+
+    for _machine in _machines:
+        for k, v in kwargs.items():
+            try:
+                if magicattr.get(_machine, str(k)) == v:
+                    _filtered_machines.append(_machine)
+            except AttributeError as exc:
+                log.error(f"Missing attribute: {exc}")
+    if _filtered_machines:
+        return _filtered_machines
+    return None

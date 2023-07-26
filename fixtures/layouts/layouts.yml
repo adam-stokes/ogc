@@ -5,7 +5,6 @@ layouts:
     remote_path: /home/ubuntu/ogc
     runs_on: debian-11
     scale: 1
-    scripts: "fixtures/ex_deploy_ubuntu"
     username: "ubuntu"
     ssh_private_key: ~/.ssh/id_rsa_libcloud
     ssh_public_key: ~/.ssh/id_rsa_libcloud.pub

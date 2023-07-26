@@ -9,7 +9,6 @@ import os
 import sys
 import tempfile
 import typing as t
-from functools import partial
 from multiprocessing import cpu_count
 from pathlib import Path
 
@@ -30,6 +29,7 @@ from pampy import _
 from pampy import match as pmatch
 from rich.table import Table
 
+from ogc import db
 from ogc.log import CONSOLE as con
 from ogc.log import get_logger
 from ogc.models.actions import ActionModel
@@ -86,9 +86,11 @@ class MachineOpts(t.TypedDict):
     instance_name: t.NotRequired[str]
     limit: t.NotRequired[int]
     tag: t.NotRequired[str]
+    yaml: t.NotRequired[bool]
+    json: t.NotRequired[bool]
 
 
-def filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
+def filter_machines(**kwargs: MachineOpts) -> list[MachineModel] | None:
     """Filters machines by instance_id or all if none is provided
 
     Args:
@@ -97,30 +99,10 @@ def filter_machines(**kwargs: MachineOpts) -> list[MachineModel]:
     Returns:
         List of machines
     """
-    return t.cast(
-        list[MachineModel],
-        pmatch(
-            kwargs,
-            {"instance_id": _},
-            lambda x: [
-                node for node in MachineModel.query() if x and x == node.node.id
-            ],
-            {"instance_name": _},
-            lambda x: [
-                node for node in MachineModel.query() if x and x == node.node.name
-            ],
-            {"limit": _},
-            lambda x: [node for node in MachineModel.query()[:x]],
-            {"tag": _},
-            lambda x: [
-                node
-                for node in MachineModel.query()
-                if x and set(x).intersection(node.layout.tags)
-            ],
-            _,
-            [node for node in MachineModel.query()],
-        ),
-    )
+    results = db.query(**kwargs)
+    if not results:
+        return None
+    return results
 
 
 def filter_layouts(**kwargs: MachineOpts) -> list[LayoutModel]:
@@ -241,93 +223,21 @@ def down(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> bool:
 
 
 def ls(
-    provisioner: BaseProvisioner, **kwargs: MachineOpts
+    output_format: str = "table", **kwargs: MachineOpts
 ) -> list[MachineModel] | None:
     """Return a list of machines for deployment
 
     Pass in a mapping of options to filter machines
 
     Args:
-        provisioner: Provisioner
         kwargs: Mapping of options to pass to `ls`
 
     Additional Options:
 
         |Key|Value|
         |---|-----|
-        | output_file | Where to store status output, filename can end with .html or .svg |
-        | yaml | Output as YAML |
-        | suppress_output | Whether to print out the table or just return results |
+        | output_format | table, yaml, json, suppress_output
 
-    Example:
-        ``` bash
-        > ogc ubuntu.py ls -v -o limit=8
-        ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃ ID                             ┃ Name                                 ┃ Created            ┃ Status       ┃ Labels                                                                                      ┃ Connection                                                                                   ┃
-        ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-        │ 5407368969918077947            │ ogc-ubuntu-ogc-f664-000              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.134.169.153                                 │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 3631668729125788664            │ ogc-ubuntu-ogc-f664-001              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.188.125                                 │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 3575202029581097972            │ ogc-ubuntu-ogc-f664-002              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@104.155.176.229                                │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 4961396037101018096            │ ogc-ubuntu-ogc-f664-003              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.71.231.9                                    │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 6845512080056900556            │ ogc-ubuntu-ogc-f664-004              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.61.39                                   │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 8257796978812902341            │ ogc-ubuntu-ogc-f664-006              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.170.252.152                                 │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 4654244594843638721            │ ogc-ubuntu-ogc-f664-007              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@34.133.234.5                                   │
-        ├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
-        │ 2604966443513535453            │ ogc-ubuntu-ogc-f664-008              │ an hour ago        │ running      │ division=engineering,org=obs,team=observability,project=perf                                │ ssh -i /Users/adam/.ssh/id_rsa_libcloud ubuntu@35.226.159.94                                  │
-        └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-        Node Count: 8
-        ```
-
-        Suppressing the output is useful if you are using the framework programatically.
-
-        ``` python title="ubuntu.py"
-        from ogc import ls, fs, init, exec
-
-        deployment = init(
-            layout_model=dict(
-                instance_size="e2-standard-4",
-                name="ubuntu-ogc",
-                provider="google",
-                remote_path="/home/ubuntu/ogc",
-                runs_on="ubuntu-2004-lts",
-                scale=9,
-                scripts="fixtures/ex_deploy_ubuntu",
-                username="ubuntu",
-                ssh_private_key=fs.expand_path("~/.ssh/id_rsa_libcloud"),
-                ssh_public_key=fs.expand_path("~/.ssh/id_rsa_libcloud.pub"),
-                ports=["22:22", "80:80", "443:443", "5601:5601"],
-                tags=[],
-                labels=dict(
-                    division="engineering", org="obs", team="observability", project="perf"
-                ),
-            ),
-        )
-
-
-        def uname(**kwargs: str):
-            kwargs.update({"cmd": "uname -a"})
-            output = exec(deployment, **kwargs)
-            if output:
-                print("commands executed successfully")
-        ```
-
-        Execute the above:
-        ```bash title="bash -c"
-        > ogc ubuntu.py uname -v
-        [19:20:14] INFO     Establing provider connection...
-        [19:20:25] INFO     Executing commands across 1 node(s)
-        [19:20:27] DEBUG    {'exit_code': 0, 'out': "Linux ogc-ubuntu-ogc-bb60-000 5.15.0-1027-gcp #34~20.04.1-Ubuntu SMP Mon Jan 9
-                            18:40:09 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux", 'error': '', 'cmd': '/usr/bin/ssh -o
-                            StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /root/.ssh/id_ed25519
-                            ubuntu@34.27.170.121 uname -a'}
-        commands executed successfully
-        ```
 
     Returns:
         List of deployed machines
@@ -405,12 +315,15 @@ def ls(
         con.record = False
 
     nodes = filter_machines(**kwargs)
-    if "yaml" in kwargs and kwargs["yaml"]:
-        ui_nodes_yaml(nodes=nodes)
-    elif "json" in kwargs and kwargs["json"]:
-        ui_nodes_json(nodes=nodes)
-    elif "suppress_output" not in kwargs:
-        ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
+    if nodes:
+        if output_format == "yaml":
+            ui_nodes_yaml(nodes=nodes)
+        elif output_format == "json":
+            ui_nodes_json(nodes=nodes)
+        elif output_format == "suppress_output":
+            ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
+        else:
+            ui_nodes_table(nodes=nodes)
     return nodes if nodes else None
 
 
@@ -491,11 +404,11 @@ def ls_layouts(
     return layouts if layouts else None
 
 
-def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
+def exec(machines: list[MachineModel], cmd: str) -> bool:
     """Execute commands on node(s)
 
     Args:
-        provisioner: provisioner
+        machines: list of machines to execute on
         kwargs: Options to exec
 
     Additional Options:
@@ -505,22 +418,13 @@ def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
 
     Example:
         ``` bash
-        > ogc -v exec 'ls -l'
-        # Single machine
-        > ogc -v exec sles-machine-1 'ls -l'
+        > ogc -v exec elastic-agent 'ls -l'
         ```
 
     Returns:
         True if succesful, False otherwise.
     """
-    cmd: str | None = None
-    nodes: list[MachineModel] | None = None
-    if "cmd" in kwargs:
-        cmd = kwargs["cmd"]
-
-    nodes = filter_machines(**kwargs)
-
-    log.info(f"Executing '{cmd}' across {len(nodes)} node(s)")
+    log.info(f"Executing '{cmd}' across {len(machines)} node(s)")
 
     def _exec(node: MachineModel, cmd: str) -> bool:
         _node: MachineModel = node
@@ -566,22 +470,22 @@ def exec(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
         return False
 
     if cmd:
-        for node in nodes:
+        for node in machines:
             pool.spawn(_exec, node, cmd)
         return bool(pool.join())
     return False
 
 
 def exec_scripts(
-    layouts: list[LayoutModel],
-    **kwargs: MachineOpts,
+    machines: list[MachineModel],
+    script_dir: Path,
 ) -> bool:
     """Execute scripts
 
     Executing scripts/templates on a node.
 
     Args:
-        provisioner: provisioner
+        machines: machines to execute scripts on
         kwargs: Options to exec_scripts
 
     Additional Options:
@@ -591,25 +495,16 @@ def exec_scripts(
 
     Example:
         ``` bash
-        > ogc ubuntu.py exec_scripts -v -o scripts='/home/ubuntu/new-deploy-scripts'
-        # Optionally, run the scripts defined in the layout
-        > ogc ubuntu.py exec_scripts -v
+        > ogc -v exec_scripts elastic-agent /home/ubuntu/new-deploy-scripts
         ```
     Returns:
         True if succesful, False otherwise.
     """
-    scripts: str | None = None
-    nodes: list[MachineModel] | None = None
-    if "scripts" in kwargs:
-        scripts = kwargs["scripts"]
+    log.info(f"Executing scripts across {len(machines)} node(s)")
 
-    nodes = filter_machines(**kwargs)
-
-    log.info(f"Executing scripts across {len(nodes)} node(s)")
-
-    def _exec_scripts(node: MachineModel, scripts: str | Path | None = None) -> bool:
+    def _exec_scripts(node: MachineModel, scripts: str | Path) -> bool:
         _node: MachineModel = node
-        _scripts = Path(scripts) if scripts else Path(_node.layout.scripts)
+        _scripts = Path(scripts)
         if not _scripts.exists():
             return False
 
@@ -678,6 +573,7 @@ def exec_scripts(
                         log.debug(step)
         return True
 
-    for node in nodes:
-        pool.spawn(_exec_scripts, node, scripts)
-    return pool.join()
+    for node in machines:
+        pool.spawn(_exec_scripts, node, script_dir)
+    pool.join()
+    return True
