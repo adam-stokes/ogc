@@ -38,10 +38,11 @@ def down(query: str) -> None:
         opts.update({k: v})
 
     _machines = db.query(**opts)
-    for _machine in _machines:
-        log.info(f"Tearing down {_machine.node.name}")
-        pool.spawn(_down_async, _machine)
-    pool.join()
+    if _machines:
+        for _machine in _machines:
+            log.info(f"Tearing down {_machine.node.name}")
+            pool.spawn(_down_async, _machine)
+        pool.join()
 
 
 cli.add_command(down, name="down")
