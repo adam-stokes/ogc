@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 major = 6
-minor = 3
+minor = 4
 patch = 0
