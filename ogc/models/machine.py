@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 from pathlib import Path
 
 import paramiko.ssh_exception
@@ -10,11 +11,10 @@ from libcloud.compute.ssh import ParamikoSSHClient
 from retry import retry
 
 from ogc import db
-from ogc.log import get_logger
 
 from .layout import LayoutModel
 
-log = get_logger("ogc")
+log = logging.getLogger("ogc")
 
 
 @define

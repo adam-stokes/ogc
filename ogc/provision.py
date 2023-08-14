@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import os
 import typing as t
 import uuid
@@ -30,11 +31,10 @@ from retry import retry
 from ogc import db
 from ogc.enums import CLOUD_IMAGE_MAP
 from ogc.exceptions import ProvisionException
-from ogc.log import get_logger
 from ogc.models.layout import LayoutModel
 from ogc.models.machine import MachineModel
 
-log = get_logger("ogc")
+log = logging.getLogger("ogc")
 
 
 class BaseProvisioner:

@@ -31,7 +31,6 @@ from rich.table import Table
 
 from ogc import db
 from ogc.log import CONSOLE as con
-from ogc.log import get_logger
 from ogc.models.actions import ActionModel
 from ogc.models.layout import LayoutModel
 from ogc.models.machine import MachineModel
@@ -39,8 +38,9 @@ from ogc.provision import BaseProvisioner
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
+import logging
 
-log = get_logger("ogc")
+log = logging.getLogger("ogc")
 pool = Pool(MAX_WORKERS)
 
 
@@ -568,7 +568,7 @@ def exec_scripts(
                             err=step.stderr if hasattr(step, "stderr") else "",
                             cmd=f"{step.script} {step.args}",
                         )
-                        log.info(action)
+                        log.debug(action)
                     case _:
                         log.debug(step)
         return True

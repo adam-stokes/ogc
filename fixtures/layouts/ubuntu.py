@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from ogc import fs, get_logger, init
+import logging
 
-log = get_logger("ogc")
+from ogc import fs, init
+
+log = logging.getLogger("ogc")
 
 deployment = init(
     layout_model=dict(

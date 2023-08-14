@@ -1,6 +1,7 @@
 """teardown machines"""
 from __future__ import annotations
 
+import logging
 import os
 from multiprocessing import cpu_count
 
@@ -9,14 +10,13 @@ from gevent.pool import Pool
 
 from ogc import db
 from ogc.commands.base import cli
-from ogc.log import get_logger
 from ogc.models import machine
 from ogc.provision import BaseProvisioner
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 
-log = get_logger("ogc.commands.down")
+log = logging.getLogger("ogc.commands.down")
 pool = Pool(size=MAX_WORKERS)
 
 

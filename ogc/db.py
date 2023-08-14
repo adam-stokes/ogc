@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import typing as t
 from pathlib import Path
 
@@ -7,10 +8,9 @@ import dill
 import magicattr
 from diskcache import Cache
 
-from ogc.log import get_logger
 from ogc.models.machine import MachineModel
 
-log = get_logger("ogc.db")
+log = logging.getLogger("ogc.db")
 
 dill.settings["recurse"] = True
 

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from ogc import fs, get_logger, init
+import logging
 
-log = get_logger("ogc")
+from ogc import fs, init
+
+log = logging.getLogger("ogc")
 
 deployment = init(
     layout_model=dict(
@@ -14,7 +16,6 @@ deployment = init(
         remote_path="/home/centos/ogc",
         runs_on="sles-12",
         scale=1,
-        scripts="fixtures/ex_deploy_sles",
         username="centos",
         ssh_private_key=fs.expand_path("~/.ssh/id_rsa_libcloud"),
         ssh_public_key=fs.expand_path("~/.ssh/id_rsa_libcloud.pub"),

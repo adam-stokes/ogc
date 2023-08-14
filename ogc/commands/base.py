@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+import logging
 import os
 from multiprocessing import cpu_count
 
 import click
 from dotenv import load_dotenv
-
-from ogc.log import get_logger
 
 # Not advertised, but available for those who seek moar power.
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
@@ -17,7 +16,7 @@ MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
 def cli(verbose: bool) -> None:
     """Just a simple provisioner"""
     load_dotenv()
-    get_logger("ogc", verbose)
+    logging.getLogger("ogc")
 
 
 def start() -> None:

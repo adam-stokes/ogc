@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import io
+import logging
 import sys
 from pathlib import Path
 
@@ -11,7 +12,6 @@ import yaml
 from ogc import db
 from ogc.commands.base import cli
 from ogc.deployer import up as d_up
-from ogc.log import get_logger
 from ogc.models import layout
 
 
@@ -27,7 +27,7 @@ from ogc.models import layout
 )
 def up(force: bool, tag: str, spec: Path | io.TextIOWrapper) -> None:
     """Launches machines from layout specifications by tag"""
-    log = get_logger("ogc.commands.up")
+    log = logging.getLogger("ogc.commands.up")
     _machines = db.query()
 
     if _machines and not force:

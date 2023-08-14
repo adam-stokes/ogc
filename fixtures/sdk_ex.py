@@ -8,13 +8,13 @@ from multiprocessing import cpu_count
 
 from ogc import fs
 from ogc.deployer import down, up
-from ogc.log import get_logger
 from ogc.models.layout import LayoutModel
 from ogc.provision import choose_provisioner
 
 MAX_WORKERS = int(cpu_count() - 1)
+import logging
 
-log = get_logger("ogc")
+log = logging.getLogger("ogc")
 
 # pull this from supported matrix table
 supported_versions = [
