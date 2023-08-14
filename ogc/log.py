@@ -39,7 +39,6 @@ def get_logger(name: str, verbose: bool = False) -> Logger:
 
         log_level = os.environ.get("OGC_LOG_LEVEL", "").upper()
         logger = logging.getLogger("ogc")
-        logger.setLevel(logging.DEBUG if log_level == "DEBUG" else logging.INFO)
         handler = RichHandler(
             rich_tracebacks=True,
             omit_repeated_times=False,
@@ -51,6 +50,7 @@ def get_logger(name: str, verbose: bool = False) -> Logger:
             console=CONSOLE,
         )
         handler.setFormatter(Formatter(LOGFORMAT_RICH))
+        handler.setLevel(logging.INFO)
 
         logger.addHandler(handler)
 
@@ -58,6 +58,7 @@ def get_logger(name: str, verbose: bool = False) -> Logger:
             "ogc-debug.log", maxBytes=1024 * 1024 * 10, backupCount=10  # 10Mb
         )
         rfh.setFormatter(Formatter(LOGFORMAT))
+        rfh.setLevel(logging.DEBUG)
         logger.addHandler(rfh)
 
     logger = logging.getLogger(name)
