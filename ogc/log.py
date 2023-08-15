@@ -27,8 +27,9 @@ handler = RichHandler(
 handler.setFormatter(logging.Formatter("%(name)s: %(message)s"))
 handler.setLevel(os.environ.get("OGC_LOG_LEVEL", logging.INFO))
 
+OGC_DEBUG_FILE = os.environ.get("OGC_DEBUG_FILE", "ogc-debug.log")
 rfd = RotatingFileHandler(
-    "ogc-debug.log", maxBytes=1024 * 1024 * 10, backupCount=10  # 10Mb
+    OGC_DEBUG_FILE, maxBytes=1024 * 1024 * 10, backupCount=10  # 10Mb
 )
 rfd.setLevel(logging.DEBUG)
 rfd.setFormatter(
