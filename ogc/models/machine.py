@@ -58,6 +58,7 @@ class MachineModel:
                 key=str(priv_key),
                 timeout=300,
                 use_compression=True,
+                keep_alive=5,
             )
             try:
                 _client.connect()

@@ -38,7 +38,6 @@ rfd.setFormatter(
 
 logging.basicConfig(
     level=logging.NOTSET,
-    # format=LOGFORMAT,python
     handlers=[
         handler,
         rfd,

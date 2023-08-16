@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import sys
 import tempfile
@@ -37,8 +38,13 @@ from ogc.models.machine import MachineModel
 from ogc.provision import BaseProvisioner
 
 # Not advertised, but available for those who seek moar power.
-MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", cpu_count() - 1))
-import logging
+# If more than 10 cpus, limit to 9. The CI provides a lot more
+# cpu's than needed
+_cpu_count = cpu_count()
+if _cpu_count >= 10:
+    _cpu_count = 9
+MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", _cpu_count))
+
 
 log = logging.getLogger("ogc")
 pool = Pool(MAX_WORKERS)
