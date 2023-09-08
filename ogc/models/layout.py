@@ -1,11 +1,7 @@
 """Layout model"""
 from __future__ import annotations
 
-import uuid
-
 from attr import define, field
-
-from ogc import db
 
 
 @define
