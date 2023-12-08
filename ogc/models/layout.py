@@ -1,6 +1,9 @@
 """Layout model"""
 from __future__ import annotations
 
+import random
+import string
+
 from attr import define, field
 
 
@@ -11,10 +14,9 @@ class LayoutModel:
     ```python
     layout_model=dict(
         instance_size="e2-standard-4",
-        name="ubuntu-ogc",
         provider="google",
-        remote_path="/home/ubuntu/ogc",
-        runs_on="ubuntu-2004-lts",
+        remote_path="/home/ubuntu",
+        runs_on="ubuntu-2204-lts",
         scale=9,
         scripts="fixtures/ex_deploy_ubuntu",
         username="ubuntu",
@@ -29,7 +31,6 @@ class LayoutModel:
     """
 
     instance_size: str = field()
-    name: str = field()
     provider: str = field()
     remote_path: str = field()
     runs_on: str = field()
@@ -40,8 +41,14 @@ class LayoutModel:
     tags: list[str] = field()
     labels: dict = field()
     ports: dict = field()
+    name: str = field(init=False)
 
     @classmethod
     def create_from_specs(cls, specs: list) -> list[LayoutModel]:
         """Creates layout objects from spec file"""
         return [LayoutModel(**spec) for spec in specs]
+
+    @name.default
+    def get_name(self) -> str:
+        alphabet = string.ascii_lowercase + string.digits
+        return f"ogc-layout-{''.join(random.choices(alphabet, k=8))}"

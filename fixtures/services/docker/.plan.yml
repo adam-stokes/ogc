@@ -1,0 +1,4 @@
+name: docker
+summary: deploys docker onto host
+status_checks:
+  success: 'sudo docker ps'

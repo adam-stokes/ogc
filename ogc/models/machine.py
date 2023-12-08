@@ -1,10 +1,7 @@
-from __future__ import annotations
-
 import datetime
-import logging
 from pathlib import Path
 
-import paramiko.ssh_exception
+import structlog
 from attrs import define, field
 from libcloud.compute.base import Node
 from libcloud.compute.ssh import ParamikoSSHClient
@@ -14,18 +11,28 @@ from ogc import db
 
 from .layout import LayoutModel
 
-log = logging.getLogger("ogc")
+log = structlog.getLogger()
 
 
 @define
 class MachineModel:
     layout: LayoutModel = field()
     node: Node = field()
+    name: str = field(init=False)
     created: datetime.datetime = field(init=False)
     instance_name: str = field(init=False)
     instance_id: str = field(init=False)
     public_ip: str = field(init=False)
     private_ip: str = field(init=False)
+    username: str = field(init=False)
+
+    @name.default
+    def get_name(self) -> str:
+        return self.layout.name.replace("layout", "machine")
+
+    @username.default
+    def get_username(self) -> str:
+        return self.layout.username
 
     @instance_name.default
     def get_instance_name(self) -> str:
@@ -71,7 +78,7 @@ class MachineModel:
         return None
 
     @classmethod
-    def query(cls, **kwargs: str) -> list[MachineModel]:
+    def query(cls, **kwargs: str) -> list["MachineModel"]:
         """list layouts"""
         cache = db.cache_path()
         _machines = [

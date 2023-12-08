@@ -10,20 +10,10 @@ import typing as t
 import uuid
 from pathlib import Path
 
-from libcloud.common.google import (
-    InvalidRequestError,
-    ResourceExistsError,
-    ResourceNotFoundError,
-)
-from libcloud.compute.base import (
-    KeyPair,
-    Node,
-    NodeAuthSSHKey,
-    NodeDriver,
-    NodeImage,
-    NodeLocation,
-    NodeSize,
-)
+from libcloud.common.google import (InvalidRequestError, ResourceExistsError,
+                                    ResourceNotFoundError)
+from libcloud.compute.base import (KeyPair, Node, NodeAuthSSHKey, NodeDriver,
+                                   NodeImage, NodeLocation, NodeSize)
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from retry import retry
@@ -232,7 +222,7 @@ class AWSProvisioner(BaseProvisioner):
         size = self.sizes(self.layout.instance_size)[0]
 
         opts = dict(
-            name=f"{str(uuid.uuid4())[:8]}-{self.layout.name}",
+            name=self.layout.name,
             image=image,
             size=size,
             auth=auth,
@@ -378,7 +368,7 @@ class GCEProvisioner(BaseProvisioner):
         try:
             self.provisioner.ex_get_firewall(name)  # type: ignore
         except ResourceNotFoundError:
-            log.warning(f"No firewall found, will create {name} to attach nodes to.")
+            log.debug(f"No firewall found, will create {name} to attach nodes to.")
             try:
                 self.provisioner.ex_create_firewall(  # type: ignore
                     name, [{"IPProtocol": "tcp", "ports": ports}], target_tags=tags
@@ -450,9 +440,8 @@ class GCEProvisioner(BaseProvisioner):
             self.layout.tags.append("environment-ogc")
             self.layout.tags.append("repo-ogc")
 
-        suffix = str(uuid.uuid4())[:8]
         opts = dict(
-            name=f"{self.layout.name}-{suffix}",
+            name=self.layout.name,
             size=size,
             image=self.image_from_family(self.layout.runs_on),
             ex_metadata=ex_metadata,
@@ -466,9 +455,9 @@ class GCEProvisioner(BaseProvisioner):
             _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         except ResourceNotFoundError:
             log.error("Failed to create node", exc_info=True)
-            # Usually a name clash
-            suffix = str(uuid.uuid4())[:8]
-            opts["name"] = f"{self.layout.name}-{suffix}"
+            # Usually a name clash, 12/8/23 this shouldnt happen any longer
+            # keeping here just in case.
+            opts["name"] = f"{self.layout.name}-1"
             _nodes = [self.provisioner.create_node(**opts)]  # type: ignore
         if not _nodes:
             log.error("Could not create nodes")

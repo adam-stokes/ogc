@@ -1,0 +1,9 @@
+#!/bin/bash
+# run apmsoak
+# env=APM_URL,APM_APIKEY
+
+sudo docker run --rm docker.elastic.co/observability-ci/apmsoak:next -- -rewrite-ids \
+                                                                        -rewrite-timestamps \
+                                                                        -rewrite-span-names \
+                                                                        -server ${env["APM_URL"]} \
+                                                                        -api-key ${env["APM_APIKEY"]} &

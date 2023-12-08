@@ -7,38 +7,34 @@ import click
 
 from ogc import db
 from ogc.commands.base import cli
-from ogc.deployer import exec, exec_scripts
+from ogc.deployer import exec, exec_scripts, ssh
+from ogc.provision import BaseProvisioner
 
 
 @click.command(help="Execute command against machines")
-@click.option("--query", "-q", "query", help="Filter machines via attributes")
 @click.argument("cmd", type=str, metavar="cmd")
-def _exec(query: str, cmd: str) -> None:
+@click.pass_obj
+def _exec(ctx_obj, cmd: str) -> None:
     """Executes commands on machines by tag"""
-    opts = {}
-    if query:
-        k, v = query.split("=")
-        opts.update({k: v})
-
-    _machines = db.query(**opts)
-    if _machines:
-        exec(_machines, cmd)
+    exec(cmd, **ctx_obj.opts)
 
 
 @click.command(help="Execute scripts against machines")
-@click.option("--query", "-q", "query", help="Filter machines via attributes")
 @click.argument("script-dir", type=Path, metavar="path/to/script/or/dir")
-def _exec_scripts(query: str, script_dir: Path) -> None:
+@click.pass_obj
+def _exec_scripts(ctx_obj, script_dir: Path) -> None:
     """Launches machines from layout specifications by tag"""
-    opts = {}
-    if query:
-        k, v = query.split("=")
-        opts.update({k: v})
+    exec_scripts(script_dir, **ctx_obj.opts)
 
-    _machines = db.query(**opts)
-    if _machines:
-        exec_scripts(_machines, script_dir)
+
+@click.command(help="SSH into machine")
+@click.pass_obj
+def _ssh(ctx_obj) -> None:
+    """ssh into machine"""
+    _machines = db.query(**ctx_obj.opts)
+    ssh(provisioner=BaseProvisioner.from_machine(machine=_machines[0]))
 
 
 cli.add_command(_exec, name="exec")
 cli.add_command(_exec_scripts, name="exec-scripts")
+cli.add_command(_ssh, name="ssh")

@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import sys
 import tempfile
@@ -14,24 +13,22 @@ from multiprocessing import cpu_count
 from pathlib import Path
 
 import arrow
+import rich.console
 import sh
+import structlog
 import yaml
 from attrs import asdict, fields, filters
 from gevent.pool import Pool
-from libcloud.compute.deployment import (
-    Deployment,
-    FileDeployment,
-    MultiStepDeployment,
-    ScriptDeployment,
-)
+from libcloud.compute.deployment import (Deployment, FileDeployment,
+                                         MultiStepDeployment, ScriptDeployment)
 from mako.lookup import TemplateLookup
 from mako.template import Template
 from pampy import _
 from pampy import match as pmatch
 from rich.table import Table
 
+import ogc.service
 from ogc import db
-from ogc.log import CONSOLE as con
 from ogc.models.actions import ActionModel
 from ogc.models.layout import LayoutModel
 from ogc.models.machine import MachineModel
@@ -46,7 +43,7 @@ if _cpu_count >= 10:
 MAX_WORKERS = int(os.environ.get("OGC_MAX_WORKERS", _cpu_count))
 
 
-log = logging.getLogger("ogc")
+log = structlog.getLogger()
 pool = Pool(MAX_WORKERS)
 
 
@@ -152,7 +149,7 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
 
     Example:
         ``` bash
-        > ogc ubuntu.py ssh -v -o instance_id=5407368969918077947
+        > ogc -v ssh -q layout.name=machine-1
         ```
     """
     nodes = filter_machines(**kwargs)
@@ -175,17 +172,15 @@ def ssh(provisioner: BaseProvisioner, **kwargs: MachineOpts) -> None:
     sys.exit(1)
 
 
-def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
+def up(layouts: list[LayoutModel]) -> bool:
     """Bring up machines
 
     Args:
         provisioner: provisioner
-        kwargs: Mapping of options to pass to `up`
 
     Returns:
         True if successful, False otherwise.
     """
-    log.info("Bringing up machines")
 
     def _up_async(layout: LayoutModel) -> None:
         provisioner = BaseProvisioner.from_layout(layout=layout)
@@ -195,9 +190,18 @@ def up(layouts: list[LayoutModel], **kwargs: MachineOpts) -> bool:
         except Exception:
             log.error("Could not bring up instance", exc_info=True)
 
+    log.info(
+        "Creating machines from layouts",
+        layouts=", ".join([f"({l.name})" for l in layouts]),
+    )
     for layout in layouts:
         pool.spawn(_up_async, layout)
     pool.join()
+
+    _new_machines = ", ".join(
+        [f"({m.name}:{m.username}@{m.public_ip})" for m in filter_machines()]
+    )
+    log.info(f"Machines ready", machines=_new_machines)
     return True
 
 
@@ -249,6 +253,8 @@ def ls(
         List of deployed machines
     """
 
+    con = rich.console.Console(log_time=True)
+
     def ui_nodes_yaml(nodes: list[MachineModel]) -> None:
         con.out(
             yaml.safe_dump(
@@ -271,6 +277,18 @@ def ls(
                 indent=2,
             )
         )
+
+    def ui_nodes_list(nodes: list[MachineModel]) -> None:
+        services_list = db.registry_path()
+        for node in nodes:
+            _services = ""
+            if node.name in services_list.iterkeys():
+                _services = ", ".join(
+                    [srvc for srvc in db.pickle_to_model(services_list[node.name])]
+                )
+            con.out(
+                f"{node.name}: {node.username}@{node.public_ip} | services: ({_services if _services else 'add some'})"
+            )
 
     def ui_nodes_table(
         nodes: list[MachineModel], output_file: str | None = None
@@ -326,6 +344,8 @@ def ls(
             ui_nodes_yaml(nodes=nodes)
         elif output_format == "json":
             ui_nodes_json(nodes=nodes)
+        elif output_format == "list":
+            ui_nodes_list(nodes=nodes)
         elif output_format == "suppress_output":
             ui_nodes_table(nodes=nodes, output_file=kwargs.get("output_file", None))
         else:
@@ -410,7 +430,7 @@ def ls_layouts(
     return layouts if layouts else None
 
 
-def exec(machines: list[MachineModel], cmd: str) -> bool:
+def exec(cmd: str, **kwargs: MachineOpts) -> bool:
     """Execute commands on node(s)
 
     Args:
@@ -424,13 +444,12 @@ def exec(machines: list[MachineModel], cmd: str) -> bool:
 
     Example:
         ``` bash
-        > ogc -v exec elastic-agent 'ls -l'
+        > ogc -v exec 'ls -l'
         ```
 
     Returns:
         True if succesful, False otherwise.
     """
-    log.info(f"Executing '{cmd}' across {len(machines)} node(s)")
 
     def _exec(node: MachineModel, cmd: str) -> bool:
         _node: MachineModel = node
@@ -471,21 +490,32 @@ def exec(machines: list[MachineModel], cmd: str) -> bool:
                 err=str(return_status["error"]),
                 cmd=str(return_status["cmd"]),
             )
-            log.info(action)
+            if action.exit_code > 0:
+                log.error(
+                    "Action failed",
+                    cmd=action.cmd,
+                    exit_code=action.exit_code,
+                    err=action.err,
+                )
+            else:
+                log.info(
+                    "Action complete",
+                    cmd=action.cmd,
+                    exit_code=action.exit_code,
+                )
             return bool(return_status["exit_code"] == 0)
         return False
 
     if cmd:
+        machines = filter_machines(**kwargs)
+        log.info(f"Executing '{cmd}' across {len(machines)} node(s)")
         for node in machines:
             pool.spawn(_exec, node, cmd)
         return bool(pool.join())
     return False
 
 
-def exec_scripts(
-    machines: list[MachineModel],
-    script_dir: Path,
-) -> bool:
+def exec_scripts(script_dir: Path, **kwargs: MachineOpts) -> bool:
     """Execute scripts
 
     Executing scripts/templates on a node.
@@ -501,12 +531,11 @@ def exec_scripts(
 
     Example:
         ``` bash
-        > ogc -v exec_scripts elastic-agent /home/ubuntu/new-deploy-scripts
+        > ogc -v exec_scripts /home/ubuntu/new-deploy-scripts
         ```
     Returns:
         True if succesful, False otherwise.
     """
-    log.info(f"Executing scripts across {len(machines)} node(s)")
 
     def _exec_scripts(node: MachineModel, scripts: str | Path) -> bool:
         _node: MachineModel = node
@@ -516,6 +545,8 @@ def exec_scripts(
 
         if not _scripts.is_dir():
             scripts_to_run = [_scripts.resolve()]
+            _plan = yaml.safe_load((_scripts.parent / ".plan.yml").read_text())
+            ogc.service.add(_node, _plan["name"])
         else:
             # teardown file is a special file that gets executed before node
             # destroy
@@ -579,6 +610,8 @@ def exec_scripts(
                         log.debug(step)
         return True
 
+    machines = filter_machines(**kwargs)
+    log.info(f"Executing scripts across {len(machines)} node(s)")
     for node in machines:
         pool.spawn(_exec_scripts, node, script_dir)
     pool.join()

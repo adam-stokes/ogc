@@ -1,0 +1,6 @@
+#!/bin/bash
+# run apmsoak
+# requires=docker
+# env=APM_URL,APM_APIKEY
+
+sudo docker pull docker.elastic.co/observability-ci/apmsoak:next

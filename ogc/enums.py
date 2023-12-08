@@ -1,15 +1,7 @@
 """ Enums
 """
 
-from __future__ import annotations
-
 import typing as t
-
-LOCAL_ARTIFACT_PATH = "artifacts"
-SUPPORTED_PROVIDERS = ["AWS", "GOOGLE"]
-
-# List of tasks that can not be defined in the provision spec
-RESERVED_TASKS = ["ls", "ssh"]
 
 CLOUD_IMAGE_MAP: t.Mapping[str, t.Mapping[str, t.Mapping[str, str]]] = {
     "aws": {
