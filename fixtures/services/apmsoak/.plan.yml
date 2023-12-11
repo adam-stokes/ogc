@@ -1,4 +1,5 @@
 name: apmsoak
 summary: apmsoak injector
-status_checks:
-  success: 'sudo docker image ls --filter reference=docker.elastic.co/observability-ci/apmsoak'
+env:
+  - APM_URL
+  - APM_APIKEY

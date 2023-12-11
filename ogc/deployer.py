@@ -21,8 +21,8 @@ from attrs import asdict, fields, filters
 from gevent.pool import Pool
 from libcloud.compute.deployment import (Deployment, FileDeployment,
                                          MultiStepDeployment, ScriptDeployment)
-from mako.lookup import TemplateLookup
-from mako.template import Template
+from jinja2 import Environment, FileSystemLoader
+
 from pampy import _
 from pampy import match as pmatch
 from rich.table import Table
@@ -65,15 +65,11 @@ def render(template: Path, context: Ctx) -> str:
     Returns:
         Rendered template string
     """
-    fpath = template.absolute()
-    lookup = TemplateLookup(
-        directories=[
-            str(template.parent.absolute()),
-            str(template.parent.parent.absolute()),
-        ]
-    )
-    _template = Template(filename=str(fpath), lookup=lookup)
-    return str(_template.render(**context))
+
+    loader = FileSystemLoader(searchpath=str(template.parent))
+    env = Environment(loader=loader)
+    temp = env.get_template(str(template.parts[-1]))
+    return temp.render(**context)
 
 
 class MachineOpts(t.TypedDict):

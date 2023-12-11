@@ -1,0 +1,20 @@
+#!/bin/bash
+# installs elastic-package
+#
+# 12/10/23 - elastic-package stack up fails
+# https://github.com/elastic/elastic-package/issues/1306
+
+{% set releases = "https://github.com/elastic/elastic-package/releases/download" %}
+{% set version = "0.95.0" %}
+{% set pkg_name = "elastic-package" %}
+{% set os = "linux" %}
+{% set arch = "amd64" %}
+{% set filename = [pkg_name, version, os, arch]|join('_') %}
+{% set filetar = [filename, '.tar.gz']|join %}
+
+sudo apt-get update
+sudo apt-get install -qyf wget
+
+wget {{releases}}/v{{version}}/{{filetar}}
+tar -xvf {{filetar}}
+sudo mv {{pkg_name}} /usr/bin/{{pkg_name}}

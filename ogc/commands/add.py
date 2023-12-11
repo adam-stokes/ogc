@@ -13,6 +13,8 @@ from ogc.commands.base import cli
 from ogc.deployer import exec_scripts
 from ogc.models import layout
 
+log = structlog.getLogger()
+
 
 @click.command(help="Add a service to machine")
 @click.argument("service-dir", type=Path, metavar="path/to/service-dir")
@@ -21,14 +23,14 @@ def _add(ctx_obj, service_dir: Path) -> None:
     """"""
     if not (service_dir / ".plan.yml").exists():
         log.error(
-            "No .plan.yml found,  unable to process service",
-            path=service_dir / ".plan.yml",
+            "No .plan.yml found,  unable to process plan",
+            path=(service_dir / ".plan.yml").resolve(),
         )
         sys.exit(1)
     if not (service_dir / "install").exists():
         log.error(
             "No install hook found, unable to process service",
-            path=service_dir / "install",
+            path=(service_dir / "install").resolve(),
         )
         sys.exit(1)
 
